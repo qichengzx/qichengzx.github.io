@@ -1,6 +1,6 @@
 title: vps 搭建个人git服务器
 date: 2015-11-07 23:34:10
-tags: vps git 
+tags: vps,git 
 ---
 
 
@@ -17,15 +17,22 @@ tags: vps git
 
 
 #### 0 在本地生成ssh key
-`
-	ssh-keygen -C "youremail@mailprovider.com" 
+
+	ssh-keygen -C "youremail@mailprovider.com"
+
 	Generating public/private rsa key pair.
+	
 	Enter file in which to save the key (/home/flynn/.ssh/id_rsa):
+	
 	Enter passphrase (empty for no passphrase):
+	
 	Enter same passphrase again: 
+	
 	Your identification has been saved in foo_rsa.
+	
 	Your public key has been saved in foo_rsa.pub.
-`
+
+
 注意替换成自己的邮箱，可以一路回车，也可以在 Enter passphrase 的时候输入一个密码保护一下。如果已经生成过了可以 **略过这步**。
 #### 1 在服务器添加git用户
 首先切换到root用户，`su -` 。
