@@ -4,15 +4,15 @@
 
 # Site
 title: 启程
-subtitle:
-description:
+subtitle: PHP是最好的语言
+description: 记录写代码过程中的成长
 author: qichengzx
 language: 
 timezone: 
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://qichengzx.com
+url: http://www.qichengzx.com
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
@@ -62,8 +62,24 @@ pagination_dir: page
 
 # Extensions
 ## Plugins: http://hexo.io/plugins/
+pbugins: hexo-generator-feed
 ## Themes: http://hexo.io/themes/
 theme: landscape
+
+
+twitter: #右边栏要显示twitter展示的话，需要在此设置
+  username: moxie198
+  show_replies: false
+  tweet_count: 5
+
+addthis: #SNS分享，身在天朝，当然用“百度分享”，暂时默认，后面会介绍
+  enable: true
+  pubid:
+  facebook: true
+  twitter: true
+  google: true
+  pinterest: true
+
 
 # Deployment
 ## Docs: http://hexo.io/docs/deployment.html
