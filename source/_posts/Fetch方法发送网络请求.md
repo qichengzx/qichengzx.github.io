@@ -1,5 +1,5 @@
 layout: react-native
-title: Fetch方法发送网络请求
+title: React-Native Fetch方法发送网络请求
 date: 2015-11-06 22:54:22
 tags:  [react-native,fetch,网络请求]
 ---
