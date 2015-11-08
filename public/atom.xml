@@ -93,10 +93,10 @@ Your <span class="keyword">public</span> <span class="keyword">key</span> has be
   
   <entry>
     <title><![CDATA[Fetch方法发送网络请求]]></title>
-    <link href="http://www.qichengzx.com/2015/11/07/Fetch%E6%96%B9%E6%B3%95%E5%8F%91%E9%80%81%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/"/>
-    <id>http://www.qichengzx.com/2015/11/07/Fetch方法发送网络请求/</id>
-    <published>2015-11-07T03:54:22.000Z</published>
-    <updated>2015-11-07T15:46:30.061Z</updated>
+    <link href="http://www.qichengzx.com/2015/11/06/Fetch%E6%96%B9%E6%B3%95%E5%8F%91%E9%80%81%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/"/>
+    <id>http://www.qichengzx.com/2015/11/06/Fetch方法发送网络请求/</id>
+    <published>2015-11-06T14:54:22.000Z</published>
+    <updated>2015-11-08T02:41:30.000Z</updated>
     <content type="html"><![CDATA[<p>先贴一个官方文档。<br><a href="https://facebook.github.io/react-native/docs/network.html#content" target="_blank" rel="external">Network</a></p>
 <pre><code>fetch<span class="list">(<span class="quoted">'https</span><span class="keyword">://mywebsite</span>.com/endpoint/', {
     method: <span class="quoted">'POST</span>',
@@ -143,7 +143,11 @@ fetch(url, {
 <]]>
     </summary>
     
-      <category term="react-native,fetch,网络请求" scheme="http://www.qichengzx.com/tags/react-native-fetch-%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/"/>
+      <category term="fetch" scheme="http://www.qichengzx.com/tags/fetch/"/>
+    
+      <category term="react-native" scheme="http://www.qichengzx.com/tags/react-native/"/>
+    
+      <category term="网络请求" scheme="http://www.qichengzx.com/tags/%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/"/>
     
   </entry>
   
@@ -151,8 +155,8 @@ fetch(url, {
     <title><![CDATA[Hello World]]></title>
     <link href="http://www.qichengzx.com/2015/11/06/hello-world/"/>
     <id>http://www.qichengzx.com/2015/11/06/hello-world/</id>
-    <published>2015-11-06T10:03:20.193Z</published>
-    <updated>2015-11-06T08:05:06.797Z</updated>
+    <published>2015-11-06T13:54:22.000Z</published>
+    <updated>2015-11-08T02:35:08.000Z</updated>
     <content type="html"><![CDATA[<p>Welcome to <a href="http://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="http://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="http://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
 <h2 id="Quick_Start">Quick Start</h2><h3 id="Create_a_new_post">Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
 <p>More info: <a href="http://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>

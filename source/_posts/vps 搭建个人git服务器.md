@@ -1,6 +1,6 @@
 title: vps 搭建个人git服务器
 date: 2015-11-07 23:34:10
-tags: vps,git 
+tags:  [vps,git]
 ---
 
 
