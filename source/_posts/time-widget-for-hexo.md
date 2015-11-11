@@ -74,7 +74,7 @@ js脚本
   	$('#clock-animations').html(stylesDeg);
   
  
-### STEP 3
+### STEP 2
 CSS样式
 
 新建文件time.styl，路径为`/source/css/_partial/time.styl`
@@ -299,7 +299,7 @@ CSS样式
  
  之后，在sidebar.styl 末尾加入 `@import "time"`,这是styl的语法，表示引入一个文件，因为两个文件是同级，所以可以直接这么写，加`./`也可以。
  
-### STEP 4
+### STEP 3
 最后，在themes的config文件中注册这个挂件。
 
 在_config.yml中，找到`widgets`，在你想要加的位置中加入 `- time`，即模板文件名。
