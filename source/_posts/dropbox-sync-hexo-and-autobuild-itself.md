@@ -1,4 +1,4 @@
-title: 利用Dropbox同步hexo并自动发布
+title: 利用Dropbox同步hexo的文章源文件并自动生成文章发布
 layout: photo
 date: 2015-11-13 14:12:35
 tags:  [hexo,dropbox]
@@ -120,12 +120,14 @@ vi /etc/incron.conf
 
 ```
 
-（此时可能需要sudo权限，因为是dbox用户）在文件的最后一行，去掉```editor = vi```前的#，保存退出。
-```incrontab -e```
+（此时可能需要sudo权限，因为是dbox用户）在文件的最后一行，去掉editor = vi前的#，保存退出。
+
+输入：incrontab -e
 
 
 ```
 /home/dbox/Dropbox/yourfolder/ IN_ATTRIB,IN_MOVE /home/dbox/hexo.bash
+
 ```
 
 第一个参数：用来接收Dropbox同步的文件夹
