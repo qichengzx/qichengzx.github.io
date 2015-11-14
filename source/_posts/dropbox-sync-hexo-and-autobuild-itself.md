@@ -84,7 +84,7 @@ cd ~ && wget -O - "https://www.dropbox.com/download?plat=lnx.x86_64" | tar xzf -
 
 验证成功后，会在当前用户的home目录中创建Dropbox目录，即Dropbox同步的目录。
 
-此时，如果你打开了 ```top```，那应该发现此时服务器的内存有点捉急了，原因是Dropbox这个进程占的很多，所以一般情况下```killall dropbox```退出就好了，壕请随意。
+此时，如果你打开了 ```top``` ，那应该发现此时服务器的内存有点捉急了，原因是Dropbox这个进程占的很多，所以一般情况下 ```killall dropbox``` 退出就好了，壕请随意。
 
 ### STEP 1 设置文件夹监测
 
@@ -98,7 +98,7 @@ apt-get install incron
 yum install incron
 ```
 
-** 设置开机启动**
+** 设置开机启动 **
 
 安装sysv-rc-conf，用于管理服务的启动
 
@@ -114,8 +114,10 @@ sysv-rc-conf incron on
 ```
 vi /etc/incron.conf
 ```
+
 （此时可能需要sudo权限，因为是dbox用户）在文件的最后一行，去掉```editor = vi```前的#，保存退出。
 ```incrontab -e```
+
 
 ```
 /home/dbox/Dropbox/yourfolder/ IN_ATTRIB,IN_MOVE /home/dbox/hexo.bash
