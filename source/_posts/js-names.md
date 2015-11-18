@@ -1,6 +1,6 @@
 title: JS标识符
 categories: javascript
-date: 2015-11-18 22:07:21
+date: 2015-11-17 22:07:21
 tags:  [javascript,标识符]
 
 ---
@@ -26,7 +26,6 @@ this throw throws transient true try typeof
 var volatile void
 while with
 ```
-![](http://shiqichan.qiniudn.com/use-qiniu-store-image-for-hexo/qiniu.png)
 
 这个列表里的大部分并未用在JS语言里，有一些已经逐渐在新标准中出现，但是这个列表也不包括一些本应该保留的字，如undefined,NaN,Infinity。
 
