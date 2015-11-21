@@ -80,6 +80,10 @@ cd ~ && wget -O - "https://www.dropbox.com/download?plat=lnx.x86_64" | tar xzf -
 
 ** 注意在出现“此电脑现在已与 Dropbox 关联。欢迎 your username”前不要ctrl+c 退出这个程序。 **
 
+打开授权链接后会出现如下的提示，选择连接即可。
+
+![](http://7b1hhm.com1.z0.glb.clouddn.com/hexo33B2BAAF-6996-41AA-BFA3-FC177106F62A.png)
+
 一定要注意，不然你都会奇怪为啥再次启动这个进程的时候还会出现“尚未关联的提示”
 
 验证成功后，会在当前用户的home目录中创建Dropbox目录，即Dropbox同步的目录。
@@ -175,6 +179,12 @@ cd ~ && ./.dropbox-dist/dropboxd
 
 ~~但是实际上我本人在测试的时候，512内存的服务器会只剩下4M内存，然后再执行任何命令都提示
 ```-bash: fork: Cannot allocate memory```，持续很长时间，一开始以为是同时跑的进程太多导致内存不够，把没用的mongodb，redis都kill之后还是这样，后来干脆在执行这个脚本的时候把Dropbox的后台禁掉，也不行，之后想到了在这段脚本里echo一段数字到log中，执行的时候发现会写入多次，但是还是不清楚为什么会出现这种情况，进程里也是出现了两个或多个hexo，于是干脆就在这段脚本开始时先kill dropbox和hexo，在末尾再kill hexo。实际运行起来，内存还是会降到最低，但是持续时间明显减少到可以接受的程度。~~
+
+---
+2015-11-21 14:06:07 附截图
+---
+
+![](http://7b1hhm.com1.z0.glb.clouddn.com/hexoF2A913D3-14C5-4FC9-B177-500AC0434036.png)
 
 ---
 2015-11-14 22:38:06 测试发现，上述带删除线的方法依然不行。内存依然会榨干很长时间。
