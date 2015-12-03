@@ -11,6 +11,31 @@ categories: javascript
 
 本文主要实现node连接MySQL并读取指定表的数据输出到ejs模板中。
 
+MySQL是一款非常常用的开源数据库，[npm中也有MySQL的包](https://www.npmjs.com/package/mysql)。
+
+
+###MySQL测试库的表结构：
+
+```
+DROP TABLE IF EXISTS `news`;
+CREATE TABLE `news` (
+  `id` int(11) NOT NULL DEFAULT '0',
+  `title` varchar(45) NOT NULL DEFAULT '',
+  `createtime` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+LOCK TABLES `news` WRITE;
+INSERT INTO `news` VALUES (1,'news one',1449064787),(2,'news two',1449064790),(3,'news three',1449064900);
+UNLOCK TABLES;
+```
+
+### 安装Nodejs MySQL包
+
+```
+npm install mysql
+```
+
 ### server.js
 
 ```
