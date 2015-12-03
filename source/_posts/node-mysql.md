@@ -1,7 +1,9 @@
 title: node连接MySQL并读取数据
 date: 2015-12-03 21:38:37
 tags:  [node,mysql]
+categories: javascript
 ---
+
 
 ![](http://7b1hhm.com1.z0.glb.clouddn.com/hexo201312030901.jpg)
 
