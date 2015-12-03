@@ -1,4 +1,4 @@
-title: node连接MySQL并读取数据
+title: Node.js连接MySQL并读取数据
 date: 2015-12-03 21:38:37
 tags:  [node,mysql]
 categories: javascript
@@ -30,7 +30,7 @@ INSERT INTO `news` VALUES (1,'news one',1449064787),(2,'news two',1449064790),(3
 UNLOCK TABLES;
 ```
 
-### 安装Nodejs MySQL包
+### 安装Node.js MySQL包
 
 ```
 npm install mysql
