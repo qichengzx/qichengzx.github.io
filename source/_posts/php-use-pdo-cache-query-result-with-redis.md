@@ -66,7 +66,7 @@ if($cache){
 	    	//查询完成，以json格式写入Redis中。
 			$redis->set($MY_NODE_KEY_.$rs['id'],json_encode($rs));
 			print_r($rs);
-			error_log($date.'read from mysql', 3, './debug.txt');
+			error_log($date."read from mysql \r\n", 3, './debug.txt');
 	    }
 	    
 	//PDO连接出错
