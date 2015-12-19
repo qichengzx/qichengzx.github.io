@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="https://www.qichengzx.com/"/>
-  <updated>2015-12-19T13:09:47.000Z</updated>
+  <updated>2015-12-19T13:26:32.000Z</updated>
   <id>https://www.qichengzx.com/</id>
   
   <author>
@@ -19,8 +19,8 @@
     <link href="https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html"/>
     <id>https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html</id>
     <published>2015-12-19T08:38:37.000Z</published>
-    <updated>2015-12-19T13:09:47.000Z</updated>
-    <content type="html"><![CDATA[<p><img src="/att/img/201512/thehttps.png" alt=""></p>
+    <updated>2015-12-19T13:26:32.000Z</updated>
+    <content type="html"><![CDATA[<p><img src="https://s.qichengzx.com/img/201512/https.png" alt=""></p>
 <p>Let’s Encrypt是一个新的CA机构，提供非常简单并且免费的TLS／SSL证书服务。</p>
 <p>可谓万众期待。</p>
 <p>说下我的环境：</p>
@@ -29,8 +29,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
 </code></pre><p>首先你要有个域名，其次要有个服务器。</p>
 <h3 id="STEP_0_－_安装Let’s_Encrypt_客户端">STEP 0 － 安装Let’s Encrypt 客户端</h3><p>#####安装git</p>
 <p>先更新下系统</p>
-<figure class="highlight q"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-<span class="built_in">get</span> <span class="keyword">update</span></span><br></pre></td></tr></table></figure>
-<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-<span class="keyword">get</span> -y install git</span><br></pre></td></tr></table></figure>
+<figure class="highlight q"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-<span class="built_in">get</span> <span class="keyword">update</span></span><br><span class="line">sudo apt-<span class="built_in">get</span> -y install git</span><br></pre></td></tr></table></figure>
 <h5 id="Clone_Let’s_Encrypt">Clone Let’s Encrypt</h5><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo git <span class="keyword">clone</span> <span class="title">https</span>://github.com/letsencrypt/letsencrypt /opt/letsencrypt</span><br></pre></td></tr></table></figure>
 <p>这里把下载的文件放到了/opt/letsencrypt文件夹</p>
 <h3 id="STEP_1－生成证书">STEP 1－生成证书</h3><p>首先需要关闭80端口</p>
@@ -70,11 +69,10 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
 <p>参考资料：<br><a href="https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-14-04" target="_blank" rel="external">How To Secure Nginx with Let’s Encrypt on Ubuntu 14.04</a></p>
 ]]></content>
     <summary type="html">
-    <![CDATA[<p><img src="/att/img/201512/thehttps.png" alt=""></p>
+    <![CDATA[<p><img src="https://s.qichengzx.com/img/201512/https.png" alt=""></p>
 <p>Let’s Encrypt是一个新的CA机构，提供非常简单并且免费的TLS／SSL证书服务。</p>
 <p>可谓万众期待。</p>
-<p>说下我的环境：</p>
-<]]>
+]]>
     </summary>
     
       <category term="https" scheme="https://www.qichengzx.com/tags/https/"/>
