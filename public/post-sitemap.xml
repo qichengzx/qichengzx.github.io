@@ -23,14 +23,6 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2015/12/16/jquery-custom-post.html</loc>
-        <lastmod>2015-12-16T13:26:28.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
         <loc>https://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html</loc>
         <lastmod>2015-12-06T01:31:01.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -57,22 +49,6 @@
     <url>
         <loc>https://www.qichengzx.com/2015/11/17/js-names.html</loc>
         <lastmod>2015-11-18T14:21:40.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://www.qichengzx.com/2015/11/16/js-.html</loc>
-        <lastmod>2015-11-17T14:02:49.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://www.qichengzx.com/2015/11/17/mac-senseidb-zookeeper.html</loc>
-        <lastmod>2015-11-17T09:40:28.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
