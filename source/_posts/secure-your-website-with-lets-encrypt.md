@@ -18,7 +18,7 @@ Let's Encrypt是一个新的CA机构，提供非常简单并且免费的TLS／SS
 
 ### STEP 0 － 安装Let's Encrypt 客户端
  
-#####安装git
+##### 安装git
 
 先更新下系统
 
