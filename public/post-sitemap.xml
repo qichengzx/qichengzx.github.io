@@ -1,30 +1,110 @@
 <?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="sitemap.xsl"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-        <loc>http://www.qichengzx.com</loc>
+        <loc>https://www.qichengzx.com</loc>
         <changefreq>daily</changefreq>
         <priority>1</priority>
     </url>
 
     <url>
-        <loc>http://www.qichengzx.com/2015/11/07/Fetch%E6%96%B9%E6%B3%95%E5%8F%91%E9%80%81%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/</loc>
-        <lastmod>2015-11-08T02:54:13.629Z</lastmod>
+        <loc>https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html</loc>
+        <lastmod>2015-12-19T13:09:47.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
     </url>
 
     <url>
-        <loc>http://www.qichengzx.com/2015/11/08/vps%20%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BAgit%E6%9C%8D%E5%8A%A1%E5%99%A8/</loc>
-        <lastmod>2015-11-08T02:44:16.869Z</lastmod>
+        <loc>https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html</loc>
+        <lastmod>2015-12-19T07:50:01.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
     </url>
 
     <url>
-        <loc>http://www.qichengzx.com/2015/11/07/hello-world/</loc>
-        <lastmod>2015-11-08T02:36:03.789Z</lastmod>
+        <loc>https://www.qichengzx.com/2015/12/16/jquery-custom-post.html</loc>
+        <lastmod>2015-12-16T13:26:28.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html</loc>
+        <lastmod>2015-12-06T01:31:01.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2015/12/03/nodejs-mysql.html</loc>
+        <lastmod>2015-12-03T14:24:07.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html</loc>
+        <lastmod>2015-11-21T13:50:00.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2015/11/17/js-names.html</loc>
+        <lastmod>2015-11-18T14:21:40.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2015/11/16/js-.html</loc>
+        <lastmod>2015-11-17T14:02:49.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2015/11/17/mac-senseidb-zookeeper.html</loc>
+        <lastmod>2015-11-17T09:40:28.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html</loc>
+        <lastmod>2015-11-11T09:28:05.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2015/11/06/React-Native-Fetch.html</loc>
+        <lastmod>2015-11-08T02:51:53.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2015/11/07/Set%20Up%20a%20Private%20Git%20Server%20on%20a%20VPS.html</loc>
+        <lastmod>2015-11-08T02:42:16.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2015/11/06/hello-world.html</loc>
+        <lastmod>2015-11-08T02:35:08.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 

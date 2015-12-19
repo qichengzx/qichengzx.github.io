@@ -24,9 +24,6 @@ Let's Encrypt是一个新的CA机构，提供非常简单并且免费的TLS／SS
 
 ```
 sudo apt-get update
-```
-
-```
 sudo apt-get -y install git
 ```
 

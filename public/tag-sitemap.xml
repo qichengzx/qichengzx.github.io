@@ -2,36 +2,155 @@
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
     <url>
-        <loc>http://www.qichengzx.com/tags/vps/</loc>
-        <lastmod>2015-11-08T02:44:16.869Z</lastmod>
+        <loc>https://www.qichengzx.com/tags/vps/</loc>
+        <lastmod>2015-11-08T02:42:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
-        <loc>http://www.qichengzx.com/tags/git/</loc>
-        <lastmod>2015-11-08T02:44:16.869Z</lastmod>
+        <loc>https://www.qichengzx.com/tags/git/</loc>
+        <lastmod>2015-11-08T02:42:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
-        <loc>http://www.qichengzx.com/tags/react-native/</loc>
-        <lastmod>2015-11-08T02:54:13.629Z</lastmod>
+        <loc>https://www.qichengzx.com/tags/react-native/</loc>
+        <lastmod>2015-11-08T02:51:53.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
-        <loc>http://www.qichengzx.com/tags/fetch/</loc>
-        <lastmod>2015-11-08T02:54:13.629Z</lastmod>
+        <loc>https://www.qichengzx.com/tags/fetch/</loc>
+        <lastmod>2015-11-08T02:51:53.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
-        <loc>http://www.qichengzx.com/tags/%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/</loc>
-        <lastmod>2015-11-08T02:54:13.629Z</lastmod>
+        <loc>https://www.qichengzx.com/tags/%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/</loc>
+        <lastmod>2015-11-08T02:51:53.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/time/</loc>
+        <lastmod>2015-11-11T09:28:05.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/widget/</loc>
+        <lastmod>2015-11-11T09:28:05.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/js/</loc>
+        <lastmod>2015-11-17T14:02:49.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/url/</loc>
+        <lastmod>2015-11-17T14:02:49.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/%E6%AD%A3%E5%88%99/</loc>
+        <lastmod>2015-11-17T14:02:49.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/javascript/</loc>
+        <lastmod>2015-11-18T14:21:40.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/%E6%A0%87%E8%AF%86%E7%AC%A6/</loc>
+        <lastmod>2015-11-18T14:21:40.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/excel/</loc>
+        <lastmod>2015-11-21T13:50:00.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/node/</loc>
+        <lastmod>2015-12-03T14:24:07.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/php/</loc>
+        <lastmod>2015-12-06T01:31:01.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/pdo/</loc>
+        <lastmod>2015-12-06T01:31:01.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/redis/</loc>
+        <lastmod>2015-12-06T01:31:01.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/mysql/</loc>
+        <lastmod>2015-12-06T01:31:01.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/hexo/</loc>
+        <lastmod>2015-12-19T07:50:01.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/dropbox/</loc>
+        <lastmod>2015-12-19T07:50:01.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/https/</loc>
+        <lastmod>2015-12-19T13:09:47.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/ssl/</loc>
+        <lastmod>2015-12-19T13:09:47.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>

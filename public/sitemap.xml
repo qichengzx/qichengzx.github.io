@@ -2,13 +2,18 @@
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
     <sitemap>
-        <loc>http://www.qichengzx.com/post-sitemap.xml</loc>
-        <lastmod>2015-11-08T02:54:13.629Z</lastmod>
+        <loc>https://www.qichengzx.com/post-sitemap.xml</loc>
+        <lastmod>2015-12-19T13:09:47.000Z</lastmod>
     </sitemap>
 
     <sitemap>
-        <loc>http://www.qichengzx.com/tag-sitemap.xml</loc>
-        <lastmod>2015-11-08T02:44:16.869Z</lastmod>
+        <loc>https://www.qichengzx.com/category-sitemap.xml</loc>
+        <lastmod>2015-11-21T13:50:00.000Z</lastmod>
+    </sitemap>
+
+    <sitemap>
+        <loc>https://www.qichengzx.com/tag-sitemap.xml</loc>
+        <lastmod>2015-11-08T02:42:16.000Z</lastmod>
     </sitemap>
 
 </sitemapindex>
