@@ -3,17 +3,34 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Tag: vps | 启程</title>
+  <title>MySQL命令行导出结果集到Excel | 启程</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
-<meta property="og:type" content="website">
-<meta property="og:title" content="启程">
-<meta property="og:url" content="https://www.qichengzx.com/tags/vps/index.html">
+  <meta name="description" content="某个需求，为了简单单独建表存储，而且没有相关的后台管理方法，无法查看，或导出，但是又突然出现需要导出这个需求。
+所以突然想到MySQL是否带了这种直接导出到文件中的方法，查资料后发现果然有。
+只需要在命令行中执行如下查询即可。
+1SELECT * FROM my_table INTO OUTFILE &apos;file.csv&apos; FIELDS TERMINATED BY &apos;,&apos;;
+有几点需要注意：
+0.文">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL命令行导出结果集到Excel">
+<meta property="og:url" content="https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html">
 <meta property="og:site_name" content="启程">
-<meta property="og:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
+<meta property="og:description" content="某个需求，为了简单单独建表存储，而且没有相关的后台管理方法，无法查看，或导出，但是又突然出现需要导出这个需求。
+所以突然想到MySQL是否带了这种直接导出到文件中的方法，查资料后发现果然有。
+只需要在命令行中执行如下查询即可。
+1SELECT * FROM my_table INTO OUTFILE &apos;file.csv&apos; FIELDS TERMINATED BY &apos;,&apos;;
+有几点需要注意：
+0.文">
+<meta property="og:image" content="http://7b1hhm.com1.z0.glb.clouddn.com/hexo1631785_mysql.gif">
+<meta property="og:updated_time" content="2015-11-21T13:50:00.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="启程">
-<meta name="twitter:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
+<meta name="twitter:title" content="MySQL命令行导出结果集到Excel">
+<meta name="twitter:description" content="某个需求，为了简单单独建表存储，而且没有相关的后台管理方法，无法查看，或导出，但是又突然出现需要导出这个需求。
+所以突然想到MySQL是否带了这种直接导出到文件中的方法，查资料后发现果然有。
+只需要在命令行中执行如下查询即可。
+1SELECT * FROM my_table INTO OUTFILE &apos;file.csv&apos; FIELDS TERMINATED BY &apos;,&apos;;
+有几点需要注意：
+0.文">
 <meta name="twitter:creator" content="@qichengzx">
   
     <link rel="alternative" href="/atom.xml" title="启程" type="application/atom+xml">
@@ -60,39 +77,95 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2015" class="archive-year">2015</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2015/11/07/Set Up a Private Git Server on a VPS.html" class="archive-article-date">
-  <time datetime="2015-11-07T15:34:10.000Z" itemprop="datePublished">Nov 7</time>
+        <section id="main"><article id="post-export-results-of-mysql-to-excel" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/11/21/export-results-of-mysql-to-excel.html" class="article-date">
+  <time datetime="2015-11-21T13:24:35.000Z" itemprop="datePublished">2015-11-21</time>
 </a>
-      
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mysql/">mysql</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2015/11/07/Set Up a Private Git Server on a VPS.html">vps 搭建个人git服务器</a>
+    <h1 class="article-title" itemprop="name">
+      MySQL命令行导出结果集到Excel
     </h1>
   
 
-    </header>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="http://7b1hhm.com1.z0.glb.clouddn.com/hexo1631785_mysql.gif" alt=""></p>
+<p>某个需求，为了简单单独建表存储，而且没有相关的后台管理方法，无法查看，或导出，但是又突然出现需要导出这个需求。</p>
+<p>所以突然想到MySQL是否带了这种直接导出到文件中的方法，查资料后发现果然有。</p>
+<p>只需要在命令行中执行如下查询即可。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> my_table <span class="keyword">INTO</span> <span class="keyword">OUTFILE</span> <span class="string">'file.csv'</span> <span class="keyword">FIELDS</span> <span class="keyword">TERMINATED</span> <span class="keyword">BY</span> <span class="string">','</span>;</span></span><br></pre></td></tr></table></figure>
+<p>有几点需要注意：</p>
+<pre><code><span class="number">0.</span>文件将在服务器上生成，所以需要需要MySQL进程有生成文件的权限。
+<span class="number">1.</span>必须为一个不存在的文件名。
+</code></pre><p>其实还有一些功能，或者说是说明，这里并没有写。</p>
+<p>官方文档：</p>
+<p><a href="http://dev.mysql.com/doc/refman/5.5/en/select-into.html" target="_blank" rel="external">13.2.9.1 SELECT … INTO Syntax</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html" data-id="ciid5ubq60010dy8mjqurdito" class="article-share-link">Share</a>
+      
+        <a href="https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/excel/">excel</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li></ul>
+
+    </footer>
   </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/12/03/nodejs-mysql.html" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Node.js连接MySQL并读取数据
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/11/17/js-names.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">JS标识符</div>
+    </a>
+  
+</nav>
+
+  
 </article>
-  
-  
-    </div></section>
-  
+
+
+<section id="comments">
+  <div class="ds-thread" data-thread-key="ciid5ubq60010dy8mjqurdito" data-title="MySQL命令行导出结果集到Excel" data-url="https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html"></div>
+  <script>
+    var duoshuoQuery = {short_name:"qichengzx"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0] 
+       || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+</section>
 </section>
         
           <aside id="sidebar">
