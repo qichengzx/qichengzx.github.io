@@ -5,14 +5,14 @@
 # Site
 title: 启程
 subtitle: 
-description: 记录写代码过程中的成长
+description: 记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界
 author: qichengzx
 language: 
 timezone: 
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://www.qichengzx.com
+url: https://www.qichengzx.com
 root: /
 permalink: :year/:month/:day/:title.html
 permalink_defaults:
