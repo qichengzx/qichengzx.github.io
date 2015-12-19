@@ -109,15 +109,15 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
 <p>过期时间：2016-03-15</p>
 <p>至于过期时间为什么这么短则是出于安全考虑。不宜使用同一个证书太长时间。</p>
 <h5 id="证书文件：">证书文件：</h5><p>上一步成功后，会有如下4个文件生成。</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ls <span class="regexp">/etc/</span>letsencrypt<span class="regexp">/live/y</span>our_domain_name</span><br></pre></td></tr></table></figure>
 <pre><code><span class="attribute">cert.pem</span>: <span class="string">证书</span>
 <span class="attribute">chain.pem</span>: <span class="string">The Let's Encrypt chain certificate（不知道什么鬼）</span>
 <span class="attribute">fullchain.pem</span>: <span class="string">cert.pem and chain.pem combined</span>
 <span class="attribute">privkey.pem</span>: <span class="string">证书私钥</span>
-</code></pre><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ls <span class="regexp">/etc/</span>letsencrypt<span class="regexp">/live/y</span>our_domain_name</span><br></pre></td></tr></table></figure>
-<h3 id="STEP_2－配置Web服务器(Nginx)">STEP 2－配置Web服务器(Nginx)</h3><p>证书生成完毕，现在可以配置Web服务器了。</p>
+</code></pre><h3 id="STEP_2－配置Web服务器(Nginx)">STEP 2－配置Web服务器(Nginx)</h3><p>证书生成完毕，现在可以配置Web服务器了。</p>
 <p>编辑配置文件：</p>
 <figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vi <span class="regexp">/etc/</span>nginx<span class="regexp">/sites-available/</span><span class="keyword">default</span></span><br></pre></td></tr></table></figure>
-<p>在server里，增加如下代码：</p>
+<p>在server区块中，增加如下代码：</p>
 <figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">listen 443 ssl<span class="comment">;</span></span><br><span class="line">server_name example.com<span class="comment">;</span></span><br><span class="line">ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem<span class="comment">;</span></span><br><span class="line">ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem<span class="comment">;</span></span><br></pre></td></tr></table></figure>
 <p>如果之前是绑定的80端口，直接改为443即可，后边增加 ssl 。</p>
 <p>如果想使用最安全的SSL协议，增加如下代码：</p>
@@ -134,7 +134,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html" data-id="ciid56h9p000es08m2h8eeuug" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html" data-id="ciid58w1s000efh8mvmdu8pbd" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html#comments" class="article-comment-link">Comments</a>
       
@@ -164,7 +164,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/16/jquery-custom-post.html" data-id="ciid56hab001es08m7i1gv4u8" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/12/16/jquery-custom-post.html" data-id="ciid58w2d001efh8m8hyfd3sh" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/12/16/jquery-custom-post.html#comments" class="article-comment-link">Comments</a>
       
@@ -220,7 +220,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html" data-id="ciid56h9s000js08mu0bxmmd1" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html" data-id="ciid58w1u000jfh8m1og6rfnc" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html#comments" class="article-comment-link">Comments</a>
       
@@ -286,7 +286,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/03/nodejs-mysql.html" data-id="ciid56h9v000us08mupoh4k0n" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/12/03/nodejs-mysql.html" data-id="ciid58w1x000ufh8maq6bou33" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/12/03/nodejs-mysql.html#comments" class="article-comment-link">Comments</a>
       
@@ -341,7 +341,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html" data-id="ciid56hae001gs08mumesml7h" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html" data-id="ciid58w2g001gfh8mayk0y5j8" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html#comments" class="article-comment-link">Comments</a>
       
@@ -391,7 +391,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/17/js-names.html" data-id="ciid56ha60011s08mpwva6x87" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/17/js-names.html" data-id="ciid58w280011fh8m76rjx8xu" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/17/js-names.html#comments" class="article-comment-link">Comments</a>
       
@@ -422,7 +422,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/17/mac-senseidb-zookeeper.html" data-id="ciid56ha40010s08moszyj7jl" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/17/mac-senseidb-zookeeper.html" data-id="ciid58w260010fh8ms3pk42mu" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/17/mac-senseidb-zookeeper.html#comments" class="article-comment-link">Comments</a>
       
@@ -477,7 +477,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/16/js-.html" data-id="ciid56ha80017s08mq2nlfpow" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/16/js-.html" data-id="ciid58w2a0017fh8md3hlkvgn" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/16/js-.html#comments" class="article-comment-link">Comments</a>
       
@@ -605,7 +605,7 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html" data-id="ciid56hag001ms08mhobpo9zp" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html" data-id="ciid58w2i001mfh8mhbjfu04f" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html#comments" class="article-comment-link">Comments</a>
       
@@ -931,7 +931,7 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html" data-id="ciid56h9m0007s08mozo95pjm" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html" data-id="ciid58w1p0007fh8mpswfzoxg" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html#comments" class="article-comment-link">Comments</a>
       

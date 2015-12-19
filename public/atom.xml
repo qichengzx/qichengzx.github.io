@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="https://www.qichengzx.com/"/>
-  <updated>2015-12-19T13:29:36.000Z</updated>
+  <updated>2015-12-19T13:31:45.000Z</updated>
   <id>https://www.qichengzx.com/</id>
   
   <author>
@@ -19,7 +19,7 @@
     <link href="https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html"/>
     <id>https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html</id>
     <published>2015-12-19T08:38:37.000Z</published>
-    <updated>2015-12-19T13:29:36.000Z</updated>
+    <updated>2015-12-19T13:31:45.000Z</updated>
     <content type="html"><![CDATA[<p><img src="https://s.qichengzx.com/img/201512/https.png" alt=""></p>
 <p>Let’s Encrypt是一个新的CA机构，提供非常简单并且免费的TLS／SSL证书服务。</p>
 <p>可谓万众期待。</p>
@@ -45,15 +45,15 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
 <p>过期时间：2016-03-15</p>
 <p>至于过期时间为什么这么短则是出于安全考虑。不宜使用同一个证书太长时间。</p>
 <h5 id="证书文件：">证书文件：</h5><p>上一步成功后，会有如下4个文件生成。</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ls <span class="regexp">/etc/</span>letsencrypt<span class="regexp">/live/y</span>our_domain_name</span><br></pre></td></tr></table></figure>
 <pre><code><span class="attribute">cert.pem</span>: <span class="string">证书</span>
 <span class="attribute">chain.pem</span>: <span class="string">The Let's Encrypt chain certificate（不知道什么鬼）</span>
 <span class="attribute">fullchain.pem</span>: <span class="string">cert.pem and chain.pem combined</span>
 <span class="attribute">privkey.pem</span>: <span class="string">证书私钥</span>
-</code></pre><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ls <span class="regexp">/etc/</span>letsencrypt<span class="regexp">/live/y</span>our_domain_name</span><br></pre></td></tr></table></figure>
-<h3 id="STEP_2－配置Web服务器(Nginx)">STEP 2－配置Web服务器(Nginx)</h3><p>证书生成完毕，现在可以配置Web服务器了。</p>
+</code></pre><h3 id="STEP_2－配置Web服务器(Nginx)">STEP 2－配置Web服务器(Nginx)</h3><p>证书生成完毕，现在可以配置Web服务器了。</p>
 <p>编辑配置文件：</p>
 <figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vi <span class="regexp">/etc/</span>nginx<span class="regexp">/sites-available/</span><span class="keyword">default</span></span><br></pre></td></tr></table></figure>
-<p>在server里，增加如下代码：</p>
+<p>在server区块中，增加如下代码：</p>
 <figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">listen 443 ssl<span class="comment">;</span></span><br><span class="line">server_name example.com<span class="comment">;</span></span><br><span class="line">ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem<span class="comment">;</span></span><br><span class="line">ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem<span class="comment">;</span></span><br></pre></td></tr></table></figure>
 <p>如果之前是绑定的80端口，直接改为443即可，后边增加 ssl 。</p>
 <p>如果想使用最安全的SSL协议，增加如下代码：</p>

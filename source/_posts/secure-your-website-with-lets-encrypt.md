@@ -91,15 +91,17 @@ IMPORTANT NOTES:
 
 上一步成功后，会有如下4个文件生成。
 
+    
+```
+sudo ls /etc/letsencrypt/live/your_domain_name
+```
+
 
     cert.pem: 证书
     chain.pem: The Let's Encrypt chain certificate（不知道什么鬼）
     fullchain.pem: cert.pem and chain.pem combined
     privkey.pem: 证书私钥
-    
-```
-sudo ls /etc/letsencrypt/live/your_domain_name
-```
+
 
 ### STEP 2－配置Web服务器(Nginx)
 
@@ -111,7 +113,7 @@ sudo ls /etc/letsencrypt/live/your_domain_name
 sudo vi /etc/nginx/sites-available/default
 ```
 
-在server里，增加如下代码：
+在server区块中，增加如下代码：
 
 ```
 listen 443 ssl;
