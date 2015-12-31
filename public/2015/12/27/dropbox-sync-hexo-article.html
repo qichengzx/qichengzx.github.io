@@ -20,7 +20,7 @@
 以下为前提：
 本地已安装hexo，和Dropb">
 <meta property="og:image" content="https://s.qichengzx.com/img/201512/20130702165945-558672261.jpg">
-<meta property="og:updated_time" content="2015-12-28T09:15:57.000Z">
+<meta property="og:updated_time" content="2015-12-31T13:45:54.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用Dropbox同步hexo文章">
 <meta name="twitter:description" content="继之前那次失败的尝试之后（只在当时写的时候实验过几次，每次都以服务器卡死结束），后来在又多了几篇日志之后连generate也不能愉快的完成了。索性就在本地生成然后git push到服务器。
@@ -97,25 +97,21 @@
     <div class="article-entry" itemprop="articleBody">
       
         <p><img src="https://s.qichengzx.com/img/201512/20130702165945-558672261.jpg" alt=""></p>
-<p>继之前那次失败的尝试之后（只在当时写的时候实验过几次，每次都以服务器卡死结束），后来在又多了几篇日志之后连generate也不能愉快的完成了。索性就在本地生成然后git push到服务器。</p>
+<p>继之前<a href="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html">那次失败的尝试</a>之后（只在当时写的时候实验过几次，每次都以服务器卡死结束），后来在又多了几篇日志之后连generate也不能愉快的完成了。索性就在本地生成然后git push到服务器。</p>
 <p>现在想更激进一些，git只管理日志以外的东西，比如hexo的升级，或模板的调整和日志源文件。而生成的静态文件直接通过Dropbox客户端同步到服务器。</p>
 <p>话不多说。</p>
 <p>以下为前提：</p>
 <pre><code>本地已安装hexo，和Dropbox客户端，并且客户端的同步目录已经选择到hexo的目录。
 服务器已安装dropbox服务，及相应的用户。
-</code></pre><p><a href="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html">https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html</a></p>
-<p>Dropbox的同步目录选hexo根目录或public都行，只是在服务器的处理脚本那同步修改下就行了。</p>
+</code></pre><p>Dropbox的同步目录选hexo根目录或public都行，只是在服务器的处理脚本那同步修改下就行了。</p>
 <p>以下内容假设已在服务器添加dbox用户用于dropbox服务的同步处理。并且也已经设置了与dropbox账户的关联。</p>
 <h4 id="启动dropboxd">启动dropboxd</h4><p>用dbox用户登录服务器。</p>
 <p>然后，启动dropboxd进程。</p>
 <figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">~<span class="regexp">/dropbox-dist/dropboxd</span> &amp;</span><br></pre></td></tr></table></figure>
-<h4 id="设置文件夹监测">设置文件夹监测</h4><p>#####先安装incron服务。</p>
-<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apt-get <span class="keyword">install</span> incron</span><br><span class="line">yum <span class="keyword">install</span> incron</span><br></pre></td></tr></table></figure>
-<p>#####开机启动</p>
-<p>安装sysv-rc-conf，用于管理服务的启动</p>
+<h4 id="设置文件夹监测">设置文件夹监测</h4><h5 id="先安装incron服务。">先安装incron服务。</h5><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apt-get <span class="keyword">install</span> incron</span><br><span class="line">yum <span class="keyword">install</span> incron</span><br></pre></td></tr></table></figure>
+<h5 id="开机启动">开机启动</h5><p>安装sysv-rc-conf，用于管理服务的启动</p>
 <figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">apt-get install sysv-rc-<span class="keyword">conf</span></span><br><span class="line">sysv-rc-<span class="keyword">conf</span> incron <span class="keyword">on</span></span><br><span class="line">sysv-rc-<span class="keyword">conf</span> --<span class="keyword">list</span> <span class="comment">//用于查看所有服务的状态</span></span><br></pre></td></tr></table></figure>
-<p>#####创建监测服务</p>
-<p>先修改下incron的编辑器</p>
+<h5 id="创建监测服务">创建监测服务</h5><p>先修改下incron的编辑器</p>
 <figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo <span class="keyword">vi</span> /etc/incron.<span class="keyword">conf</span></span><br></pre></td></tr></table></figure>
 <p>在文件的最后一行，去掉editor = vi前的#，保存退出。</p>
 <p>输入：</p>
@@ -136,7 +132,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html" data-id="ciiu9nl9x0016840rucqk4go5" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html" data-id="ciiub1ni50016di0rj4owzbl0" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html#comments" class="article-comment-link">Comments</a>
       
@@ -162,7 +158,7 @@
 
 
 <section id="comments">
-  <div class="ds-thread" data-thread-key="ciiu9nl9x0016840rucqk4go5" data-title="使用Dropbox同步hexo文章" data-url="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html"></div>
+  <div class="ds-thread" data-thread-key="ciiub1ni50016di0rj4owzbl0" data-title="使用Dropbox同步hexo文章" data-url="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html"></div>
   <script>
     var duoshuoQuery = {short_name:"qichengzx"};
     (function() {

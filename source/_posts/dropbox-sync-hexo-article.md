@@ -4,7 +4,7 @@ tags:  [dropbox,hexo]
 ---
 ![](https://s.qichengzx.com/img/201512/20130702165945-558672261.jpg)
 
-继之前那次失败的尝试之后（只在当时写的时候实验过几次，每次都以服务器卡死结束），后来在又多了几篇日志之后连generate也不能愉快的完成了。索性就在本地生成然后git push到服务器。
+继之前[那次失败的尝试](https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html)之后（只在当时写的时候实验过几次，每次都以服务器卡死结束），后来在又多了几篇日志之后连generate也不能愉快的完成了。索性就在本地生成然后git push到服务器。
 
 现在想更激进一些，git只管理日志以外的东西，比如hexo的升级，或模板的调整和日志源文件。而生成的静态文件直接通过Dropbox客户端同步到服务器。
 
@@ -15,7 +15,6 @@ tags:  [dropbox,hexo]
 	本地已安装hexo，和Dropbox客户端，并且客户端的同步目录已经选择到hexo的目录。
 	服务器已安装dropbox服务，及相应的用户。
 
-https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html
 
 Dropbox的同步目录选hexo根目录或public都行，只是在服务器的处理脚本那同步修改下就行了。
 
@@ -33,14 +32,14 @@ Dropbox的同步目录选hexo根目录或public都行，只是在服务器的处
 
 #### 设置文件夹监测
 
-#####先安装incron服务。
+##### 先安装incron服务。
 
 ```
 apt-get install incron
 yum install incron
 ```
 
-#####开机启动
+##### 开机启动
 
 安装sysv-rc-conf，用于管理服务的启动
 
@@ -51,7 +50,7 @@ sysv-rc-conf --list //用于查看所有服务的状态
 
 ```
 
-#####创建监测服务
+##### 创建监测服务
 
 先修改下incron的编辑器
 
