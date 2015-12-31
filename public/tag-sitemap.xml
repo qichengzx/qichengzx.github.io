@@ -107,20 +107,6 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/tags/hexo/</loc>
-        <lastmod>2015-12-19T07:50:01.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>https://www.qichengzx.com/tags/dropbox/</loc>
-        <lastmod>2015-12-19T07:50:01.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>https://www.qichengzx.com/tags/https/</loc>
         <lastmod>2015-12-19T13:31:45.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -130,6 +116,20 @@
     <url>
         <loc>https://www.qichengzx.com/tags/ssl/</loc>
         <lastmod>2015-12-19T13:31:45.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/hexo/</loc>
+        <lastmod>2015-12-28T09:15:57.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/dropbox/</loc>
+        <lastmod>2015-12-28T09:15:57.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
