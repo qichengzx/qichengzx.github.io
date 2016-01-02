@@ -69,7 +69,7 @@ incrontab -e
 
 如果当前登录的不是dbox用户，可以使用
 ```
-crontab -udbox -e
+incrontab -udbox -e
 ```
 
 然后输入：

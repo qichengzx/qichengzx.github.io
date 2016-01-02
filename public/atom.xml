@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="https://www.qichengzx.com/"/>
-  <updated>2015-12-31T13:45:54.000Z</updated>
+  <updated>2016-01-01T14:25:02.000Z</updated>
   <id>https://www.qichengzx.com/</id>
   
   <author>
@@ -19,7 +19,7 @@
     <link href="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html"/>
     <id>https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html</id>
     <published>2015-12-27T13:47:09.000Z</published>
-    <updated>2015-12-31T13:45:54.000Z</updated>
+    <updated>2016-01-01T14:25:02.000Z</updated>
     <content type="html"><![CDATA[<p><img src="https://s.qichengzx.com/img/201512/20130702165945-558672261.jpg" alt=""></p>
 <p>继之前<a href="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html">那次失败的尝试</a>之后（只在当时写的时候实验过几次，每次都以服务器卡死结束），后来在又多了几篇日志之后连generate也不能愉快的完成了。索性就在本地生成然后git push到服务器。</p>
 <p>现在想更激进一些，git只管理日志以外的东西，比如hexo的升级，或模板的调整和日志源文件。而生成的静态文件直接通过Dropbox客户端同步到服务器。</p>
@@ -40,7 +40,7 @@
 <p>在文件的最后一行，去掉editor = vi前的#，保存退出。</p>
 <p>输入：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">incrontab <span class="operator">-e</span></span><br></pre></td></tr></table></figure>
-<p>如果当前登录的不是dbox用户，可以使用<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">crontab -udbox <span class="operator">-e</span></span><br></pre></td></tr></table></figure></p>
+<p>如果当前登录的不是dbox用户，可以使用<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">incrontab -udbox <span class="operator">-e</span></span><br></pre></td></tr></table></figure></p>
 <p>然后输入：</p>
 <figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">/home/</span>dbox<span class="regexp">/Dropbox/y</span>ourfolder<span class="regexp">/ IN_ATTRIB,IN_MOVE /</span>home<span class="regexp">/dbox/</span>dbox.sh</span><br></pre></td></tr></table></figure>
 <p>第一个参数：用来接收Dropbox同步的文件夹</p>
