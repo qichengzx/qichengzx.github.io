@@ -5,18 +5,18 @@ tags:  [crontab,mysql,linux]
 
 ---
 
-![](https://s.qichengzx.com/att/img/201601/crontab.jpg)
+![](https://s.qichengzx.com/img/201601/crontab.jpg)
 
 crontab命令之前写过了，在[Linux crontab 访问PHP URL完成定时任务](http://segmentfault.com/a/1190000003953826)，今天写了一个用来备份数据库的脚本。
 
 主要会用到以下几个命令：
 
-####mysqldump
+#### mysqldump
 
 参考文章：[mysqldump导入导出数据库总结 ](http://blog.csdn.net/shellching/article/details/8129687)
 
 
-####创建.sh文件：
+#### 创建.sh文件：
 
 ```
 cd ~
@@ -49,7 +49,7 @@ mysqldump -hlocalhost -uroot -p'root' --all-databases | gzip > /var/backups/data
 
 参考文章：[Linux中find常见用法示例](http://www.cnblogs.com/wanqieddy/archive/2011/06/09/2076785.html)
 
-####删除之前的备份文件
+#### 删除之前的备份文件
 
 在刚才的backup.sh中继续输入：
 
@@ -61,11 +61,11 @@ rm -rf `find . -name '*.sql.gz' -mtime +10`
 
 这句命令有两部分，
 
-第一部分是删除命令：```rm -rf```。就是那句一定要慎用的命令了，
+第一部分是删除命令：'rm -rf'。就是那句一定要慎用的命令了.
 
 第二部分是找到：当前目录，名字以'.sql.gz'结尾的，更改时间在10天以前的文件。
 
-'.'表示当前目录，由于上一句是```cd /var/backups/```，所以这里使用当前目录即可。
+'.'表示当前目录，由于上一句是'cd /var/backups/'，所以这里使用当前目录即可。
 
 '-name '和'-mtime'参数是find命令的条件。
 
@@ -75,11 +75,12 @@ rm -rf `find . -name '*.sql.gz' -mtime +10`
 
 但是为了什么时候突然想看一下日志，或者备份出错的时候查问题，还可以在脚本里加上记录日志的命令：
 
-####日志
+#### 日志
 
 ```
 echo 'Begin Backup Database At :' `date +'%Y-%m-%d %H:%M:%S'`
 ```
+
 这里又用到了date。
 
 参考文章：[Linux下date命令，格式化输出，时间设置 ](http://blog.csdn.net/jk110333/article/details/8590746/)

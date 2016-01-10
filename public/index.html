@@ -88,13 +88,11 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p><img src="https://s.qichengzx.com/att/img/201601/crontab.jpg" alt=""></p>
+        <p><img src="https://s.qichengzx.com/img/201601/crontab.jpg" alt=""></p>
 <p>crontab命令之前写过了，在<a href="http://segmentfault.com/a/1190000003953826" target="_blank" rel="external">Linux crontab 访问PHP URL完成定时任务</a>，今天写了一个用来备份数据库的脚本。</p>
 <p>主要会用到以下几个命令：</p>
-<p>####mysqldump</p>
-<p>参考文章：<a href="http://blog.csdn.net/shellching/article/details/8129687" target="_blank" rel="external">mysqldump导入导出数据库总结 </a></p>
-<p>####创建.sh文件：</p>
-<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cd</span> ~</span><br><span class="line"><span class="keyword">vi</span> backup.<span class="keyword">sh</span></span><br></pre></td></tr></table></figure>
+<h4 id="mysqldump">mysqldump</h4><p>参考文章：<a href="http://blog.csdn.net/shellching/article/details/8129687" target="_blank" rel="external">mysqldump导入导出数据库总结 </a></p>
+<h4 id="创建-sh文件：">创建.sh文件：</h4><figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cd</span> ~</span><br><span class="line"><span class="keyword">vi</span> backup.<span class="keyword">sh</span></span><br></pre></td></tr></table></figure>
 <p>backup.sh内主要内容如下：</p>
 <figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -hlocalhost -uroot -p'root' --databases database1 | gzip &gt; /var/backups/databases-database1<span class="escape">`d</span>ate +'<span class="var_expand">%Y%</span>m<span class="var_expand">%d_%</span>H<span class="var_expand">%M%</span>S'<span class="escape">`.</span>sql.gz</span><br></pre></td></tr></table></figure>
 <p>首先用mysqldump命令</p>
@@ -105,23 +103,32 @@
 <p>有备份，就会有备份后的处理，显而易见的问题是备份多了会比较占空间，并且也用不到那么多备份。所以备份完成删除掉一段时间以前的就可以了。这步也可以在备份前做，无所谓。</p>
 <p>这里又用到了find命令</p>
 <p>参考文章：<a href="http://www.cnblogs.com/wanqieddy/archive/2011/06/09/2076785.html" target="_blank" rel="external">Linux中find常见用法示例</a></p>
-<p>####删除之前的备份文件</p>
-<p>在刚才的backup.sh中继续输入：</p>
+<h4 id="删除之前的备份文件">删除之前的备份文件</h4><p>在刚才的backup.sh中继续输入：</p>
 <figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd <span class="regexp">/var/backups/</span></span><br><span class="line">rm -rf `<span class="javascript">find . -name <span class="string">'*.sql.gz'</span> -mtime +<span class="number">10</span></span>`</span><br></pre></td></tr></table></figure>
 <p>这句命令有两部分，</p>
-<p>第一部分是删除命令：<figure class="highlight"><figcaption><span>-rf```。就是那句一定要慎用的命令了，</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#10;&#31532;&#20108;&#37096;&#20998;&#26159;&#25214;&#21040;&#65306;&#24403;&#21069;&#30446;&#24405;&#65292;&#21517;&#23383;&#20197;&#39;.sql.gz&#39;&#32467;&#23614;&#30340;&#65292;&#26356;&#25913;&#26102;&#38388;&#22312;10&#22825;&#20197;&#21069;&#30340;&#25991;&#20214;&#12290;&#10;&#10;&#39;.&#39;&#34920;&#31034;&#24403;&#21069;&#30446;&#24405;&#65292;&#30001;&#20110;&#19978;&#19968;&#21477;&#26159;```cd /var/backups/```&#65292;&#25152;&#20197;&#36825;&#37324;&#20351;&#29992;&#24403;&#21069;&#30446;&#24405;&#21363;&#21487;&#12290;&#10;&#10;&#39;-name &#39;&#21644;&#39;-mtime&#39;&#21442;&#25968;&#26159;find&#21629;&#20196;&#30340;&#26465;&#20214;&#12290;&#10;&#10;&#20855;&#20307;&#30340;&#35828;&#26126;&#65292;&#21644;&#20854;&#20182;&#26465;&#20214;&#21487;&#20197;&#21442;&#32771;&#21069;&#36793;&#35828;&#21040;&#30340;&#25991;&#31456;&#12290;&#10;&#10;&#21040;&#36825;&#37324;&#22522;&#26412;&#19978;&#22791;&#20221;&#33050;&#26412;&#23601;&#23436;&#25104;&#20102;&#12290;&#10;&#10;&#20294;&#26159;&#20026;&#20102;&#20160;&#20040;&#26102;&#20505;&#31361;&#28982;&#24819;&#30475;&#19968;&#19979;&#26085;&#24535;&#65292;&#25110;&#32773;&#22791;&#20221;&#20986;&#38169;&#30340;&#26102;&#20505;&#26597;&#38382;&#39064;&#65292;&#36824;&#21487;&#20197;&#22312;&#33050;&#26412;&#37324;&#21152;&#19978;&#35760;&#24405;&#26085;&#24535;&#30340;&#21629;&#20196;&#65306;&#10;&#10;####&#26085;&#24535;</span><br></pre></td></tr></table></figure></p>
-<p>echo ‘Begin Backup Database At :’ <code>date +&#39;%Y-%m-%d %H:%M:%S&#39;</code><br><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">这里又用到了date。</span><br><span class="line"></span><br><span class="line">参考文章：[<span class="link_label">Linux下date命令，格式化输出，时间设置 </span>](<span class="link_url">http://blog.csdn.net/jk110333/article/details/8590746/</span>)</span><br><span class="line"></span><br><span class="line">脚本保存之后，记得添加执行权限；</span><br></pre></td></tr></table></figure></p>
-<p>sudo chmod +x backup.sh<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">接下来就是在系统里添加crontab任务了。</span><br></pre></td></tr></table></figure></p>
-<p>cd /etc/<br>vi crontab</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">在文件末尾，加上</span><br></pre></td></tr></table></figure>
-<p>m  h dom mon dow user    command<br>00 5 <em> </em> * root /home/yourname/backup.sh &gt;&gt; /var/log/backup.log<br>```</p>
+<p>第一部分是删除命令：’rm -rf’。就是那句一定要慎用的命令了.</p>
+<p>第二部分是找到：当前目录，名字以’.sql.gz’结尾的，更改时间在10天以前的文件。</p>
+<p>‘.’表示当前目录，由于上一句是’cd /var/backups/‘，所以这里使用当前目录即可。</p>
+<p>‘-name ‘和’-mtime’参数是find命令的条件。</p>
+<p>具体的说明，和其他条件可以参考前边说到的文章。</p>
+<p>到这里基本上备份脚本就完成了。</p>
+<p>但是为了什么时候突然想看一下日志，或者备份出错的时候查问题，还可以在脚本里加上记录日志的命令：</p>
+<h4 id="日志">日志</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo '<span class="operator"><span class="keyword">Begin</span> <span class="keyword">Backup</span> <span class="keyword">Database</span> <span class="keyword">At</span> :<span class="string">' `date +'</span>%Y-%<span class="keyword">m</span>-%<span class="keyword">d</span> %H:%<span class="keyword">M</span>:%S<span class="string">'`</span></span></span><br></pre></td></tr></table></figure>
+<p>这里又用到了date。</p>
+<p>参考文章：<a href="http://blog.csdn.net/jk110333/article/details/8590746/" target="_blank" rel="external">Linux下date命令，格式化输出，时间设置 </a></p>
+<p>脚本保存之后，记得添加执行权限；</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">sudo</span> <span class="tag">chmod</span> +<span class="tag">x</span> <span class="tag">backup</span><span class="class">.sh</span></span><br></pre></td></tr></table></figure>
+<p>接下来就是在系统里添加crontab任务了。</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cd</span> /etc/</span><br><span class="line"><span class="keyword">vi</span> crontab</span><br></pre></td></tr></table></figure>
+<p>在文件末尾，加上</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">m</span>  <span class="keyword">h</span> dom mon dow user	command</span><br><span class="line">00 5 * * * root /home/yourname/backup.<span class="keyword">sh</span> &gt;&gt; /<span class="keyword">var</span>/<span class="keyword">log</span>/backup.<span class="literal">log</span></span><br></pre></td></tr></table></figure>
 <p>这样，backup.sh里的echo就会输出到/var/log/backup.log中了。</p>
 <p>Over。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html" data-id="cij8g7dlj001d8j0rp84x0w5h" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html" data-id="cij8gce2z001dh30rqj1ji8sk" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html#comments" class="article-comment-link">Comments</a>
       
@@ -193,7 +200,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html" data-id="cij8g7dld00168j0r064g8dfo" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html" data-id="cij8gce2u0016h30rb391iw8e" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html#comments" class="article-comment-link">Comments</a>
       
@@ -279,7 +286,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html" data-id="cij8g7dkt00078j0r44l36bzv" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html" data-id="cij8gce280007h30r3xf6l87o" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html#comments" class="article-comment-link">Comments</a>
       
@@ -337,7 +344,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html" data-id="cij8g7dl0000c8j0rppigt7ai" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html" data-id="cij8gce2g000ch30rl5orfzot" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html#comments" class="article-comment-link">Comments</a>
       
@@ -403,7 +410,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/03/nodejs-mysql.html" data-id="cij8g7dl5000n8j0rnlhw9379" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/12/03/nodejs-mysql.html" data-id="cij8gce2l000nh30rvjmetr3h" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/12/03/nodejs-mysql.html#comments" class="article-comment-link">Comments</a>
       
@@ -458,7 +465,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html" data-id="cij8g7dlb00108j0r0hbhwk6g" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html" data-id="cij8gce2r0010h30rkfksghln" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html#comments" class="article-comment-link">Comments</a>
       
@@ -508,7 +515,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/17/js-names.html" data-id="cij8g7dl7000t8j0rbdbbj5gl" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/17/js-names.html" data-id="cij8gce2n000th30rxdmq0e1f" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/17/js-names.html#comments" class="article-comment-link">Comments</a>
       
@@ -636,7 +643,7 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html" data-id="cij8g7dlg001a8j0rwqf4d8jm" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html" data-id="cij8gce2x001ah30r1goq5rj0" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html#comments" class="article-comment-link">Comments</a>
       
@@ -962,7 +969,7 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html" data-id="cij8g7dk800008j0r7uvseatm" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html" data-id="cij8gce1q0000h30rphzd4l0n" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html#comments" class="article-comment-link">Comments</a>
       
@@ -1064,7 +1071,7 @@ Your <span class="keyword">public</span> <span class="keyword">key</span> has be
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html" data-id="cij8g7dln001l8j0rwy96bg48" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html" data-id="cij8gce32001lh30riy6ofv1w" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html#comments" class="article-comment-link">Comments</a>
       
