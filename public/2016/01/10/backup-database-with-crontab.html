@@ -3,31 +3,40 @@
 <head>
   <meta charset="utf-8">
   
-  <title>使用Dropbox同步hexo文章 | 启程</title>
+  <title>crontab实现定时备份数据库 | 启程</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="继之前那次失败的尝试之后（只在当时写的时候实验过几次，每次都以服务器卡死结束），后来在又多了几篇日志之后连generate也不能愉快的完成了。索性就在本地生成然后git push到服务器。
-现在想更激进一些，git只管理日志以外的东西，比如hexo的升级，或模板的调整和日志源文件。而生成的静态文件直接通过Dropbox客户端同步到服务器。
-话不多说。
-以下为前提：
-本地已安装hexo，和Dropb">
+  <meta name="description" content="crontab命令之前写过了，在Linux crontab 访问PHP URL完成定时任务，今天写了一个用来备份数据库的脚本。
+主要会用到以下几个命令：
+####mysqldump
+参考文章：mysqldump导入导出数据库总结 
+####创建.sh文件：
+12cd ~vi backup.sh
+backup.sh内主要内容如下：
+1mysqldump -hlocalhost -uroot -p&apos;r">
 <meta property="og:type" content="article">
-<meta property="og:title" content="使用Dropbox同步hexo文章">
-<meta property="og:url" content="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html">
+<meta property="og:title" content="crontab实现定时备份数据库">
+<meta property="og:url" content="https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html">
 <meta property="og:site_name" content="启程">
-<meta property="og:description" content="继之前那次失败的尝试之后（只在当时写的时候实验过几次，每次都以服务器卡死结束），后来在又多了几篇日志之后连generate也不能愉快的完成了。索性就在本地生成然后git push到服务器。
-现在想更激进一些，git只管理日志以外的东西，比如hexo的升级，或模板的调整和日志源文件。而生成的静态文件直接通过Dropbox客户端同步到服务器。
-话不多说。
-以下为前提：
-本地已安装hexo，和Dropb">
-<meta property="og:image" content="https://s.qichengzx.com/img/201512/20130702165945-558672261.jpg">
-<meta property="og:updated_time" content="2016-01-01T14:25:02.000Z">
+<meta property="og:description" content="crontab命令之前写过了，在Linux crontab 访问PHP URL完成定时任务，今天写了一个用来备份数据库的脚本。
+主要会用到以下几个命令：
+####mysqldump
+参考文章：mysqldump导入导出数据库总结 
+####创建.sh文件：
+12cd ~vi backup.sh
+backup.sh内主要内容如下：
+1mysqldump -hlocalhost -uroot -p&apos;r">
+<meta property="og:image" content="https://s.qichengzx.com/att/img/201601/crontab.jpg">
+<meta property="og:updated_time" content="2016-01-10T11:18:18.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="使用Dropbox同步hexo文章">
-<meta name="twitter:description" content="继之前那次失败的尝试之后（只在当时写的时候实验过几次，每次都以服务器卡死结束），后来在又多了几篇日志之后连generate也不能愉快的完成了。索性就在本地生成然后git push到服务器。
-现在想更激进一些，git只管理日志以外的东西，比如hexo的升级，或模板的调整和日志源文件。而生成的静态文件直接通过Dropbox客户端同步到服务器。
-话不多说。
-以下为前提：
-本地已安装hexo，和Dropb">
+<meta name="twitter:title" content="crontab实现定时备份数据库">
+<meta name="twitter:description" content="crontab命令之前写过了，在Linux crontab 访问PHP URL完成定时任务，今天写了一个用来备份数据库的脚本。
+主要会用到以下几个命令：
+####mysqldump
+参考文章：mysqldump导入导出数据库总结 
+####创建.sh文件：
+12cd ~vi backup.sh
+backup.sh内主要内容如下：
+1mysqldump -hlocalhost -uroot -p&apos;r">
 <meta name="twitter:creator" content="@qichengzx">
   
     <link rel="alternative" href="/atom.xml" title="启程" type="application/atom+xml">
@@ -74,12 +83,16 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-dropbox-sync-hexo-article" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-backup-database-with-crontab" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2015/12/27/dropbox-sync-hexo-article.html" class="article-date">
-  <time datetime="2015-12-27T13:47:09.000Z" itemprop="datePublished">2015-12-27</time>
+    <a href="/2016/01/10/backup-database-with-crontab.html" class="article-date">
+  <time datetime="2016-01-10T10:52:55.000Z" itemprop="datePublished">2016-01-10</time>
 </a>
     
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/linux/">linux</a>
+  </div>
+
   </div>
   <div class="article-inner">
     
@@ -88,7 +101,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      使用Dropbox同步hexo文章
+      crontab实现定时备份数据库
     </h1>
   
 
@@ -96,48 +109,45 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p><img src="https://s.qichengzx.com/img/201512/20130702165945-558672261.jpg" alt=""></p>
-<p>继之前<a href="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html">那次失败的尝试</a>之后（只在当时写的时候实验过几次，每次都以服务器卡死结束），后来在又多了几篇日志之后连generate也不能愉快的完成了。索性就在本地生成然后git push到服务器。</p>
-<p>现在想更激进一些，git只管理日志以外的东西，比如hexo的升级，或模板的调整和日志源文件。而生成的静态文件直接通过Dropbox客户端同步到服务器。</p>
-<p>话不多说。</p>
-<p>以下为前提：</p>
-<pre><code>本地已安装hexo，和Dropbox客户端，并且客户端的同步目录已经选择到hexo的目录。
-服务器已安装dropbox服务，及相应的用户。
-</code></pre><p>Dropbox的同步目录选hexo根目录或public都行，只是在服务器的处理脚本那同步修改下就行了。</p>
-<p>以下内容假设已在服务器添加dbox用户用于dropbox服务的同步处理。并且也已经设置了与dropbox账户的关联。</p>
-<h4 id="启动dropboxd">启动dropboxd</h4><p>用dbox用户登录服务器。</p>
-<p>然后，启动dropboxd进程。</p>
-<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">~<span class="regexp">/dropbox-dist/dropboxd</span> &amp;</span><br></pre></td></tr></table></figure>
-<h4 id="设置文件夹监测">设置文件夹监测</h4><h5 id="先安装incron服务。">先安装incron服务。</h5><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apt-get <span class="keyword">install</span> incron</span><br><span class="line">yum <span class="keyword">install</span> incron</span><br></pre></td></tr></table></figure>
-<h5 id="开机启动">开机启动</h5><p>安装sysv-rc-conf，用于管理服务的启动</p>
-<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">apt-get install sysv-rc-<span class="keyword">conf</span></span><br><span class="line">sysv-rc-<span class="keyword">conf</span> incron <span class="keyword">on</span></span><br><span class="line">sysv-rc-<span class="keyword">conf</span> --<span class="keyword">list</span> <span class="comment">//用于查看所有服务的状态</span></span><br></pre></td></tr></table></figure>
-<h5 id="创建监测服务">创建监测服务</h5><p>先修改下incron的编辑器</p>
-<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo <span class="keyword">vi</span> /etc/incron.<span class="keyword">conf</span></span><br></pre></td></tr></table></figure>
-<p>在文件的最后一行，去掉editor = vi前的#，保存退出。</p>
-<p>输入：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">incrontab <span class="operator">-e</span></span><br></pre></td></tr></table></figure>
-<p>如果当前登录的不是dbox用户，可以使用<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">incrontab -udbox <span class="operator">-e</span></span><br></pre></td></tr></table></figure></p>
-<p>然后输入：</p>
-<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">/home/</span>dbox<span class="regexp">/Dropbox/y</span>ourfolder<span class="regexp">/ IN_ATTRIB,IN_MOVE /</span>home<span class="regexp">/dbox/</span>dbox.sh</span><br></pre></td></tr></table></figure>
-<p>第一个参数：用来接收Dropbox同步的文件夹</p>
-<p>第二个参数：指监测的动作</p>
-<p>第三个参数：处理脚本</p>
-<p>监测的动作可以用：</p>
-<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">IN_ACCESS，即文件被访问</span><br><span class="line">IN_MODIFY，文件被 <span class="keyword">write</span></span><br><span class="line">IN_ATTRIB，文件属性被修改，如 <span class="keyword">chmod</span>、<span class="keyword">chown</span>、touch 等</span><br><span class="line">IN_CLOSE_WRITE，可写文件被 <span class="keyword">close</span></span><br><span class="line">IN_CLOSE_NOWRITE，不可写文件被 <span class="keyword">close</span></span><br><span class="line">IN_OPEN，文件被 <span class="keyword">open</span></span><br><span class="line">IN_MOVED_FROM，文件被移走,如 mv</span><br><span class="line">IN_MOVED_TO，文件被移来，如 mv、cp</span><br><span class="line">IN_CREATE，创建新文件</span><br><span class="line">IN_DELETE，文件被删除，如 rm</span><br><span class="line">IN_DELETE_SELF，自删除，即一个可执行文件在执行时删除自己</span><br><span class="line">IN_MOVE_SELF，自移动，即一个可执行文件在执行时移动自己</span><br><span class="line">IN_UNMOUNT，宿主文件系统被 umount</span><br><span class="line">IN_CLOSE，文件被关闭，等同于(IN_CLOSE_WRITE | IN_CLOSE_NOWRITE)</span><br><span class="line">IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)</span><br><span class="line"><span class="comment">#上面所说的文件也包括目录。</span></span><br></pre></td></tr></table></figure>
-<h5 id="处理同步后的文件的脚本">处理同步后的文件的脚本</h5><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cd <span class="regexp">/home/</span>dbox/</span><br><span class="line">vi dbox.sh</span><br><span class="line"></span><br><span class="line">cd <span class="regexp">/home/</span>dbox<span class="regexp">/Dropbox/</span>yoursite/</span><br><span class="line">cp -R <span class="keyword">public</span><span class="regexp">/ /</span>var<span class="regexp">/www/</span>yoursite/</span><br></pre></td></tr></table></figure>
-<p>最后一句要注意看你本地同步了哪些内容，还要注意与网站的目录对应。</p>
-<p>还要注意dbox.sh要有执行权限，和yoursite的写入权限。</p>
-<p>至此，完成。</p>
+        <p><img src="https://s.qichengzx.com/att/img/201601/crontab.jpg" alt=""></p>
+<p>crontab命令之前写过了，在<a href="http://segmentfault.com/a/1190000003953826" target="_blank" rel="external">Linux crontab 访问PHP URL完成定时任务</a>，今天写了一个用来备份数据库的脚本。</p>
+<p>主要会用到以下几个命令：</p>
+<p>####mysqldump</p>
+<p>参考文章：<a href="http://blog.csdn.net/shellching/article/details/8129687" target="_blank" rel="external">mysqldump导入导出数据库总结 </a></p>
+<p>####创建.sh文件：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cd</span> ~</span><br><span class="line"><span class="keyword">vi</span> backup.<span class="keyword">sh</span></span><br></pre></td></tr></table></figure>
+<p>backup.sh内主要内容如下：</p>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -hlocalhost -uroot -p'root' --databases database1 | gzip &gt; /var/backups/databases-database1<span class="escape">`d</span>ate +'<span class="var_expand">%Y%</span>m<span class="var_expand">%d_%</span>H<span class="var_expand">%M%</span>S'<span class="escape">`.</span>sql.gz</span><br></pre></td></tr></table></figure>
+<p>首先用mysqldump命令</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span>连接数据库</span><br><span class="line"><span class="number">2.</span>选择要备份数据库</span><br><span class="line"><span class="number">3.</span>选择存储备份文件的方式，这里使用了gzip了生成一个压缩包</span><br></pre></td></tr></table></figure>
+<p>根据文档，如果想备份所有数据库，可以使用</p>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -hlocalhost -uroot -p'root' --all-databases | gzip &gt; /var/backups/databases-all-database<span class="escape">`d</span>ate +'<span class="var_expand">%Y%</span>m<span class="var_expand">%d_%</span>H<span class="var_expand">%M%</span>S'<span class="escape">`.</span>sql.gz</span><br></pre></td></tr></table></figure>
+<p>保存。</p>
+<p>有备份，就会有备份后的处理，显而易见的问题是备份多了会比较占空间，并且也用不到那么多备份。所以备份完成删除掉一段时间以前的就可以了。这步也可以在备份前做，无所谓。</p>
+<p>这里又用到了find命令</p>
+<p>参考文章：<a href="http://www.cnblogs.com/wanqieddy/archive/2011/06/09/2076785.html" target="_blank" rel="external">Linux中find常见用法示例</a></p>
+<p>####删除之前的备份文件</p>
+<p>在刚才的backup.sh中继续输入：</p>
+<figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd <span class="regexp">/var/backups/</span></span><br><span class="line">rm -rf `<span class="javascript">find . -name <span class="string">'*.sql.gz'</span> -mtime +<span class="number">10</span></span>`</span><br></pre></td></tr></table></figure>
+<p>这句命令有两部分，</p>
+<p>第一部分是删除命令：<figure class="highlight"><figcaption><span>-rf```。就是那句一定要慎用的命令了，</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#10;&#31532;&#20108;&#37096;&#20998;&#26159;&#25214;&#21040;&#65306;&#24403;&#21069;&#30446;&#24405;&#65292;&#21517;&#23383;&#20197;&#39;.sql.gz&#39;&#32467;&#23614;&#30340;&#65292;&#26356;&#25913;&#26102;&#38388;&#22312;10&#22825;&#20197;&#21069;&#30340;&#25991;&#20214;&#12290;&#10;&#10;&#39;.&#39;&#34920;&#31034;&#24403;&#21069;&#30446;&#24405;&#65292;&#30001;&#20110;&#19978;&#19968;&#21477;&#26159;```cd /var/backups/```&#65292;&#25152;&#20197;&#36825;&#37324;&#20351;&#29992;&#24403;&#21069;&#30446;&#24405;&#21363;&#21487;&#12290;&#10;&#10;&#39;-name &#39;&#21644;&#39;-mtime&#39;&#21442;&#25968;&#26159;find&#21629;&#20196;&#30340;&#26465;&#20214;&#12290;&#10;&#10;&#20855;&#20307;&#30340;&#35828;&#26126;&#65292;&#21644;&#20854;&#20182;&#26465;&#20214;&#21487;&#20197;&#21442;&#32771;&#21069;&#36793;&#35828;&#21040;&#30340;&#25991;&#31456;&#12290;&#10;&#10;&#21040;&#36825;&#37324;&#22522;&#26412;&#19978;&#22791;&#20221;&#33050;&#26412;&#23601;&#23436;&#25104;&#20102;&#12290;&#10;&#10;&#20294;&#26159;&#20026;&#20102;&#20160;&#20040;&#26102;&#20505;&#31361;&#28982;&#24819;&#30475;&#19968;&#19979;&#26085;&#24535;&#65292;&#25110;&#32773;&#22791;&#20221;&#20986;&#38169;&#30340;&#26102;&#20505;&#26597;&#38382;&#39064;&#65292;&#36824;&#21487;&#20197;&#22312;&#33050;&#26412;&#37324;&#21152;&#19978;&#35760;&#24405;&#26085;&#24535;&#30340;&#21629;&#20196;&#65306;&#10;&#10;####&#26085;&#24535;</span><br></pre></td></tr></table></figure></p>
+<p>echo ‘Begin Backup Database At :’ <code>date +&#39;%Y-%m-%d %H:%M:%S&#39;</code><br><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">这里又用到了date。</span><br><span class="line"></span><br><span class="line">参考文章：[<span class="link_label">Linux下date命令，格式化输出，时间设置 </span>](<span class="link_url">http://blog.csdn.net/jk110333/article/details/8590746/</span>)</span><br><span class="line"></span><br><span class="line">脚本保存之后，记得添加执行权限；</span><br></pre></td></tr></table></figure></p>
+<p>sudo chmod +x backup.sh<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">接下来就是在系统里添加crontab任务了。</span><br></pre></td></tr></table></figure></p>
+<p>cd /etc/<br>vi crontab</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">在文件末尾，加上</span><br></pre></td></tr></table></figure>
+<p>m  h dom mon dow user    command<br>00 5 <em> </em> * root /home/yourname/backup.sh &gt;&gt; /var/log/backup.log<br>```</p>
+<p>这样，backup.sh里的echo就会输出到/var/log/backup.log中了。</p>
+<p>Over。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html" data-id="cij8g7dld00168j0r064g8dfo" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html" data-id="cij8g7dlj001d8j0rp84x0w5h" class="article-share-link">Share</a>
       
-        <a href="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html#comments" class="article-comment-link">Comments</a>
+        <a href="https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html#comments" class="article-comment-link">Comments</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dropbox/">dropbox</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hexo/">hexo</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/crontab/">crontab</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li></ul>
 
     </footer>
   </div>
@@ -145,19 +155,10 @@
     
 <nav id="article-nav">
   
-    <a href="/2016/01/10/backup-database-with-crontab.html" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Newer</strong>
-      <div class="article-nav-title">
-        
-          crontab实现定时备份数据库
-        
-      </div>
-    </a>
   
-  
-    <a href="/2015/12/19/secure-your-website-with-lets-encrypt.html" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/2015/12/27/dropbox-sync-hexo-article.html" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">使用Let&#39;s Encrypt制作数字证书</div>
+      <div class="article-nav-title">使用Dropbox同步hexo文章</div>
     </a>
   
 </nav>
@@ -167,7 +168,7 @@
 
 
 <section id="comments">
-  <div class="ds-thread" data-thread-key="cij8g7dld00168j0r064g8dfo" data-title="使用Dropbox同步hexo文章" data-url="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html"></div>
+  <div class="ds-thread" data-thread-key="cij8g7dlj001d8j0rp84x0w5h" data-title="crontab实现定时备份数据库" data-url="https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html"></div>
   <script>
     var duoshuoQuery = {short_name:"qichengzx"};
     (function() {

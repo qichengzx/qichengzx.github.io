@@ -7,6 +7,14 @@
     </url>
 
     <url>
+        <loc>https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html</loc>
+        <lastmod>2016-01-10T11:18:18.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html</loc>
         <lastmod>2016-01-01T14:25:02.000Z</lastmod>
         <changefreq>weekly</changefreq>

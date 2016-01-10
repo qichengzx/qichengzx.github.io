@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="https://www.qichengzx.com/"/>
-  <updated>2016-01-01T14:25:02.000Z</updated>
+  <updated>2016-01-10T11:18:18.000Z</updated>
   <id>https://www.qichengzx.com/</id>
   
   <author>
@@ -13,6 +13,57 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[crontab实现定时备份数据库]]></title>
+    <link href="https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html"/>
+    <id>https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html</id>
+    <published>2016-01-10T10:52:55.000Z</published>
+    <updated>2016-01-10T11:18:18.000Z</updated>
+    <content type="html"><![CDATA[<p><img src="https://s.qichengzx.com/att/img/201601/crontab.jpg" alt=""></p>
+<p>crontab命令之前写过了，在<a href="http://segmentfault.com/a/1190000003953826" target="_blank" rel="external">Linux crontab 访问PHP URL完成定时任务</a>，今天写了一个用来备份数据库的脚本。</p>
+<p>主要会用到以下几个命令：</p>
+<p>####mysqldump</p>
+<p>参考文章：<a href="http://blog.csdn.net/shellching/article/details/8129687" target="_blank" rel="external">mysqldump导入导出数据库总结 </a></p>
+<p>####创建.sh文件：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cd</span> ~</span><br><span class="line"><span class="keyword">vi</span> backup.<span class="keyword">sh</span></span><br></pre></td></tr></table></figure>
+<p>backup.sh内主要内容如下：</p>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -hlocalhost -uroot -p'root' --databases database1 | gzip &gt; /var/backups/databases-database1<span class="escape">`d</span>ate +'<span class="var_expand">%Y%</span>m<span class="var_expand">%d_%</span>H<span class="var_expand">%M%</span>S'<span class="escape">`.</span>sql.gz</span><br></pre></td></tr></table></figure>
+<p>首先用mysqldump命令</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span>连接数据库</span><br><span class="line"><span class="number">2.</span>选择要备份数据库</span><br><span class="line"><span class="number">3.</span>选择存储备份文件的方式，这里使用了gzip了生成一个压缩包</span><br></pre></td></tr></table></figure>
+<p>根据文档，如果想备份所有数据库，可以使用</p>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -hlocalhost -uroot -p'root' --all-databases | gzip &gt; /var/backups/databases-all-database<span class="escape">`d</span>ate +'<span class="var_expand">%Y%</span>m<span class="var_expand">%d_%</span>H<span class="var_expand">%M%</span>S'<span class="escape">`.</span>sql.gz</span><br></pre></td></tr></table></figure>
+<p>保存。</p>
+<p>有备份，就会有备份后的处理，显而易见的问题是备份多了会比较占空间，并且也用不到那么多备份。所以备份完成删除掉一段时间以前的就可以了。这步也可以在备份前做，无所谓。</p>
+<p>这里又用到了find命令</p>
+<p>参考文章：<a href="http://www.cnblogs.com/wanqieddy/archive/2011/06/09/2076785.html" target="_blank" rel="external">Linux中find常见用法示例</a></p>
+<p>####删除之前的备份文件</p>
+<p>在刚才的backup.sh中继续输入：</p>
+<figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd <span class="regexp">/var/backups/</span></span><br><span class="line">rm -rf `<span class="javascript">find . -name <span class="string">'*.sql.gz'</span> -mtime +<span class="number">10</span></span>`</span><br></pre></td></tr></table></figure>
+<p>这句命令有两部分，</p>
+<p>第一部分是删除命令：<figure class="highlight"><figcaption><span>-rf```。就是那句一定要慎用的命令了，</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#10;&#31532;&#20108;&#37096;&#20998;&#26159;&#25214;&#21040;&#65306;&#24403;&#21069;&#30446;&#24405;&#65292;&#21517;&#23383;&#20197;&#39;.sql.gz&#39;&#32467;&#23614;&#30340;&#65292;&#26356;&#25913;&#26102;&#38388;&#22312;10&#22825;&#20197;&#21069;&#30340;&#25991;&#20214;&#12290;&#10;&#10;&#39;.&#39;&#34920;&#31034;&#24403;&#21069;&#30446;&#24405;&#65292;&#30001;&#20110;&#19978;&#19968;&#21477;&#26159;```cd /var/backups/```&#65292;&#25152;&#20197;&#36825;&#37324;&#20351;&#29992;&#24403;&#21069;&#30446;&#24405;&#21363;&#21487;&#12290;&#10;&#10;&#39;-name &#39;&#21644;&#39;-mtime&#39;&#21442;&#25968;&#26159;find&#21629;&#20196;&#30340;&#26465;&#20214;&#12290;&#10;&#10;&#20855;&#20307;&#30340;&#35828;&#26126;&#65292;&#21644;&#20854;&#20182;&#26465;&#20214;&#21487;&#20197;&#21442;&#32771;&#21069;&#36793;&#35828;&#21040;&#30340;&#25991;&#31456;&#12290;&#10;&#10;&#21040;&#36825;&#37324;&#22522;&#26412;&#19978;&#22791;&#20221;&#33050;&#26412;&#23601;&#23436;&#25104;&#20102;&#12290;&#10;&#10;&#20294;&#26159;&#20026;&#20102;&#20160;&#20040;&#26102;&#20505;&#31361;&#28982;&#24819;&#30475;&#19968;&#19979;&#26085;&#24535;&#65292;&#25110;&#32773;&#22791;&#20221;&#20986;&#38169;&#30340;&#26102;&#20505;&#26597;&#38382;&#39064;&#65292;&#36824;&#21487;&#20197;&#22312;&#33050;&#26412;&#37324;&#21152;&#19978;&#35760;&#24405;&#26085;&#24535;&#30340;&#21629;&#20196;&#65306;&#10;&#10;####&#26085;&#24535;</span><br></pre></td></tr></table></figure></p>
+<p>echo ‘Begin Backup Database At :’ <code>date +&#39;%Y-%m-%d %H:%M:%S&#39;</code><br><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">这里又用到了date。</span><br><span class="line"></span><br><span class="line">参考文章：[<span class="link_label">Linux下date命令，格式化输出，时间设置 </span>](<span class="link_url">http://blog.csdn.net/jk110333/article/details/8590746/</span>)</span><br><span class="line"></span><br><span class="line">脚本保存之后，记得添加执行权限；</span><br></pre></td></tr></table></figure></p>
+<p>sudo chmod +x backup.sh<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">接下来就是在系统里添加crontab任务了。</span><br></pre></td></tr></table></figure></p>
+<p>cd /etc/<br>vi crontab</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">在文件末尾，加上</span><br></pre></td></tr></table></figure>
+<p>m  h dom mon dow user    command<br>00 5 <em> </em> * root /home/yourname/backup.sh &gt;&gt; /var/log/backup.log<br>```</p>
+<p>这样，backup.sh里的echo就会输出到/var/log/backup.log中了。</p>
+<p>Over。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p><img src="https://s.qichengzx.com/att/img/201601/crontab.jpg" alt=""></p>
+<p>crontab命令之前写过了，在<a href="http://segmentfault.com/a/119000000]]>
+    </summary>
+    
+      <category term="crontab" scheme="https://www.qichengzx.com/tags/crontab/"/>
+    
+      <category term="linux" scheme="https://www.qichengzx.com/tags/linux/"/>
+    
+      <category term="mysql" scheme="https://www.qichengzx.com/tags/mysql/"/>
+    
+      <category term="linux" scheme="https://www.qichengzx.com/categories/linux/"/>
+    
+  </entry>
   
   <entry>
     <title><![CDATA[使用Dropbox同步hexo文章]]></title>

@@ -62,6 +62,79 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-backup-database-with-crontab" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/01/10/backup-database-with-crontab.html" class="article-date">
+  <time datetime="2016-01-10T10:52:55.000Z" itemprop="datePublished">2016-01-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/linux/">linux</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/01/10/backup-database-with-crontab.html">crontab实现定时备份数据库</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="https://s.qichengzx.com/att/img/201601/crontab.jpg" alt=""></p>
+<p>crontab命令之前写过了，在<a href="http://segmentfault.com/a/1190000003953826" target="_blank" rel="external">Linux crontab 访问PHP URL完成定时任务</a>，今天写了一个用来备份数据库的脚本。</p>
+<p>主要会用到以下几个命令：</p>
+<p>####mysqldump</p>
+<p>参考文章：<a href="http://blog.csdn.net/shellching/article/details/8129687" target="_blank" rel="external">mysqldump导入导出数据库总结 </a></p>
+<p>####创建.sh文件：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cd</span> ~</span><br><span class="line"><span class="keyword">vi</span> backup.<span class="keyword">sh</span></span><br></pre></td></tr></table></figure>
+<p>backup.sh内主要内容如下：</p>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -hlocalhost -uroot -p'root' --databases database1 | gzip &gt; /var/backups/databases-database1<span class="escape">`d</span>ate +'<span class="var_expand">%Y%</span>m<span class="var_expand">%d_%</span>H<span class="var_expand">%M%</span>S'<span class="escape">`.</span>sql.gz</span><br></pre></td></tr></table></figure>
+<p>首先用mysqldump命令</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span>连接数据库</span><br><span class="line"><span class="number">2.</span>选择要备份数据库</span><br><span class="line"><span class="number">3.</span>选择存储备份文件的方式，这里使用了gzip了生成一个压缩包</span><br></pre></td></tr></table></figure>
+<p>根据文档，如果想备份所有数据库，可以使用</p>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -hlocalhost -uroot -p'root' --all-databases | gzip &gt; /var/backups/databases-all-database<span class="escape">`d</span>ate +'<span class="var_expand">%Y%</span>m<span class="var_expand">%d_%</span>H<span class="var_expand">%M%</span>S'<span class="escape">`.</span>sql.gz</span><br></pre></td></tr></table></figure>
+<p>保存。</p>
+<p>有备份，就会有备份后的处理，显而易见的问题是备份多了会比较占空间，并且也用不到那么多备份。所以备份完成删除掉一段时间以前的就可以了。这步也可以在备份前做，无所谓。</p>
+<p>这里又用到了find命令</p>
+<p>参考文章：<a href="http://www.cnblogs.com/wanqieddy/archive/2011/06/09/2076785.html" target="_blank" rel="external">Linux中find常见用法示例</a></p>
+<p>####删除之前的备份文件</p>
+<p>在刚才的backup.sh中继续输入：</p>
+<figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd <span class="regexp">/var/backups/</span></span><br><span class="line">rm -rf `<span class="javascript">find . -name <span class="string">'*.sql.gz'</span> -mtime +<span class="number">10</span></span>`</span><br></pre></td></tr></table></figure>
+<p>这句命令有两部分，</p>
+<p>第一部分是删除命令：<figure class="highlight"><figcaption><span>-rf```。就是那句一定要慎用的命令了，</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#10;&#31532;&#20108;&#37096;&#20998;&#26159;&#25214;&#21040;&#65306;&#24403;&#21069;&#30446;&#24405;&#65292;&#21517;&#23383;&#20197;&#39;.sql.gz&#39;&#32467;&#23614;&#30340;&#65292;&#26356;&#25913;&#26102;&#38388;&#22312;10&#22825;&#20197;&#21069;&#30340;&#25991;&#20214;&#12290;&#10;&#10;&#39;.&#39;&#34920;&#31034;&#24403;&#21069;&#30446;&#24405;&#65292;&#30001;&#20110;&#19978;&#19968;&#21477;&#26159;```cd /var/backups/```&#65292;&#25152;&#20197;&#36825;&#37324;&#20351;&#29992;&#24403;&#21069;&#30446;&#24405;&#21363;&#21487;&#12290;&#10;&#10;&#39;-name &#39;&#21644;&#39;-mtime&#39;&#21442;&#25968;&#26159;find&#21629;&#20196;&#30340;&#26465;&#20214;&#12290;&#10;&#10;&#20855;&#20307;&#30340;&#35828;&#26126;&#65292;&#21644;&#20854;&#20182;&#26465;&#20214;&#21487;&#20197;&#21442;&#32771;&#21069;&#36793;&#35828;&#21040;&#30340;&#25991;&#31456;&#12290;&#10;&#10;&#21040;&#36825;&#37324;&#22522;&#26412;&#19978;&#22791;&#20221;&#33050;&#26412;&#23601;&#23436;&#25104;&#20102;&#12290;&#10;&#10;&#20294;&#26159;&#20026;&#20102;&#20160;&#20040;&#26102;&#20505;&#31361;&#28982;&#24819;&#30475;&#19968;&#19979;&#26085;&#24535;&#65292;&#25110;&#32773;&#22791;&#20221;&#20986;&#38169;&#30340;&#26102;&#20505;&#26597;&#38382;&#39064;&#65292;&#36824;&#21487;&#20197;&#22312;&#33050;&#26412;&#37324;&#21152;&#19978;&#35760;&#24405;&#26085;&#24535;&#30340;&#21629;&#20196;&#65306;&#10;&#10;####&#26085;&#24535;</span><br></pre></td></tr></table></figure></p>
+<p>echo ‘Begin Backup Database At :’ <code>date +&#39;%Y-%m-%d %H:%M:%S&#39;</code><br><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">这里又用到了date。</span><br><span class="line"></span><br><span class="line">参考文章：[<span class="link_label">Linux下date命令，格式化输出，时间设置 </span>](<span class="link_url">http://blog.csdn.net/jk110333/article/details/8590746/</span>)</span><br><span class="line"></span><br><span class="line">脚本保存之后，记得添加执行权限；</span><br></pre></td></tr></table></figure></p>
+<p>sudo chmod +x backup.sh<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">接下来就是在系统里添加crontab任务了。</span><br></pre></td></tr></table></figure></p>
+<p>cd /etc/<br>vi crontab</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">在文件末尾，加上</span><br></pre></td></tr></table></figure>
+<p>m  h dom mon dow user    command<br>00 5 <em> </em> * root /home/yourname/backup.sh &gt;&gt; /var/log/backup.log<br>```</p>
+<p>这样，backup.sh里的echo就会输出到/var/log/backup.log中了。</p>
+<p>Over。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html" data-id="cij8g7dlj001d8j0rp84x0w5h" class="article-share-link">Share</a>
+      
+        <a href="https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/crontab/">crontab</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-dropbox-sync-hexo-article" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2015/12/27/dropbox-sync-hexo-article.html" class="article-date">
@@ -120,7 +193,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html" data-id="ciivs387000161h0rqn0i02xx" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html" data-id="cij8g7dld00168j0r064g8dfo" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html#comments" class="article-comment-link">Comments</a>
       
@@ -206,7 +279,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html" data-id="ciivs386800071h0rmjseol39" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html" data-id="cij8g7dkt00078j0r44l36bzv" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html#comments" class="article-comment-link">Comments</a>
       
@@ -264,7 +337,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html" data-id="ciivs386l000c1h0rk4ry66wn" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html" data-id="cij8g7dl0000c8j0rppigt7ai" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html#comments" class="article-comment-link">Comments</a>
       
@@ -330,7 +403,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/03/nodejs-mysql.html" data-id="ciivs386p000n1h0rckan98ta" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/12/03/nodejs-mysql.html" data-id="cij8g7dl5000n8j0rnlhw9379" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/12/03/nodejs-mysql.html#comments" class="article-comment-link">Comments</a>
       
@@ -385,7 +458,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html" data-id="ciivs386y00101h0rha7g3s8j" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html" data-id="cij8g7dlb00108j0r0hbhwk6g" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html#comments" class="article-comment-link">Comments</a>
       
@@ -435,7 +508,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/17/js-names.html" data-id="ciivs386s000t1h0rvubsttl9" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/17/js-names.html" data-id="cij8g7dl7000t8j0rbdbbj5gl" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/17/js-names.html#comments" class="article-comment-link">Comments</a>
       
@@ -563,7 +636,7 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html" data-id="ciivs3873001a1h0rrmmraelw" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html" data-id="cij8g7dlg001a8j0rwqf4d8jm" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html#comments" class="article-comment-link">Comments</a>
       
@@ -889,7 +962,7 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html" data-id="ciivs385m00001h0rb0r0lifr" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html" data-id="cij8g7dk800008j0r7uvseatm" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html#comments" class="article-comment-link">Comments</a>
       
@@ -991,92 +1064,12 @@ Your <span class="keyword">public</span> <span class="keyword">key</span> has be
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html" data-id="ciivs3876001d1h0rfhhijkzo" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html" data-id="cij8g7dln001l8j0rwy96bg48" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html#comments" class="article-comment-link">Comments</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/git/">git</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vps/">vps</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="react-native-React-Native-Fetch" class="article article-type-react-native" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2015/11/06/React-Native-Fetch.html" class="article-date">
-  <time datetime="2015-11-06T14:54:22.000Z" itemprop="datePublished">2015-11-06</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2015/11/06/React-Native-Fetch.html">React-Native Fetch方法发送网络请求</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>先贴一个官方文档。<br><a href="https://facebook.github.io/react-native/docs/network.html#content" target="_blank" rel="external">Network</a></p>
-<pre><code>fetch<span class="list">(<span class="quoted">'https</span><span class="keyword">://mywebsite</span>.com/endpoint/', {
-    method: <span class="quoted">'POST</span>',
-    headers: {
-        <span class="quoted">'Accept</span>': <span class="quoted">'application/json</span>',
-        <span class="quoted">'Content-Type</span>': <span class="quoted">'application/json</span>',
-    },
-    body: JSON.stringify<span class="list">({
-        firstParam: <span class="quoted">'yourValue</span>',
-        secondParam: <span class="quoted">'yourOtherValue</span>',
-    })</span>
-})</span>
-</code></pre><p>一开始我就是单纯的这么写的，愉快的把URL替换掉，把参数替换掉，然后。。。<br>我愉快的敲下 <code>var_dump($_POST[&#39;firstParam&#39;])</code> 的时候，后台没接到任何东西，后来在stackoverflow上看到回答，说之所以接收不到，是因为这不属于form data，想要这么写，需要在接收前添加 <code>file_get_contents(&#39;php://input&#39;)</code>,然后果然就可以了。</p>
-<pre><code><span class="variable">$json</span> = json_decode(file_get_contents(<span class="string">'php://input'</span>), <span class="literal">true</span>);
-var_dump(<span class="variable">$json</span>[<span class="string">'firstParam'</span>]);
-</code></pre><p>但是这样会影响到现有的web应用，所以又继续查资料，发现可以改成下边这样的方法。</p>
-<pre><code><span class="function"><span class="keyword">function</span> <span class="title">toQueryString</span>(<span class="params">obj</span>) </span>{
-    <span class="keyword">return</span> obj ? <span class="built_in">Object</span>.keys(obj).sort().map(<span class="function"><span class="keyword">function</span> (<span class="params">key</span>) </span>{
-        <span class="keyword">var</span> val = obj[key];
-        <span class="keyword">if</span> (<span class="built_in">Array</span>.isArray(val)) {
-            <span class="keyword">return</span> val.sort().map(<span class="function"><span class="keyword">function</span> (<span class="params">val2</span>) </span>{
-                <span class="keyword">return</span> <span class="built_in">encodeURIComponent</span>(key) + <span class="string">'='</span> + <span class="built_in">encodeURIComponent</span>(val2);
-            }).join(<span class="string">'&amp;'</span>);
-        }
-
-        <span class="keyword">return</span> <span class="built_in">encodeURIComponent</span>(key) + <span class="string">'='</span> + <span class="built_in">encodeURIComponent</span>(val);
-    }).join(<span class="string">'&amp;'</span>) : <span class="string">''</span>;
-}
-
-
-fetch(url, {
-    method: <span class="string">'post'</span>,
-    body: toQueryString({ 
-        <span class="string">'firstParam'</span>: <span class="string">'yourValue'</span>,
-        <span class="string">'secondParam'</span>:<span class="string">'yourOtherValue'</span> 
-    })
-}) 
-</code></pre><p>这样，在后台就可以正常的用$_POST[‘firstParam’];接收了。</p>
-<p><a href="http://stackoverflow.com/questions/32448862/how-can-i-use-react-native-with-php-with-fetch-return-data-is-always-null" target="_blank" rel="external">Sending data as key-value pair using fetch polyfill in react-native</a></p>
-<p><a href="http://stackoverflow.com/questions/31201940/sending-data-as-key-value-pair-using-fetch-polyfill-in-react-native" target="_blank" rel="external">How can I use react-native with php with fetch return data is always null</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/06/React-Native-Fetch.html" data-id="ciivs3878001i1h0rj2idswhh" class="article-share-link">Share</a>
-      
-        <a href="https://www.qichengzx.com/2015/11/06/React-Native-Fetch.html#comments" class="article-comment-link">Comments</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/fetch/">fetch</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/react-native/">react-native</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/网络请求/">网络请求</a></li></ul>
 
     </footer>
   </div>
@@ -1128,7 +1121,7 @@ fetch(url, {
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">1</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -1137,7 +1130,7 @@ fetch(url, {
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -1146,7 +1139,7 @@ fetch(url, {
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/dropbox/" style="font-size: 15px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/hexo/" style="font-size: 20px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/javascript/" style="font-size: 10px;">javascript</a> <a href="/tags/mysql/" style="font-size: 20px;">mysql</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 10px;">php</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a>
+      <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/dropbox/" style="font-size: 13.33px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/hexo/" style="font-size: 16.67px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/javascript/" style="font-size: 10px;">javascript</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 20px;">mysql</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 10px;">php</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a>
     </div>
   </div>
 
@@ -1155,7 +1148,7 @@ fetch(url, {
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
     </div>
   </div>
 
@@ -1165,6 +1158,10 @@ fetch(url, {
     <h3 class="widget-title">Recents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2016/01/10/backup-database-with-crontab.html">crontab实现定时备份数据库</a>
+          </li>
         
           <li>
             <a href="/2015/12/27/dropbox-sync-hexo-article.html">使用Dropbox同步hexo文章</a>
@@ -1182,10 +1179,6 @@ fetch(url, {
             <a href="/2015/12/03/nodejs-mysql.html">Node.js连接MySQL并读取数据</a>
           </li>
         
-          <li>
-            <a href="/2015/11/21/export-results-of-mysql-to-excel.html">MySQL命令行导出结果集到Excel</a>
-          </li>
-        
       </ul>
     </div>
   </div>
@@ -1201,7 +1194,7 @@ fetch(url, {
       &copy; 2016 qichengzx<br>
       Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
       <a href="http://itxs.co/s/83a61yzi" target="_blank">科学上网工具</a>
-      
+      Hosted by <a href="https://www.digitalocean.com/?refcode=2cb067f6a1f0" target="_blank">DigitalOcean</a>
     </div>
   </div>
 </footer>
