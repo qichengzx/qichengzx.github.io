@@ -3,39 +3,17 @@
 <head>
   <meta charset="utf-8">
   
-  <title>React-Native Fetch方法发送网络请求 | 启程</title>
+  <title>Tag: input | 启程</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="先贴一个官方文档。Network
-fetch(&apos;https://mywebsite.com/endpoint/&apos;, {
-    method: &apos;POST&apos;,
-    headers: {
-        &apos;Accept&apos;: &apos;application/json&apos;,
-        &apos;Content-Type&apos;: &apos;application/json&apos;,
-    },
-    body: JSON.s">
-<meta property="og:type" content="article">
-<meta property="og:title" content="React-Native Fetch方法发送网络请求">
-<meta property="og:url" content="https://www.qichengzx.com/2015/11/06/React-Native-Fetch.html">
+  <meta name="description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
+<meta property="og:type" content="website">
+<meta property="og:title" content="启程">
+<meta property="og:url" content="https://www.qichengzx.com/tags/input/index.html">
 <meta property="og:site_name" content="启程">
-<meta property="og:description" content="先贴一个官方文档。Network
-fetch(&apos;https://mywebsite.com/endpoint/&apos;, {
-    method: &apos;POST&apos;,
-    headers: {
-        &apos;Accept&apos;: &apos;application/json&apos;,
-        &apos;Content-Type&apos;: &apos;application/json&apos;,
-    },
-    body: JSON.s">
-<meta property="og:updated_time" content="2015-11-08T02:51:53.000Z">
+<meta property="og:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="React-Native Fetch方法发送网络请求">
-<meta name="twitter:description" content="先贴一个官方文档。Network
-fetch(&apos;https://mywebsite.com/endpoint/&apos;, {
-    method: &apos;POST&apos;,
-    headers: {
-        &apos;Accept&apos;: &apos;application/json&apos;,
-        &apos;Content-Type&apos;: &apos;application/json&apos;,
-    },
-    body: JSON.s">
+<meta name="twitter:title" content="启程">
+<meta name="twitter:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
 <meta name="twitter:creator" content="@qichengzx">
   
     <link rel="alternative" href="/atom.xml" title="启程" type="application/atom+xml">
@@ -82,120 +60,39 @@ fetch(&apos;https://mywebsite.com/endpoint/&apos;, {
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="react-native-React-Native-Fetch" class="article article-type-react-native" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2015/11/06/React-Native-Fetch.html" class="article-date">
-  <time datetime="2015-11-06T14:54:22.000Z" itemprop="datePublished">2015-11-06</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
+        <section id="main">
   
-    <h1 class="article-title" itemprop="name">
-      React-Native Fetch方法发送网络请求
+  
+    
+    
+      
+      
+      <section class="archives-wrap">
+        <div class="archive-year-wrap">
+          <a href="/archives/2016" class="archive-year">2016</a>
+        </div>
+        <div class="archives">
+    
+    <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      <a href="/2016/01/11/placeholder-animate.html" class="archive-article-date">
+  <time datetime="2016-01-11T13:42:58.000Z" itemprop="datePublished">Jan 11</time>
+</a>
+      
+  
+    <h1 itemprop="name">
+      <a class="archive-article-title" href="/2016/01/11/placeholder-animate.html">一个简单的input获得焦点时</a>
     </h1>
   
 
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>先贴一个官方文档。<br><a href="https://facebook.github.io/react-native/docs/network.html#content" target="_blank" rel="external">Network</a></p>
-<pre><code>fetch<span class="list">(<span class="quoted">'https</span><span class="keyword">://mywebsite</span>.com/endpoint/', {
-    method: <span class="quoted">'POST</span>',
-    headers: {
-        <span class="quoted">'Accept</span>': <span class="quoted">'application/json</span>',
-        <span class="quoted">'Content-Type</span>': <span class="quoted">'application/json</span>',
-    },
-    body: JSON.stringify<span class="list">({
-        firstParam: <span class="quoted">'yourValue</span>',
-        secondParam: <span class="quoted">'yourOtherValue</span>',
-    })</span>
-})</span>
-</code></pre><p>一开始我就是单纯的这么写的，愉快的把URL替换掉，把参数替换掉，然后。。。<br>我愉快的敲下 <code>var_dump($_POST[&#39;firstParam&#39;])</code> 的时候，后台没接到任何东西，后来在stackoverflow上看到回答，说之所以接收不到，是因为这不属于form data，想要这么写，需要在接收前添加 <code>file_get_contents(&#39;php://input&#39;)</code>,然后果然就可以了。</p>
-<pre><code><span class="variable">$json</span> = json_decode(file_get_contents(<span class="string">'php://input'</span>), <span class="literal">true</span>);
-var_dump(<span class="variable">$json</span>[<span class="string">'firstParam'</span>]);
-</code></pre><p>但是这样会影响到现有的web应用，所以又继续查资料，发现可以改成下边这样的方法。</p>
-<pre><code><span class="function"><span class="keyword">function</span> <span class="title">toQueryString</span>(<span class="params">obj</span>) </span>{
-    <span class="keyword">return</span> obj ? <span class="built_in">Object</span>.keys(obj).sort().map(<span class="function"><span class="keyword">function</span> (<span class="params">key</span>) </span>{
-        <span class="keyword">var</span> val = obj[key];
-        <span class="keyword">if</span> (<span class="built_in">Array</span>.isArray(val)) {
-            <span class="keyword">return</span> val.sort().map(<span class="function"><span class="keyword">function</span> (<span class="params">val2</span>) </span>{
-                <span class="keyword">return</span> <span class="built_in">encodeURIComponent</span>(key) + <span class="string">'='</span> + <span class="built_in">encodeURIComponent</span>(val2);
-            }).join(<span class="string">'&amp;'</span>);
-        }
-
-        <span class="keyword">return</span> <span class="built_in">encodeURIComponent</span>(key) + <span class="string">'='</span> + <span class="built_in">encodeURIComponent</span>(val);
-    }).join(<span class="string">'&amp;'</span>) : <span class="string">''</span>;
-}
-
-
-fetch(url, {
-    method: <span class="string">'post'</span>,
-    body: toQueryString({ 
-        <span class="string">'firstParam'</span>: <span class="string">'yourValue'</span>,
-        <span class="string">'secondParam'</span>:<span class="string">'yourOtherValue'</span> 
-    })
-}) 
-</code></pre><p>这样，在后台就可以正常的用$_POST[‘firstParam’];接收了。</p>
-<p><a href="http://stackoverflow.com/questions/32448862/how-can-i-use-react-native-with-php-with-fetch-return-data-is-always-null" target="_blank" rel="external">Sending data as key-value pair using fetch polyfill in react-native</a></p>
-<p><a href="http://stackoverflow.com/questions/31201940/sending-data-as-key-value-pair-using-fetch-polyfill-in-react-native" target="_blank" rel="external">How can I use react-native with php with fetch return data is always null</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/06/React-Native-Fetch.html" data-id="cijavsmcc001vte0r6a40mf2n" class="article-share-link">Share</a>
-      
-        <a href="https://www.qichengzx.com/2015/11/06/React-Native-Fetch.html#comments" class="article-comment-link">Comments</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/fetch/">fetch</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/react-native/">react-native</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/网络请求/">网络请求</a></li></ul>
-
-    </footer>
+    </header>
   </div>
-  
-    
-<nav id="article-nav">
-  
-    <a href="/2015/11/07/Set Up a Private Git Server on a VPS.html" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Newer</strong>
-      <div class="article-nav-title">
-        
-          vps 搭建个人git服务器
-        
-      </div>
-    </a>
-  
-  
-    <a href="/2015/11/06/hello-world.html" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">Hello World</div>
-    </a>
-  
-</nav>
-
-  
 </article>
-
-
-<section id="comments">
-  <div class="ds-thread" data-thread-key="cijavsmcc001vte0r6a40mf2n" data-title="React-Native Fetch方法发送网络请求" data-url="https://www.qichengzx.com/2015/11/06/React-Native-Fetch.html"></div>
-  <script>
-    var duoshuoQuery = {short_name:"qichengzx"};
-    (function() {
-      var ds = document.createElement('script');
-      ds.type = 'text/javascript';ds.async = true;
-      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
-      ds.charset = 'UTF-8';
-      (document.getElementsByTagName('head')[0] 
-       || document.getElementsByTagName('body')[0]).appendChild(ds);
-    })();
-    </script>
-</section>
+  
+  
+    </div></section>
+  
 </section>
         
           <aside id="sidebar">

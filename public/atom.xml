@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="https://www.qichengzx.com/"/>
-  <updated>2016-01-10T11:22:53.000Z</updated>
+  <updated>2016-01-12T04:11:06.000Z</updated>
   <id>https://www.qichengzx.com/</id>
   
   <author>
@@ -13,6 +13,32 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[一个简单的input获得焦点时]]></title>
+    <link href="https://www.qichengzx.com/2016/01/11/placeholder-animate.html"/>
+    <id>https://www.qichengzx.com/2016/01/11/placeholder-animate.html</id>
+    <published>2016-01-11T13:42:58.000Z</published>
+    <updated>2016-01-12T04:11:06.000Z</updated>
+    <content type="html"><![CDATA[<p>以前经常见到的一种页面表单效果，但是并没有在项目中用过，前几天在sf上看到相关问题，顺手写了一个，还挺简单，没什么含量。</p>
+<p>此处省略HTML头信息等内容。</p>
+<h3 id="HTML">HTML</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"text"</span> <span class="attribute">id</span>=<span class="value">"uname"</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="title">label</span>&gt;</span>Name<span class="tag">&lt;/<span class="title">label</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="CSS">CSS</h3><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">div</span><span class="rules">&#123;</span><br><span class="line">  <span class="rule"><span class="attribute">position</span>:<span class="value">relative</span></span>;</span><br><span class="line">  <span class="rule"><span class="attribute">top</span>:<span class="value"><span class="number">20px</span></span></span>;</span><br><span class="line">&#125;</span></span><br><span class="line"><span class="tag">input</span><span class="rules">&#123;</span><br><span class="line">  <span class="rule"><span class="attribute">width</span>:<span class="value"><span class="number">200px</span></span></span>;</span><br><span class="line">  <span class="rule"><span class="attribute">height</span>:<span class="value"><span class="number">30px</span></span></span>;</span><br><span class="line">  <span class="rule"><span class="attribute">line-height</span>:<span class="value"><span class="number">30px</span></span></span>;</span><br><span class="line">  <span class="rule"><span class="attribute">padding</span>:<span class="value"><span class="number">0</span> <span class="number">3px</span></span></span>;</span><br><span class="line">  <span class="rule"><span class="attribute">border</span>:<span class="value">none</span></span>;</span><br><span class="line">  <span class="rule"><span class="attribute">border-bottom</span>:<span class="value"><span class="number">1px</span> solod <span class="hexcolor">#666</span></span></span>;</span><br><span class="line"></span><br><span class="line">&#125;</span></span><br><span class="line"><span class="tag">label</span><span class="rules">&#123;</span><br><span class="line">  <span class="rule"><span class="attribute">position</span>:<span class="value">absolute</span></span>;</span><br><span class="line">  <span class="rule"><span class="attribute">top</span>:<span class="value"><span class="number">0</span></span></span>;</span><br><span class="line">  <span class="rule"><span class="attribute">left</span>:<span class="value"><span class="number">5px</span></span></span>;</span><br><span class="line">  <span class="rule"><span class="attribute">color</span>:<span class="value"><span class="hexcolor">#ccc</span></span></span>;</span><br><span class="line">  <span class="rule"><span class="attribute">height</span>:<span class="value"><span class="number">30px</span></span></span>;</span><br><span class="line">  <span class="rule"><span class="attribute">line-height</span>:<span class="value"><span class="number">30px</span></span></span>;</span><br><span class="line">&#125;</span></span><br></pre></td></tr></table></figure>
+<h3 id="JS">JS</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$(<span class="built_in">document</span>).on(<span class="string">'focus'</span>,<span class="string">'input'</span>,<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	$(<span class="keyword">this</span>).siblings(<span class="string">'label'</span>).animate(&#123;top:<span class="string">'-20px'</span>&#125;);</span><br><span class="line">&#125;)</span><br><span class="line">.on(<span class="string">'focusout'</span>,<span class="string">'input'</span>,<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	$(<span class="keyword">this</span>).siblings(<span class="string">'label'</span>).animate(&#123;top:<span class="string">'0'</span>&#125;);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="RESULT">RESULT</h3><iframe width="100%" height="300" src="//jsfiddle.net/qichengzx/zc91Lyx7/8/embedded/" allowfullscreen="allowfullscreen" frameborder="0"></iframe>]]></content>
+    <summary type="html">
+    <![CDATA[<p>以前经常见到的一种页面表单效果，但是并没有在项目中用过，前几天在sf上看到相关问题，顺手写了一个，还挺简单，没什么含量。</p>
+<p>此处省略HTML头信息等内容。</p>
+<h3 id="HTML">HTML</h3><figure class="highlight x]]>
+    </summary>
+    
+      <category term="input" scheme="https://www.qichengzx.com/tags/input/"/>
+    
+      <category term="javascript" scheme="https://www.qichengzx.com/tags/javascript/"/>
+    
+      <category term="javascript" scheme="https://www.qichengzx.com/categories/javascript/"/>
+    
+  </entry>
   
   <entry>
     <title><![CDATA[crontab实现定时备份数据库]]></title>

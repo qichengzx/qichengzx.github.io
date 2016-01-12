@@ -3,39 +3,27 @@
 <head>
   <meta charset="utf-8">
   
-  <title>React-Native Fetch方法发送网络请求 | 启程</title>
+  <title>一个简单的input获得焦点时 | 启程</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="先贴一个官方文档。Network
-fetch(&apos;https://mywebsite.com/endpoint/&apos;, {
-    method: &apos;POST&apos;,
-    headers: {
-        &apos;Accept&apos;: &apos;application/json&apos;,
-        &apos;Content-Type&apos;: &apos;application/json&apos;,
-    },
-    body: JSON.s">
+  <meta name="description" content="以前经常见到的一种页面表单效果，但是并没有在项目中用过，前几天在sf上看到相关问题，顺手写了一个，还挺简单，没什么含量。
+此处省略HTML头信息等内容。
+HTML1234&amp;lt;div&amp;gt;  &amp;lt;input type=&quot;text&quot; id=&quot;uname&quot;/&amp;gt;  &amp;lt;label&amp;gt;Name&amp;lt;/label&amp;gt;&amp;lt;/div&amp;gt;
+CSS1234567891011121">
 <meta property="og:type" content="article">
-<meta property="og:title" content="React-Native Fetch方法发送网络请求">
-<meta property="og:url" content="https://www.qichengzx.com/2015/11/06/React-Native-Fetch.html">
+<meta property="og:title" content="一个简单的input获得焦点时">
+<meta property="og:url" content="https://www.qichengzx.com/2016/01/11/placeholder-animate.html">
 <meta property="og:site_name" content="启程">
-<meta property="og:description" content="先贴一个官方文档。Network
-fetch(&apos;https://mywebsite.com/endpoint/&apos;, {
-    method: &apos;POST&apos;,
-    headers: {
-        &apos;Accept&apos;: &apos;application/json&apos;,
-        &apos;Content-Type&apos;: &apos;application/json&apos;,
-    },
-    body: JSON.s">
-<meta property="og:updated_time" content="2015-11-08T02:51:53.000Z">
+<meta property="og:description" content="以前经常见到的一种页面表单效果，但是并没有在项目中用过，前几天在sf上看到相关问题，顺手写了一个，还挺简单，没什么含量。
+此处省略HTML头信息等内容。
+HTML1234&amp;lt;div&amp;gt;  &amp;lt;input type=&quot;text&quot; id=&quot;uname&quot;/&amp;gt;  &amp;lt;label&amp;gt;Name&amp;lt;/label&amp;gt;&amp;lt;/div&amp;gt;
+CSS1234567891011121">
+<meta property="og:updated_time" content="2016-01-12T04:11:06.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="React-Native Fetch方法发送网络请求">
-<meta name="twitter:description" content="先贴一个官方文档。Network
-fetch(&apos;https://mywebsite.com/endpoint/&apos;, {
-    method: &apos;POST&apos;,
-    headers: {
-        &apos;Accept&apos;: &apos;application/json&apos;,
-        &apos;Content-Type&apos;: &apos;application/json&apos;,
-    },
-    body: JSON.s">
+<meta name="twitter:title" content="一个简单的input获得焦点时">
+<meta name="twitter:description" content="以前经常见到的一种页面表单效果，但是并没有在项目中用过，前几天在sf上看到相关问题，顺手写了一个，还挺简单，没什么含量。
+此处省略HTML头信息等内容。
+HTML1234&amp;lt;div&amp;gt;  &amp;lt;input type=&quot;text&quot; id=&quot;uname&quot;/&amp;gt;  &amp;lt;label&amp;gt;Name&amp;lt;/label&amp;gt;&amp;lt;/div&amp;gt;
+CSS1234567891011121">
 <meta name="twitter:creator" content="@qichengzx">
   
     <link rel="alternative" href="/atom.xml" title="启程" type="application/atom+xml">
@@ -82,12 +70,16 @@ fetch(&apos;https://mywebsite.com/endpoint/&apos;, {
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="react-native-React-Native-Fetch" class="article article-type-react-native" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-placeholder-animate" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2015/11/06/React-Native-Fetch.html" class="article-date">
-  <time datetime="2015-11-06T14:54:22.000Z" itemprop="datePublished">2015-11-06</time>
+    <a href="/2016/01/11/placeholder-animate.html" class="article-date">
+  <time datetime="2016-01-11T13:42:58.000Z" itemprop="datePublished">2016-01-11</time>
 </a>
     
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/javascript/">javascript</a>
+  </div>
+
   </div>
   <div class="article-inner">
     
@@ -96,7 +88,7 @@ fetch(&apos;https://mywebsite.com/endpoint/&apos;, {
         
   
     <h1 class="article-title" itemprop="name">
-      React-Native Fetch方法发送网络请求
+      一个简单的input获得焦点时
     </h1>
   
 
@@ -104,56 +96,21 @@ fetch(&apos;https://mywebsite.com/endpoint/&apos;, {
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>先贴一个官方文档。<br><a href="https://facebook.github.io/react-native/docs/network.html#content" target="_blank" rel="external">Network</a></p>
-<pre><code>fetch<span class="list">(<span class="quoted">'https</span><span class="keyword">://mywebsite</span>.com/endpoint/', {
-    method: <span class="quoted">'POST</span>',
-    headers: {
-        <span class="quoted">'Accept</span>': <span class="quoted">'application/json</span>',
-        <span class="quoted">'Content-Type</span>': <span class="quoted">'application/json</span>',
-    },
-    body: JSON.stringify<span class="list">({
-        firstParam: <span class="quoted">'yourValue</span>',
-        secondParam: <span class="quoted">'yourOtherValue</span>',
-    })</span>
-})</span>
-</code></pre><p>一开始我就是单纯的这么写的，愉快的把URL替换掉，把参数替换掉，然后。。。<br>我愉快的敲下 <code>var_dump($_POST[&#39;firstParam&#39;])</code> 的时候，后台没接到任何东西，后来在stackoverflow上看到回答，说之所以接收不到，是因为这不属于form data，想要这么写，需要在接收前添加 <code>file_get_contents(&#39;php://input&#39;)</code>,然后果然就可以了。</p>
-<pre><code><span class="variable">$json</span> = json_decode(file_get_contents(<span class="string">'php://input'</span>), <span class="literal">true</span>);
-var_dump(<span class="variable">$json</span>[<span class="string">'firstParam'</span>]);
-</code></pre><p>但是这样会影响到现有的web应用，所以又继续查资料，发现可以改成下边这样的方法。</p>
-<pre><code><span class="function"><span class="keyword">function</span> <span class="title">toQueryString</span>(<span class="params">obj</span>) </span>{
-    <span class="keyword">return</span> obj ? <span class="built_in">Object</span>.keys(obj).sort().map(<span class="function"><span class="keyword">function</span> (<span class="params">key</span>) </span>{
-        <span class="keyword">var</span> val = obj[key];
-        <span class="keyword">if</span> (<span class="built_in">Array</span>.isArray(val)) {
-            <span class="keyword">return</span> val.sort().map(<span class="function"><span class="keyword">function</span> (<span class="params">val2</span>) </span>{
-                <span class="keyword">return</span> <span class="built_in">encodeURIComponent</span>(key) + <span class="string">'='</span> + <span class="built_in">encodeURIComponent</span>(val2);
-            }).join(<span class="string">'&amp;'</span>);
-        }
-
-        <span class="keyword">return</span> <span class="built_in">encodeURIComponent</span>(key) + <span class="string">'='</span> + <span class="built_in">encodeURIComponent</span>(val);
-    }).join(<span class="string">'&amp;'</span>) : <span class="string">''</span>;
-}
-
-
-fetch(url, {
-    method: <span class="string">'post'</span>,
-    body: toQueryString({ 
-        <span class="string">'firstParam'</span>: <span class="string">'yourValue'</span>,
-        <span class="string">'secondParam'</span>:<span class="string">'yourOtherValue'</span> 
-    })
-}) 
-</code></pre><p>这样，在后台就可以正常的用$_POST[‘firstParam’];接收了。</p>
-<p><a href="http://stackoverflow.com/questions/32448862/how-can-i-use-react-native-with-php-with-fetch-return-data-is-always-null" target="_blank" rel="external">Sending data as key-value pair using fetch polyfill in react-native</a></p>
-<p><a href="http://stackoverflow.com/questions/31201940/sending-data-as-key-value-pair-using-fetch-polyfill-in-react-native" target="_blank" rel="external">How can I use react-native with php with fetch return data is always null</a></p>
-
+        <p>以前经常见到的一种页面表单效果，但是并没有在项目中用过，前几天在sf上看到相关问题，顺手写了一个，还挺简单，没什么含量。</p>
+<p>此处省略HTML头信息等内容。</p>
+<h3 id="HTML">HTML</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"text"</span> <span class="attribute">id</span>=<span class="value">"uname"</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="title">label</span>&gt;</span>Name<span class="tag">&lt;/<span class="title">label</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="CSS">CSS</h3><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">div</span><span class="rules">&#123;</span><br><span class="line">  <span class="rule"><span class="attribute">position</span>:<span class="value">relative</span></span>;</span><br><span class="line">  <span class="rule"><span class="attribute">top</span>:<span class="value"><span class="number">20px</span></span></span>;</span><br><span class="line">&#125;</span></span><br><span class="line"><span class="tag">input</span><span class="rules">&#123;</span><br><span class="line">  <span class="rule"><span class="attribute">width</span>:<span class="value"><span class="number">200px</span></span></span>;</span><br><span class="line">  <span class="rule"><span class="attribute">height</span>:<span class="value"><span class="number">30px</span></span></span>;</span><br><span class="line">  <span class="rule"><span class="attribute">line-height</span>:<span class="value"><span class="number">30px</span></span></span>;</span><br><span class="line">  <span class="rule"><span class="attribute">padding</span>:<span class="value"><span class="number">0</span> <span class="number">3px</span></span></span>;</span><br><span class="line">  <span class="rule"><span class="attribute">border</span>:<span class="value">none</span></span>;</span><br><span class="line">  <span class="rule"><span class="attribute">border-bottom</span>:<span class="value"><span class="number">1px</span> solod <span class="hexcolor">#666</span></span></span>;</span><br><span class="line"></span><br><span class="line">&#125;</span></span><br><span class="line"><span class="tag">label</span><span class="rules">&#123;</span><br><span class="line">  <span class="rule"><span class="attribute">position</span>:<span class="value">absolute</span></span>;</span><br><span class="line">  <span class="rule"><span class="attribute">top</span>:<span class="value"><span class="number">0</span></span></span>;</span><br><span class="line">  <span class="rule"><span class="attribute">left</span>:<span class="value"><span class="number">5px</span></span></span>;</span><br><span class="line">  <span class="rule"><span class="attribute">color</span>:<span class="value"><span class="hexcolor">#ccc</span></span></span>;</span><br><span class="line">  <span class="rule"><span class="attribute">height</span>:<span class="value"><span class="number">30px</span></span></span>;</span><br><span class="line">  <span class="rule"><span class="attribute">line-height</span>:<span class="value"><span class="number">30px</span></span></span>;</span><br><span class="line">&#125;</span></span><br></pre></td></tr></table></figure>
+<h3 id="JS">JS</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$(<span class="built_in">document</span>).on(<span class="string">'focus'</span>,<span class="string">'input'</span>,<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	$(<span class="keyword">this</span>).siblings(<span class="string">'label'</span>).animate(&#123;top:<span class="string">'-20px'</span>&#125;);</span><br><span class="line">&#125;)</span><br><span class="line">.on(<span class="string">'focusout'</span>,<span class="string">'input'</span>,<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	$(<span class="keyword">this</span>).siblings(<span class="string">'label'</span>).animate(&#123;top:<span class="string">'0'</span>&#125;);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="RESULT">RESULT</h3><iframe width="100%" height="300" src="//jsfiddle.net/qichengzx/zc91Lyx7/8/embedded/" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/06/React-Native-Fetch.html" data-id="cijavsmcc001vte0r6a40mf2n" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/01/11/placeholder-animate.html" data-id="cijavsmbi000cte0rqrqsk4an" class="article-share-link">Share</a>
       
-        <a href="https://www.qichengzx.com/2015/11/06/React-Native-Fetch.html#comments" class="article-comment-link">Comments</a>
+        <a href="https://www.qichengzx.com/2016/01/11/placeholder-animate.html#comments" class="article-comment-link">Comments</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/fetch/">fetch</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/react-native/">react-native</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/网络请求/">网络请求</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/input/">input</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/javascript/">javascript</a></li></ul>
 
     </footer>
   </div>
@@ -161,19 +118,10 @@ fetch(url, {
     
 <nav id="article-nav">
   
-    <a href="/2015/11/07/Set Up a Private Git Server on a VPS.html" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Newer</strong>
-      <div class="article-nav-title">
-        
-          vps 搭建个人git服务器
-        
-      </div>
-    </a>
   
-  
-    <a href="/2015/11/06/hello-world.html" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/2016/01/10/backup-database-with-crontab.html" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">Hello World</div>
+      <div class="article-nav-title">crontab实现定时备份数据库</div>
     </a>
   
 </nav>
@@ -183,7 +131,7 @@ fetch(url, {
 
 
 <section id="comments">
-  <div class="ds-thread" data-thread-key="cijavsmcc001vte0r6a40mf2n" data-title="React-Native Fetch方法发送网络请求" data-url="https://www.qichengzx.com/2015/11/06/React-Native-Fetch.html"></div>
+  <div class="ds-thread" data-thread-key="cijavsmbi000cte0rqrqsk4an" data-title="一个简单的input获得焦点时" data-url="https://www.qichengzx.com/2016/01/11/placeholder-animate.html"></div>
   <script>
     var duoshuoQuery = {short_name:"qichengzx"};
     (function() {
