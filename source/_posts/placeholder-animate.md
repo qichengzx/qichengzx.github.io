@@ -1,4 +1,4 @@
-title: 一个简单的input获得焦点时
+title: 一个简单的input获得焦点时的小动画效果
 categories: javascript
 date: 2016-01-11 21:42:58
 tags:  [javascript,input]
