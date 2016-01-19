@@ -62,6 +62,332 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-time-widget-for-hexo" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/11/11/time-widget-for-hexo.html" class="article-date">
+  <time datetime="2015-11-11T06:16:29.000Z" itemprop="datePublished">2015-11-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/11/11/time-widget-for-hexo.html">为hexo加一个时钟小挂件</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>之前在 <a href="http://segmentfault.com/a/1190000003055672" target="_blank" rel="external">HTML+CSS3再加一点点JS做的一个小时钟</a> 看到的这个问题，觉得很好把代码存下来了，今天突发奇想把它放到hexo的新博客上。</p>
+<h3 id="STEP_0">STEP 0</h3><p>把HTML内容放到新建的模板里，我命名为time.ejs。</p>
+<pre><code>    &lt;<span class="keyword">div</span> <span class="type">class</span>=<span class="string">"widget-wrap"</span>&gt;
+    &lt;h3 <span class="type">class</span>=<span class="string">"widget-title"</span>&gt;Time&lt;/h3&gt;
+    &lt;<span class="keyword">div</span> <span class="type">class</span>=<span class="string">"widget time"</span>&gt;
+        &lt;style <span class="property">id</span>=<span class="string">"clock-animations"</span>&gt;&lt;/style&gt;
+        &lt;<span class="keyword">div</span> <span class="type">class</span>=<span class="string">"clock-wrapper"</span>&gt;
+            &lt;<span class="keyword">div</span> <span class="type">class</span>=<span class="string">"clock-base"</span>&gt;
+                    &lt;<span class="keyword">div</span> <span class="type">class</span>=<span class="string">"clock-indicator"</span>&gt;
+                        &lt;<span class="keyword">div</span>&gt;&lt;/<span class="keyword">div</span>&gt;
+                        &lt;<span class="keyword">div</span>&gt;&lt;/<span class="keyword">div</span>&gt;
+                        &lt;<span class="keyword">div</span>&gt;&lt;/<span class="keyword">div</span>&gt;
+                        &lt;<span class="keyword">div</span>&gt;&lt;/<span class="keyword">div</span>&gt;
+                        &lt;<span class="keyword">div</span>&gt;&lt;/<span class="keyword">div</span>&gt;
+                        &lt;<span class="keyword">div</span>&gt;&lt;/<span class="keyword">div</span>&gt;
+                        &lt;<span class="keyword">div</span>&gt;&lt;/<span class="keyword">div</span>&gt;
+                        &lt;<span class="keyword">div</span>&gt;&lt;/<span class="keyword">div</span>&gt;
+                        &lt;<span class="keyword">div</span>&gt;&lt;/<span class="keyword">div</span>&gt;
+                        &lt;<span class="keyword">div</span>&gt;&lt;/<span class="keyword">div</span>&gt;
+                        &lt;<span class="keyword">div</span>&gt;&lt;/<span class="keyword">div</span>&gt;
+                        &lt;<span class="keyword">div</span>&gt;&lt;/<span class="keyword">div</span>&gt;
+                    &lt;/<span class="keyword">div</span>&gt;
+                    &lt;<span class="keyword">div</span> <span class="type">class</span>=<span class="string">"clock-hour"</span>&gt;&lt;/<span class="keyword">div</span>&gt;
+                    &lt;<span class="keyword">div</span> <span class="type">class</span>=<span class="string">"clock-minute"</span>&gt;&lt;/<span class="keyword">div</span>&gt;
+                    &lt;<span class="keyword">div</span> <span class="type">class</span>=<span class="string">"clock-second"</span>&gt;&lt;/<span class="keyword">div</span>&gt;
+                    &lt;<span class="keyword">div</span> <span class="type">class</span>=<span class="string">"clock-center"</span>&gt;&lt;/<span class="keyword">div</span>&gt;
+            &lt;/<span class="keyword">div</span>&gt;
+        &lt;/<span class="keyword">div</span>&gt;
+    &lt;/<span class="keyword">div</span>&gt;
+&lt;/<span class="keyword">div</span>&gt;
+</code></pre><p>原文中<code>&lt;style id=&quot;clock-animations&quot;&gt;&lt;/style&gt;</code>是放在head区域的，为了减小对全局的影响，我拿到这个挂件中了，实际上并没有影响。</p>
+<p>这里要注意挂件的代码结构要尽量与主题自带的结构一致。（仅仅是为了好看，和好整理）</p>
+<p>当然了，这个文件要放在<code>layout/_widget</code>下。</p>
+<h3 id="STEP_1">STEP 1</h3><p>js脚本</p>
+<p>由于脚本内容较少，我就直接放在了script.js中，文件位置再source/js。</p>
+<pre><code>var <span class="built_in">now</span> = <span class="keyword">new</span> <span class="built_in">Date</span>();
+  var <span class="built_in">second</span> = <span class="built_in">now</span>.getSeconds();
+  var <span class="built_in">minute</span> = <span class="built_in">now</span>.getMinutes();
+  var <span class="built_in">hour</span> = <span class="built_in">now</span>.getHours();
+  <span class="keyword">if</span> (<span class="built_in">hour</span> &gt; <span class="number">12</span>) {
+      <span class="built_in">hour</span> = <span class="built_in">hour</span> - <span class="number">12</span>;
+  }
+  hourDeg   = <span class="built_in">hour</span> * <span class="number">30</span> + <span class="built_in">now</span>.getMinutes() / <span class="number">60</span> * <span class="number">30</span>;
+  minuteDeg = <span class="built_in">now</span>.getMinutes() * <span class="number">6</span>;
+  secondDeg = <span class="built_in">now</span>.getSeconds() * <span class="number">6</span>;
+  stylesDeg = [
+      <span class="string">"@keyframes rotate-hour{ from{transform:rotate("</span> + hourDeg + <span class="string">"deg);}to{transform:rotate("</span> + (hourDeg + <span class="number">360</span>) + <span class="string">"deg);}}"</span>,
+      <span class="string">"@keyframes rotate-minute{from{transform:rotate("</span> + minuteDeg + <span class="string">"deg);}to{transform:rotate("</span> + (minuteDeg + <span class="number">360</span>) + <span class="string">"deg);}}"</span>,
+      <span class="string">"@keyframes rotate-second{from{transform:rotate("</span> + secondDeg + <span class="string">"deg);}to{transform:rotate("</span> + (secondDeg + <span class="number">360</span>) + <span class="string">"deg);}}"</span>,
+      <span class="string">"@-moz-keyframes rotate-hour{ from{transform:rotate("</span> + hourDeg + <span class="string">"deg);}to{transform:rotate("</span> + (hourDeg + <span class="number">360</span>) + <span class="string">"deg);}}"</span>,
+      <span class="string">"@-moz-keyframes rotate-minute{from{transform:rotate("</span> + minuteDeg + <span class="string">"deg);}to{transform:rotate("</span> + (minuteDeg + <span class="number">360</span>) + <span class="string">"deg);}}"</span>,
+      <span class="string">"@-moz-keyframes rotate-second{from{transform:rotate("</span> + secondDeg + <span class="string">"deg);}to{transform:rotate("</span> + (secondDeg + <span class="number">360</span>) + <span class="string">"deg);}}"</span>,
+      <span class="string">"@-webkit-keyframes rotate-hour{from{transform:rotate("</span> + hourDeg + <span class="string">"deg);}to{transform:rotate("</span> + (hourDeg + <span class="number">360</span>) + <span class="string">"deg);}}"</span>,
+      <span class="string">"@-webkit-keyframes rotate-minute{from{transform:rotate("</span> + minuteDeg + <span class="string">"deg);}to{transform:rotate("</span> + (minuteDeg + <span class="number">360</span>) + <span class="string">"deg);}}"</span>,
+      <span class="string">"@-webkit-keyframes rotate-second{from{transform:rotate("</span> + secondDeg + <span class="string">"deg);}to{transform:rotate("</span> + (secondDeg + <span class="number">360</span>) + <span class="string">"deg);}}"</span>
+  ].<span class="built_in">join</span>(<span class="string">""</span>);
+  $(<span class="comment">'#clock-animations').html(stylesDeg);</span>
+</code></pre><h3 id="STEP_2">STEP 2</h3><p>CSS样式</p>
+<p>新建文件time.styl，路径为<code>/source/css/_partial/time.styl</code></p>
+<p>内容略多，主要是给多浏览器写前缀。</p>
+<pre><code><span class="class">.clock-wrapper</span> <span class="rules">{
+    <span class="rule"><span class="attribute">position</span>:<span class="value"> relative</span></span>;
+    <span class="rule"><span class="attribute">height</span>:<span class="value"> <span class="number">250px</span></span></span>;
+    <span class="rule"><span class="attribute">width</span>:<span class="value"> <span class="number">250px</span></span></span>;
+    <span class="rule"><span class="attribute">background-image</span>:<span class="value"> <span class="function">linear-gradient</span>(<span class="hexcolor">#f7f7f7</span>,<span class="hexcolor">#e0e0e0</span>)</span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">50%</span></span></span>;
+    <span class="rule"><span class="attribute">box-shadow</span>:<span class="value"> <span class="number">0</span> <span class="number">10px</span> <span class="number">15px</span> <span class="function">rgba</span>(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,.<span class="number">15</span>),<span class="number">0</span> <span class="number">2px</span> <span class="number">2px</span> <span class="function">rgba</span>(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,.<span class="number">2</span>)</span></span>;
+}</span>
+<span class="class">.clock-base</span> <span class="rules">{
+    <span class="rule"><span class="attribute">width</span>:<span class="value"> <span class="number">250px</span></span></span>;
+    <span class="rule"><span class="attribute">height</span>:<span class="value"> <span class="number">250px</span></span></span>;
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#eee</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">50%</span></span></span>;
+    <span class="rule"><span class="attribute">box-shadow</span>:<span class="value"> <span class="number">0</span> <span class="number">0</span> <span class="number">5px</span> <span class="hexcolor">#eee</span></span></span>;
+}</span>
+<span class="class">.clock-indicator</span> <span class="rules">{
+    <span class="rule"><span class="attribute">z-index</span>:<span class="value"> <span class="number">1</span></span></span>;
+    <span class="rule"><span class="attribute">position</span>:<span class="value"> absolute</span></span>;
+    <span class="rule"><span class="attribute">top</span>:<span class="value"> <span class="number">15px</span></span></span>;
+    <span class="rule"><span class="attribute">left</span>:<span class="value"> <span class="number">15px</span></span></span>;
+    <span class="rule"><span class="attribute">width</span>:<span class="value"> <span class="number">230px</span></span></span>;
+    <span class="rule"><span class="attribute">height</span>:<span class="value"> <span class="number">230px</span></span></span>;
+}</span>
+<span class="class">.clock-indicator</span> <span class="tag">div</span> <span class="rules">{
+    <span class="rule"><span class="attribute">position</span>:<span class="value"> absolute</span></span>;
+    <span class="rule"><span class="attribute">width</span>:<span class="value"> <span class="number">2px</span></span></span>;
+    <span class="rule"><span class="attribute">height</span>:<span class="value"> <span class="number">4px</span></span></span>;
+    <span class="rule"><span class="attribute">margin</span>:<span class="value"> <span class="number">113px</span> <span class="number">114px</span></span></span>;
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#a4a4a4</span></span></span>;
+}</span>
+<span class="class">.clock-indicator</span> <span class="tag">div</span><span class="pseudo">:nth-child(1)</span> <span class="rules">{
+    <span class="rule"><span class="attribute">transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">30deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;
+    <span class="rule"><span class="attribute">-ms-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">30deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;     <span class="comment">/* IE 9 */</span>
+    <span class="rule"><span class="attribute">-moz-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">30deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;    <span class="comment">/* Firefox */</span>
+    <span class="rule"><span class="attribute">-webkit-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">30deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>; <span class="comment">/* Safari 和 Chrome */</span>
+    <span class="rule"><span class="attribute">-o-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">30deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;  <span class="comment">/* Opera */</span>        }</span>
+    <span class="class">.clock-indicator</span> <span class="tag">div</span><span class="pseudo">:nth-child(2)</span> <span class="rules">{
+    <span class="rule"><span class="attribute">transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">60deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;
+    <span class="rule"><span class="attribute">-ms-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">60deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;     <span class="comment">/* IE 9 */</span>
+    <span class="rule"><span class="attribute">-moz-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">60deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;    <span class="comment">/* Firefox */</span>
+    <span class="rule"><span class="attribute">-webkit-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">60deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>; <span class="comment">/* Safari 和 Chrome */</span>
+    <span class="rule"><span class="attribute">-o-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">60deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;  <span class="comment">/* Opera */</span>
+}</span>
+<span class="class">.clock-indicator</span> <span class="tag">div</span><span class="pseudo">:nth-child(3)</span> <span class="rules">{
+    <span class="rule"><span class="attribute">transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">90deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;
+    <span class="rule"><span class="attribute">-ms-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">90deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;     <span class="comment">/* IE 9 */</span>
+    <span class="rule"><span class="attribute">-moz-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">90deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;    <span class="comment">/* Firefox */</span>
+    <span class="rule"><span class="attribute">-webkit-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">90deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>; <span class="comment">/* Safari 和 Chrome */</span>
+    <span class="rule"><span class="attribute">-o-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">90deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;  <span class="comment">/* Opera */</span>
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#5a5a5a</span></span></span>;
+}</span>
+<span class="class">.clock-indicator</span> <span class="tag">div</span><span class="pseudo">:nth-child(4)</span> <span class="rules">{
+    <span class="rule"><span class="attribute">transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">120deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;
+    <span class="rule"><span class="attribute">-ms-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">120deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;    <span class="comment">/* IE 9 */</span>
+    <span class="rule"><span class="attribute">-moz-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">120deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;   <span class="comment">/* Firefox */</span>
+    <span class="rule"><span class="attribute">-webkit-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">120deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>; <span class="comment">/* Safari 和 Chrome */</span>
+    <span class="rule"><span class="attribute">-o-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">120deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;     <span class="comment">/* Opera */</span>
+}</span>
+<span class="class">.clock-indicator</span> <span class="tag">div</span><span class="pseudo">:nth-child(5)</span> <span class="rules">{
+    <span class="rule"><span class="attribute">transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">150deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;
+    <span class="rule"><span class="attribute">-ms-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">150deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;    <span class="comment">/* IE 9 */</span>
+    <span class="rule"><span class="attribute">-moz-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">150deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;   <span class="comment">/* Firefox */</span>
+    <span class="rule"><span class="attribute">-webkit-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">150deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>; <span class="comment">/* Safari 和 Chrome */</span>
+    <span class="rule"><span class="attribute">-o-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">150deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;     <span class="comment">/* Opera */</span>
+}</span>
+<span class="class">.clock-indicator</span> <span class="tag">div</span><span class="pseudo">:nth-child(6)</span> <span class="rules">{
+    <span class="rule"><span class="attribute">transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">180deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;
+    <span class="rule"><span class="attribute">-ms-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">180deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;    <span class="comment">/* IE 9 */</span>
+    <span class="rule"><span class="attribute">-moz-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">180deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;   <span class="comment">/* Firefox */</span>
+    <span class="rule"><span class="attribute">-webkit-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">180deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>; <span class="comment">/* Safari 和 Chrome */</span>
+    <span class="rule"><span class="attribute">-o-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">180deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;     <span class="comment">/* Opera */</span>
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#5a5a5a</span></span></span>;
+}</span>
+<span class="class">.clock-indicator</span> <span class="tag">div</span><span class="pseudo">:nth-child(7)</span> <span class="rules">{
+    <span class="rule"><span class="attribute">transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">210deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;
+    <span class="rule"><span class="attribute">-ms-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">210deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;    <span class="comment">/* IE 9 */</span>
+    <span class="rule"><span class="attribute">-moz-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">210deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;   <span class="comment">/* Firefox */</span>
+    <span class="rule"><span class="attribute">-webkit-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">210deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>; <span class="comment">/* Safari 和 Chrome */</span>
+    <span class="rule"><span class="attribute">-o-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">210deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;     <span class="comment">/* Opera */</span>
+}</span>
+<span class="class">.clock-indicator</span> <span class="tag">div</span><span class="pseudo">:nth-child(8)</span> <span class="rules">{
+    <span class="rule"><span class="attribute">transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">240deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;
+    <span class="rule"><span class="attribute">-ms-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">240deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;    <span class="comment">/* IE 9 */</span>
+    <span class="rule"><span class="attribute">-moz-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">240deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;   <span class="comment">/* Firefox */</span>
+    <span class="rule"><span class="attribute">-webkit-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">240deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>; <span class="comment">/* Safari 和 Chrome */</span>
+    <span class="rule"><span class="attribute">-o-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">240deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;     <span class="comment">/* Opera */</span>
+}</span>
+<span class="class">.clock-indicator</span> <span class="tag">div</span><span class="pseudo">:nth-child(9)</span> <span class="rules">{
+    <span class="rule"><span class="attribute">transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">270deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;
+    <span class="rule"><span class="attribute">-ms-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">270deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;    <span class="comment">/* IE 9 */</span>
+    <span class="rule"><span class="attribute">-moz-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">270deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;   <span class="comment">/* Firefox */</span>
+    <span class="rule"><span class="attribute">-webkit-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">270deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>; <span class="comment">/* Safari 和 Chrome */</span>
+    <span class="rule"><span class="attribute">-o-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">270deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;     <span class="comment">/* Opera */</span>
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#5a5a5a</span></span></span>;
+}</span>
+<span class="class">.clock-indicator</span> <span class="tag">div</span><span class="pseudo">:nth-child(10)</span> <span class="rules">{
+    <span class="rule"><span class="attribute">transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">300deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;
+    <span class="rule"><span class="attribute">-ms-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">300deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;    <span class="comment">/* IE 9 */</span>
+    <span class="rule"><span class="attribute">-moz-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">300deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;   <span class="comment">/* Firefox */</span>
+    <span class="rule"><span class="attribute">-webkit-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">300deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>; <span class="comment">/* Safari 和 Chrome */</span>
+    <span class="rule"><span class="attribute">-o-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">300deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;     <span class="comment">/* Opera */</span>
+}</span>
+<span class="class">.clock-indicator</span> <span class="tag">div</span><span class="pseudo">:nth-child(11)</span> <span class="rules">{
+    <span class="rule"><span class="attribute">transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">330deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;
+    <span class="rule"><span class="attribute">-ms-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">330deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;    <span class="comment">/* IE 9 */</span>
+    <span class="rule"><span class="attribute">-moz-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">330deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;   <span class="comment">/* Firefox */</span>
+    <span class="rule"><span class="attribute">-webkit-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">330deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>; <span class="comment">/* Safari 和 Chrome */</span>
+    <span class="rule"><span class="attribute">-o-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">330deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;     <span class="comment">/* Opera */</span>
+}</span>
+<span class="class">.clock-indicator</span> <span class="tag">div</span><span class="pseudo">:nth-child(12)</span> <span class="rules">{
+    <span class="rule"><span class="attribute">transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">360deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;
+    <span class="rule"><span class="attribute">-ms-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">360deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;    <span class="comment">/* IE 9 */</span>
+    <span class="rule"><span class="attribute">-moz-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">360deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;   <span class="comment">/* Firefox */</span>
+    <span class="rule"><span class="attribute">-webkit-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">360deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>; <span class="comment">/* Safari 和 Chrome */</span>
+    <span class="rule"><span class="attribute">-o-transform</span>:<span class="value"><span class="function">rotate</span>(<span class="number">360deg</span>) <span class="function">translateY</span>(-<span class="number">113px</span>)</span></span>;     <span class="comment">/* Opera */</span>
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#5a5a5a</span></span></span>;
+}</span>
+<span class="class">.clock-hour</span> <span class="rules">{
+    <span class="rule"><span class="attribute">z-index</span>:<span class="value"> <span class="number">2</span></span></span>;
+    <span class="rule"><span class="attribute">position</span>:<span class="value"> absolute</span></span>;
+    <span class="rule"><span class="attribute">left</span>:<span class="value"> <span class="number">128px</span></span></span>;
+    <span class="rule"><span class="attribute">top</span>:<span class="value"> <span class="number">80px</span></span></span>;
+    <span class="rule"><span class="attribute">width</span>:<span class="value"> <span class="number">4px</span></span></span>;
+    <span class="rule"><span class="attribute">height</span>:<span class="value"> <span class="number">65px</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">2px</span></span></span>;
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#555</span></span></span>;
+    <span class="rule"><span class="attribute">box-shadow</span>:<span class="value"> <span class="number">0</span> <span class="number">0</span> <span class="number">2px</span> <span class="function">rgba</span>(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0.2</span>)</span></span>; 
+    <span class="rule"><span class="attribute">transform-origin</span>:<span class="value"> <span class="number">2px</span> <span class="number">50px</span></span></span>;
+    <span class="rule"><span class="attribute">-moz-transform-origin</span>:<span class="value"> <span class="number">2px</span> <span class="number">50px</span></span></span>;
+    <span class="rule"><span class="attribute">-ms-transform-origin</span>:<span class="value"> <span class="number">2px</span> <span class="number">50px</span></span></span>;
+    <span class="rule"><span class="attribute">-o-transform-origin</span>:<span class="value"> <span class="number">2px</span> <span class="number">50px</span></span></span>;
+    <span class="rule"><span class="attribute">-webkit-transform-origin</span>:<span class="value"> <span class="number">2px</span> <span class="number">50px</span></span></span>;
+    <span class="rule"><span class="attribute">transition</span>:<span class="value"> <span class="number">1s</span></span></span>;
+    <span class="rule"><span class="attribute">-moz-transition</span>:<span class="value"> <span class="number">1s</span></span></span>; <span class="comment">/* Firefox 4 */</span>
+    <span class="rule"><span class="attribute">-webkit-transition</span>:<span class="value"> <span class="number">1s</span></span></span>; <span class="comment">/* Safari 和 Chrome */</span>
+    <span class="rule"><span class="attribute">-o-transition</span>:<span class="value"> <span class="number">1s</span></span></span>; <span class="comment">/* Opera */</span>
+    <span class="rule"><span class="attribute">animation</span>:<span class="value">rotate-hour <span class="number">43200s</span> linear infinite</span></span>;
+    <span class="rule"><span class="attribute">-webkit-animation</span>:<span class="value"> rotate-hour <span class="number">43200s</span> linear infinite</span></span>; <span class="comment">/* Safari 和 Chrome */</span>
+}</span>
+<span class="class">.clock-minute</span> <span class="rules">{
+    <span class="rule"><span class="attribute">z-index</span>:<span class="value"> <span class="number">3</span></span></span>;
+    <span class="rule"><span class="attribute">position</span>:<span class="value"> absolute</span></span>;
+    <span class="rule"><span class="attribute">left</span>:<span class="value"> <span class="number">128px</span></span></span>;
+    <span class="rule"><span class="attribute">top</span>:<span class="value"> <span class="number">60px</span></span></span>;
+    <span class="rule"><span class="attribute">width</span>:<span class="value"> <span class="number">4px</span></span></span>;
+    <span class="rule"><span class="attribute">height</span>:<span class="value"> <span class="number">85px</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">2px</span></span></span>;
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#555</span></span></span>;
+    <span class="rule"><span class="attribute">box-shadow</span>:<span class="value"> <span class="number">0</span> <span class="number">0</span> <span class="number">2px</span> <span class="function">rgba</span>(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0.2</span>)</span></span>; 
+    <span class="rule"><span class="attribute">transition</span>:<span class="value"> <span class="number">1s</span></span></span>;
+    <span class="rule"><span class="attribute">-moz-transition</span>:<span class="value"> <span class="number">1s</span></span></span>; <span class="comment">/* Firefox 4 */</span>
+    <span class="rule"><span class="attribute">-webkit-transition</span>:<span class="value"> <span class="number">1s</span></span></span>; <span class="comment">/* Safari 和 Chrome */</span>
+    <span class="rule"><span class="attribute">-o-transition</span>:<span class="value"> <span class="number">1s</span></span></span>; <span class="comment">/* Opera */</span>
+    <span class="rule"><span class="attribute">transform-origin</span>:<span class="value"> <span class="number">2px</span> <span class="number">70px</span></span></span>;
+    <span class="rule"><span class="attribute">-moz-transform-origin</span>:<span class="value"> <span class="number">2px</span> <span class="number">70px</span></span></span>;
+    <span class="rule"><span class="attribute">-ms-transform-origin</span>:<span class="value"> <span class="number">2px</span> <span class="number">70px</span></span></span>;
+    <span class="rule"><span class="attribute">-o-transform-origin</span>:<span class="value"> <span class="number">2px</span> <span class="number">70px</span></span></span>;
+    <span class="rule"><span class="attribute">-webkit-transform-origin</span>:<span class="value"> <span class="number">2px</span> <span class="number">70px</span></span></span>;
+    <span class="rule"><span class="attribute">animation</span>:<span class="value">rotate-minute <span class="number">3600s</span> linear infinite</span></span>;
+    <span class="rule"><span class="attribute">-webkit-animation</span>:<span class="value"> rotate-minute <span class="number">3600s</span> linear infinite</span></span>; <span class="comment">/* Safari 和 Chrome */</span>
+}</span>
+<span class="class">.clock-second</span> <span class="rules">{
+    <span class="rule"><span class="attribute">z-index</span>:<span class="value"> <span class="number">4</span></span></span>;
+    <span class="rule"><span class="attribute">position</span>:<span class="value"> absolute</span></span>;
+    <span class="rule"><span class="attribute">left</span>:<span class="value"> <span class="number">129px</span></span></span>;
+    <span class="rule"><span class="attribute">top</span>:<span class="value"> <span class="number">15px</span></span></span>;
+    <span class="rule"><span class="attribute">width</span>:<span class="value"> <span class="number">2px</span></span></span>;
+    <span class="rule"><span class="attribute">height</span>:<span class="value"> <span class="number">140px</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">2px</span></span></span>;
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#a00</span></span></span>;
+    <span class="rule"><span class="attribute">box-shadow</span>:<span class="value"> <span class="number">0</span> <span class="number">0</span> <span class="number">1px</span> <span class="function">rgba</span>(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0.2</span>)</span></span>; 
+    <span class="rule"><span class="attribute">transform-origin</span>:<span class="value"> <span class="number">1px</span> <span class="number">115px</span></span></span>;
+    <span class="rule"><span class="attribute">-moz-transform-origin</span>:<span class="value"> <span class="number">1px</span> <span class="number">115px</span></span></span>;
+    <span class="rule"><span class="attribute">-ms-transform-origin</span>:<span class="value"> <span class="number">1px</span> <span class="number">115px</span></span></span>;
+    <span class="rule"><span class="attribute">-o-transform-origin</span>:<span class="value"> <span class="number">1px</span> <span class="number">115px</span></span></span>;
+    <span class="rule"><span class="attribute">-webkit-transform-origin</span>:<span class="value"> <span class="number">1px</span> <span class="number">115px</span></span></span>;
+    <span class="rule"><span class="attribute">transition</span>:<span class="value"> <span class="number">1s</span></span></span>;
+    <span class="rule"><span class="attribute">-moz-transition</span>:<span class="value"> <span class="number">1s</span></span></span>; <span class="comment">/* Firefox 4 */</span>
+    <span class="rule"><span class="attribute">-webkit-transition</span>:<span class="value"> <span class="number">1s</span></span></span>; <span class="comment">/* Safari 和 Chrome */</span>
+    <span class="rule"><span class="attribute">-o-transition</span>:<span class="value"> <span class="number">1s</span></span></span>; <span class="comment">/* Opera */</span>
+    <span class="rule"><span class="attribute">animation</span>:<span class="value">rotate-hour <span class="number">60s</span> linear infinite</span></span>;
+     <span class="rule"><span class="attribute">-webkit-animation</span>:<span class="value"> rotate-second <span class="number">60s</span> linear infinite</span></span>;  <span class="comment">/* Safari 和 Chrome */</span>
+}</span>
+<span class="class">.clock-second</span><span class="pseudo">:after</span> <span class="rules">{
+    <span class="rule"><span class="attribute">content</span>:<span class="value"> <span class="string">""</span></span></span>;
+    <span class="rule"><span class="attribute">display</span>:<span class="value"> block</span></span>;
+    <span class="rule"><span class="attribute">position</span>:<span class="value"> absolute</span></span>;
+    <span class="rule"><span class="attribute">width</span>:<span class="value"> <span class="number">8px</span></span></span>;
+    <span class="rule"><span class="attribute">height</span>:<span class="value"> <span class="number">8px</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">50%</span></span></span>;
+    <span class="rule"><span class="attribute">left</span>:<span class="value"> -<span class="number">3px</span></span></span>;
+    <span class="rule"><span class="attribute">top</span>:<span class="value"><span class="number">110px</span></span></span>;
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#a00</span></span></span>;
+    <span class="rule"><span class="attribute">box-shadow</span>:<span class="value"> <span class="number">0</span> <span class="number">0</span> <span class="number">3px</span> <span class="function">rgba</span>(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0.2</span>)</span></span>;
+}</span>
+<span class="class">.clock-center</span> <span class="rules">{
+    <span class="rule"><span class="attribute">z-index</span>:<span class="value"> <span class="number">1</span></span></span>;
+    <span class="rule"><span class="attribute">position</span>:<span class="value"> absolute</span></span>;
+    <span class="rule"><span class="attribute">left</span>:<span class="value"> <span class="number">55px</span></span></span>;
+    <span class="rule"><span class="attribute">top</span>:<span class="value"> <span class="number">55px</span></span></span>;
+    <span class="rule"><span class="attribute">background-image</span>:<span class="value"> <span class="function">linear-gradient</span>(<span class="hexcolor">#e3e3e3</span>,<span class="hexcolor">#f7f7f7</span>)</span></span>; 
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">50%</span></span></span>;
+    <span class="rule"><span class="attribute">width</span>:<span class="value"> <span class="number">150px</span></span></span>;
+    <span class="rule"><span class="attribute">height</span>:<span class="value"> <span class="number">150px</span></span></span>;
+    <span class="rule"><span class="attribute">box-shadow</span>:<span class="value"> inset <span class="number">0</span> -<span class="number">1px</span> <span class="number">0</span> <span class="hexcolor">#fafafa</span>, inset <span class="number">0</span> <span class="number">1px</span> <span class="number">0</span> <span class="hexcolor">#e3e3e3</span></span></span>;
+}</span>
+<span class="class">.clock-center</span><span class="pseudo">:after</span><span class="rules">{
+    <span class="rule"><span class="attribute">content</span>:<span class="value"> <span class="string">""</span></span></span>;
+    <span class="rule"><span class="attribute">display</span>:<span class="value"> block</span></span>;
+    <span class="rule"><span class="attribute">width</span>:<span class="value"> <span class="number">20px</span></span></span>;
+    <span class="rule"><span class="attribute">height</span>:<span class="value"> <span class="number">20px</span></span></span>;
+    <span class="rule"><span class="attribute">margin</span>:<span class="value"> <span class="number">65px</span></span></span>;
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#ddd</span></span></span>;
+    <span class="rule"><span class="attribute">border-radius</span>:<span class="value"> <span class="number">50%</span></span></span>;
+}</span>
+</code></pre><p> 之后，在sidebar.styl 末尾加入 <code>@import &quot;time&quot;</code>,这是styl的语法，表示引入一个文件，因为两个文件是同级，所以可以直接这么写，加<code>./</code>也可以。</p>
+<h3 id="STEP_3">STEP 3</h3><p>最后，在themes的config文件中注册这个挂件。</p>
+<p>在_config.yml中，找到<code>widgets</code>，在你想要加的位置中加入 <code>- time</code>，即模板文件名。<br>比如我的widgets变成了这样：</p>
+<pre><code>widgets:
+-<span class="ruby"> clock
+</span>-<span class="ruby"> category
+</span>-<span class="ruby"> tag
+</span>-<span class="ruby"> tagcloud
+</span>-<span class="ruby"> archive
+</span>-<span class="ruby"> recent_posts</span>
+</code></pre><h3 id="LAST">LAST</h3><p>至此，就全部完事，可以去<code>hexo generate</code>或<code>hexo server</code>了。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html" data-id="cijlhth3l0000ps0rle1ntbmh" class="article-share-link">Share</a>
+      
+        <a href="https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hexo/">hexo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/time/">time</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/widget/">widget</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Set Up a Private Git Server on a VPS" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2015/11/07/Set Up a Private Git Server on a VPS.html" class="article-date">
@@ -150,7 +476,7 @@ Your <span class="keyword">public</span> <span class="keyword">key</span> has be
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html" data-id="cijbfvnqa001qwa0r6h57j5ej" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html" data-id="cijlhth4r001xps0r2tbekryy" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html#comments" class="article-comment-link">Comments</a>
       
@@ -230,7 +556,7 @@ fetch(url, {
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/06/React-Native-Fetch.html" data-id="cijbfvnqc001vwa0rggf4wubp" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/06/React-Native-Fetch.html" data-id="cijlhth4t0022ps0rbwk6avjb" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/06/React-Native-Fetch.html#comments" class="article-comment-link">Comments</a>
       
@@ -279,7 +605,7 @@ fetch(url, {
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/06/hello-world.html" data-id="cijbfvnpz0014wa0rgxd7idnc" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/06/hello-world.html" data-id="cijlhth4c0014ps0rstk2oaqf" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/06/hello-world.html#comments" class="article-comment-link">Comments</a>
       
@@ -334,7 +660,7 @@ fetch(url, {
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">1</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -343,7 +669,7 @@ fetch(url, {
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -352,7 +678,7 @@ fetch(url, {
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/dropbox/" style="font-size: 13.33px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/hexo/" style="font-size: 16.67px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 13.33px;">javascript</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 20px;">mysql</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 10px;">php</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a>
+      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/dropbox/" style="font-size: 13.33px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/hexo/" style="font-size: 16.67px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 16.67px;">javascript</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 20px;">mysql</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 13.33px;">php</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a>
     </div>
   </div>
 
@@ -361,7 +687,7 @@ fetch(url, {
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
     </div>
   </div>
 
@@ -371,6 +697,10 @@ fetch(url, {
     <h3 class="widget-title">Recents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2016/01/19/echarts-pie.html">ECharts饼图示例</a>
+          </li>
         
           <li>
             <a href="/2016/01/11/placeholder-animate.html">一个简单的input获得焦点时的小动画效果</a>
@@ -386,10 +716,6 @@ fetch(url, {
         
           <li>
             <a href="/2015/12/19/secure-your-website-with-lets-encrypt.html">使用Let&#39;s Encrypt制作数字证书</a>
-          </li>
-        
-          <li>
-            <a href="/2015/12/05/php-use-pdo-cache-query-result-with-redis.html">PHP使用Redis作为缓存使用PDO读取MySQL数据</a>
           </li>
         
       </ul>
