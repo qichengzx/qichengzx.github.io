@@ -114,13 +114,6 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/tags/mysql/</loc>
-        <lastmod>2016-01-10T11:22:53.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>https://www.qichengzx.com/tags/crontab/</loc>
         <lastmod>2016-01-10T11:22:53.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -158,6 +151,13 @@
     <url>
         <loc>https://www.qichengzx.com/tags/ECharts/</loc>
         <lastmod>2016-01-19T14:25:04.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/mysql/</loc>
+        <lastmod>2016-02-03T10:27:20.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>

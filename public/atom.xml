@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="https://www.qichengzx.com/"/>
-  <updated>2016-01-19T14:25:04.000Z</updated>
+  <updated>2016-02-03T10:27:20.000Z</updated>
   <id>https://www.qichengzx.com/</id>
   
   <author>
@@ -13,6 +13,39 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[MySQL实现row_number]]></title>
+    <link href="https://www.qichengzx.com/2016/02/03/MySQL%E5%AE%9E%E7%8E%B0row_number%20.html"/>
+    <id>https://www.qichengzx.com/2016/02/03/MySQL实现row_number .html</id>
+    <published>2016-02-03T10:25:26.000Z</published>
+    <updated>2016-02-03T10:27:20.000Z</updated>
+    <content type="html"><![CDATA[<p>在本教程中，我们将在MySQL中实现一个非常实用的row_number功能。</p>
+<p>row_number是一个返回数据排序编号的排名方法，从1开始。我们经常需要用到row_number去生成某些报表，不幸的是，MySQL并不像MSSQL，Oracle一样支持这个方法。在MySQL中如果想实现这个功能需要临时变量。</p>
+<p>为了在MySQL中实现row_number，需要在查询中实用临时变量，下图中从employees表中查询出5条数据，并且从1开始，为每一行添加了编号(row number)。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator"><span class="keyword">SET</span> @row_number = <span class="number">0</span>;</span></span><br><span class="line"> </span><br><span class="line"><span class="operator"><span class="keyword">SELECT</span> </span><br><span class="line">    (@row_number:=@row_number + <span class="number">1</span>) <span class="keyword">AS</span> <span class="keyword">num</span>, firstName, lastName</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">    employees</span><br><span class="line"><span class="keyword">LIMIT</span> <span class="number">5</span>;</span></span><br></pre></td></tr></table></figure>
+<p><img src="/images/mysql-row_number-session-variables.jpg" alt=""></p>
+<p>在上面的查询中：</p>
+<pre><code>首先，我们定义了一个变量叫做row_number,初始值为<span class="number">0</span>，row_number是以@为前缀的一个临时变量。
+
+然后，在查询中，我们为这个变量每次+<span class="number">1</span>，LIMIT分句是为了限制返回的结果数，此处设为<span class="number">5.</span>
+</code></pre><p>另一个方法是使用临时变量作为派生表，联合主表。看下边的查询语句：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator"><span class="keyword">SELECT</span> </span><br><span class="line">    (@row_number:=@row_number + <span class="number">1</span>) <span class="keyword">AS</span> <span class="keyword">num</span>, firstName, lastName</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">    employees,(<span class="keyword">SELECT</span> @row_number:=<span class="number">0</span>) <span class="keyword">AS</span> <span class="keyword">t</span></span><br><span class="line"><span class="keyword">LIMIT</span> <span class="number">5</span>;</span></span><br></pre></td></tr></table></figure>
+<p>需要注意，派生表必须使用别名，以使查询语句在语法上没有问题。</p>
+<p>由于时间关系（回家过年），暂时到这里，文中部分内容可能翻译的有点不太顺，可以直接看下原文，原文中还有一部分讲分组查询中实用row_number。</p>
+<p>这个之后再写。</p>
+<p>原文地址：<a href="http://www.mysqltutorial.org/mysql-row_number/" target="_blank" rel="external">MySQL row_number, This Is How You Emulate It</a></p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>在本教程中，我们将在MySQL中实现一个非常实用的row_number功能。</p>
+<p>row_number是一个返回数据排序编号的排名方法，从1开始。我们经常需要用到row_number去生成某些报表，不幸的是，MySQL并不像MSSQL，Oracle一样支持这个方法]]>
+    </summary>
+    
+      <category term="mysql" scheme="https://www.qichengzx.com/tags/mysql/"/>
+    
+      <category term="mysql" scheme="https://www.qichengzx.com/categories/mysql/"/>
+    
+  </entry>
   
   <entry>
     <title><![CDATA[ECharts饼图示例]]></title>

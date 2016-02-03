@@ -63,6 +63,65 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-MySQL实现row_number " class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/02/03/MySQL实现row_number .html" class="article-date">
+  <time datetime="2016-02-03T10:25:26.000Z" itemprop="datePublished">2016-02-03</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mysql/">mysql</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/02/03/MySQL实现row_number .html">MySQL实现row_number</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在本教程中，我们将在MySQL中实现一个非常实用的row_number功能。</p>
+<p>row_number是一个返回数据排序编号的排名方法，从1开始。我们经常需要用到row_number去生成某些报表，不幸的是，MySQL并不像MSSQL，Oracle一样支持这个方法。在MySQL中如果想实现这个功能需要临时变量。</p>
+<p>为了在MySQL中实现row_number，需要在查询中实用临时变量，下图中从employees表中查询出5条数据，并且从1开始，为每一行添加了编号(row number)。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator"><span class="keyword">SET</span> @row_number = <span class="number">0</span>;</span></span><br><span class="line"> </span><br><span class="line"><span class="operator"><span class="keyword">SELECT</span> </span><br><span class="line">    (@row_number:=@row_number + <span class="number">1</span>) <span class="keyword">AS</span> <span class="keyword">num</span>, firstName, lastName</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">    employees</span><br><span class="line"><span class="keyword">LIMIT</span> <span class="number">5</span>;</span></span><br></pre></td></tr></table></figure>
+<p><img src="/images/mysql-row_number-session-variables.jpg" alt=""></p>
+<p>在上面的查询中：</p>
+<pre><code>首先，我们定义了一个变量叫做row_number,初始值为<span class="number">0</span>，row_number是以@为前缀的一个临时变量。
+
+然后，在查询中，我们为这个变量每次+<span class="number">1</span>，LIMIT分句是为了限制返回的结果数，此处设为<span class="number">5.</span>
+</code></pre><p>另一个方法是使用临时变量作为派生表，联合主表。看下边的查询语句：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator"><span class="keyword">SELECT</span> </span><br><span class="line">    (@row_number:=@row_number + <span class="number">1</span>) <span class="keyword">AS</span> <span class="keyword">num</span>, firstName, lastName</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">    employees,(<span class="keyword">SELECT</span> @row_number:=<span class="number">0</span>) <span class="keyword">AS</span> <span class="keyword">t</span></span><br><span class="line"><span class="keyword">LIMIT</span> <span class="number">5</span>;</span></span><br></pre></td></tr></table></figure>
+<p>需要注意，派生表必须使用别名，以使查询语句在语法上没有问题。</p>
+<p>由于时间关系（回家过年），暂时到这里，文中部分内容可能翻译的有点不太顺，可以直接看下原文，原文中还有一部分讲分组查询中实用row_number。</p>
+<p>这个之后再写。</p>
+<p>原文地址：<a href="http://www.mysqltutorial.org/mysql-row_number/" target="_blank" rel="external">MySQL row_number, This Is How You Emulate It</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://www.qichengzx.com/2016/02/03/MySQL实现row_number .html" data-id="cik6oz7d90029jk0rpwjdfqn4" class="article-share-link">Share</a>
+      
+        <a href="https://www.qichengzx.com/2016/02/03/MySQL实现row_number .html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-echarts-pie" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2016/01/19/echarts-pie.html" class="article-date">
@@ -106,7 +165,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/01/19/echarts-pie.html" data-id="cijm7cp6o001bnh0rwlv9ynts" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/01/19/echarts-pie.html" data-id="cik6oz7ct001bjk0rlgke88oe" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/01/19/echarts-pie.html#comments" class="article-comment-link">Comments</a>
       
@@ -158,7 +217,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/01/11/placeholder-animate.html" data-id="cijm7cp68000cnh0rsvzli2ci" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/01/11/placeholder-animate.html" data-id="cik6oz7ce000cjk0ryk6zfufv" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/01/11/placeholder-animate.html#comments" class="article-comment-link">Comments</a>
       
@@ -238,7 +297,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html" data-id="cijm7cp6x001pnh0rxshsuib1" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html" data-id="cik6oz7d1001pjk0rjxr0dkfc" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html#comments" class="article-comment-link">Comments</a>
       
@@ -310,7 +369,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html" data-id="cijm7cp6t001inh0r3t2fxxm6" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html" data-id="cik6oz7cx001ijk0ri7lewp99" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html#comments" class="article-comment-link">Comments</a>
       
@@ -396,7 +455,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html" data-id="cijm7cp660007nh0r22qhqbau" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html" data-id="cik6oz7cc0007jk0rmb45x6qv" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html#comments" class="article-comment-link">Comments</a>
       
@@ -454,7 +513,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html" data-id="cijm7cp6b000jnh0r8ovko5vj" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html" data-id="cik6oz7ci000jjk0rrh1imf4i" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html#comments" class="article-comment-link">Comments</a>
       
@@ -520,7 +579,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/03/nodejs-mysql.html" data-id="cijm7cp6f000unh0rop12a0jv" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/12/03/nodejs-mysql.html" data-id="cik6oz7ck000ujk0rglabk9vq" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/12/03/nodejs-mysql.html#comments" class="article-comment-link">Comments</a>
       
@@ -575,7 +634,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html" data-id="cijm7cp6m0015nh0r4cqxt30u" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html" data-id="cik6oz7cr0015jk0rbqtigl3o" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html#comments" class="article-comment-link">Comments</a>
       
@@ -625,140 +684,12 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/17/js-names.html" data-id="cijm7cp6h000znh0ro7o9m3xz" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/17/js-names.html" data-id="cik6oz7cm000zjk0r9xwg9lk8" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/17/js-names.html#comments" class="article-comment-link">Comments</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/javascript/">javascript</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/标识符/">标识符</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="photo-dropbox-sync-hexo-and-autobuild-itself" class="article article-type-photo" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html" class="article-date">
-  <time datetime="2015-11-13T06:12:35.000Z" itemprop="datePublished">2015-11-13</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html">利用Dropbox同步hexo的文章源文件并自动生成文章发布</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><strong> 阅读之前默认为已在服务器安装hexo，也默认服务器可以访问Dropbox </strong></p>
-<p><strong> 不建议服务器内存小于512M ，谁卡谁知道 </strong></p>
-<h3 id="最初的最初">最初的最初</h3><p>先说下我最终完成的结构：</p>
-<pre><code><span class="number">1.</span>本地有一个日志文件夹，用于存放md文件，或HTML文件，作为本地的Dropbox客户端同步的目录
-<span class="number">2.</span>服务器home文件夹中init一套hexo程序，用于接收本地的md文件，和generate，minify
-</code></pre><p>流程：</p>
-<pre><code><span class="number">1.</span>本地撰写，本地客户端自动同步
-<span class="number">2.</span>服务器Dropbox设置的同步目录接收本地的内容并cp到专门用于生成的hexo目录里
-<span class="number">3.</span>服务器用于生成的hexo生成新日志，cp到web目录中
-</code></pre><p>这么做的原因是，如果一共（是整个博客一共）只有一篇文章或几篇文章，那几乎没影响，如果，有几十篇了，据我观察，生成很耗时，可能会导致搜索引擎访问出现404，用户打开一个生成到一半的文件，用户打开一个木有样式的文章。</p>
-<h3 id="STEP_0_安装Dropbox">STEP 0 安装Dropbox</h3><p><a href="https://db.tt/mMNtRA6x" target="_blank" rel="external">注册Dropbox</a>。</p>
-<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>( ! has_dropbox_account() )&#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="string">"请先注册个账户啊亲"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>由于Dropbox默认安装在~，所以建议新建一个专用于同步的账户，如dbox。</p>
-<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">adduser </span>dbox</span><br><span class="line"><span class="label">passwd</span> dbox</span><br></pre></td></tr></table></figure>
-<p><strong> 请记住密码。请记住密码。请记住密码。 </strong></p>
-<p>然后，用新建的账户登录进去。</p>
-<p>终于可以安装Dropbox了。</p>
-<p>这里要区分一下你的系统，</p>
-<p><strong> 32位: </strong></p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">cd</span> <span class="regexp">~ &amp;&amp;</span> wget -O - <span class="string">"https://www.dropbox.com/download?plat=lnx.x86"</span> | tar xzf -</span><br></pre></td></tr></table></figure>
-<p><strong> 64位: </strong></p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">cd</span> <span class="regexp">~ &amp;&amp;</span> wget -O - <span class="string">"https://www.dropbox.com/download?plat=lnx.x86_64"</span> | tar xzf -</span><br></pre></td></tr></table></figure>
-<p>然后就可以运行Dropbox的守护程序了</p>
-<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">~<span class="regexp">/.dropbox-dist/dropboxd</span> &amp;</span><br></pre></td></tr></table></figure>
-<p>第一次在新的电脑上启动，会提示：</p>
-<pre><code>此电脑尚未与任何 Dropbox 帐户关联...
-
-请访问 https://www.dropbox.com/cli_link_nonce?nonce=95cd317d2<span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span> 来关联此设备。
-
-此电脑现在已与 Dropbox 关联。欢迎 yourname username
-</code></pre><p><strong> 注意在出现“此电脑现在已与 Dropbox 关联。欢迎 your username”前不要ctrl+c 退出这个程序。 </strong></p>
-<p>打开授权链接后会出现如下的提示，选择连接即可。</p>
-<p><img src="http://7b1hhm.com1.z0.glb.clouddn.com/hexo33B2BAAF-6996-41AA-BFA3-FC177106F62A.png" alt=""></p>
-<p>一定要注意，不然你都会奇怪为啥再次启动这个进程的时候还会出现“尚未关联的提示”</p>
-<p>验证成功后，会在当前用户的home目录中创建Dropbox目录，即Dropbox同步的目录。</p>
-<p>此时，如果你打开了 top，那应该发现此时服务器的内存有点捉急了，原因是Dropbox这个进程占的很多，所以一般情况下killall dropbox 退出就好了，壕请随意。</p>
-<h3 id="STEP_1_设置文件夹监测">STEP 1 设置文件夹监测</h3><p><strong>安装incron服务</strong></p>
-<p>incron是Linux下一个监测文件变化的服务</p>
-<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apt-get <span class="keyword">install</span> incron</span><br><span class="line">yum <span class="keyword">install</span> incron</span><br></pre></td></tr></table></figure>
-<p><strong> 设置开机启动 </strong></p>
-<p>安装sysv-rc-conf，用于管理服务的启动</p>
-<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apt-<span class="built_in">get</span> install sysv-rc-<span class="keyword">conf</span></span><br><span class="line">sysv-rc-<span class="keyword">conf</span> incron <span class="keyword">on</span></span><br></pre></td></tr></table></figure>
-<p><strong> 创建监测任务 </strong></p>
-<p>先修改下incron的编辑器</p>
-<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">vi</span> /etc/incron.<span class="keyword">conf</span></span><br></pre></td></tr></table></figure>
-<p>（此时可能需要sudo权限，因为是dbox用户）在文件的最后一行，去掉editor = vi前的#，保存退出。</p>
-<p>输入：incrontab -e</p>
-<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">/home/</span>dbox<span class="regexp">/Dropbox/y</span>ourfolder<span class="regexp">/ IN_ATTRIB,IN_MOVE /</span>home<span class="regexp">/dbox/</span>hexo.bash</span><br></pre></td></tr></table></figure>
-<p>第一个参数：用来接收Dropbox同步的文件夹</p>
-<p>第二个参数：指监测的动作</p>
-<p>第三个参数：处理脚本</p>
-<p>监测的动作可以用：</p>
-<pre><code>IN_ACCESS，即文件被访问
-IN_MODIFY，文件被 <span class="keyword">write</span>
-IN_ATTRIB，文件属性被修改，如 <span class="keyword">chmod</span>、<span class="keyword">chown</span>、touch 等
-IN_CLOSE_WRITE，可写文件被 <span class="keyword">close</span>
-IN_CLOSE_NOWRITE，不可写文件被 <span class="keyword">close</span>
-IN_OPEN，文件被 <span class="keyword">open</span>
-IN_MOVED_FROM，文件被移走,如 mv
-IN_MOVED_TO，文件被移来，如 mv、cp
-IN_CREATE，创建新文件
-IN_DELETE，文件被删除，如 rm
-IN_DELETE_SELF，自删除，即一个可执行文件在执行时删除自己
-IN_MOVE_SELF，自移动，即一个可执行文件在执行时移动自己
-IN_UNMOUNT，宿主文件系统被 umount
-IN_CLOSE，文件被关闭，等同于(IN_CLOSE_WRITE | IN_CLOSE_NOWRITE)
-IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
-<span class="comment">#上面所说的文件也包括目录。</span>
-</code></pre><p>可以选自己需要的动作</p>
-<p>接下来写处理脚本<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">vi</span> <span class="tag">hexo</span><span class="class">.bash</span></span><br></pre></td></tr></table></figure></p>
-<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cp</span> -R /home/dbox/Dropbox/yourfolder/* /home/dbox/dropasync/<span class="keyword">source</span>/_posts/;</span><br><span class="line"><span class="keyword">cd</span> /home/dbox/dropasync/ &amp;&amp; hexo gm</span><br><span class="line"><span class="keyword">cd</span> ~ &amp;&amp; ./.dropbox-dist/dropboxd</span><br></pre></td></tr></table></figure>
-<p>理论上到这里已经可以了。</p>
-<p><del>但是实际上我本人在测试的时候，512内存的服务器会只剩下4M内存，然后再执行任何命令都提示<br><code>-bash: fork: Cannot allocate memory</code>，持续很长时间，一开始以为是同时跑的进程太多导致内存不够，把没用的mongodb，redis都kill之后还是这样，后来干脆在执行这个脚本的时候把Dropbox的后台禁掉，也不行，之后想到了在这段脚本里echo一段数字到log中，执行的时候发现会写入多次，但是还是不清楚为什么会出现这种情况，进程里也是出现了两个或多个hexo，于是干脆就在这段脚本开始时先kill dropbox和hexo，在末尾再kill hexo。实际运行起来，内存还是会降到最低，但是持续时间明显减少到可以接受的程度。</del></p>
-<hr>
-<h2 id="2015-11-21_14:06:07_附截图">2015-11-21 14:06:07 附截图</h2><p><img src="http://7b1hhm.com1.z0.glb.clouddn.com/hexoF2A913D3-14C5-4FC9-B177-500AC0434036.png" alt=""></p>
-<hr>
-<p>2015-11-14 22:38:06 测试发现，上述带删除线的方法依然不行。内存依然会榨干很长时间。</p>
-<hr>
-<p>至于为何出现这个情况，咱不可知。。。总不能完全是因为内存太小吧……</p>
-<p>后续应该还会继续改进这个脚本。</p>
-<p><strong>另外，在安装这个用于生成日志的hexo程序的时候也出现了npm killed的问题，查了资料发现也是因为内存不足，npm install -d 可以查看安装过程，如果出错可以用来定位到底是什么原因引起错误</strong></p>
-<p>一些参考资料：</p>
-<p><a href="http://lucifr.com/2013/06/02/hexo-on-cloud-with-dropbox-and-vps/" target="_blank" rel="external">Hexo 服务器端布署及 Dropbox 同步</a></p>
-<p><a href="http://www.fanicy.com/2014/06/01/0001.hexowithvpsdropbox/" target="_blank" rel="external">用Hexo+Vps搭建博客并用Dropbox同步自动发布</a></p>
-<p><a href="http://linux.die.net/man/5/incrontab" target="_blank" rel="external">incrontab(5) - Linux man page</a></p>
-<p><a href="http://wlx.westgis.ac.cn/tag/incrontab/" target="_blank" rel="external">incron：linux下基于文件的事件触发</a></p>
-<p><a href="http://askubuntu.com/questions/221293/why-is-chkconfig-no-longer-available-in-ubuntu" target="_blank" rel="external">Why is chkconfig no longer available in Ubuntu?</a></p>
-<p><a href="https://www.garron.me/en/linux/use-incron-rsync-dropbox-backup.html" target="_blank" rel="external">Use incron to Trigger Action when File Changes 如果设置incrontab出现问题可以参考这篇</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html" data-id="cijm7cp6w001mnh0r6mxq5nq9" class="article-share-link">Share</a>
-      
-        <a href="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html#comments" class="article-comment-link">Comments</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dropbox/">dropbox</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hexo/">hexo</a></li></ul>
 
     </footer>
   </div>
@@ -810,7 +741,7 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">1</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -819,7 +750,7 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -837,7 +768,7 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
     </div>
   </div>
 
@@ -847,6 +778,10 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
     <h3 class="widget-title">Recents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2016/02/03/MySQL实现row_number .html">MySQL实现row_number</a>
+          </li>
         
           <li>
             <a href="/2016/01/19/echarts-pie.html">ECharts饼图示例</a>
@@ -862,10 +797,6 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
         
           <li>
             <a href="/2015/12/27/dropbox-sync-hexo-article.html">使用Dropbox同步hexo文章</a>
-          </li>
-        
-          <li>
-            <a href="/2015/12/19/secure-your-website-with-lets-encrypt.html">使用Let&#39;s Encrypt制作数字证书</a>
           </li>
         
       </ul>

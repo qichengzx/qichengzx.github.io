@@ -3,18 +3,26 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Tag: 标识符 | 启程</title>
+  <title>MySQL实现row_number | 启程</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta http-equiv="Access-Control-Allow-Origin" content="*">
-  <meta name="description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
-<meta property="og:type" content="website">
-<meta property="og:title" content="启程">
-<meta property="og:url" content="https://www.qichengzx.com/tags/标识符/index.html">
+  <meta name="description" content="在本教程中，我们将在MySQL中实现一个非常实用的row_number功能。
+row_number是一个返回数据排序编号的排名方法，从1开始。我们经常需要用到row_number去生成某些报表，不幸的是，MySQL并不像MSSQL，Oracle一样支持这个方法。在MySQL中如果想实现这个功能需要临时变量。
+为了在MySQL中实现row_number，需要在查询中实用临时变量，下图中从employ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL实现row_number">
+<meta property="og:url" content="https://www.qichengzx.com/2016/02/03/MySQL实现row_number .html">
 <meta property="og:site_name" content="启程">
-<meta property="og:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
+<meta property="og:description" content="在本教程中，我们将在MySQL中实现一个非常实用的row_number功能。
+row_number是一个返回数据排序编号的排名方法，从1开始。我们经常需要用到row_number去生成某些报表，不幸的是，MySQL并不像MSSQL，Oracle一样支持这个方法。在MySQL中如果想实现这个功能需要临时变量。
+为了在MySQL中实现row_number，需要在查询中实用临时变量，下图中从employ">
+<meta property="og:image" content="https://www.qichengzx.com/images/mysql-row_number-session-variables.jpg">
+<meta property="og:updated_time" content="2016-02-03T10:27:20.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="启程">
-<meta name="twitter:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
+<meta name="twitter:title" content="MySQL实现row_number">
+<meta name="twitter:description" content="在本教程中，我们将在MySQL中实现一个非常实用的row_number功能。
+row_number是一个返回数据排序编号的排名方法，从1开始。我们经常需要用到row_number去生成某些报表，不幸的是，MySQL并不像MSSQL，Oracle一样支持这个方法。在MySQL中如果想实现这个功能需要临时变量。
+为了在MySQL中实现row_number，需要在查询中实用临时变量，下图中从employ">
 <meta name="twitter:creator" content="@qichengzx">
   
     <link rel="alternative" href="/atom.xml" title="启程" type="application/atom+xml">
@@ -61,39 +69,90 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2015" class="archive-year">2015</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2015/11/17/js-names.html" class="archive-article-date">
-  <time datetime="2015-11-17T14:07:21.000Z" itemprop="datePublished">Nov 17</time>
+        <section id="main"><article id="post-MySQL实现row_number " class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/02/03/MySQL实现row_number .html" class="article-date">
+  <time datetime="2016-02-03T10:25:26.000Z" itemprop="datePublished">2016-02-03</time>
 </a>
-      
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mysql/">mysql</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2015/11/17/js-names.html">JS标识符</a>
+    <h1 class="article-title" itemprop="name">
+      MySQL实现row_number
     </h1>
   
 
-    </header>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在本教程中，我们将在MySQL中实现一个非常实用的row_number功能。</p>
+<p>row_number是一个返回数据排序编号的排名方法，从1开始。我们经常需要用到row_number去生成某些报表，不幸的是，MySQL并不像MSSQL，Oracle一样支持这个方法。在MySQL中如果想实现这个功能需要临时变量。</p>
+<p>为了在MySQL中实现row_number，需要在查询中实用临时变量，下图中从employees表中查询出5条数据，并且从1开始，为每一行添加了编号(row number)。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator"><span class="keyword">SET</span> @row_number = <span class="number">0</span>;</span></span><br><span class="line"> </span><br><span class="line"><span class="operator"><span class="keyword">SELECT</span> </span><br><span class="line">    (@row_number:=@row_number + <span class="number">1</span>) <span class="keyword">AS</span> <span class="keyword">num</span>, firstName, lastName</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">    employees</span><br><span class="line"><span class="keyword">LIMIT</span> <span class="number">5</span>;</span></span><br></pre></td></tr></table></figure>
+<p><img src="/images/mysql-row_number-session-variables.jpg" alt=""></p>
+<p>在上面的查询中：</p>
+<pre><code>首先，我们定义了一个变量叫做row_number,初始值为<span class="number">0</span>，row_number是以@为前缀的一个临时变量。
+
+然后，在查询中，我们为这个变量每次+<span class="number">1</span>，LIMIT分句是为了限制返回的结果数，此处设为<span class="number">5.</span>
+</code></pre><p>另一个方法是使用临时变量作为派生表，联合主表。看下边的查询语句：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator"><span class="keyword">SELECT</span> </span><br><span class="line">    (@row_number:=@row_number + <span class="number">1</span>) <span class="keyword">AS</span> <span class="keyword">num</span>, firstName, lastName</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">    employees,(<span class="keyword">SELECT</span> @row_number:=<span class="number">0</span>) <span class="keyword">AS</span> <span class="keyword">t</span></span><br><span class="line"><span class="keyword">LIMIT</span> <span class="number">5</span>;</span></span><br></pre></td></tr></table></figure>
+<p>需要注意，派生表必须使用别名，以使查询语句在语法上没有问题。</p>
+<p>由于时间关系（回家过年），暂时到这里，文中部分内容可能翻译的有点不太顺，可以直接看下原文，原文中还有一部分讲分组查询中实用row_number。</p>
+<p>这个之后再写。</p>
+<p>原文地址：<a href="http://www.mysqltutorial.org/mysql-row_number/" target="_blank" rel="external">MySQL row_number, This Is How You Emulate It</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://www.qichengzx.com/2016/02/03/MySQL实现row_number .html" data-id="cik6oz7d90029jk0rpwjdfqn4" class="article-share-link">Share</a>
+      
+        <a href="https://www.qichengzx.com/2016/02/03/MySQL实现row_number .html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li></ul>
+
+    </footer>
   </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2016/01/19/echarts-pie.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">ECharts饼图示例</div>
+    </a>
+  
+</nav>
+
+  
 </article>
-  
-  
-    </div></section>
-  
+
+
+<section id="comments">
+  <div class="ds-thread" data-thread-key="cik6oz7d90029jk0rpwjdfqn4" data-title="MySQL实现row_number" data-url="https://www.qichengzx.com/2016/02/03/MySQL实现row_number .html"></div>
+  <script>
+    var duoshuoQuery = {short_name:"qichengzx"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0] 
+       || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+</section>
 </section>
         
           <aside id="sidebar">
