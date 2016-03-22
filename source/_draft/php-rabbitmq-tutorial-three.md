@@ -11,34 +11,71 @@ tags:  [php,rabbitmq]
 
 为了说明这个模式，我们会创建一个简单的日志系统（logging system，以下简称日志系统），它由两个程序组成--第一个是发送日志信息，第二个是接收日志并打印。
 
-In our logging system every running copy of the receiver program will get the messages. 这样就可以运行一个接收端就把日志保存到硬盘里，同时运行另一个接收端去实时显示日志到屏幕。
+日志系统的每一个运行的接收端程序都会接收信息，这样就可以运行一个接收端就把日志保存到硬盘里，同时运行另一个接收端去实时显示日志到屏幕。
 
 本质上，日志内容是广播给所有的接收端的。
 
 ### 交换
+
 在之前的章节中我们从一个队列里发送和接收消息，现在该把完整的RabbitMQ消息模型介绍给大家了。
 
 让我们快速的回看一遍在之前的章节中的内容：
 
-生产者是一个用来发送消息的程序
+	>生产者是一个用来发送消息的程序
 
-队列是一个存储消息的缓冲区
+	>队列是一个存储消息的缓冲区
 
-消费者是一个接收消息的程序
+	>消费者是一个接收消息的程序
 
 RabbitMQ消息模型的核心思想是，生产者永远不会直接发送给任何消息队列，实际上，生产者一般情况下甚至不知道消息应该发送给哪个队列。
 
 生产者只能发送消息到交换器中，交换器非常简单。一方面从生产者接收消息，另一方面把消息推送到队列中。交换器必须知道如何处理接收到的消息，是推送到某个队列？推送到多个队列？还是丢弃这条消息。这个规则通过交换器类型(exchange type)来指定。
 
-@图1
+![](/images/rabbitmq/exchanges.png)
 
-这里是交换器的几个类型：direct,topic,headers,fanout。这里我们主要关注最后一个--fanout，我们创建一个类型为 fanout 的交换器，命名为 logs。
+这里是交换器的几个类型：direct,topic,headers,fanout。这里我们主要关注最后一个--fanout，创建一个类型为 fanout 的交换器，命名为 logs。
 
 ```
 $channel->exchange_declare('logs','fanout',false,false,false);
 ```
 
-fanout交换器非常简单，你可以从名称中猜出它的功能，它把所有接收到的消息广播给所有它知道的队列，这也正是我们的日志程序需要的功能。
+fanout交换器非常简单，你可以从名称中猜出它的功能，它把所有接收到的消息广播给所有它知道的队列，这也正是我们的日志系统需要的功能。
+
+
+#### 交换器列表
+
+可以使用rabbitmqctl 命令列出服务器上的所有交换器：
+
+```
+sudo rabbitmqctl list_exchanges
+
+Listing exchanges ...
+        direct
+amq.direct      direct
+amq.fanout      fanout
+amq.headers     headers
+amq.match       headers
+amq.rabbitmq.log        topic
+amq.rabbitmq.trace      topic
+amq.topic       topic
+logs    fanout
+...done.
+```
+
+结果中有一些amq.*和一些未命名的交换器，这是一些默认创建的交换器，它们不太可能是现在需要用到的。
+
+#### 未命名交换器
+
+在之前的章节中我们对交换器一无所知，直到可以发送消息给队列。大概是因为我们当时正在使用一个以空字符串“”定义的默认的交换器。
+
+回想一下之前怎么发布消息：
+
+```
+$channel->basic_publish($msg,'','hello');
+```
+
+这里就是使用默认或者说未命名的交换器：消息被routing_key的值
+Here we use the default or nameless exchange: messages are routed to the queue with the name specified by routing_key, if it exists. The routing key is the second argument to basic_publish
 
 现在，可以发布消息到这个队列。
 
@@ -49,28 +86,29 @@ $channel->basic_publish($msg,'logs');
 
 ### 临时队列
 
-也许你还记得在之前我们使用了一个已命名的队列（还记得 hello 队列 和 task_queue 队列吗？）。命名一个队列是至关重要的，我们需要指定一个worker到同一个队列。当想让生产者和消费者使用同一个队列时给队列命名是非常重要的。
+也许你还记得在之前我们使用了一个指定的队列（还记得 hello 队列 和 task_queue 队列吗？）。可以命名一个队列是至关重要的--我们需要指定一个worker到同一个队列。当想让生产者和消费者使用同一个队列时给队列命名是非常重要的。
 
-但是现在在我们的日志系统中不需要在乎这个了，我们需要接收所有的消息，不仅仅是其中的一部分，我们也，因此需要做两件事。
+但是在我们的日志系统中情况不同了，我们想要接收所有的消息，不仅仅是其中的一部分，We're also interested only in currently flowing messages not in the old ones. ，因此需要做两件事。
 
-首先，当连接到Rabbit时，需要一个空的队列，为达到这个目的可以生成一个随机的名字，或者，更好一点的是，让服务器为我们随机选一个队列名字。
+首先，当连接到Rabbit时，需要一个空的队列，为达到这个目的可以生成一个名字随机的队列，或者，更好一点的是，让服务器为我们随机选一个队列名字。
 
-其次，当与消费者失去连接的时候队列需要自动删除。
+其次，一旦与消费者失去连接，队列需要自动删除。
 
-在[php-amqplib](https://github.com/php-amqplib/php-amqplib)中，当我们创建了一个名字为空的队列时，实际上它是一个生成了名字的队列。
+在[php-amqplib](https://github.com/php-amqplib/php-amqplib)中，当我们创建了一个名字为空的队列时，实际上是创建了一个被生成了名字的非持久化的队列。
 
 ```
 list($queue_name,,) = $channel->queue_declare("");
 ```
 
-方法的返回值，$queue_name变量包含了一个Rabbit生成的随机字符串。比如也许是这样的：amq.gen-JzTY20BRgKO-HjmUJj0wLg。
+方法的返回值，$queue_name变量包含了一个Rabbit生成的字符串。比如也许是这样的：amq.gen-JzTY20BRgKO-HjmUJj0wLg。
 
-当连接被关闭的时候，队列也会被删掉，因为队列被声明为一个私有的。
+当连接被关闭的时候，队列也会被删掉，因为队列是独有的。
 
 ## 绑定(Bindlings)
 
+![](/images/rabbitmq/bindings.png)
 
-我们已经创建了一个fanout类型的交换器和一个队列。现在需要告诉交换器发送消息给队列。交换器和队列之间的关系称之为绑定(binding)
+我们已经创建了一个fanout类型的交换器和一个队列。现在需要让交换器发送消息给队列。交换器和队列之间的关系称之为绑定(binding)
 
 ```
 $channel->queue_bind($queue_name,'logs');
