@@ -7,11 +7,11 @@ tags:  [php,rabbitmq]
 
 ## 工作队列
 
-##### （使用php-amqplib库）
+##### （使用[php-amqplib](https://github.com/php-amqplib/php-amqplib)库）
 
-在本教程[第一部分](/) 我们已经写完了从一个指定队列发送和接收消息的程序。在这一章节中，我们会创建一个工作队列（Work Queue）来分发耗时的任务给多个工作者（workers）。
+在本教程[第一部分](/2016/02/28/php-rabbitmq-tutorial-one.html) 我们已经写完了从一个指定队列发送和接收消息的程序。在这一章节中，我们会创建一个工作队列（Work Queue）来分发耗时的任务给多个工作者（worker）。
 
-工作队列（也被称为 任务队列-task queue）主要是避免立即执行资源密集型任务并且还要等待它执行完毕。相反，需要让任务稍后执行，我们把一个任务当做一条信息发送给队列，后台运行的工作者（workers）会取出任务并执行，当运行多个workers时任务会在它们之间共享。
+工作队列（也被称为 任务队列-task queue）主要是避免立即执行资源密集型任务并且还要等待它执行完毕。相反，需要让任务稍后执行，我们把一个任务当做一条信息发送给队列，后台运行的工作者（worker）会取出任务并执行，当运行多个worker时任务会在它们之间共享。
 
 这个概念在web应用中非常有用，可以在短暂的HTTP请求期间处理一些复杂的任务。
 
@@ -25,8 +25,8 @@ tags:  [php,rabbitmq]
 $data = impllode(' ',array_slice($argv,1));
 if(empty($data))$data = "Hello World";
 $msg = new AMQPMessage($data,
-						array('delivery_mode'=>2)#make message persistent
-						);
+	array('delivery_mode'=>2)#make message persistent
+);
 $channel->basic_publish($msg,'','task_queue');
 echo "[x] Sent ",$data,"\n";
 ```
@@ -47,7 +47,7 @@ $channel->basic_consume('task_queue','',false,false,false,false,$callback);
 
 注意我们伪造的任务需要花费时间（即发送的字符串中要有一些"."）
 
-然后在运行：
+然后运行：
 
 ```
 php new_task.php "A very hard task which takes two seconds.."
@@ -58,7 +58,7 @@ php wordker.php
 
 使用工作队列的一个好处就是它能够并行的处理队列。如果有太多工作需要处理，只需要添加新的worker就可以了。
 
-首先，我们试着同时运行worker.php，它们都会从队列接收到消息，但是到底是不是这样呢？我们看一下。
+首先，我们试着同时运行两个worker.php，它们都会从队列接收到消息，但是到底是不是这样呢？我们看一下。
 
 此时需要打开3个终端，其中两个运行worker.php，这两个就是我们的消费者 - C1和C2。
 
@@ -75,7 +75,7 @@ php worker.php
 [*] Waiting for messages. To exit press CTRL+C
 ```
 
-在第三个终端中我们会发送新的任务，一旦消费者程序已经在运行，就可以发送一些消息了。
+在第三个终端中我们会发送新的任务，消费者程序开始运行后就可以发送一些消息了。
 
 shell3
 
@@ -111,17 +111,17 @@ RabbitMQ会默认按顺序把消息发送给下一个消费者，平均每个消
 
 ## 消息响应
 
-执行一个任务会消耗一定的时间，也许你想知道如果一个消费者在执行一个耗时较长的任务然后执行一部分的时候挂掉会发生什么。在我们当前的代码中，一旦RabbitMQ把消息分发给消费者便会立即从内存中移除。这种情况下，如果停止一个worker，它正在处理的消息就会丢失。同时其他所有发送给这个worker的还没有处理的消息也会丢失。
+执行一个任务会消耗一定的时间，也许你想知道如果一个消费者在执行一个耗时较长的任务但是在执行一部分的时候挂掉会发生什么。在我们当前的代码中，一旦RabbitMQ把消息分发给消费者便会立即从内存中移除。这种情况下，如果停止一个worker，它正在处理的消息就会丢失。同时其他所有发送给这个worker的还没有处理的消息也会丢失。
 
-但是我们不想丢失任何任务，如果一个worker挂掉，需要让任务发送到另一个worker。
+但是我们不想丢失任何任务，如果一个worker挂掉，需要把任务发送到另一个worker。
 
-为了确保消息永不丢失，RabbitMq支持消息响应（message acknowledgements），消费者会发送一个响应告诉RabbitMQ已经收到了某条消息，并且已经处理，这样RabbitMQ就可以删掉它了。
+为了确保消息永不丢失，RabbitMQ支持消息响应（message acknowledgements），消费者会发送一个响应告诉RabbitMQ已经收到了某条消息，并且已经处理，这样RabbitMQ就可以删掉它了。
 
-如果一个消费者程序在未发送响应之前挂掉了（频道关闭，链接关闭，或者TCP连接丢失），RabbitMQ会认为消息没有完全处理并且会重新推送到队列中。如果此时有其他的消费者程序在运行，RabbitMQ会很快把消息发送给另一个消费者。这样就可以确保消息不会丢失，即使worker偶尔挂掉。
+如果一个消费者程序在未发送响应之前挂掉了（频道关闭，链接关闭，或者TCP连接丢失），RabbitMQ会认为消息没有完全处理然后会重新推送到队列中。如果此时有其他的消费者程序在运行，RabbitMQ会很快把消息发送给另一个消费者。这样就可以确保消息不会丢失，即使worker偶尔挂掉。
 
 消息是没有超时的概念的，当worker断开连接的时候，RabbitMQ会重新发送消息，这样在处理一个耗时较长的消息任务时就不会出现问题了。
 
-消息响应默认是关闭的。可以通过设置basic_consume的第四个参数为false(true表示不开启应答)，然后在处理完任务的时候从worker发送一个合适的响应内容。
+消息响应默认是关闭的。可以通过设置basic_consume的第四个参数为false(true表示不开启应答)，然后在处理完任务的时候从worker发送一个正确的响应内容。
 
 ```
 $callback = function($msg){
@@ -133,7 +133,7 @@ $callback = function($msg){
 $channel->basic_consume('task_queue','',false,false,false,false,$callback);
 ```
 
-这样我们就可以确保当你CTRL+C杀掉一个正在处理消息的worker的时候，消息并不会丢失。很快在这个worker挂掉之后，未响应的消息就会发送给RabbitMQ（即RabbitMQ收不到应该收到的响应消息）。
+这样我们就可以确保当你CTRL+C杀掉一个正在处理消息的worker的时候，消息并不会丢失。在这个worker挂掉之后，所有未响应的消息就会发送。
 
 ### 忘了响应
 
@@ -156,7 +156,7 @@ hello    0       0
 
 当RabbitMQ退出或崩溃，它会丢失之前所有的队列和消息，除非你特意告诉它。所以我们必须把队列和消息设为持久化。
 
-首先，需要确保RabbitMQ永不丢失队列。需要把它声明为<i>持久化（durable）</i>，所以修改queue_declare的第三个参数为true：
+首先，为了队列不丢失，需要把它声明为<i>持久化（durable）</i>，所以修改queue_declare的第三个参数为true：
 
 ```
 $channel->queue_declare('hello',false,true,false,false);
