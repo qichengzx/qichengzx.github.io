@@ -63,6 +63,64 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-php-use-pdo-cache-query-result-with-redis" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/12/05/php-use-pdo-cache-query-result-with-redis.html" class="article-date">
+  <time datetime="2015-12-05T14:37:09.000Z" itemprop="datePublished">2015-12-05</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/php/">php</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/12/05/php-use-pdo-cache-query-result-with-redis.html">PHP使用Redis作为缓存使用PDO读取MySQL数据</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="http://7b1hhm.com1.z0.glb.clouddn.com/hexo1414772222.jpg" alt=""></p>
+<p>图片转自：<a href="http://blog.encodez.com/blog/using-pdofetchall-examples-with-codes-and-output-results" target="_blank" rel="external">Using PDO::fetchAll – Examples with codes and output results</a></p>
+<p>一个简单的例子。</p>
+<p><strong>实现功能：</strong></p>
+<pre><code><span class="number">1.</span>使用PDO读取数据
+
+<span class="number">2.</span>使用Redis缓存结果
+
+<span class="number">3.</span>再次查询时会从Redis查询，减少MySQL查询
+</code></pre><p>没有注意代码的逻辑，仅实现思路。</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"></span><br><span class="line">//一上来肯定是配置pdo的连接信息。其实这步在这个示例中可以放到第一个<span class="keyword">else</span>中。</span><br><span class="line"><span class="variable">$dsn</span> = <span class="string">'mysql:dbname=node;host=127.0.0.1'</span>;</span><br><span class="line"><span class="variable">$user</span> = <span class="string">'root'</span>;</span><br><span class="line"><span class="variable">$password</span> = <span class="string">''</span>;</span><br><span class="line"></span><br><span class="line">//连接Redis</span><br><span class="line"><span class="variable">$redis</span>= new Redis();</span><br><span class="line"><span class="variable">$redis-</span>&gt;connect(<span class="string">'127.0.0.1'</span>,<span class="number">6379</span>);</span><br><span class="line"></span><br><span class="line">//接收查询参数</span><br><span class="line"><span class="variable">$id</span> = intval($_GET[<span class="string">'id'</span>]);</span><br><span class="line"></span><br><span class="line">//设置在Redis中存储的KEY</span><br><span class="line"><span class="variable">$MY</span>_NODE_KEY<span class="number">_</span> = <span class="string">'TEST_PDO_REDIS_ID_'</span>;</span><br><span class="line"></span><br><span class="line">//拼接KEY和查询ID，读取Redis，</span><br><span class="line"><span class="variable">$cache</span> = <span class="variable">$redis-</span>&gt;get(<span class="variable">$MY</span>_NODE_KEY<span class="number">_</span>.<span class="variable">$id</span>);</span><br><span class="line"></span><br><span class="line">//用来插入log的时间参数</span><br><span class="line"><span class="variable">$date</span> = date(<span class="string">"Y-m-d H:i:s"</span>);</span><br><span class="line"><span class="keyword">if</span>(<span class="variable">$cache</span>)&#123;</span><br><span class="line">	//Redis缓存存在则直接输出</span><br><span class="line">	print_r(json_decode(<span class="variable">$cache</span>,true));</span><br><span class="line">	//并记录log</span><br><span class="line">	error_log(<span class="variable">$date</span>.<span class="string">"---read from redis \r\n"</span>, <span class="number">3</span>, <span class="string">'./debug.txt'</span>);</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">	//缓存不存在，则连接PDO</span><br><span class="line">	try &#123;</span><br><span class="line">    	<span class="variable">$pdo</span> = new PDO(<span class="variable">$dsn</span>, <span class="variable">$user</span>, <span class="variable">$password</span>);</span><br><span class="line">    	error_log(<span class="variable">$date</span>.<span class="string">"---Connection Succcess \r\n"</span>, <span class="number">3</span>, <span class="string">'./debug.txt'</span>);</span><br><span class="line">		</span><br><span class="line">		//查询</span><br><span class="line">	    <span class="variable">$query</span> = <span class="variable">$pdo</span> -&gt; query(<span class="string">"select * from news where id = '$id'"</span>);</span><br><span class="line">		//设置结果集为数组</span><br><span class="line">	    // [PDOStatement::fetch](http://php.net/manual/zh/pdostatement.fetch.php)</span><br><span class="line">	    <span class="variable">$query-</span>&gt;setFetchMode(PDO::FETCH_ASSOC);</span><br><span class="line">	    </span><br><span class="line">	    <span class="variable">$rs</span> = <span class="variable">$query-</span>&gt;fetch();</span><br><span class="line">	</span><br><span class="line">	    if (is_array(<span class="variable">$rs</span>)) &#123;</span><br><span class="line">	    	//查询完成，以json格式写入Redis中。</span><br><span class="line">			<span class="variable">$redis-</span>&gt;set(<span class="variable">$MY</span>_NODE_KEY<span class="number">_</span>.<span class="variable">$rs</span>[<span class="string">'id'</span>],json_encode(<span class="variable">$rs</span>));</span><br><span class="line">			print_r(<span class="variable">$rs</span>);</span><br><span class="line">			error_log(<span class="variable">$date</span>.<span class="string">"read from mysql \r\n"</span>, <span class="number">3</span>, <span class="string">'./debug.txt'</span>);</span><br><span class="line">	    &#125;</span><br><span class="line">	    </span><br><span class="line">	//PDO连接出错</span><br><span class="line">	&#125; catch (PDOException <span class="variable">$e</span>) &#123;</span><br><span class="line">		//输出错误信息，并记录log中</span><br><span class="line">    	echo <span class="string">'Connection failed: '</span> . <span class="variable">$e-</span>&gt;getMessage();</span><br><span class="line">    	error_log(<span class="variable">$date</span>.<span class="string">"---Connection failed \r\n"</span>, <span class="number">3</span>, <span class="string">'./debug.txt'</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>写的很糙，逻辑已经简单到没有逻辑了。</p>
+<p>一句话说一下思路就是：<br>    先看有没有缓存<br>    木有就查数据库，写入缓存</p>
+<p>参考资料：<br>    <a href="http://php.net/manual/zh/book.pdo.php" target="_blank" rel="external">PHP 数据对象</a><br>    <a href="http://www.cnblogs.com/zemliu/archive/2012/05/08/2490953.html" target="_blank" rel="external">PHP PDO的简单使用(query(),exec(),prepare(),Transaction,行锁)</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html" data-id="cin47x880000j4r0rno63d3z0" class="article-share-link">Share</a>
+      
+        <a href="https://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pdo/">pdo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/php/">php</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis/">redis</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-nodejs-mysql" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2015/12/03/nodejs-mysql.html" class="article-date">
@@ -115,7 +173,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/03/nodejs-mysql.html" data-id="ciljhlgir000zow0rg1s14dsz" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/12/03/nodejs-mysql.html" data-id="cin47x88800134r0rf1kf3qj2" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/12/03/nodejs-mysql.html#comments" class="article-comment-link">Comments</a>
       
@@ -170,7 +228,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html" data-id="ciljhlgiy001aow0r6ldq97wk" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html" data-id="cin47x88f001e4r0rxwjoewac" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html#comments" class="article-comment-link">Comments</a>
       
@@ -220,7 +278,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/17/js-names.html" data-id="ciljhlgit0014ow0rp4uc9ttf" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/17/js-names.html" data-id="cin47x88a00184r0rimdpex72" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/17/js-names.html#comments" class="article-comment-link">Comments</a>
       
@@ -348,7 +406,7 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html" data-id="ciljhlgj5001row0re1cokgtk" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html" data-id="cin47x88m001v4r0rxxdcz3gq" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html#comments" class="article-comment-link">Comments</a>
       
@@ -674,7 +732,7 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html" data-id="ciljhlghz0000ow0rmspqrqyc" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html" data-id="cin47x87o00004r0r0zufnc51" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html#comments" class="article-comment-link">Comments</a>
       
@@ -776,7 +834,7 @@ Your <span class="keyword">public</span> <span class="keyword">key</span> has be
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html" data-id="ciljhlgjb0026ow0r48mud19f" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html" data-id="cin47x88r002a4r0rv1l6wo8l" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html#comments" class="article-comment-link">Comments</a>
       
@@ -856,7 +914,7 @@ fetch(url, {
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/06/React-Native-Fetch.html" data-id="ciljhlgjd002bow0rb3k7jpdh" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/06/React-Native-Fetch.html" data-id="cin47x88t002f4r0rxpbbjasm" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/06/React-Native-Fetch.html#comments" class="article-comment-link">Comments</a>
       
@@ -905,7 +963,7 @@ fetch(url, {
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/06/hello-world.html" data-id="ciljhlgix0019ow0r08uh54e9" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/06/hello-world.html" data-id="cin47x88d001d4r0rb7vkxjif" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/06/hello-world.html#comments" class="article-comment-link">Comments</a>
       
@@ -960,7 +1018,7 @@ fetch(url, {
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">2</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">3</span></li></ul>
     </div>
   </div>
 
@@ -969,7 +1027,7 @@ fetch(url, {
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -978,7 +1036,7 @@ fetch(url, {
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/dropbox/" style="font-size: 13.33px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/hexo/" style="font-size: 16.67px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 16.67px;">javascript</a> <a href="/tags/js/" style="font-size: 10px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 20px;">mysql</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 16.67px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 10px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a>
+      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/dropbox/" style="font-size: 12.5px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/hexo/" style="font-size: 15px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 15px;">javascript</a> <a href="/tags/js/" style="font-size: 10px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 20px;">mysql</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 17.5px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 12.5px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a>
     </div>
   </div>
 
@@ -987,7 +1045,7 @@ fetch(url, {
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
     </div>
   </div>
 
@@ -997,6 +1055,10 @@ fetch(url, {
     <h3 class="widget-title">Recents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2016/04/17/php-rabbitmq-tutorial-two.html">PHP RabbitMQ 教程（二） - 工作队列</a>
+          </li>
         
           <li>
             <a href="/2016/02/28/php-rabbitmq-tutorial-one.html">PHP RabbitMQ 教程（一） - 介绍</a>
@@ -1012,10 +1074,6 @@ fetch(url, {
         
           <li>
             <a href="/2016/02/03/MySQL实现row_number .html">MySQL实现row_number</a>
-          </li>
-        
-          <li>
-            <a href="/2016/01/19/echarts-pie.html">ECharts饼图示例</a>
           </li>
         
       </ul>
