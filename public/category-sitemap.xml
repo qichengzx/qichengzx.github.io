@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="sitemap.xsl"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-        <loc>https://www.qichengzx.com</loc>
+        <loc>http://www.qichengzx.com</loc>
         <changefreq>daily</changefreq>
         <priority>1</priority>
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/categories/linux/</loc>
+        <loc>http://www.qichengzx.com/categories/linux/</loc>
         <lastmod>2016-01-10T11:22:53.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/categories/mysql/</loc>
+        <loc>http://www.qichengzx.com/categories/mysql/</loc>
         <lastmod>2016-02-25T03:35:21.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/categories/javascript/</loc>
+        <loc>http://www.qichengzx.com/categories/javascript/</loc>
         <lastmod>2016-02-25T09:16:54.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/categories/php/</loc>
-        <lastmod>2016-04-17T06:55:01.000Z</lastmod>
+        <loc>http://www.qichengzx.com/categories/php/</loc>
+        <lastmod>2016-04-23T12:02:49.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>

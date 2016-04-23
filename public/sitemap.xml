@@ -2,17 +2,17 @@
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
     <sitemap>
-        <loc>https://www.qichengzx.com/post-sitemap.xml</loc>
-        <lastmod>2016-04-17T06:55:01.000Z</lastmod>
+        <loc>http://www.qichengzx.com/post-sitemap.xml</loc>
+        <lastmod>2016-04-23T12:02:49.000Z</lastmod>
     </sitemap>
 
     <sitemap>
-        <loc>https://www.qichengzx.com/category-sitemap.xml</loc>
+        <loc>http://www.qichengzx.com/category-sitemap.xml</loc>
         <lastmod>2016-01-10T11:22:53.000Z</lastmod>
     </sitemap>
 
     <sitemap>
-        <loc>https://www.qichengzx.com/tag-sitemap.xml</loc>
+        <loc>http://www.qichengzx.com/tag-sitemap.xml</loc>
         <lastmod>2015-11-08T02:42:16.000Z</lastmod>
     </sitemap>
 

@@ -3,9 +3,9 @@
   <title><![CDATA[启程]]></title>
   
   <link href="/atom.xml" rel="self"/>
-  <link href="https://www.qichengzx.com/"/>
-  <updated>2016-04-17T06:55:01.000Z</updated>
-  <id>https://www.qichengzx.com/</id>
+  <link href="http://www.qichengzx.com/"/>
+  <updated>2016-04-23T12:01:13.000Z</updated>
+  <id>http://www.qichengzx.com/</id>
   
   <author>
     <name><![CDATA[qichengzx]]></name>
@@ -15,16 +15,93 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title><![CDATA[PHP RabbitMQ 教程（三） - 发布/订阅]]></title>
+    <link href="http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html"/>
+    <id>http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html</id>
+    <published>2016-04-23T11:58:17.000Z</published>
+    <updated>2016-04-23T12:01:13.000Z</updated>
+    <content type="html"><![CDATA[<h3 id="发布/订阅">发布/订阅</h3><p>我们在<a href="/2016/04/17/php-rabbitmq-tutorial-two.html">上一节</a>创建了一个工作队列，并假定队列对应的任务传送给了某个客户端。在这一章节我们会做一些完全不一样的东西–我们会发送一条消息到多个消费者，也称之为“发布/订阅”模式。</p>
+<p>为了说明这个模式，我们会创建一个简单的日志系统（logging system，以下简称日志系统），它由两个程序组成–第一个是发送日志信息，第二个是接收日志并打印。</p>
+<p>日志系统的每一个运行的接收端程序都会接收信息，这样就可以运行一个接收端就把日志保存到硬盘里，同时运行另一个接收端去实时显示日志到屏幕。</p>
+<p>本质上，日志内容是广播给所有的接收端的。</p>
+<h3 id="交换器">交换器</h3><p>在之前的章节中我们从一个队列里发送和接收消息，现在该把完整的RabbitMQ消息模型介绍给大家了。</p>
+<p>让我们快速的回看一遍在之前的章节中的内容：</p>
+<pre><code>&gt;生产者是一个用来发送消息的程序
+
+&gt;队列是一个存储消息的缓冲区
+
+&gt;消费者是一个接收消息的程序
+</code></pre><p>RabbitMQ消息模型的核心思想是，生产者永远不会直接发送给任何消息队列，实际上，生产者一般情况下甚至不知道消息应该发送给哪个队列。</p>
+<p>生产者只能发送消息到交换器中，交换器非常简单。一方面从生产者接收消息，另一方面把消息推送到队列中。交换器必须知道如何处理接收到的消息，是推送到某个队列？推送到多个队列？还是丢弃这条消息。这个规则通过交换器类型(exchange type)来指定。</p>
+<p><img src="/images/rabbitmq/exchanges.png" alt=""></p>
+<p>这里是交换器的几个类型：direct,topic,headers,fanout。这里我们主要关注最后一个–fanout，创建一个类型为 fanout 的交换器，命名为 logs。</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$channel-</span>&gt;exchange_declare(<span class="string">'logs'</span>,<span class="string">'fanout'</span>,<span class="literal">false</span>,<span class="literal">false</span>,<span class="literal">false</span>);</span><br></pre></td></tr></table></figure>
+<p>fanout交换器非常简单，你可以从名称中猜出它的功能，它把所有接收到的消息广播给所有它知道的队列，这也正是我们的日志系统需要的功能。</p>
+<h4 id="列出交换器">列出交换器</h4><p>可以使用rabbitmqctl 命令列出服务器上的所有交换器：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">sudo rabbitmqctl list_exchanges</span><br><span class="line"></span><br><span class="line">Listing exchanges ...</span><br><span class="line">        direct</span><br><span class="line">amq<span class="class">.direct</span>      direct</span><br><span class="line">amq<span class="class">.fanout</span>      fanout</span><br><span class="line">amq<span class="class">.headers</span>     headers</span><br><span class="line">amq<span class="class">.match</span>       headers</span><br><span class="line">amq<span class="class">.rabbitmq</span><span class="class">.log</span>        topic</span><br><span class="line">amq<span class="class">.rabbitmq</span><span class="class">.trace</span>      topic</span><br><span class="line">amq<span class="class">.topic</span>       topic</span><br><span class="line">logs    fanout</span><br><span class="line">..<span class="class">.done</span>.</span><br></pre></td></tr></table></figure>
+<p>结果中有一些amq.*和一些未命名的交换器，这是一些默认创建的交换器，它们不太可能是现在需要用到的。</p>
+<h4 id="未命名交换器">未命名交换器</h4><p>在之前的章节中我们对交换器一无所知，直到可以发送消息给队列。大概是因为我们当时正在使用一个以空字符串“”定义的默认的交换器。</p>
+<p>回想一下之前怎么发布消息：</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$channel-</span>&gt;basic_publish(<span class="variable">$msg</span>,<span class="string">''</span>,<span class="string">'hello'</span>);</span><br></pre></td></tr></table></figure>
+<p>这里就是使用默认或者说未命名的交换器：消息被routing_key的值<br>Here we use the default or nameless exchange: messages are routed to the queue with the name specified by routing_key, if it exists. The routing key is the second argument to basic_publish</p>
+<p>现在，可以发布消息到这个队列。</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$channel-</span>&gt;exchange_declare(<span class="string">'logs'</span>,<span class="string">'fanout'</span>,<span class="literal">false</span>,<span class="literal">false</span>,<span class="literal">false</span>);</span><br><span class="line"><span class="variable">$channel-</span>&gt;basic_publish(<span class="variable">$msg</span>,<span class="string">'logs'</span>);</span><br></pre></td></tr></table></figure>
+<h3 id="临时队列">临时队列</h3><p>也许你还记得在之前我们使用了一个指定的队列（还记得 hello 队列 和 task_queue 队列吗？）。可以命名一个队列是至关重要的–我们需要指定一个worker到同一个队列。当想让生产者和消费者使用同一个队列时给队列命名是非常重要的。</p>
+<p>但是在我们的日志系统中情况不同了，我们想要接收所有的消息，不仅仅是其中的一部分，我们关心的是最新的消息而不是旧的，因此需要做两件事。</p>
+<p>首先，当连接到RabbitMQ时，需要一个空的队列，可以手动创建一个名字随机的队列，或者，更好的办法是，让服务器为我们随机选一个队列名字。</p>
+<p>其次，一旦与消费者失去连接，队列需要自动删除。</p>
+<p>在<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">php-amqplib</a>中，当我们创建了一个名字为空的队列时，实际上是创建了一个被生成了名字的非持久化的队列。</p>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">list($queue_name, ,) = $channel-&gt;queue_declare(<span class="string">""</span>)<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+<p>方法执行后，$queue_name变量包含了一个RabbitMQ生成的字符串。比如也许是这样的：amq.gen-JzTY20BRgKO-HjmUJj0wLg。</p>
+<p>当连接被关闭的时候，队列也会被删掉，因为队列是独有的。</p>
+<h3 id="绑定(Bindlings)">绑定(Bindlings)</h3><p><img src="/images/rabbitmq/bindings.png" alt=""></p>
+<p>我们已经创建了一个fanout类型的交换器和一个队列。现在需要让交换器发送消息给队列。交换器和队列之间的关系称之为绑定(binding)</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$channel-</span>&gt;queue_bind(<span class="variable">$queue</span>_name,<span class="string">'logs'</span>);</span><br></pre></td></tr></table></figure>
+<p>现在开始，logs 交换器会把消息附加到队列中。</p>
+<h4 id="列出绑定（Listing_bindings）">列出绑定（Listing bindings）</h4><p>可以使用 rabbitmqctl list_bindings列出所有存在的正在使用的绑定。</p>
+<h3 id="整合">整合</h3><p><img src="/images/rabbitmq/python-three-overall.png" alt=""></p>
+<p>发送日志消息的生产者，与之前的代码看起来没什么不同，最重要的变化是现在想要发送消息到我们的 logs 交换器中，需要在发送时提供一个routing_key，但是在 fanout类型的交换器中这个值是可以忽略的。下边是emit_log.php的代码。</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"></span><br><span class="line">require_once __DIR_<span class="number">_</span> .<span class="string">'/verdor/autoload.php'</span>;</span><br><span class="line">use PhpAmqpLib\Connection\AMQPStreamConnection;</span><br><span class="line">use PhpAmqpLib\Message\AMQPMessage;</span><br><span class="line"></span><br><span class="line"><span class="variable">$connection</span> = new AMQPStreamConnection(<span class="string">'localhost'</span>,<span class="number">5672</span>,<span class="string">'guest'</span>,<span class="string">'guest'</span>);</span><br><span class="line"><span class="variable">$channel</span> = <span class="variable">$channel-</span>&gt;channel();</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel-</span>&gt;exchange_declare(<span class="string">'logs'</span>,<span class="string">'fanout'</span>,<span class="literal">false</span>,<span class="literal">false</span>,<span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$data</span> = implode(<span class="string">' '</span>,array_slice(<span class="variable">$argv</span>,<span class="number">1</span>));</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">empty</span>(<span class="variable">$data</span>)) <span class="variable">$data</span> = <span class="string">"info:Hello World"</span>;</span><br><span class="line"><span class="variable">$msg</span> = new AMQPMessage(<span class="variable">$data</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel-</span>&gt;basic_publish(<span class="variable">$msg</span>,<span class="string">'logs'</span>);</span><br><span class="line"></span><br><span class="line">echo <span class="string">"[x]Sent "</span>,<span class="variable">$data</span>,<span class="string">"\n"</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel-</span>&gt;close();</span><br><span class="line"><span class="variable">$connection-</span>&gt;close();</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>(<a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/emit_log.php" target="_blank" rel="external">emit_log.php</a>)</p>
+<p>如你所见，建立连接后声明了交换器，这一步是必须的，因为发送消息到一个不存在的交换器是被禁止的。</p>
+<p>如果还没有队列绑定到交换器，信息会丢失，但是这对于我们是可以的，如果没有消费者监听，我们可以安全的丢弃消息。</p>
+<p>receive_logs.php：</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"></span><br><span class="line">require_once __DIR_<span class="number">_</span> .<span class="string">'/vendor/autoload.php'</span>;</span><br><span class="line">use PhpAmqpLib\Connection\QMAPStreamConnection;</span><br><span class="line"></span><br><span class="line"><span class="variable">$connection</span> = new AMQPStreamConnection(<span class="string">'localhost'</span>,<span class="number">5672</span>,<span class="string">'guest'</span>,<span class="string">'guest'</span>);</span><br><span class="line"><span class="variable">$channel</span> = <span class="variable">$connection-</span>&gt;channel();</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel-</span>&gt;queue_bind(<span class="variable">$queue</span>_name,<span class="string">'logs'</span>);</span><br><span class="line"></span><br><span class="line">echo <span class="string">'[*] Waiting for logs. To exit press CTRL+C'</span>,<span class="string">"\n"</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$callback</span> = <span class="keyword">function</span>(<span class="variable">$msg</span>)&#123;</span><br><span class="line">	echo <span class="string">'[x]'</span>,<span class="variable">$msg-</span>&gt;body,<span class="string">"\n"</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel-</span>&gt;basic_consume(<span class="variable">$queue</span>_name,<span class="string">''</span>,<span class="literal">false</span>,<span class="literal">true</span>,<span class="literal">false</span>,<span class="literal">false</span>,<span class="variable">$callback</span>);</span><br><span class="line"></span><br><span class="line">whild(count(<span class="variable">$channel-</span>&gt;callbacks))&#123;</span><br><span class="line">	<span class="variable">$channel-</span>&gt;wait();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel-</span>&gt;close();</span><br><span class="line"><span class="variable">$connection-</span>&gt;close();</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>(<a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/receive_logs.php" target="_blank" rel="external">receive_logs.php</a>)</p>
+<p>如果想保存日志到文件中，可以在命令中输入</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">php</span> <span class="tag">receive_logs</span><span class="class">.php</span> &gt; <span class="tag">logs_from_rabbit</span><span class="class">.log</span></span><br></pre></td></tr></table></figure>
+<p>如果想在屏幕上查看日志，新打开一个终端并运行：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">php</span> <span class="tag">receive_logs</span><span class="class">.php</span></span><br></pre></td></tr></table></figure>
+<p>发送日志：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">php</span> <span class="tag">emit_log</span><span class="class">.php</span></span><br></pre></td></tr></table></figure>
+<p>使用 rabbitmqctl list_bindings 可以确认代码确实创建了绑定和队列，当两个receive_logs.php在运行的时候会看到类似这样的：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo rabbitmqctl list_bindings</span><br><span class="line">Listing bindings ...</span><br><span class="line">logs    exchange        amq<span class="class">.gen-JzTY20BRgKO-HjmUJj0wLg</span>  queue           []</span><br><span class="line">logs    exchange        amq<span class="class">.gen-vso0PVvyiRIL2WoV3i48Yg</span>  queue           []</span><br><span class="line">..<span class="class">.done</span>.</span><br></pre></td></tr></table></figure>
+<p>对于结果的解释很简单，logs交换器中的数据发送到两个服务器指定的队列，而这正是我们要实现的。</p>
+<p>想要弄明白怎样去监听部分消息，转到第四部分。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<h3 id="发布/订阅">发布/订阅</h3><p>我们在<a href="/2016/04/17/php-rabbitmq-tutorial-two.html">上一节</a>创建了一个工作队列，并假定队列对应的任务传送给了某个客户端。在这一章节我们会做一些完全不一样的东西]]>
+    </summary>
+    
+      <category term="php" scheme="http://www.qichengzx.com/tags/php/"/>
+    
+      <category term="rabbitmq" scheme="http://www.qichengzx.com/tags/rabbitmq/"/>
+    
+      <category term="php" scheme="http://www.qichengzx.com/categories/php/"/>
+    
+  </entry>
+  
+  <entry>
     <title><![CDATA[PHP RabbitMQ 教程（二） - 工作队列]]></title>
-    <link href="https://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html"/>
-    <id>https://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html</id>
-    <published>2016-04-17T06:55:01.000Z</published>
-    <updated>2016-04-17T06:55:01.000Z</updated>
-    <content type="html"><![CDATA[<h2 id="工作队列">工作队列</h2><h5 id="（使用php-amqplib库）">（使用<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">php-amqplib</a>库）</h5><p><img src="/images/rabbitmq/python-two.png" alt=""></p>
+    <link href="http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html"/>
+    <id>http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html</id>
+    <published>2016-04-17T06:39:30.000Z</published>
+    <updated>2016-04-23T12:02:49.000Z</updated>
+    <content type="html"><![CDATA[<h3 id="工作队列">工作队列</h3><h5 id="（使用php-amqplib库）">（使用<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">php-amqplib</a>库）</h5><p><img src="/images/rabbitmq/python-two.png" alt=""></p>
 <p>在本教程<a href="/2016/02/28/php-rabbitmq-tutorial-one.html">第一部分</a> 我们已经写完了从一个指定队列发送和接收消息的程序。在这一章节中，我们会创建一个工作队列（Work Queue）来分发耗时的任务给多个工作者（worker）。</p>
 <p>工作队列（也被称为 任务队列-task queue）主要是避免立即执行资源密集型任务并且还要等待它执行完毕。相反，需要让任务稍后执行，我们把一个任务当做一条信息发送给队列，后台运行的工作者（worker）会取出任务并执行，当运行多个worker时任务会在它们之间共享。</p>
 <p>这个概念在web应用中非常有用，可以在短暂的HTTP请求期间处理一些复杂的任务。</p>
-<h2 id="准备">准备</h2><p>在前面的部分我们发送了一条内容为“Hello World”的信息，现在我们会发送一些字符串，把这些字符串当做复杂的任务，我们并没有一个实际的任务，像是图片缩放，或者转换PDF文件，所以我们使用sleep方法来假设任务很繁忙。我们会在字符串中加入一些“.”来表示复杂复杂程度；每一个“.”表示需要耗时1秒，比如，“Hello …”代表需要耗时3秒。</p>
+<h3 id="准备工作">准备工作</h3><p>在前面的部分我们发送了一条内容为“Hello World”的信息，现在我们会发送一些字符串，把这些字符串当做复杂的任务，我们并没有一个实际的任务，像是图片缩放，或者转换PDF文件，所以我们使用sleep方法来假设任务很繁忙。我们会在字符串中加入一些“.”来表示复杂复杂程度；每一个“.”表示需要耗时1秒，比如，“Hello …”代表需要耗时3秒。</p>
 <p>我们从上一节的基础上稍微改动了一下send.php，来允许消息可以从命令行发送，这个程序会发送任务到队列中，把它命名为new_task.php</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$data</span> = impllode(<span class="string">' '</span>,array_slice(<span class="variable">$argv</span>,<span class="number">1</span>));</span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">empty</span>(<span class="variable">$data</span>))<span class="variable">$data</span> = <span class="string">"Hello World"</span>;</span><br><span class="line"><span class="variable">$msg</span> = <span class="keyword">new</span> AMQPMessage(<span class="variable">$data</span>,</span><br><span class="line">	<span class="keyword">array</span>(<span class="string">'delivery_mode'</span>=&gt;<span class="number">2</span>)<span class="comment">#设置消息持久化，下边会讲到。</span></span><br><span class="line">);</span><br><span class="line"><span class="variable">$channel</span>-&gt;basic_publish(<span class="variable">$msg</span>,<span class="string">''</span>,<span class="string">'task_queue'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="string">"[x] Sent "</span>,<span class="variable">$data</span>,<span class="string">"\n"</span>;</span><br></pre></td></tr></table></figure>
 <p>上一节的receive.php也需要一些改动：需要为消息中的每一个“.”模拟1秒的工作。它会从队列中取出消息并运行，把它命名为worker.php：</p>
@@ -32,7 +109,7 @@
 <p>注意我们伪造的任务需要花费时间（即发送的字符串中要有一些”.”）</p>
 <p>然后运行：</p>
 <figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">php new_task<span class="class">.php</span> <span class="string">"A very hard task which takes two seconds.."</span></span><br><span class="line">php wordker.php</span><br></pre></td></tr></table></figure>
-<h2 id="轮询分发">轮询分发</h2><p>使用工作队列的一个好处就是它能够并行的处理队列。如果有太多工作需要处理，只需要添加新的worker就可以了。</p>
+<h3 id="轮询分发">轮询分发</h3><p>使用工作队列的一个好处就是它能够并行的处理队列。如果有太多工作需要处理，只需要添加新的worker就可以了。</p>
 <p>首先，我们试着同时运行两个worker.php，它们都会从队列接收到消息，但是到底是不是这样呢？我们看一下。</p>
 <p>此时需要打开3个终端，其中两个运行worker.php，这两个就是我们的消费者 - C1和C2。</p>
 <p>shell1</p>
@@ -48,7 +125,7 @@
 <p>shell2</p>
 <figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">php worker<span class="class">.php</span></span><br><span class="line">[*] Waiting <span class="keyword">for</span> messages<span class="class">.To</span> exit press CTRL+C</span><br><span class="line">[x]Received <span class="string">'Second message.'</span></span><br><span class="line">[x]Received <span class="string">'Fourth message...'</span></span><br></pre></td></tr></table></figure>
 <p>RabbitMQ会默认按顺序把消息发送给下一个消费者，平均每个消费者都会得到一样多数量的消息，这种分发消息的方式叫做轮询。试着添加三个或更多个worker来运行。</p>
-<h2 id="消息响应">消息响应</h2><p>执行一个任务会消耗一定的时间，也许你想知道如果一个消费者在执行一个耗时较长的任务时但是在执行一部分的时候挂掉会发生什么。在我们当前的代码中，一旦RabbitMQ把消息分发给消费者便会立即从内存中移除。这种情况下，如果停止一个worker，它正在处理的消息就会丢失。同时其他所有发送给这个worker的还没有处理的消息也会丢失。</p>
+<h3 id="消息响应">消息响应</h3><p>执行一个任务会消耗一定的时间，也许你想知道如果一个消费者在执行一个耗时较长的任务时但是在执行一部分的时候挂掉会发生什么。在我们当前的代码中，一旦RabbitMQ把消息分发给消费者便会立即从内存中移除。这种情况下，如果停止一个worker，它正在处理的消息就会丢失。同时其他所有发送给这个worker的还没有处理的消息也会丢失。</p>
 <p>但是我们不想丢失任何任务，如果一个worker挂掉，需要把任务发送到另一个worker。</p>
 <p>为了确保消息永不丢失，RabbitMQ支持消息响应（message acknowledgements），消费者会发送一个响应告诉RabbitMQ已经收到了某条消息，并且已经处理，这样RabbitMQ就可以删掉它了。</p>
 <p>如果一个消费者程序在未发送响应之前挂掉了（频道关闭，链接关闭，或者TCP连接丢失），RabbitMQ会认为消息没有完全处理然后会重新推送到队列中。如果此时有其他的消费者程序在运行，RabbitMQ会很快把消息发送给另一个消费者。这样就可以确保消息不会丢失，即使worker偶尔挂掉。</p>
@@ -59,7 +136,7 @@
 <h3 id="忘了响应">忘了响应</h3><p>一个很容易犯的错误就是忘了basic_ack，后果很严重。消息会在程序退出后重新发送（可能看起来像是随机返还 原文：which may look like random redelivery），但是如果它不释放未响应的消息，RabbitMQ就会占用越来越多的内存。</p>
 <p>为了排除这种错误可以使用rabbitmqctl来打印messages_unacknowledges字段：</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo rabbitmqctl list_queues name messages_ready messages_unacknowledged</span><br><span class="line"></span><br><span class="line">Listing queues ...</span><br><span class="line">hello    <span class="number">0</span>       <span class="number">0</span></span><br><span class="line">...done.</span><br></pre></td></tr></table></figure>
-<h2 id="消息持久化">消息持久化</h2><p>我们已经学习了确保即使消费者程序挂掉，任务也不会丢失。但是任务还是会在RabbitMQ服务停止的时候丢失。</p>
+<h3 id="消息持久化">消息持久化</h3><p>我们已经学习了确保即使消费者程序挂掉，任务也不会丢失。但是任务还是会在RabbitMQ服务停止的时候丢失。</p>
 <p>当RabbitMQ退出或崩溃，它会丢失之前所有的队列和消息，除非你特意告诉它。所以我们必须把队列和消息设为持久化。</p>
 <p>首先，为了队列不丢失，需要把它声明为<i>持久化（durable）</i>，所以修改queue_declare的第三个参数为true：</p>
 <figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$channel-</span>&gt;queue_declare(<span class="string">'hello'</span>,<span class="literal">false</span>,<span class="literal">true</span>,<span class="literal">false</span>,<span class="literal">false</span>);</span><br></pre></td></tr></table></figure>
@@ -69,13 +146,13 @@
 <p>这时候，我们就可以确保在RabbitMQ重启之后task_queue队列不会丢失。现在需要设置消息持久化了 - 通过设置AMQPMessage的属性数组中消息属性 delivery_mode = 2来达到。</p>
 <figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$msg</span> = new AMQPMessage(<span class="variable">$data</span>,</span><br><span class="line">		<span class="keyword">array</span>(<span class="string">'delivery_mode'</span>=&gt;<span class="number">2</span>) //设置消息持久化</span><br><span class="line">	);</span><br></pre></td></tr></table></figure>
 <h3 id="关于消息持久化的说明">关于消息持久化的说明</h3><p>设置消息持久化并不能完全保证消息不会丢失。这只是告诉让RabbitMQ要把消息保存到硬盘，但是从RabbitMQ接收到消息到保存完成仍然还有一个短暂的间隔时间。因为RabbitMQ并不是每一条消息都会使用fsync(2)，可能只是保存到缓存中而不是真正的写到磁盘里。并不能保证消息真正的持久化，但是对于简单的工作队列已经足够了。如果你需要更健壮的持久化，可以使用<a href="https://www.rabbitmq.com/confirms.html" target="_blank" rel="external">publisher confirms</a>机制。</p>
-<h2 id="公平分发">公平分发</h2><p>也许你注意到它仍没有像我们想的那样去派发任务，比如在两个worker的情况下，处理奇数消息的比较繁忙，处理偶数消息的比较轻松，一个worker不断的忙碌而另一个几乎不需要工作，但是RabbitmQ并不知道这些，并且继续一如既往的派发消息。</p>
+<h3 id="公平分发">公平分发</h3><p>也许你注意到它仍没有像我们想的那样去派发任务，比如在两个worker的情况下，处理奇数消息的比较繁忙，处理偶数消息的比较轻松，一个worker不断的忙碌而另一个几乎不需要工作，但是RabbitmQ并不知道这些，并且继续一如既往的派发消息。</p>
 <p>这是因为RabbitMQ在消息进入队列的时候只管去派发，并不管消费者未做出响应的消息数。它只是把每第n条消息发送给第n个消费者。</p>
 <p>我们可以使用basic_qos方法，并设置prefetch_count = 1。这样是告诉RabbitMQ在同一时刻不要发送超过1条消息给一个worker，或者说，不要发送新的消息给worker直到它已处理完上一条消息并作出了响应。这样，它就会把消息发送给下一个空闲的worker了。</p>
 <p><img src="/images/rabbitmq/prefetch-count.png" alt=""></p>
 <figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$channel-</span>&gt;basic_qos(null,<span class="number">1</span>,null);</span><br></pre></td></tr></table></figure>
 <h3 id="注意队列长度">注意队列长度</h3><p>如果所有的worker都处于忙碌状态，队列就会填满，你需要留意，添加更多的worker，或者使用其他的策略。</p>
-<h2 id="整合">整合</h2><p>最终，new_task.php的代码如下：</p>
+<h3 id="整合">整合</h3><p>最终，new_task.php的代码如下：</p>
 <figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"></span><br><span class="line">require_once __DIR_<span class="number">_</span> .<span class="string">'/verdor/autoload.php'</span>;</span><br><span class="line">use PhpAmqpLib\Connection\AMQPStreamConnection;</span><br><span class="line">use PhpAmqpLib\Message\AMQPMessage;</span><br><span class="line"></span><br><span class="line"><span class="variable">$connection</span> = new AMQPStreamConnection(<span class="string">'localhost'</span>,<span class="number">5672</span>,<span class="string">'guest'</span>,<span class="string">'guest'</span>);</span><br><span class="line"><span class="variable">$channel</span> = <span class="variable">$connection-</span>&gt;channel();</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel-</span>&gt;queue_declare(<span class="string">'task_queue'</span>,<span class="literal">false</span>,<span class="literal">true</span>,<span class="literal">false</span>,<span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$data</span> = implode(<span class="string">' '</span>,array_slice(<span class="variable">$argv</span>,<span class="number">1</span>));</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">empty</span>(<span class="variable">$data</span>)) <span class="variable">$data</span> = <span class="string">"Hello World!"</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$msg</span> = new AMQPMessage(<span class="variable">$data</span>,</span><br><span class="line">	<span class="keyword">array</span>(<span class="string">'delivery_mode'</span>=&gt;<span class="number">2</span>) // 消息持久化</span><br><span class="line">);</span><br><span class="line"><span class="variable">$channel-</span>&gt;basic_publish(<span class="variable">$msg</span>,<span class="string">''</span>,<span class="string">'task_queue'</span>);</span><br><span class="line"></span><br><span class="line">echo <span class="string">"[x]Sent "</span>, <span class="variable">$data</span>, <span class="string">"\n"</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel-</span>&gt;close();</span><br><span class="line"><span class="variable">$connection-</span>&gt;close();</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
 <p><a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/new_task.php" target="_blank" rel="external">new_task.php源码</a></p>
 <p>worker.php</p>
@@ -85,26 +162,26 @@
 <p>现在我们可以继续学习第三部分的内容，学习如何发送相同的消息给多个消费者。</p>
 ]]></content>
     <summary type="html">
-    <![CDATA[<h2 id="工作队列">工作队列</h2><h5 id="（使用php-amqplib库）">（使用<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">php-]]>
+    <![CDATA[<h3 id="工作队列">工作队列</h3><h5 id="（使用php-amqplib库）">（使用<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">php-]]>
     </summary>
     
-      <category term="php" scheme="https://www.qichengzx.com/tags/php/"/>
+      <category term="php" scheme="http://www.qichengzx.com/tags/php/"/>
     
-      <category term="rabbitmq" scheme="https://www.qichengzx.com/tags/rabbitmq/"/>
+      <category term="rabbitmq" scheme="http://www.qichengzx.com/tags/rabbitmq/"/>
     
-      <category term="php" scheme="https://www.qichengzx.com/categories/php/"/>
+      <category term="php" scheme="http://www.qichengzx.com/categories/php/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[PHP RabbitMQ 教程（一） - 介绍]]></title>
-    <link href="https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html"/>
-    <id>https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html</id>
+    <link href="http://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html"/>
+    <id>http://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html</id>
     <published>2016-02-28T03:10:03.000Z</published>
-    <updated>2016-03-08T14:01:34.000Z</updated>
+    <updated>2016-04-23T10:14:10.000Z</updated>
     <content type="html"><![CDATA[<h2 id="准备工作">准备工作</h2><h3 id="先决条件">先决条件</h3><p>本教程先决条件是RabbitMQ已经安装并正在以5672端口运行在 localhost，如果你使用了不同的域，端口，用户，密码，连接配置需要适当改变。</p>
 <h3 id="获得帮助">获得帮助</h3><p>如果在本教程中遇到问题，可以通过邮件列表进行联系。</p>
-<h2 id="介绍">介绍</h2><p>RabbitMQ是一个消息代理，它的本质是，从producers（生产者）接收消息，然后发送给consumers（消费者），在这个过程中，可以根据自己的配置规则使用路由，缓冲区，保存消息。</p>
+<h3 id="介绍">介绍</h3><p>RabbitMQ是一个消息代理，它的本质是，从producers（生产者）接收消息，然后发送给consumers（消费者），在这个过程中，可以根据自己的配置规则使用路由，缓冲区，保存消息。</p>
 <p>通常的，RabbitMQ，信息传送（messaging），使用一些专业术语。（RabbitMQ, and messaging in general, uses some jargon.）</p>
 <pre><code>&gt;生产（Producing）仅仅意味着发送，发送信息的程序叫做生产者（producers），以下图表示：
 </code></pre><p><img src="/images/rabbitmq/producer.png" alt=""></p>
@@ -164,18 +241,18 @@
 <h3 id="获得帮]]>
     </summary>
     
-      <category term="php" scheme="https://www.qichengzx.com/tags/php/"/>
+      <category term="php" scheme="http://www.qichengzx.com/tags/php/"/>
     
-      <category term="rabbitmq" scheme="https://www.qichengzx.com/tags/rabbitmq/"/>
+      <category term="rabbitmq" scheme="http://www.qichengzx.com/tags/rabbitmq/"/>
     
-      <category term="php" scheme="https://www.qichengzx.com/categories/php/"/>
+      <category term="php" scheme="http://www.qichengzx.com/categories/php/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[一段有意思的JS For循环代码]]></title>
-    <link href="https://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html"/>
-    <id>https://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html</id>
+    <link href="http://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html"/>
+    <id>http://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html</id>
     <published>2016-02-25T09:10:43.000Z</published>
     <updated>2016-02-25T09:16:54.000Z</updated>
     <content type="html"><![CDATA[<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">var a =<span class="number">0</span>;</span><br><span class="line"><span class="keyword">for</span> (var i =<span class="number">0</span>,j =<span class="number">0</span>; i &lt;<span class="number">10</span>,j&lt;<span class="number">6</span>;i++,j++) &#123;</span><br><span class="line">	a = i+j;</span><br><span class="line">	console.<span class="built_in">log</span>(<span class="string">"i="</span>+i);</span><br><span class="line">	console.<span class="built_in">log</span>(<span class="string">"j="</span>+j);</span><br><span class="line">	console.<span class="built_in">log</span>(<span class="string">"a="</span>+a);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -187,16 +264,16 @@
     <![CDATA[<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="]]>
     </summary>
     
-      <category term="js" scheme="https://www.qichengzx.com/tags/js/"/>
+      <category term="js" scheme="http://www.qichengzx.com/tags/js/"/>
     
-      <category term="javascript" scheme="https://www.qichengzx.com/categories/javascript/"/>
+      <category term="javascript" scheme="http://www.qichengzx.com/categories/javascript/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[MySQL实现row_number第二部分]]></title>
-    <link href="https://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html"/>
-    <id>https://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html</id>
+    <link href="http://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html"/>
+    <id>http://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html</id>
     <published>2016-02-24T09:58:24.000Z</published>
     <updated>2016-02-25T03:35:21.000Z</updated>
     <content type="html"><![CDATA[<p>接上篇：<a href="https://www.qichengzx.com/2016/02/03/MySQL%E5%AE%9E%E7%8E%B0row_number%20.html">MySQL实现row_number</a></p>
@@ -219,16 +296,16 @@
 <h3 id="为分组增加row_n]]>
     </summary>
     
-      <category term="mysql" scheme="https://www.qichengzx.com/tags/mysql/"/>
+      <category term="mysql" scheme="http://www.qichengzx.com/tags/mysql/"/>
     
-      <category term="mysql" scheme="https://www.qichengzx.com/categories/mysql/"/>
+      <category term="mysql" scheme="http://www.qichengzx.com/categories/mysql/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[MySQL实现row_number]]></title>
-    <link href="https://www.qichengzx.com/2016/02/03/MySQL%E5%AE%9E%E7%8E%B0row_number%20.html"/>
-    <id>https://www.qichengzx.com/2016/02/03/MySQL实现row_number .html</id>
+    <link href="http://www.qichengzx.com/2016/02/03/MySQL%E5%AE%9E%E7%8E%B0row_number%20.html"/>
+    <id>http://www.qichengzx.com/2016/02/03/MySQL实现row_number .html</id>
     <published>2016-02-03T10:25:26.000Z</published>
     <updated>2016-02-03T10:27:20.000Z</updated>
     <content type="html"><![CDATA[<p>在本教程中，我们将在MySQL中实现一个非常实用的row_number功能。</p>
@@ -252,16 +329,16 @@
 <p>row_number是一个返回数据排序编号的排名方法，从1开始。我们经常需要用到row_number去生成某些报表，不幸的是，MySQL并不像MSSQL，Oracle一样支持这个方法]]>
     </summary>
     
-      <category term="mysql" scheme="https://www.qichengzx.com/tags/mysql/"/>
+      <category term="mysql" scheme="http://www.qichengzx.com/tags/mysql/"/>
     
-      <category term="mysql" scheme="https://www.qichengzx.com/categories/mysql/"/>
+      <category term="mysql" scheme="http://www.qichengzx.com/categories/mysql/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[ECharts饼图示例]]></title>
-    <link href="https://www.qichengzx.com/2016/01/19/echarts-pie.html"/>
-    <id>https://www.qichengzx.com/2016/01/19/echarts-pie.html</id>
+    <link href="http://www.qichengzx.com/2016/01/19/echarts-pie.html"/>
+    <id>http://www.qichengzx.com/2016/01/19/echarts-pie.html</id>
     <published>2016-01-19T13:27:00.000Z</published>
     <updated>2016-01-19T14:25:04.000Z</updated>
     <content type="html"><![CDATA[<p><img src="/images/BEEC6560-EC03-4027-969D-DBB584A47E69.png" alt=""></p>
@@ -284,20 +361,20 @@
 <p>由于数据库里本身没有存储地区数据，只有IP，所以也用到了<a href="]]>
     </summary>
     
-      <category term="ECharts" scheme="https://www.qichengzx.com/tags/ECharts/"/>
+      <category term="ECharts" scheme="http://www.qichengzx.com/tags/ECharts/"/>
     
-      <category term="javascript" scheme="https://www.qichengzx.com/tags/javascript/"/>
+      <category term="javascript" scheme="http://www.qichengzx.com/tags/javascript/"/>
     
-      <category term="php" scheme="https://www.qichengzx.com/tags/php/"/>
+      <category term="php" scheme="http://www.qichengzx.com/tags/php/"/>
     
-      <category term="javascript" scheme="https://www.qichengzx.com/categories/javascript/"/>
+      <category term="javascript" scheme="http://www.qichengzx.com/categories/javascript/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[一个简单的input获得焦点时的小动画效果]]></title>
-    <link href="https://www.qichengzx.com/2016/01/11/placeholder-animate.html"/>
-    <id>https://www.qichengzx.com/2016/01/11/placeholder-animate.html</id>
+    <link href="http://www.qichengzx.com/2016/01/11/placeholder-animate.html"/>
+    <id>http://www.qichengzx.com/2016/01/11/placeholder-animate.html</id>
     <published>2016-01-11T13:42:58.000Z</published>
     <updated>2016-01-12T13:33:24.000Z</updated>
     <content type="html"><![CDATA[<p>以前经常见到的一种页面表单效果，但是并没有在项目中用过，前几天在sf上看到相关问题，顺手写了一个，还挺简单，没什么含量。</p>
@@ -315,18 +392,18 @@
 <h3 id="HTML">HTML</h3><figure class="highlight x]]>
     </summary>
     
-      <category term="input" scheme="https://www.qichengzx.com/tags/input/"/>
+      <category term="input" scheme="http://www.qichengzx.com/tags/input/"/>
     
-      <category term="javascript" scheme="https://www.qichengzx.com/tags/javascript/"/>
+      <category term="javascript" scheme="http://www.qichengzx.com/tags/javascript/"/>
     
-      <category term="javascript" scheme="https://www.qichengzx.com/categories/javascript/"/>
+      <category term="javascript" scheme="http://www.qichengzx.com/categories/javascript/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[crontab实现定时备份数据库]]></title>
-    <link href="https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html"/>
-    <id>https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html</id>
+    <link href="http://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html"/>
+    <id>http://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html</id>
     <published>2016-01-10T10:52:55.000Z</published>
     <updated>2016-01-10T11:22:53.000Z</updated>
     <content type="html"><![CDATA[<p><img src="https://s.qichengzx.com/img/201601/crontab.jpg" alt=""></p>
@@ -371,20 +448,20 @@
 <p>crontab命令之前写过了，在<a href="http://segmentfault.com/a/1190000003953]]>
     </summary>
     
-      <category term="crontab" scheme="https://www.qichengzx.com/tags/crontab/"/>
+      <category term="crontab" scheme="http://www.qichengzx.com/tags/crontab/"/>
     
-      <category term="linux" scheme="https://www.qichengzx.com/tags/linux/"/>
+      <category term="linux" scheme="http://www.qichengzx.com/tags/linux/"/>
     
-      <category term="mysql" scheme="https://www.qichengzx.com/tags/mysql/"/>
+      <category term="mysql" scheme="http://www.qichengzx.com/tags/mysql/"/>
     
-      <category term="linux" scheme="https://www.qichengzx.com/categories/linux/"/>
+      <category term="linux" scheme="http://www.qichengzx.com/categories/linux/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[使用Dropbox同步hexo文章]]></title>
-    <link href="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html"/>
-    <id>https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html</id>
+    <link href="http://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html"/>
+    <id>http://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html</id>
     <published>2015-12-27T13:47:09.000Z</published>
     <updated>2016-01-01T14:25:02.000Z</updated>
     <content type="html"><![CDATA[<p><img src="https://s.qichengzx.com/img/201512/20130702165945-558672261.jpg" alt=""></p>
@@ -425,16 +502,16 @@
 <p>继之前<a href="https://www.qichengzx.com/2015/11/1]]>
     </summary>
     
-      <category term="dropbox" scheme="https://www.qichengzx.com/tags/dropbox/"/>
+      <category term="dropbox" scheme="http://www.qichengzx.com/tags/dropbox/"/>
     
-      <category term="hexo" scheme="https://www.qichengzx.com/tags/hexo/"/>
+      <category term="hexo" scheme="http://www.qichengzx.com/tags/hexo/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[使用Let's Encrypt制作数字证书]]></title>
-    <link href="https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html"/>
-    <id>https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html</id>
+    <link href="http://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html"/>
+    <id>http://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html</id>
     <published>2015-12-19T08:38:37.000Z</published>
     <updated>2015-12-19T13:31:45.000Z</updated>
     <content type="html"><![CDATA[<p><img src="https://s.qichengzx.com/img/201512/https.png" alt=""></p>
@@ -491,16 +568,16 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
 ]]>
     </summary>
     
-      <category term="https" scheme="https://www.qichengzx.com/tags/https/"/>
+      <category term="https" scheme="http://www.qichengzx.com/tags/https/"/>
     
-      <category term="ssl" scheme="https://www.qichengzx.com/tags/ssl/"/>
+      <category term="ssl" scheme="http://www.qichengzx.com/tags/ssl/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[PHP使用Redis作为缓存使用PDO读取MySQL数据]]></title>
-    <link href="https://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html"/>
-    <id>https://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html</id>
+    <link href="http://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html"/>
+    <id>http://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html</id>
     <published>2015-12-05T14:37:09.000Z</published>
     <updated>2015-12-06T01:31:01.000Z</updated>
     <content type="html"><![CDATA[<p><img src="http://7b1hhm.com1.z0.glb.clouddn.com/hexo1414772222.jpg" alt=""></p>
@@ -523,22 +600,22 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
 <p>图片转自：<a href="http://blog.encodez.com/blog/using-pdofe]]>
     </summary>
     
-      <category term="mysql" scheme="https://www.qichengzx.com/tags/mysql/"/>
+      <category term="mysql" scheme="http://www.qichengzx.com/tags/mysql/"/>
     
-      <category term="pdo" scheme="https://www.qichengzx.com/tags/pdo/"/>
+      <category term="pdo" scheme="http://www.qichengzx.com/tags/pdo/"/>
     
-      <category term="php" scheme="https://www.qichengzx.com/tags/php/"/>
+      <category term="php" scheme="http://www.qichengzx.com/tags/php/"/>
     
-      <category term="redis" scheme="https://www.qichengzx.com/tags/redis/"/>
+      <category term="redis" scheme="http://www.qichengzx.com/tags/redis/"/>
     
-      <category term="php" scheme="https://www.qichengzx.com/categories/php/"/>
+      <category term="php" scheme="http://www.qichengzx.com/categories/php/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[Node.js连接MySQL并读取数据]]></title>
-    <link href="https://www.qichengzx.com/2015/12/03/nodejs-mysql.html"/>
-    <id>https://www.qichengzx.com/2015/12/03/nodejs-mysql.html</id>
+    <link href="http://www.qichengzx.com/2015/12/03/nodejs-mysql.html"/>
+    <id>http://www.qichengzx.com/2015/12/03/nodejs-mysql.html</id>
     <published>2015-12-03T13:38:37.000Z</published>
     <updated>2015-12-03T14:24:07.000Z</updated>
     <content type="html"><![CDATA[<p><img src="http://7b1hhm.com1.z0.glb.clouddn.com/hexo201312030901.jpg" alt=""></p>
@@ -569,18 +646,18 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
 <p>文章部分代码与<a href="http://segmentfault.com/a/1190000002]]>
     </summary>
     
-      <category term="mysql" scheme="https://www.qichengzx.com/tags/mysql/"/>
+      <category term="mysql" scheme="http://www.qichengzx.com/tags/mysql/"/>
     
-      <category term="node" scheme="https://www.qichengzx.com/tags/node/"/>
+      <category term="node" scheme="http://www.qichengzx.com/tags/node/"/>
     
-      <category term="javascript" scheme="https://www.qichengzx.com/categories/javascript/"/>
+      <category term="javascript" scheme="http://www.qichengzx.com/categories/javascript/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[MySQL命令行导出结果集到Excel]]></title>
-    <link href="https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html"/>
-    <id>https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html</id>
+    <link href="http://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html"/>
+    <id>http://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html</id>
     <published>2015-11-21T13:24:35.000Z</published>
     <updated>2015-11-21T13:50:00.000Z</updated>
     <content type="html"><![CDATA[<p><img src="http://7b1hhm.com1.z0.glb.clouddn.com/hexo1631785_mysql.gif" alt=""></p>
@@ -600,18 +677,18 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
 <p>某个需求，为了简单单独建表存储，而且没有相关的后台管理方法，无法查看，或导出，但是又突然出现需要导出这]]>
     </summary>
     
-      <category term="excel" scheme="https://www.qichengzx.com/tags/excel/"/>
+      <category term="excel" scheme="http://www.qichengzx.com/tags/excel/"/>
     
-      <category term="mysql" scheme="https://www.qichengzx.com/tags/mysql/"/>
+      <category term="mysql" scheme="http://www.qichengzx.com/tags/mysql/"/>
     
-      <category term="mysql" scheme="https://www.qichengzx.com/categories/mysql/"/>
+      <category term="mysql" scheme="http://www.qichengzx.com/categories/mysql/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[JS标识符]]></title>
-    <link href="https://www.qichengzx.com/2015/11/17/js-names.html"/>
-    <id>https://www.qichengzx.com/2015/11/17/js-names.html</id>
+    <link href="http://www.qichengzx.com/2015/11/17/js-names.html"/>
+    <id>http://www.qichengzx.com/2015/11/17/js-names.html</id>
     <published>2015-11-17T14:07:21.000Z</published>
     <updated>2015-11-18T14:21:40.000Z</updated>
     <content type="html"><![CDATA[<p>标识符由一个字母开头，其后可以选择性的加上一个或多个字母、数字或下划线。但是，不能使用下面这些保留字：</p>
@@ -626,18 +703,18 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
 <figure class="highlight d"><table><tr><td class="gutter"><pre><span class="line"]]>
     </summary>
     
-      <category term="javascript" scheme="https://www.qichengzx.com/tags/javascript/"/>
+      <category term="javascript" scheme="http://www.qichengzx.com/tags/javascript/"/>
     
-      <category term="标识符" scheme="https://www.qichengzx.com/tags/%E6%A0%87%E8%AF%86%E7%AC%A6/"/>
+      <category term="标识符" scheme="http://www.qichengzx.com/tags/%E6%A0%87%E8%AF%86%E7%AC%A6/"/>
     
-      <category term="javascript" scheme="https://www.qichengzx.com/categories/javascript/"/>
+      <category term="javascript" scheme="http://www.qichengzx.com/categories/javascript/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[利用Dropbox同步hexo的文章源文件并自动生成文章发布]]></title>
-    <link href="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html"/>
-    <id>https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html</id>
+    <link href="http://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html"/>
+    <id>http://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html</id>
     <published>2015-11-13T06:12:35.000Z</published>
     <updated>2015-12-19T07:50:01.000Z</updated>
     <content type="html"><![CDATA[<p><strong> 阅读之前默认为已在服务器安装hexo，也默认服务器可以访问Dropbox </strong></p>
@@ -735,16 +812,16 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
 <h3 id="最初的最初">最初的最初</h3><p>先]]>
     </summary>
     
-      <category term="dropbox" scheme="https://www.qichengzx.com/tags/dropbox/"/>
+      <category term="dropbox" scheme="http://www.qichengzx.com/tags/dropbox/"/>
     
-      <category term="hexo" scheme="https://www.qichengzx.com/tags/hexo/"/>
+      <category term="hexo" scheme="http://www.qichengzx.com/tags/hexo/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[为hexo加一个时钟小挂件]]></title>
-    <link href="https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html"/>
-    <id>https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html</id>
+    <link href="http://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html"/>
+    <id>http://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html</id>
     <published>2015-11-11T06:16:29.000Z</published>
     <updated>2015-11-11T09:28:05.000Z</updated>
     <content type="html"><![CDATA[<p>之前在 <a href="http://segmentfault.com/a/1190000003055672" target="_blank" rel="external">HTML+CSS3再加一点点JS做的一个小时钟</a> 看到的这个问题，觉得很好把代码存下来了，今天突发奇想把它放到hexo的新博客上。</p>
@@ -1038,18 +1115,18 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
     <![CDATA[<p>之前在 <a href="http://segmentfault.com/a/1190000003055672" target="_blank" rel="external">HTML+CSS3再加一点点JS做的一个小时钟</a> 看到的这个问题，觉得很好把代码存下来了，今]]>
     </summary>
     
-      <category term="hexo" scheme="https://www.qichengzx.com/tags/hexo/"/>
+      <category term="hexo" scheme="http://www.qichengzx.com/tags/hexo/"/>
     
-      <category term="time" scheme="https://www.qichengzx.com/tags/time/"/>
+      <category term="time" scheme="http://www.qichengzx.com/tags/time/"/>
     
-      <category term="widget" scheme="https://www.qichengzx.com/tags/widget/"/>
+      <category term="widget" scheme="http://www.qichengzx.com/tags/widget/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[vps 搭建个人git服务器]]></title>
-    <link href="https://www.qichengzx.com/2015/11/07/Set%20Up%20a%20Private%20Git%20Server%20on%20a%20VPS.html"/>
-    <id>https://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html</id>
+    <link href="http://www.qichengzx.com/2015/11/07/Set%20Up%20a%20Private%20Git%20Server%20on%20a%20VPS.html"/>
+    <id>http://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html</id>
     <published>2015-11-07T15:34:10.000Z</published>
     <updated>2015-11-08T02:42:16.000Z</updated>
     <content type="html"><![CDATA[<p>以下内容主要来自<br>    <a href="https://www.digitalocean.com/community/tutorials/how-to-set-up-a-private-git-server-on-a-vps" target="_blank" rel="external">How To Set Up a Private Git Server on a VPS</a></p>
@@ -1119,16 +1196,16 @@ Your <span class="keyword">public</span> <span class="keyword">key</span> has be
     <![CDATA[<p>以下内容主要来自<br>    <a href="https://www.digitalocean.com/community/tutorials/how-to-set-up-a-private-git-server-on-a-vps" target="_blank" re]]>
     </summary>
     
-      <category term="git" scheme="https://www.qichengzx.com/tags/git/"/>
+      <category term="git" scheme="http://www.qichengzx.com/tags/git/"/>
     
-      <category term="vps" scheme="https://www.qichengzx.com/tags/vps/"/>
+      <category term="vps" scheme="http://www.qichengzx.com/tags/vps/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[React-Native Fetch方法发送网络请求]]></title>
-    <link href="https://www.qichengzx.com/2015/11/06/React-Native-Fetch.html"/>
-    <id>https://www.qichengzx.com/2015/11/06/React-Native-Fetch.html</id>
+    <link href="http://www.qichengzx.com/2015/11/06/React-Native-Fetch.html"/>
+    <id>http://www.qichengzx.com/2015/11/06/React-Native-Fetch.html</id>
     <published>2015-11-06T14:54:22.000Z</published>
     <updated>2015-11-08T02:51:53.000Z</updated>
     <content type="html"><![CDATA[<p>先贴一个官方文档。<br><a href="https://facebook.github.io/react-native/docs/network.html#content" target="_blank" rel="external">Network</a></p>
@@ -1177,18 +1254,18 @@ fetch(url, {
 <]]>
     </summary>
     
-      <category term="fetch" scheme="https://www.qichengzx.com/tags/fetch/"/>
+      <category term="fetch" scheme="http://www.qichengzx.com/tags/fetch/"/>
     
-      <category term="react-native" scheme="https://www.qichengzx.com/tags/react-native/"/>
+      <category term="react-native" scheme="http://www.qichengzx.com/tags/react-native/"/>
     
-      <category term="网络请求" scheme="https://www.qichengzx.com/tags/%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/"/>
+      <category term="网络请求" scheme="http://www.qichengzx.com/tags/%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[Hello World]]></title>
-    <link href="https://www.qichengzx.com/2015/11/06/hello-world.html"/>
-    <id>https://www.qichengzx.com/2015/11/06/hello-world.html</id>
+    <link href="http://www.qichengzx.com/2015/11/06/hello-world.html"/>
+    <id>http://www.qichengzx.com/2015/11/06/hello-world.html</id>
     <published>2015-11-06T13:54:22.000Z</published>
     <updated>2015-11-08T02:35:08.000Z</updated>
     <content type="html"><![CDATA[<p>Welcome to <a href="http://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="http://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="http://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>

@@ -1,13 +1,13 @@
 title: PHP RabbitMQ 教程（三） - 发布/订阅
 categories: php
-date: 2016-03-16 21:46:18
+date: 2016-04-23 19:58:17
 tags:  [php,rabbitmq]
 
 ---
 
-## 发布/订阅
+### 发布/订阅
 
-我们在上一节创建了一个工作队列，并假定队列对应的任务传送给了某个客户端。在这一章节我们会做一些完全不一样的东西--我们会发送一条消息到多个消费者，也称之为“发布/订阅”模式。
+我们在[上一节](/2016/04/17/php-rabbitmq-tutorial-two.html)创建了一个工作队列，并假定队列对应的任务传送给了某个客户端。在这一章节我们会做一些完全不一样的东西--我们会发送一条消息到多个消费者，也称之为“发布/订阅”模式。
 
 为了说明这个模式，我们会创建一个简单的日志系统（logging system，以下简称日志系统），它由两个程序组成--第一个是发送日志信息，第二个是接收日志并打印。
 
@@ -15,7 +15,7 @@ tags:  [php,rabbitmq]
 
 本质上，日志内容是广播给所有的接收端的。
 
-### 交换
+### 交换器
 
 在之前的章节中我们从一个队列里发送和接收消息，现在该把完整的RabbitMQ消息模型介绍给大家了。
 
@@ -42,7 +42,7 @@ $channel->exchange_declare('logs','fanout',false,false,false);
 fanout交换器非常简单，你可以从名称中猜出它的功能，它把所有接收到的消息广播给所有它知道的队列，这也正是我们的日志系统需要的功能。
 
 
-#### 交换器列表
+#### 列出交换器
 
 可以使用rabbitmqctl 命令列出服务器上的所有交换器：
 
@@ -88,23 +88,23 @@ $channel->basic_publish($msg,'logs');
 
 也许你还记得在之前我们使用了一个指定的队列（还记得 hello 队列 和 task_queue 队列吗？）。可以命名一个队列是至关重要的--我们需要指定一个worker到同一个队列。当想让生产者和消费者使用同一个队列时给队列命名是非常重要的。
 
-但是在我们的日志系统中情况不同了，我们想要接收所有的消息，不仅仅是其中的一部分，We're also interested only in currently flowing messages not in the old ones. ，因此需要做两件事。
+但是在我们的日志系统中情况不同了，我们想要接收所有的消息，不仅仅是其中的一部分，我们关心的是最新的消息而不是旧的，因此需要做两件事。
 
-首先，当连接到Rabbit时，需要一个空的队列，为达到这个目的可以生成一个名字随机的队列，或者，更好一点的是，让服务器为我们随机选一个队列名字。
+首先，当连接到RabbitMQ时，需要一个空的队列，可以手动创建一个名字随机的队列，或者，更好的办法是，让服务器为我们随机选一个队列名字。
 
 其次，一旦与消费者失去连接，队列需要自动删除。
 
 在[php-amqplib](https://github.com/php-amqplib/php-amqplib)中，当我们创建了一个名字为空的队列时，实际上是创建了一个被生成了名字的非持久化的队列。
 
 ```
-list($queue_name,,) = $channel->queue_declare("");
+list($queue_name, ,) = $channel->queue_declare("");
 ```
 
-方法的返回值，$queue_name变量包含了一个Rabbit生成的字符串。比如也许是这样的：amq.gen-JzTY20BRgKO-HjmUJj0wLg。
+方法执行后，$queue_name变量包含了一个RabbitMQ生成的字符串。比如也许是这样的：amq.gen-JzTY20BRgKO-HjmUJj0wLg。
 
 当连接被关闭的时候，队列也会被删掉，因为队列是独有的。
 
-## 绑定(Bindlings)
+### 绑定(Bindlings)
 
 ![](/images/rabbitmq/bindings.png)
 
@@ -116,11 +116,13 @@ $channel->queue_bind($queue_name,'logs');
 
 现在开始，logs 交换器会把消息附加到队列中。
 
-### 列出绑定（Listing bindings）
+#### 列出绑定（Listing bindings）
 
 可以使用 rabbitmqctl list_bindings列出所有存在的正在使用的绑定。
 
-## 把他们放到一起
+### 整合
+
+![](/images/rabbitmq/python-three-overall.png)
 
 发送日志消息的生产者，与之前的代码看起来没什么不同，最重要的变化是现在想要发送消息到我们的 logs 交换器中，需要在发送时提供一个routing_key，但是在 fanout类型的交换器中这个值是可以忽略的。下边是emit_log.php的代码。
 
@@ -147,9 +149,9 @@ echo "[x]Sent ",$data,"\n";
 
 $channel->close();
 $connection->close();
-
 ?>
 ```
+
 ([emit_log.php](https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/emit_log.php))
 
 如你所见，建立连接后声明了交换器，这一步是必须的，因为发送消息到一个不存在的交换器是被禁止的。
@@ -183,7 +185,6 @@ whild(count($channel->callbacks)){
 
 $channel->close();
 $connection->close();
-
 ?>
 ```
 ([receive_logs.php](https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/receive_logs.php))
