@@ -5,7 +5,7 @@ tags:  [crontab,mysql,linux]
 
 ---
 
-![](https://s.qichengzx.com/img/201601/crontab.jpg)
+![](/images/backup-database-with-crontab/crontab.jpg)
 
 crontab命令之前写过了，在[Linux crontab 访问PHP URL完成定时任务](http://segmentfault.com/a/1190000003953826)，今天写了一个用来备份数据库的脚本。
 

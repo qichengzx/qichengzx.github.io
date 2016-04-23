@@ -100,34 +100,6 @@
     </url>
 
     <url>
-        <loc>http://www.qichengzx.com/tags/hexo/</loc>
-        <lastmod>2016-01-01T14:25:02.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>http://www.qichengzx.com/tags/dropbox/</loc>
-        <lastmod>2016-01-01T14:25:02.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>http://www.qichengzx.com/tags/crontab/</loc>
-        <lastmod>2016-01-10T11:22:53.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>http://www.qichengzx.com/tags/linux/</loc>
-        <lastmod>2016-01-10T11:22:53.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>http://www.qichengzx.com/tags/input/</loc>
         <lastmod>2016-01-12T13:33:24.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -149,13 +121,6 @@
     </url>
 
     <url>
-        <loc>http://www.qichengzx.com/tags/mysql/</loc>
-        <lastmod>2016-02-25T03:35:21.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>http://www.qichengzx.com/tags/js/</loc>
         <lastmod>2016-02-25T09:16:54.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -172,6 +137,41 @@
     <url>
         <loc>http://www.qichengzx.com/tags/rabbitmq/</loc>
         <lastmod>2016-04-23T12:02:49.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://www.qichengzx.com/tags/mysql/</loc>
+        <lastmod>2016-04-23T12:07:24.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://www.qichengzx.com/tags/crontab/</loc>
+        <lastmod>2016-04-23T12:07:24.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://www.qichengzx.com/tags/linux/</loc>
+        <lastmod>2016-04-23T12:07:24.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://www.qichengzx.com/tags/hexo/</loc>
+        <lastmod>2016-04-23T12:08:10.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://www.qichengzx.com/tags/dropbox/</loc>
+        <lastmod>2016-04-23T12:08:10.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>

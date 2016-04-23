@@ -2,7 +2,7 @@ title: 使用Dropbox同步hexo文章
 date: 2015-12-27 21:47:09
 tags:  [dropbox,hexo]
 ---
-![](https://s.qichengzx.com/img/201512/20130702165945-558672261.jpg)
+![](/images/dropbox/20130702165945-558672261.jpg)
 
 继之前[那次失败的尝试](https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html)之后（只在当时写的时候实验过几次，每次都以服务器卡死结束），后来在又多了几篇日志之后连generate也不能愉快的完成了。索性就在本地生成然后git push到服务器。
 

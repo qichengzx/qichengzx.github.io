@@ -405,8 +405,8 @@
     <link href="http://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html"/>
     <id>http://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html</id>
     <published>2016-01-10T10:52:55.000Z</published>
-    <updated>2016-01-10T11:22:53.000Z</updated>
-    <content type="html"><![CDATA[<p><img src="https://s.qichengzx.com/img/201601/crontab.jpg" alt=""></p>
+    <updated>2016-04-23T12:07:24.000Z</updated>
+    <content type="html"><![CDATA[<p><img src="/images/backup-database-with-crontab/crontab.jpg" alt=""></p>
 <p>crontab命令之前写过了，在<a href="http://segmentfault.com/a/1190000003953826" target="_blank" rel="external">Linux crontab 访问PHP URL完成定时任务</a>，今天写了一个用来备份数据库的脚本。</p>
 <p>主要会用到以下几个命令：</p>
 <h4 id="mysqldump">mysqldump</h4><p>参考文章：<a href="http://blog.csdn.net/shellching/article/details/8129687" target="_blank" rel="external">mysqldump导入导出数据库总结 </a></p>
@@ -444,8 +444,8 @@
 <p>Over。</p>
 ]]></content>
     <summary type="html">
-    <![CDATA[<p><img src="https://s.qichengzx.com/img/201601/crontab.jpg" alt=""></p>
-<p>crontab命令之前写过了，在<a href="http://segmentfault.com/a/1190000003953]]>
+    <![CDATA[<p><img src="/images/backup-database-with-crontab/crontab.jpg" alt=""></p>
+<p>crontab命令之前写过了，在<a href="http://segmentfault.com/a/11900000039]]>
     </summary>
     
       <category term="crontab" scheme="http://www.qichengzx.com/tags/crontab/"/>
@@ -463,8 +463,8 @@
     <link href="http://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html"/>
     <id>http://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html</id>
     <published>2015-12-27T13:47:09.000Z</published>
-    <updated>2016-01-01T14:25:02.000Z</updated>
-    <content type="html"><![CDATA[<p><img src="https://s.qichengzx.com/img/201512/20130702165945-558672261.jpg" alt=""></p>
+    <updated>2016-04-23T12:08:10.000Z</updated>
+    <content type="html"><![CDATA[<p><img src="/images/dropbox/20130702165945-558672261.jpg" alt=""></p>
 <p>继之前<a href="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html">那次失败的尝试</a>之后（只在当时写的时候实验过几次，每次都以服务器卡死结束），后来在又多了几篇日志之后连generate也不能愉快的完成了。索性就在本地生成然后git push到服务器。</p>
 <p>现在想更激进一些，git只管理日志以外的东西，比如hexo的升级，或模板的调整和日志源文件。而生成的静态文件直接通过Dropbox客户端同步到服务器。</p>
 <p>话不多说。</p>
@@ -498,8 +498,8 @@
 <p>至此，完成。</p>
 ]]></content>
     <summary type="html">
-    <![CDATA[<p><img src="https://s.qichengzx.com/img/201512/20130702165945-558672261.jpg" alt=""></p>
-<p>继之前<a href="https://www.qichengzx.com/2015/11/1]]>
+    <![CDATA[<p><img src="/images/dropbox/20130702165945-558672261.jpg" alt=""></p>
+<p>继之前<a href="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo]]>
     </summary>
     
       <category term="dropbox" scheme="http://www.qichengzx.com/tags/dropbox/"/>
