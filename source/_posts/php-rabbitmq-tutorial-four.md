@@ -1,13 +1,13 @@
 title: PHP RabbitMQ 教程（四） - 路由
 categories: php
 date: 2016-04-24 14:16:41
-tags:  [php,rabbitmq]()
+tags:  [php,rabbitmq]
 
-——
+---
 
 ### 路由
-（使用[php-amqplib][2]）
-在上一节中，我们创建了一个简单的日志系统（logging system）。我们已经可以广播日志消息到多个接收者了。
+（使用[php-amqplib](https://github.com/php-amqplib/php-amqplib)）
+在[上一节](/2016/04/23/php-rabbitmq-tutorial-three.html)中，我们创建了一个简单的日志系统（logging system）。我们已经可以广播日志消息到多个接收者了。
 
 在本节中，我们要给它增加一个功能-使它能够只订阅消息的一个子集。比如，只把严重的错误信息写入到日志文件（存储到磁盘）中，但同时仍然会把所有日志信息输出到控制台中。
 
@@ -15,21 +15,19 @@ tags:  [php,rabbitmq]()
 
 在上一节中我们已经创建了绑定（bindings），代码如下：
 
-\`\`\`
-\`
-$channel-\>queue\_bind($queue\_name,’logs’);
+```
+$channel->queue_bind($queue_name,'logs');
+```
 
-\`\`\`
-\`
 绑定（bindings）是指交换器（exchange）和队列（queue）的关系。可以简单的理解为：这个队列对这个交换器中的消息感兴趣。
 
-绑定的时候可以带一个额外的 routing\_key 参数。为了避免与$channel::basic\_publish的参数混淆，我们把它叫做 binding\_key，所以我们这样使用key创建一个绑定：
+绑定的时候可以带一个额外的 routing_key 参数。为了避免与$channel::basic_publish的参数混淆，我们把它叫做 binding_key，所以我们这样使用key创建一个绑定：
 
-\`\`\`
-\`$binding\_key = ‘black’;
-$channel-\>queue\_bind($queue\_name,$exchange\_name,$binding\_key);
-\`\`\`
-\`
+```
+$binding_key = 'black';
+$channel->queue_bind($queue_name,$exchange_name,$binding_key);
+```
+
 binding key的意义取决于交换器的类型。我们之前使用过的fanout类型的交换器，会忽略这个值。
 
 ### Direct 交换器
@@ -59,126 +57,122 @@ binding key的意义取决于交换器的类型。我们之前使用过的fanout
 和以往一样，需要创建一个交换器：
 
 ```
-`$channel-\>exchange_declare(‘direct_logs’,’direct’,false,false,false);
+$channel->exchange_declare('direct_logs','direct',false,false,false);
 ```
-`
+
 然后准备发送消息：
 
 ```
-`$channel-\>exchange_declare(‘direct_logs’,’direct’,false,false,false);
-$channel-\>basic_publish($msg,’direct_logs’,$severity);
+$channel->exchange_declare('direct_logs','direct',false,false,false);
+$channel->basic_publish($msg,'direct_logs',$severity);
 ```
-`
-为了简化，我们可以假定’severity’的值可以是’info’,’warning’,’error’中的一个。
+为了简化，我们可以假定'severity'的值可以是'info','warning','error'中的一个。
 
 ### 订阅
 接收消息的脚本会跟之前一样正常工作，但是我们准备为每一个我们感兴趣的日志级别创建一个新的绑定。
 
 ```
-`foreach($severities as $severity){
-$channel-\>queue_bind($queue_name,’direct_logs’,$severity);
+foreach($severities as $severity){
+	$channel->queue_bind($queue_name,'direct_logs',$severity);
 }
 ```
-`
+
 ### 整合
 
-[image-4][3]
+![][image-3]
 
 emit_log_direct.php类的代码为：
 
 ```
-`\<?php
-require_once __DIR__ . ’/vendor/autoload.php’;
+<?php
+require_once __DIR__ . '/vendor/autoload.php';
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
-$connection = new AMQPStremConnection(‘localhost’,5672,’guest’,’guest’);
-$channel = $connection-\>channel();
+$connection = new AMQPStremConnection('localhost',5672,'guest','guest');
+$channel = $connection->channel();
 
-$channel-\>exchange_declare(‘direct_logs’,’direct’,false,false,false);
+$channel->exchange_declare('direct_logs','direct',false,false,false);
 
-$severity = isset($argv[1]) && !empty($argv[1]) ? $argv[1] : ‘info’;
+$severity = isset($argv[1]) && !empty($argv[1]) ? $argv[1] : 'info';
 
-$data = implode(‘ ’,array_slice($argv,2));
+$data = implode(' ',array_slice($argv,2));
 if(empty($data)) $data = “Hello World!”;
 
-$msg = “[x] Sent ”,$severity,’:’,$data,” \n”;
+$msg = “[x] Sent ”,$severity,':',$data,” \n”;
 
-$channel-\>close();
-$connection-\>close();
-?\>
+$channel->close();
+$connection->close();
+?>
 ```
-`
+
 receive_logs_direct.php的代码为：
 
 ```
-`\<?php
+<?php
 
-require_once __DIR__ . ‘/vendor/autoload.php’;
+require_once __DIR__ . '/vendor/autoload.php';
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 
-$connection = new AMQPStreamConnection(‘localhost’,5672,’guest’,’guest’);
-$channel = $connection-\>channel();
+$connection = new AMQPStreamConnection('localhost',5672,'guest','guest');
+$channel = $connection->channel();
 
-$channel-\>exchange_declare(‘direct_logs’,’direct’,false,false,false);
+$channel->exchange_declare('direct_logs','direct',false,false,false);
 
-list($queue_name, ,) = $channel-\>queue_declare(“”,false,false,true,false);
+list($queue_name, ,) = $channel->queue_declare(“”,false,false,true,false);
 
 $severities = array_slice($argv,1);
 if(empty($severities)){
-file_put_contents(‘php://stderr’,”Usage:$argv[0][info][warning][error]\n”);
-exit(1);
+	file_put_contents('php://stderr',”Usage:$argv[0][info][warning][error]\n”);
+	exit(1);
 }
 
 foreach($severities as $severity){
-$channel-\>queue_bind($queue_name,’direct_logs’,$severity);
+	$channel->queue_bind($queue_name,'direct_logs',$severity);
 }
 
-echo ‘[\*]Waiting for logs.To exit press CTRL+C’,”\n”;
+echo '[*]Waiting for logs.To exit press CTRL+C',”\n”;
 
 $callback = function($msg){
-echo ‘[\*]’,$msg-\>delivery_info[‘routing_key’],’:’,$msg-\>body,”\n”;	
+	echo '[*]',$msg->delivery_info['routing_key'],':',$msg->body,”\n”;	
 };
 
-$channel-\>basic_consume($queue_name,’’,false,true,false,false,$callback);
+$channel->basic_consume($queue_name,'',false,true,false,false,$callback);
 
-while(count($channel-\>callbacks)){
-$channel-\>wait();
+while(count($channel->callbacks)){
+	$channel->wait();
 }
 
-$channel-\>close();
-$connection-\>close();
-?\>
+$channel->close();
+$connection->close();
+?>
 ```
-`
-如果你想只保存’warning’或’error’（而不是’info’）级别的消息，只需要打开命令行输入：
+
+如果你想只保存'warning'或'error'（而不是'info'）级别的消息，只需要打开命令行输入：
 
 ```
-`php receive_logs_direct.php warning error \> logs_from_rabbit.log
+php receive_logs_direct.php warning error > logs_from_rabbit.log
 ```
-`
+
 如果你想在屏幕上输出所有的消息，打开一个新的终端，输入：
 
+```php
+php receive_logs_direct.php info warning error
+[*]Waiting for logs.To exit press CTRL+C
 ```
-`php receive_logs_direct.php info warning error
-[\*]Waiting for logs.To exit press CTRL+C
-```
-`
+
 例如，发送error消息，输入：
 
 ```
-`php emit_log_direct.php error “Run. Run. Or it will explode.”
-[x] Sent ‘error’:’Run. Run. Or it will explode.’
+php emit_log_direct.php error "Run. Run. Or it will explode."
+[x] Sent 'error':'Run. Run. Or it will explode.'
 ```
-`
-[][4]和[][5]
 
-转到第五节，查看如何监听基于过滤的消息。
+[emit_log_direct.php源码](https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/emit_log_direct.php)  [receive_logs_direct.php源码](https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/receive_logs_direct.php)
 
-[2]:	https://github.com/php-amqplib/php-amqplib
-[3]:	/images/rabbitmq/python-four.png
-[4]:	https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/emit_log_direct.php "emit_log_direct.php源码"
-[5]:	https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/receive_logs_direct.php "receive_logs_direct.php源码"
+转到第五节，查看如何监听基于模式的消息。
 
-[image-1]:	/images/rabbitmq/direct-exchange-multiple.png
-[image-2]:	/images/rabbitmq/direct-exchange-multiple.png
+
+[image-1]: /images/rabbitmq/direct-exchange.png
+[image-2]: /images/rabbitmq/direct-exchange-multiple.png
+[image-3]: /images/rabbitmq/python-four.png
