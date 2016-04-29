@@ -44,7 +44,9 @@ binding key 也必须是同样的格式，topic交换器背后的逻辑和direct
 
 routing key为"quick.orange.rabbit"的消息会被发送到两个队列，"lazy.orange.elephant"也会被发送到这两个队列。而"quick.orange.fox"则会发送到第一个队列，"lazy.brown.fox"会被发送到第二个队列。"lazy.pink.rabbit"会只被发送到第二个队列一次，即使它匹配两个绑定。"quick.brown.fox"不匹配任何绑定，所以会被丢弃。
 
+如果打破规则，发送一条带有一个或四个单词，如"orange"或"quick.orange.male.rabbit"会怎么样？好吧，消息会丢失，因为它不匹配任何一个绑定。
 
+但是，"lazy.orange.male.rabbit"这种消息，即使它有4个单词，依然会匹配最后一个绑定，然后被发送到第二个队列。
 
 
 
