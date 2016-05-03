@@ -31,7 +31,7 @@ binding key 也必须是同样的格式，topic交换器的逻辑和direct交换
 
 下图比较好的解释了这个情况：
 
-![](/rabbitmq/python-five.png)	
+![](/images/rabbitmq/python-five.png)	
 
 在这个例子中，我们准备全部发送描述动物的消息。这些消息带有由三个单词(两个点号分隔)组成的routing key，其中第一个单词表示速度，第二个表示颜色，第三个表示种类："<speed>.<colour>.<species>"。
 

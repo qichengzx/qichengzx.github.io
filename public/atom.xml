@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="http://www.qichengzx.com/"/>
-  <updated>2016-05-03T06:08:51.000Z</updated>
+  <updated>2016-05-03T07:11:51.000Z</updated>
   <id>http://www.qichengzx.com/</id>
   
   <author>
@@ -19,7 +19,7 @@
     <link href="http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html"/>
     <id>http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html</id>
     <published>2016-04-27T10:27:03.000Z</published>
-    <updated>2016-05-03T06:08:51.000Z</updated>
+    <updated>2016-05-03T07:11:51.000Z</updated>
     <content type="html"><![CDATA[<h3 id="主题">主题</h3><p>(<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">使用php-amqplib</a>)</p>
 <p>在<a href="/2016/04/24/php-rabbitmq-tutorial-four.html">上一节</a>我们改善了日志系统(logging system，以下简称日志系统)，为了替代fanout类型的交换器，我们使用了一个direct类型的交换器，带来的好处是可以有选择的接收日志。</p>
 <p>虽然使用direct交换器改善了系统，但是仍然有局限性 - 它不能根据多个条件进行路由。</p>
@@ -32,7 +32,7 @@
 
 <span class="preprocessor">#可以代替<span class="number">0</span>个或多个单词</span>
 </code></pre><p>下图比较好的解释了这个情况：</p>
-<p><img src="/rabbitmq/python-five.png" alt="">    </p>
+<p><img src="/images/rabbitmq/python-five.png" alt="">    </p>
 <p>在这个例子中，我们准备全部发送描述动物的消息。这些消息带有由三个单词(两个点号分隔)组成的routing key，其中第一个单词表示速度，第二个表示颜色，第三个表示种类：”<speed>.<colour>.<species>“。</species></colour></speed></p>
 <p>我们创建三个绑定：Q1的binding key为”*.orange”，Q2的binding key为”*.*.rabbit”和”lazy.#“。</p>
 <p>这些绑定可以概括为：</p>
