@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>PHP RabbitMQ 教程（五） - 主题 | 启程</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta http-equiv="Access-Control-Allow-Origin" content="*">
+  <meta name="description" content="主题(使用php-amqplib)
+在上一节我们改善了日志系统(logging system，以下简称日志系统)，为了替代fanout类型的交换器，我们使用了一个direct类型的交换器，带来的好处是可以有选择的接收日志。
+虽然使用direct交换器改善了系统，但是仍然有局限性 - 它不能根据多个条件进行路由。
+在日志系统中，我们也许不仅仅想订阅严重等级的日志，也想订阅基于消息发布源的内容。也许你">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PHP RabbitMQ 教程（五） - 主题">
+<meta property="og:url" content="http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html">
+<meta property="og:site_name" content="启程">
+<meta property="og:description" content="主题(使用php-amqplib)
+在上一节我们改善了日志系统(logging system，以下简称日志系统)，为了替代fanout类型的交换器，我们使用了一个direct类型的交换器，带来的好处是可以有选择的接收日志。
+虽然使用direct交换器改善了系统，但是仍然有局限性 - 它不能根据多个条件进行路由。
+在日志系统中，我们也许不仅仅想订阅严重等级的日志，也想订阅基于消息发布源的内容。也许你">
+<meta property="og:image" content="http://www.qichengzx.com/rabbitmq/python-five.png">
+<meta property="og:updated_time" content="2016-05-03T06:08:51.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PHP RabbitMQ 教程（五） - 主题">
+<meta name="twitter:description" content="主题(使用php-amqplib)
+在上一节我们改善了日志系统(logging system，以下简称日志系统)，为了替代fanout类型的交换器，我们使用了一个direct类型的交换器，带来的好处是可以有选择的接收日志。
+虽然使用direct交换器改善了系统，但是仍然有局限性 - 它不能根据多个条件进行路由。
+在日志系统中，我们也许不仅仅想订阅严重等级的日志，也想订阅基于消息发布源的内容。也许你">
+<meta name="twitter:creator" content="@qichengzx">
+  
+    <link rel="alternative" href="/atom.xml" title="启程" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <!-- <link href="//fonts.useso.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css"> -->
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  
+
+</head>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">启程</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.qichengzx.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-php-rabbitmq-tutorial-five" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/04/27/php-rabbitmq-tutorial-five.html" class="article-date">
+  <time datetime="2016-04-27T10:27:03.000Z" itemprop="datePublished">2016-04-27</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/php/">php</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      PHP RabbitMQ 教程（五） - 主题
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="主题">主题</h3><p>(<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">使用php-amqplib</a>)</p>
+<p>在<a href="/2016/04/24/php-rabbitmq-tutorial-four.html">上一节</a>我们改善了日志系统(logging system，以下简称日志系统)，为了替代fanout类型的交换器，我们使用了一个direct类型的交换器，带来的好处是可以有选择的接收日志。</p>
+<p>虽然使用direct交换器改善了系统，但是仍然有局限性 - 它不能根据多个条件进行路由。</p>
+<p>在日志系统中，我们也许不仅仅想订阅严重等级的日志，也想订阅基于消息发布源的内容。也许你已经知道这个概念来自于UNIX的<a href="http://en.wikipedia.org/wiki/Syslog" target="_blank" rel="external">syslog</a>工具，基于严重性(info/warn/crit…)和设备路由日志(auth/cron/kern…)的工具。</p>
+<p>这可以提高灵活性 - 我们也许只想要监听来自’cron’的关键错误而不是来自’kern’的全部日志。</p>
+<p>为了在我们的日志系统上实现这个功能，需要学习一个更复杂的 topic 交换器。</p>
+<h3 id="Topic_交换器">Topic 交换器</h3><p>发送到 topic 交换器的消息不能随意设置 routing_key - 它必须是一个单词列表，以’.’分隔。单词可以是任何内容，但是通常会具体说明消息的功能。一些有效的routing key示例：样：”stock.usd.nyse”，”nyse.vmw”，”quick.orange.rabbit”。routing key 可以是任何长度的你喜欢的单词，最大255个字节。</p>
+<p>binding key 也必须是同样的格式，topic交换器的逻辑和direct交换器类似 - 带有特定routing key的消息会被派发到所有绑定了binding key的队列，然而对于binding key依然有两个重要的特殊情况：</p>
+<pre><code>*可以代替一个单词
+
+<span class="preprocessor">#可以代替<span class="number">0</span>个或多个单词</span>
+</code></pre><p>下图比较好的解释了这个情况：</p>
+<p><img src="/rabbitmq/python-five.png" alt="">    </p>
+<p>在这个例子中，我们准备全部发送描述动物的消息。这些消息带有由三个单词(两个点号分隔)组成的routing key，其中第一个单词表示速度，第二个表示颜色，第三个表示种类：”<speed>.<colour>.<species>“。</species></colour></speed></p>
+<p>我们创建三个绑定：Q1的binding key为”*.orange”，Q2的binding key为”*.*.rabbit”和”lazy.#“。</p>
+<p>这些绑定可以概括为：</p>
+<pre><code>Q1 关注所有orange的动物
+
+Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keyword">lazy</span> animals）的消息。
+</code></pre><p>routing key为”quick.orange.rabbit”的消息会被发送到两个队列，”lazy.orange.elephant”也会被发送到这两个队列。而”quick.orange.fox”则只会发送到第一个队列，”lazy.brown.fox”会被只发送到第二个队列。”lazy.pink.rabbit”会只被发送到第二个队列一次，即使它匹配两个绑定。”quick.brown.fox”不匹配任何绑定，所以会被丢弃。</p>
+<p>如果打破规则，发送一条带有一个或四个单词，如”orange”或”quick.orange.male.rabbit”会怎么样？好吧，消息会丢失，因为它不匹配任何一个绑定。</p>
+<p>但是，”lazy.orange.male.rabbit”这种消息，即使它有4个单词，依然会匹配最后一个绑定，然后被发送到第二个队列。</p>
+<h4 id="topic_交换器">topic 交换器</h4><figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">topic 交换器非常强大，可以表现得跟其他交换器一样。</span><br><span class="line"></span><br><span class="line">当一个队列的binding <span class="variable">key</span>为<span class="string">"#"</span>时，它会接收所有消息，忽略routing <span class="variable">key</span>，像fanout交换器一样。</span><br><span class="line"></span><br><span class="line">当绑定中不存在<span class="string">"*"</span>和<span class="string">"#"</span>时，topic交换器会表现的跟direct交换器一样。</span><br></pre></td></tr></table></figure>
+<h3 id="整合">整合</h3><p>我们准备在日志系统中使用topic交换器。假定日志的routing key由两个单词：”<facility>.<severity>“组成。</severity></facility></p>
+<p>代码与上一节的几乎一致。</p>
+<p>emit_log_topic.php：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">require_once</span> <span class="keyword">__DIR__</span> . <span class="string">'/vendor/autoload.php'</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Connection</span>\<span class="title">AMQPStreamConnection</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Message</span>\<span class="title">AMQPMessage</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$connection</span> = <span class="keyword">new</span> AMQPStreamConnection(<span class="string">'localhost'</span>, <span class="number">5672</span>, <span class="string">'guest'</span>, <span class="string">'guest'</span>);</span><br><span class="line"><span class="variable">$channel</span> = <span class="variable">$connection</span>-&gt;channel();</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel</span>-&gt;exchange_declare(<span class="string">'topic_logs'</span>, <span class="string">'topic'</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$routing_key</span> = <span class="keyword">isset</span>(<span class="variable">$argv</span>[<span class="number">1</span>]) &amp;&amp; !<span class="keyword">empty</span>(<span class="variable">$argv</span>[<span class="number">1</span>]) ? <span class="variable">$argv</span>[<span class="number">1</span>] : <span class="string">'anonymous.info'</span>;</span><br><span class="line"><span class="variable">$data</span> = implode(<span class="string">' '</span>, array_slice(<span class="variable">$agrv</span>, <span class="number">2</span>));</span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">empty</span>(<span class="variable">$data</span>)) <span class="variable">$data</span> = <span class="string">"Hello Wrold!"</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$msg</span> = <span class="keyword">new</span> AMQPMessage(<span class="variable">$data</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel</span>-&gt;basic_publish(<span class="variable">$msg</span>, <span class="string">'topic_logs'</span>, <span class="variable">$routing_key</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> <span class="string">" [x] Sent "</span>,<span class="variable">$routing_key</span>,<span class="string">':'</span>,<span class="variable">$data</span>,<span class="string">" \n"</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel</span>-&gt;close();</span><br><span class="line"><span class="variable">$connection</span>-&gt;close();</span><br><span class="line"></span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>receive_logs_topic.php：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">require_once</span> <span class="keyword">__DIR__</span> . <span class="string">'/vendor/autoload.php'</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Connection</span>\<span class="title">AMQPStreamConnection</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$connection</span> = <span class="keyword">new</span> AMQPStreamConnection(<span class="string">'localhost'</span>, <span class="number">5672</span>, <span class="string">'guest'</span>, <span class="string">'guest'</span>);</span><br><span class="line"><span class="variable">$channel</span> = <span class="variable">$connection</span>-&gt;channel();</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel</span>-&gt;exchange_declare(<span class="string">'topic_logs'</span>, <span class="string">'topic'</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">list</span>(<span class="variable">$queue_name</span>, ,) = <span class="variable">$channel</span>-&gt;queue_declare(<span class="string">""</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">true</span>, <span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$binding_keys</span> = array_slice(<span class="variable">$argv</span>, <span class="number">1</span>);</span><br><span class="line"><span class="keyword">if</span>( <span class="keyword">empty</span>(<span class="variable">$binding_keys</span>) )&#123;</span><br><span class="line">  file_put_contents(<span class="string">'php://stderr'</span>, <span class="string">"Usage: $argv[0] [binding_key]\n"</span>);</span><br><span class="line">  <span class="keyword">exit</span>(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">foreach</span>(<span class="variable">$binding_keys</span> <span class="keyword">as</span> <span class="variable">$binding_key</span>)&#123;</span><br><span class="line">  <span class="variable">$channel</span>-&gt;queue_bind(<span class="variable">$queue_name</span>, <span class="string">'topic_logs'</span>, <span class="variable">$binding_key</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> <span class="string">' [*] Waiting for logs. To exit press CTRL+C'</span>, <span class="string">"\n"</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$callback</span> = <span class="function"><span class="keyword">function</span><span class="params">(<span class="variable">$msg</span>)</span></span>&#123;</span><br><span class="line">  <span class="keyword">echo</span> <span class="string">' [*] '</span>,<span class="variable">$msg</span>-&gt;delivery_info[<span class="string">'routing_key'</span>], <span class="string">':'</span>, <span class="variable">$msg</span>-&gt;body, <span class="string">"\n"</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel</span>-&gt;basic_consume(<span class="variable">$queue_name</span>, <span class="string">''</span>, <span class="keyword">false</span>, <span class="keyword">true</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="variable">$callback</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span>(count(<span class="variable">$channel</span>-&gt;callbacks))&#123;</span><br><span class="line">  <span class="variable">$channel</span>-&gt;wait();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel</span>-&gt;close();</span><br><span class="line"><span class="variable">$connection</span>-&gt;close();</span><br><span class="line"></span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>接收所有日志：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php receive_logs_topic<span class="class">.php</span> <span class="string">'#'</span></span><br></pre></td></tr></table></figure>
+<p>接收所有来自”kern”的日志：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php receive_logs_topic<span class="class">.php</span> <span class="string">"kern.*"</span></span><br></pre></td></tr></table></figure>
+<p>只接收”致命(critical)”日志：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php receive_logs_topic.php &#34;*.critical&#34;</span><br></pre></td></tr></table></figure>
+<p>创建多个绑定：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php receive_logs_topic.php &#34;kern.*&#34; &#34;*.critical&#34;</span><br></pre></td></tr></table></figure>
+<p>发布routing key为”kern.critical”的日志就输入：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php emit_log_topic.php &#34;kern.critical&#34; &#34;A critical kernel error&#34;</span><br></pre></td></tr></table></figure>
+<p>注意此代码并没有做路由或捆绑的例子，也许你想试一下两个以上的routing key参数。</p>
+<p>一些问题：</p>
+<p>​    <a href="http://www.rabbitmq.com/tutorials/tutorial-five-php.html#teaser_answer_1" target="_blank" rel="external">“*”会匹配routing key为空的消息吗？</a></p>
+<p>​    <a href="http://www.rabbitmq.com/tutorials/tutorial-five-php.html#teaser_answer_2" target="_blank" rel="external">“#.*”会匹配内容为”..”的消息吗？会匹配一个单词的消息吗？</a></p>
+<p>​    <a href="http://www.rabbitmq.com/tutorials/tutorial-five-php.html#teaser_answer_3" target="_blank" rel="external">“a.*.#”和”a.#”的区别是什么？</a></p>
+<p><a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/emit_log_topic.php" target="_blank" rel="external">emit_log_topic.php完整代码</a> <a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/receive_logs_topic.php" target="_blank" rel="external">receive_logs_topic.php完整代码</a></p>
+<p>下一步，在第六节中学习像远程过程调用一样完成消息往返。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html" data-id="cinr1bfja001cke3gf2n96l7w" class="article-share-link">Share</a>
+      
+        <a href="http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/php/">php</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/rabbitmq/">rabbitmq</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2016/04/24/php-rabbitmq-tutorial-four.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">PHP RabbitMQ 教程（四） - 路由</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<section id="comments">
+  <div class="ds-thread" data-thread-key="cinr1bfja001cke3gf2n96l7w" data-title="PHP RabbitMQ 教程（五） - 主题" data-url="http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html"></div>
+  <script>
+    var duoshuoQuery = {short_name:"qichengzx"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0] 
+       || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+</section>
+</section>
+        
+          <aside id="sidebar">
+  
+    	<div class="widget-wrap">
+		<h3 class="widget-title">Time</h3>
+		<div class="widget time">
+			<style id="clock-animations"></style>
+			<div class="clock-wrapper">
+				<div class="clock-base">
+						<div class="clock-indicator">
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+						</div>
+						<div class="clock-hour"></div>
+						<div class="clock-minute"></div>
+						<div class="clock-second"></div>
+						<div class="clock-center"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">6</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/dropbox/" style="font-size: 12px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/hexo/" style="font-size: 14px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 14px;">javascript</a> <a href="/tags/js/" style="font-size: 10px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 18px;">mysql</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 16px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2016/04/27/php-rabbitmq-tutorial-five.html">PHP RabbitMQ 教程（五） - 主题</a>
+          </li>
+        
+          <li>
+            <a href="/2016/04/24/php-rabbitmq-tutorial-four.html">PHP RabbitMQ 教程（四） - 路由</a>
+          </li>
+        
+          <li>
+            <a href="/2016/04/23/php-rabbitmq-tutorial-three.html">PHP RabbitMQ 教程（三） - 发布/订阅</a>
+          </li>
+        
+          <li>
+            <a href="/2016/04/17/php-rabbitmq-tutorial-two.html">PHP RabbitMQ 教程（二） - 工作队列</a>
+          </li>
+        
+          <li>
+            <a href="/2016/02/28/php-rabbitmq-tutorial-one.html">PHP RabbitMQ 教程（一） - 介绍</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2016 qichengzx<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+      <a href="http://itxs.co/s/83a61yzi" target="_blank">科学上网工具</a>
+      Hosted by <a href="https://www.digitalocean.com/?refcode=2cb067f6a1f0" target="_blank">DigitalOcean</a>
+    </div>
+  </div>
+</footer>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?199f8980952ead3f1af440507b4b2a7c";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="http://libs.useso.com/js/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+
+  </div>
+</body>
+</html>
