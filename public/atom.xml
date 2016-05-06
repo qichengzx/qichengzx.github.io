@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="http://www.qichengzx.com/"/>
-  <updated>2016-04-27T10:19:52.000Z</updated>
+  <updated>2016-05-03T07:11:51.000Z</updated>
   <id>http://www.qichengzx.com/</id>
   
   <author>
@@ -15,11 +15,77 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title><![CDATA[PHP RabbitMQ 教程（五） - 主题]]></title>
+    <link href="http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html"/>
+    <id>http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html</id>
+    <published>2016-04-27T10:27:03.000Z</published>
+    <updated>2016-05-03T07:11:51.000Z</updated>
+    <content type="html"><![CDATA[<h3 id="主题">主题</h3><p>(<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">使用php-amqplib</a>)</p>
+<p>在<a href="/2016/04/24/php-rabbitmq-tutorial-four.html">上一节</a>我们改善了日志系统(logging system，以下简称日志系统)，为了替代fanout类型的交换器，我们使用了一个direct类型的交换器，带来的好处是可以有选择的接收日志。</p>
+<p>虽然使用direct交换器改善了系统，但是仍然有局限性 - 它不能根据多个条件进行路由。</p>
+<p>在日志系统中，我们也许不仅仅想订阅严重等级的日志，也想订阅基于消息发布源的内容。也许你已经知道这个概念来自于UNIX的<a href="http://en.wikipedia.org/wiki/Syslog" target="_blank" rel="external">syslog</a>工具，基于严重性(info/warn/crit…)和设备路由日志(auth/cron/kern…)的工具。</p>
+<p>这可以提高灵活性 - 我们也许只想要监听来自’cron’的关键错误而不是来自’kern’的全部日志。</p>
+<p>为了在我们的日志系统上实现这个功能，需要学习一个更复杂的 topic 交换器。</p>
+<h3 id="Topic_交换器">Topic 交换器</h3><p>发送到 topic 交换器的消息不能随意设置 routing_key - 它必须是一个单词列表，以’.’分隔。单词可以是任何内容，但是通常会具体说明消息的功能。一些有效的routing key示例：样：”stock.usd.nyse”，”nyse.vmw”，”quick.orange.rabbit”。routing key 可以是任何长度的你喜欢的单词，最大255个字节。</p>
+<p>binding key 也必须是同样的格式，topic交换器的逻辑和direct交换器类似 - 带有特定routing key的消息会被派发到所有绑定了binding key的队列，然而对于binding key依然有两个重要的特殊情况：</p>
+<pre><code>*可以代替一个单词
+
+<span class="preprocessor">#可以代替<span class="number">0</span>个或多个单词</span>
+</code></pre><p>下图比较好的解释了这个情况：</p>
+<p><img src="/images/rabbitmq/python-five.png" alt="">    </p>
+<p>在这个例子中，我们准备全部发送描述动物的消息。这些消息带有由三个单词(两个点号分隔)组成的routing key，其中第一个单词表示速度，第二个表示颜色，第三个表示种类：”<speed>.<colour>.<species>“。</species></colour></speed></p>
+<p>我们创建三个绑定：Q1的binding key为”*.orange”，Q2的binding key为”*.*.rabbit”和”lazy.#“。</p>
+<p>这些绑定可以概括为：</p>
+<pre><code>Q1 关注所有orange的动物
+
+Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keyword">lazy</span> animals）的消息。
+</code></pre><p>routing key为”quick.orange.rabbit”的消息会被发送到两个队列，”lazy.orange.elephant”也会被发送到这两个队列。而”quick.orange.fox”则只会发送到第一个队列，”lazy.brown.fox”会被只发送到第二个队列。”lazy.pink.rabbit”会只被发送到第二个队列一次，即使它匹配两个绑定。”quick.brown.fox”不匹配任何绑定，所以会被丢弃。</p>
+<p>如果打破规则，发送一条带有一个或四个单词，如”orange”或”quick.orange.male.rabbit”会怎么样？好吧，消息会丢失，因为它不匹配任何一个绑定。</p>
+<p>但是，”lazy.orange.male.rabbit”这种消息，即使它有4个单词，依然会匹配最后一个绑定，然后被发送到第二个队列。</p>
+<h4 id="topic_交换器">topic 交换器</h4><figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">topic 交换器非常强大，可以表现得跟其他交换器一样。</span><br><span class="line"></span><br><span class="line">当一个队列的binding <span class="variable">key</span>为<span class="string">"#"</span>时，它会接收所有消息，忽略routing <span class="variable">key</span>，像fanout交换器一样。</span><br><span class="line"></span><br><span class="line">当绑定中不存在<span class="string">"*"</span>和<span class="string">"#"</span>时，topic交换器会表现的跟direct交换器一样。</span><br></pre></td></tr></table></figure>
+<h3 id="整合">整合</h3><p>我们准备在日志系统中使用topic交换器。假定日志的routing key由两个单词：”<facility>.<severity>“组成。</severity></facility></p>
+<p>代码与上一节的几乎一致。</p>
+<p>emit_log_topic.php：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">require_once</span> <span class="keyword">__DIR__</span> . <span class="string">'/vendor/autoload.php'</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Connection</span>\<span class="title">AMQPStreamConnection</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Message</span>\<span class="title">AMQPMessage</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$connection</span> = <span class="keyword">new</span> AMQPStreamConnection(<span class="string">'localhost'</span>, <span class="number">5672</span>, <span class="string">'guest'</span>, <span class="string">'guest'</span>);</span><br><span class="line"><span class="variable">$channel</span> = <span class="variable">$connection</span>-&gt;channel();</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel</span>-&gt;exchange_declare(<span class="string">'topic_logs'</span>, <span class="string">'topic'</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$routing_key</span> = <span class="keyword">isset</span>(<span class="variable">$argv</span>[<span class="number">1</span>]) &amp;&amp; !<span class="keyword">empty</span>(<span class="variable">$argv</span>[<span class="number">1</span>]) ? <span class="variable">$argv</span>[<span class="number">1</span>] : <span class="string">'anonymous.info'</span>;</span><br><span class="line"><span class="variable">$data</span> = implode(<span class="string">' '</span>, array_slice(<span class="variable">$agrv</span>, <span class="number">2</span>));</span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">empty</span>(<span class="variable">$data</span>)) <span class="variable">$data</span> = <span class="string">"Hello Wrold!"</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$msg</span> = <span class="keyword">new</span> AMQPMessage(<span class="variable">$data</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel</span>-&gt;basic_publish(<span class="variable">$msg</span>, <span class="string">'topic_logs'</span>, <span class="variable">$routing_key</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> <span class="string">" [x] Sent "</span>,<span class="variable">$routing_key</span>,<span class="string">':'</span>,<span class="variable">$data</span>,<span class="string">" \n"</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel</span>-&gt;close();</span><br><span class="line"><span class="variable">$connection</span>-&gt;close();</span><br><span class="line"></span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>receive_logs_topic.php：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">require_once</span> <span class="keyword">__DIR__</span> . <span class="string">'/vendor/autoload.php'</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Connection</span>\<span class="title">AMQPStreamConnection</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$connection</span> = <span class="keyword">new</span> AMQPStreamConnection(<span class="string">'localhost'</span>, <span class="number">5672</span>, <span class="string">'guest'</span>, <span class="string">'guest'</span>);</span><br><span class="line"><span class="variable">$channel</span> = <span class="variable">$connection</span>-&gt;channel();</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel</span>-&gt;exchange_declare(<span class="string">'topic_logs'</span>, <span class="string">'topic'</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">list</span>(<span class="variable">$queue_name</span>, ,) = <span class="variable">$channel</span>-&gt;queue_declare(<span class="string">""</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">true</span>, <span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$binding_keys</span> = array_slice(<span class="variable">$argv</span>, <span class="number">1</span>);</span><br><span class="line"><span class="keyword">if</span>( <span class="keyword">empty</span>(<span class="variable">$binding_keys</span>) )&#123;</span><br><span class="line">  file_put_contents(<span class="string">'php://stderr'</span>, <span class="string">"Usage: $argv[0] [binding_key]\n"</span>);</span><br><span class="line">  <span class="keyword">exit</span>(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">foreach</span>(<span class="variable">$binding_keys</span> <span class="keyword">as</span> <span class="variable">$binding_key</span>)&#123;</span><br><span class="line">  <span class="variable">$channel</span>-&gt;queue_bind(<span class="variable">$queue_name</span>, <span class="string">'topic_logs'</span>, <span class="variable">$binding_key</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> <span class="string">' [*] Waiting for logs. To exit press CTRL+C'</span>, <span class="string">"\n"</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$callback</span> = <span class="function"><span class="keyword">function</span><span class="params">(<span class="variable">$msg</span>)</span></span>&#123;</span><br><span class="line">  <span class="keyword">echo</span> <span class="string">' [*] '</span>,<span class="variable">$msg</span>-&gt;delivery_info[<span class="string">'routing_key'</span>], <span class="string">':'</span>, <span class="variable">$msg</span>-&gt;body, <span class="string">"\n"</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel</span>-&gt;basic_consume(<span class="variable">$queue_name</span>, <span class="string">''</span>, <span class="keyword">false</span>, <span class="keyword">true</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="variable">$callback</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span>(count(<span class="variable">$channel</span>-&gt;callbacks))&#123;</span><br><span class="line">  <span class="variable">$channel</span>-&gt;wait();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel</span>-&gt;close();</span><br><span class="line"><span class="variable">$connection</span>-&gt;close();</span><br><span class="line"></span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>接收所有日志：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php receive_logs_topic<span class="class">.php</span> <span class="string">'#'</span></span><br></pre></td></tr></table></figure>
+<p>接收所有来自”kern”的日志：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php receive_logs_topic<span class="class">.php</span> <span class="string">"kern.*"</span></span><br></pre></td></tr></table></figure>
+<p>只接收”致命(critical)”日志：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php receive_logs_topic.php &#34;*.critical&#34;</span><br></pre></td></tr></table></figure>
+<p>创建多个绑定：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php receive_logs_topic.php &#34;kern.*&#34; &#34;*.critical&#34;</span><br></pre></td></tr></table></figure>
+<p>发布routing key为”kern.critical”的日志就输入：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php emit_log_topic.php &#34;kern.critical&#34; &#34;A critical kernel error&#34;</span><br></pre></td></tr></table></figure>
+<p>注意此代码并没有做路由或捆绑的例子，也许你想试一下两个以上的routing key参数。</p>
+<p>一些问题：</p>
+<p>​    <a href="http://www.rabbitmq.com/tutorials/tutorial-five-php.html#teaser_answer_1" target="_blank" rel="external">“*”会匹配routing key为空的消息吗？</a></p>
+<p>​    <a href="http://www.rabbitmq.com/tutorials/tutorial-five-php.html#teaser_answer_2" target="_blank" rel="external">“#.*”会匹配内容为”..”的消息吗？会匹配一个单词的消息吗？</a></p>
+<p>​    <a href="http://www.rabbitmq.com/tutorials/tutorial-five-php.html#teaser_answer_3" target="_blank" rel="external">“a.*.#”和”a.#”的区别是什么？</a></p>
+<p><a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/emit_log_topic.php" target="_blank" rel="external">emit_log_topic.php完整代码</a> <a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/receive_logs_topic.php" target="_blank" rel="external">receive_logs_topic.php完整代码</a></p>
+<p>下一步，在第六节中学习像远程过程调用一样完成消息往返。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<h3 id="主题">主题</h3><p>(<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">使用php-amqplib</a>)</p>
+<p>在<a hre]]>
+    </summary>
+    
+      <category term="php" scheme="http://www.qichengzx.com/tags/php/"/>
+    
+      <category term="rabbitmq" scheme="http://www.qichengzx.com/tags/rabbitmq/"/>
+    
+      <category term="php" scheme="http://www.qichengzx.com/categories/php/"/>
+    
+  </entry>
+  
+  <entry>
     <title><![CDATA[PHP RabbitMQ 教程（四） - 路由]]></title>
     <link href="http://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html"/>
     <id>http://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html</id>
     <published>2016-04-24T06:16:41.000Z</published>
-    <updated>2016-04-27T10:19:52.000Z</updated>
+    <updated>2016-04-28T02:34:07.000Z</updated>
     <content type="html"><![CDATA[<h3 id="路由">路由</h3><p>（使用<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">php-amqplib</a>）<br>在<a href="/2016/04/23/php-rabbitmq-tutorial-three.html">上一节</a>中，我们创建了一个简单的日志系统（logging system）。我们已经可以广播日志消息到多个接收者了。</p>
 <p>在本节中，我们要给它增加一个功能-使它能够只订阅消息的一个子集。比如，只把严重的错误信息写入到日志文件（存储到磁盘）中，但同时仍然会把所有日志信息输出到控制台中。</p>
 <h3 id="绑定">绑定</h3><p>在上一节中我们已经创建了绑定（bindings），代码如下：</p>
@@ -76,7 +142,7 @@
     <link href="http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html"/>
     <id>http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html</id>
     <published>2016-04-23T11:58:17.000Z</published>
-    <updated>2016-04-23T12:01:13.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<h3 id="发布/订阅">发布/订阅</h3><p>我们在<a href="/2016/04/17/php-rabbitmq-tutorial-two.html">上一节</a>创建了一个工作队列，并假定队列对应的任务传送给了某个客户端。在这一章节我们会做一些完全不一样的东西–我们会发送一条消息到多个消费者，也称之为“发布/订阅”模式。</p>
 <p>为了说明这个模式，我们会创建一个简单的日志系统（logging system，以下简称日志系统），它由两个程序组成–第一个是发送日志信息，第二个是接收日志并打印。</p>
 <p>日志系统的每一个运行的接收端程序都会接收信息，这样就可以运行一个接收端就把日志保存到硬盘里，同时运行另一个接收端去实时显示日志到屏幕。</p>
@@ -153,7 +219,7 @@
     <link href="http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html"/>
     <id>http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html</id>
     <published>2016-04-17T06:39:30.000Z</published>
-    <updated>2016-04-23T12:02:49.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<h3 id="工作队列">工作队列</h3><h5 id="（使用php-amqplib库）">（使用<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">php-amqplib</a>库）</h5><p><img src="/images/rabbitmq/python-two.png" alt=""></p>
 <p>在本教程<a href="/2016/02/28/php-rabbitmq-tutorial-one.html">第一部分</a> 我们已经写完了从一个指定队列发送和接收消息的程序。在这一章节中，我们会创建一个工作队列（Work Queue）来分发耗时的任务给多个工作者（worker）。</p>
 <p>工作队列（也被称为 任务队列-task queue）主要是避免立即执行资源密集型任务并且还要等待它执行完毕。相反，需要让任务稍后执行，我们把一个任务当做一条信息发送给队列，后台运行的工作者（worker）会取出任务并执行，当运行多个worker时任务会在它们之间共享。</p>
@@ -235,7 +301,7 @@
     <link href="http://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html"/>
     <id>http://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html</id>
     <published>2016-02-28T03:10:03.000Z</published>
-    <updated>2016-04-23T10:14:10.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<h2 id="准备工作">准备工作</h2><h3 id="先决条件">先决条件</h3><p>本教程先决条件是RabbitMQ已经安装并正在以5672端口运行在 localhost，如果你使用了不同的域，端口，用户，密码，连接配置需要适当改变。</p>
 <h3 id="获得帮助">获得帮助</h3><p>如果在本教程中遇到问题，可以通过邮件列表进行联系。</p>
 <h3 id="介绍">介绍</h3><p>RabbitMQ是一个消息代理，它的本质是，从producers（生产者）接收消息，然后发送给consumers（消费者），在这个过程中，可以根据自己的配置规则使用路由，缓冲区，保存消息。</p>
@@ -311,7 +377,7 @@
     <link href="http://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html"/>
     <id>http://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html</id>
     <published>2016-02-25T09:10:43.000Z</published>
-    <updated>2016-02-25T09:16:54.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">var a =<span class="number">0</span>;</span><br><span class="line"><span class="keyword">for</span> (var i =<span class="number">0</span>,j =<span class="number">0</span>; i &lt;<span class="number">10</span>,j&lt;<span class="number">6</span>;i++,j++) &#123;</span><br><span class="line">	a = i+j;</span><br><span class="line">	console.<span class="built_in">log</span>(<span class="string">"i="</span>+i);</span><br><span class="line">	console.<span class="built_in">log</span>(<span class="string">"j="</span>+j);</span><br><span class="line">	console.<span class="built_in">log</span>(<span class="string">"a="</span>+a);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>朋友面试，遇到的面试题，电话跟我说完就回来写下来试了一下，结果与自己预想的一样。</p>
 <p>没写之前，电话里说的思路是，因为 j 限制了 小于 6，那么应该只循环6次，实际上也确实是这样。</p>
@@ -332,7 +398,7 @@
     <link href="http://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html"/>
     <id>http://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html</id>
     <published>2016-02-24T09:58:24.000Z</published>
-    <updated>2016-02-25T03:35:21.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<p>接上篇：<a href="https://www.qichengzx.com/2016/02/03/MySQL%E5%AE%9E%E7%8E%B0row_number%20.html">MySQL实现row_number</a></p>
 <h3 id="为分组增加row_number">为分组增加row number</h3><p>row_number的分析函数怎么样？（原文：How about  row_number “over partition by” functionality? ），比如，如果想为每一个组增加row number，并且在每一个新的分组重置它。</p>
 <p>查看下图中payments表。</p>
@@ -364,7 +430,7 @@
     <link href="http://www.qichengzx.com/2016/02/03/MySQL%E5%AE%9E%E7%8E%B0row_number%20.html"/>
     <id>http://www.qichengzx.com/2016/02/03/MySQL实现row_number .html</id>
     <published>2016-02-03T10:25:26.000Z</published>
-    <updated>2016-02-03T10:27:20.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<p>在本教程中，我们将在MySQL中实现一个非常实用的row_number功能。</p>
 <p>row_number是一个返回数据排序编号的排名方法，从1开始。我们经常需要用到row_number去生成某些报表，不幸的是，MySQL并不像MSSQL，Oracle一样支持这个方法。在MySQL中如果想实现这个功能需要临时变量。</p>
 <p>为了在MySQL中实现row_number，需要在查询中实用临时变量，下图中从employees表中查询出5条数据，并且从1开始，为每一行添加了编号(row number)。</p>
@@ -397,7 +463,7 @@
     <link href="http://www.qichengzx.com/2016/01/19/echarts-pie.html"/>
     <id>http://www.qichengzx.com/2016/01/19/echarts-pie.html</id>
     <published>2016-01-19T13:27:00.000Z</published>
-    <updated>2016-01-19T14:25:04.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<p><img src="/images/BEEC6560-EC03-4027-969D-DBB584A47E69.png" alt=""></p>
 <p>今天写一个做地区分布的饼图的东西。</p>
 <p>由于数据库里本身没有存储地区数据，只有IP，所以也用到了<a href="http://www.ipip.net/" target="_blank" rel="external">高春辉老师目前的项目</a>里提供的IP地址数据库。可以在数据库下载页面下载到免费的数据库文件和一个PHP处理类。</p>
@@ -433,7 +499,7 @@
     <link href="http://www.qichengzx.com/2016/01/11/placeholder-animate.html"/>
     <id>http://www.qichengzx.com/2016/01/11/placeholder-animate.html</id>
     <published>2016-01-11T13:42:58.000Z</published>
-    <updated>2016-01-12T13:33:24.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<p>以前经常见到的一种页面表单效果，但是并没有在项目中用过，前几天在sf上看到相关问题，顺手写了一个，还挺简单，没什么含量。</p>
 <p>此处省略HTML头信息等内容。</p>
 <h3 id="HTML">HTML</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"text"</span> <span class="attribute">id</span>=<span class="value">"uname"</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="title">label</span>&gt;</span>Name<span class="tag">&lt;/<span class="title">label</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
@@ -462,7 +528,7 @@
     <link href="http://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html"/>
     <id>http://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html</id>
     <published>2016-01-10T10:52:55.000Z</published>
-    <updated>2016-04-23T12:07:24.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<p><img src="/images/backup-database-with-crontab/crontab.jpg" alt=""></p>
 <p>crontab命令之前写过了，在<a href="http://segmentfault.com/a/1190000003953826" target="_blank" rel="external">Linux crontab 访问PHP URL完成定时任务</a>，今天写了一个用来备份数据库的脚本。</p>
 <p>主要会用到以下几个命令：</p>
@@ -520,7 +586,7 @@
     <link href="http://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html"/>
     <id>http://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html</id>
     <published>2015-12-27T13:47:09.000Z</published>
-    <updated>2016-04-23T12:08:10.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<p><img src="/images/dropbox/20130702165945-558672261.jpg" alt=""></p>
 <p>继之前<a href="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html">那次失败的尝试</a>之后（只在当时写的时候实验过几次，每次都以服务器卡死结束），后来在又多了几篇日志之后连generate也不能愉快的完成了。索性就在本地生成然后git push到服务器。</p>
 <p>现在想更激进一些，git只管理日志以外的东西，比如hexo的升级，或模板的调整和日志源文件。而生成的静态文件直接通过Dropbox客户端同步到服务器。</p>
@@ -570,7 +636,7 @@
     <link href="http://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html"/>
     <id>http://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html</id>
     <published>2015-12-19T08:38:37.000Z</published>
-    <updated>2015-12-19T13:31:45.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<p><img src="https://s.qichengzx.com/img/201512/https.png" alt=""></p>
 <p>Let’s Encrypt是一个新的CA机构，提供非常简单并且免费的TLS／SSL证书服务。</p>
 <p>可谓万众期待。</p>
@@ -636,7 +702,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
     <link href="http://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html"/>
     <id>http://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html</id>
     <published>2015-12-05T14:37:09.000Z</published>
-    <updated>2015-12-06T01:31:01.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<p><img src="http://7b1hhm.com1.z0.glb.clouddn.com/hexo1414772222.jpg" alt=""></p>
 <p>图片转自：<a href="http://blog.encodez.com/blog/using-pdofetchall-examples-with-codes-and-output-results" target="_blank" rel="external">Using PDO::fetchAll – Examples with codes and output results</a></p>
 <p>一个简单的例子。</p>
@@ -674,7 +740,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
     <link href="http://www.qichengzx.com/2015/12/03/nodejs-mysql.html"/>
     <id>http://www.qichengzx.com/2015/12/03/nodejs-mysql.html</id>
     <published>2015-12-03T13:38:37.000Z</published>
-    <updated>2015-12-03T14:24:07.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<p><img src="http://7b1hhm.com1.z0.glb.clouddn.com/hexo201312030901.jpg" alt=""></p>
 <p>文章部分代码与<a href="http://segmentfault.com/a/1190000002995355" target="_blank" rel="external">之前整理的一篇文章</a>一样。</p>
 <p>本文主要实现node连接MySQL并读取指定表的数据输出到ejs模板中。</p>
@@ -716,7 +782,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
     <link href="http://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html"/>
     <id>http://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html</id>
     <published>2015-11-21T13:24:35.000Z</published>
-    <updated>2015-11-21T13:50:00.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<p><img src="http://7b1hhm.com1.z0.glb.clouddn.com/hexo1631785_mysql.gif" alt=""></p>
 <p>某个需求，为了简单单独建表存储，而且没有相关的后台管理方法，无法查看，或导出，但是又突然出现需要导出这个需求。</p>
 <p>所以突然想到MySQL是否带了这种直接导出到文件中的方法，查资料后发现果然有。</p>
@@ -747,7 +813,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
     <link href="http://www.qichengzx.com/2015/11/17/js-names.html"/>
     <id>http://www.qichengzx.com/2015/11/17/js-names.html</id>
     <published>2015-11-17T14:07:21.000Z</published>
-    <updated>2015-11-18T14:21:40.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<p>标识符由一个字母开头，其后可以选择性的加上一个或多个字母、数字或下划线。但是，不能使用下面这些保留字：</p>
 <figure class="highlight d"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">abstract</span></span><br><span class="line">boolean <span class="keyword">break</span> <span class="keyword">byte</span></span><br><span class="line"><span class="keyword">case</span> <span class="keyword">catch</span> <span class="built_in">char</span> <span class="keyword">class</span> <span class="keyword">const</span> <span class="keyword">continue</span></span><br><span class="line">debugger <span class="keyword">default</span> <span class="keyword">delete</span> <span class="keyword">do</span> <span class="built_in">double</span></span><br><span class="line"><span class="keyword">else</span> <span class="keyword">enum</span> <span class="keyword">export</span> extends</span><br><span class="line"><span class="literal">false</span> <span class="keyword">final</span> <span class="keyword">finally</span> <span class="built_in">float</span> <span class="keyword">for</span> <span class="built_in">function</span></span><br><span class="line"><span class="keyword">goto</span></span><br><span class="line"><span class="keyword">if</span> implements <span class="keyword">import</span> <span class="keyword">in</span> instanceof <span class="keyword">int</span> <span class="keyword">interface</span> </span><br><span class="line"><span class="built_in">long</span></span><br><span class="line">native <span class="keyword">new</span> <span class="literal">null</span></span><br><span class="line"><span class="keyword">package</span> <span class="keyword">private</span> <span class="keyword">protected</span> <span class="keyword">public</span></span><br><span class="line"><span class="keyword">return</span></span><br><span class="line"><span class="built_in">short</span> <span class="keyword">static</span> <span class="keyword">super</span> <span class="keyword">switch</span> <span class="keyword">synchronized</span></span><br><span class="line"><span class="keyword">this</span> <span class="keyword">throw</span> throws transient <span class="literal">true</span> <span class="keyword">try</span> <span class="keyword">typeof</span></span><br><span class="line">var <span class="keyword">volatile</span> <span class="keyword">void</span></span><br><span class="line"><span class="keyword">while</span> <span class="keyword">with</span></span><br></pre></td></tr></table></figure>
 <p>这个列表里的大部分并未用在JS语言里，有一些已经逐渐在新标准中出现，但是这个列表也不包括一些本应该保留的字，如undefined,NaN,Infinity。</p>
@@ -773,7 +839,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
     <link href="http://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html"/>
     <id>http://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html</id>
     <published>2015-11-13T06:12:35.000Z</published>
-    <updated>2015-12-19T07:50:01.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<p><strong> 阅读之前默认为已在服务器安装hexo，也默认服务器可以访问Dropbox </strong></p>
 <p><strong> 不建议服务器内存小于512M ，谁卡谁知道 </strong></p>
 <h3 id="最初的最初">最初的最初</h3><p>先说下我最终完成的结构：</p>
@@ -880,7 +946,7 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
     <link href="http://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html"/>
     <id>http://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html</id>
     <published>2015-11-11T06:16:29.000Z</published>
-    <updated>2015-11-11T09:28:05.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<p>之前在 <a href="http://segmentfault.com/a/1190000003055672" target="_blank" rel="external">HTML+CSS3再加一点点JS做的一个小时钟</a> 看到的这个问题，觉得很好把代码存下来了，今天突发奇想把它放到hexo的新博客上。</p>
 <h3 id="STEP_0">STEP 0</h3><p>把HTML内容放到新建的模板里，我命名为time.ejs。</p>
 <pre><code>    &lt;<span class="keyword">div</span> <span class="type">class</span>=<span class="string">"widget-wrap"</span>&gt;
@@ -1185,7 +1251,7 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
     <link href="http://www.qichengzx.com/2015/11/07/Set%20Up%20a%20Private%20Git%20Server%20on%20a%20VPS.html"/>
     <id>http://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html</id>
     <published>2015-11-07T15:34:10.000Z</published>
-    <updated>2015-11-08T02:42:16.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<p>以下内容主要来自<br>    <a href="https://www.digitalocean.com/community/tutorials/how-to-set-up-a-private-git-server-on-a-vps" target="_blank" rel="external">How To Set Up a Private Git Server on a VPS</a></p>
 <p>之前在DigitalOcean买了个5刀的vps，本来是想搞VPN的，但是没成功，后来把个人博客放这了，后来又觉得有点浪费，索性重新启用这个域名来写技术文章。</p>
 <p>本来是用的WP的但是也一直没写，后来又想折腾别的程序试一下，就选了现在的<a href="https://hexo.io" target="_blank" rel="external">hexo</a>，昨天在自己电脑上安装了，也可以写文章页可以默认 <code>hexo server</code> 运行，然后，我愉快的把命令行关掉之后，就傻了。</p>
@@ -1256,66 +1322,6 @@ Your <span class="keyword">public</span> <span class="keyword">key</span> has be
       <category term="git" scheme="http://www.qichengzx.com/tags/git/"/>
     
       <category term="vps" scheme="http://www.qichengzx.com/tags/vps/"/>
-    
-  </entry>
-  
-  <entry>
-    <title><![CDATA[React-Native Fetch方法发送网络请求]]></title>
-    <link href="http://www.qichengzx.com/2015/11/06/React-Native-Fetch.html"/>
-    <id>http://www.qichengzx.com/2015/11/06/React-Native-Fetch.html</id>
-    <published>2015-11-06T14:54:22.000Z</published>
-    <updated>2015-11-08T02:51:53.000Z</updated>
-    <content type="html"><![CDATA[<p>先贴一个官方文档。<br><a href="https://facebook.github.io/react-native/docs/network.html#content" target="_blank" rel="external">Network</a></p>
-<pre><code>fetch<span class="list">(<span class="quoted">'https</span><span class="keyword">://mywebsite</span>.com/endpoint/', {
-    method: <span class="quoted">'POST</span>',
-    headers: {
-        <span class="quoted">'Accept</span>': <span class="quoted">'application/json</span>',
-        <span class="quoted">'Content-Type</span>': <span class="quoted">'application/json</span>',
-    },
-    body: JSON.stringify<span class="list">({
-        firstParam: <span class="quoted">'yourValue</span>',
-        secondParam: <span class="quoted">'yourOtherValue</span>',
-    })</span>
-})</span>
-</code></pre><p>一开始我就是单纯的这么写的，愉快的把URL替换掉，把参数替换掉，然后。。。<br>我愉快的敲下 <code>var_dump($_POST[&#39;firstParam&#39;])</code> 的时候，后台没接到任何东西，后来在stackoverflow上看到回答，说之所以接收不到，是因为这不属于form data，想要这么写，需要在接收前添加 <code>file_get_contents(&#39;php://input&#39;)</code>,然后果然就可以了。</p>
-<pre><code><span class="variable">$json</span> = json_decode(file_get_contents(<span class="string">'php://input'</span>), <span class="literal">true</span>);
-var_dump(<span class="variable">$json</span>[<span class="string">'firstParam'</span>]);
-</code></pre><p>但是这样会影响到现有的web应用，所以又继续查资料，发现可以改成下边这样的方法。</p>
-<pre><code><span class="function"><span class="keyword">function</span> <span class="title">toQueryString</span>(<span class="params">obj</span>) </span>{
-    <span class="keyword">return</span> obj ? <span class="built_in">Object</span>.keys(obj).sort().map(<span class="function"><span class="keyword">function</span> (<span class="params">key</span>) </span>{
-        <span class="keyword">var</span> val = obj[key];
-        <span class="keyword">if</span> (<span class="built_in">Array</span>.isArray(val)) {
-            <span class="keyword">return</span> val.sort().map(<span class="function"><span class="keyword">function</span> (<span class="params">val2</span>) </span>{
-                <span class="keyword">return</span> <span class="built_in">encodeURIComponent</span>(key) + <span class="string">'='</span> + <span class="built_in">encodeURIComponent</span>(val2);
-            }).join(<span class="string">'&amp;'</span>);
-        }
-
-        <span class="keyword">return</span> <span class="built_in">encodeURIComponent</span>(key) + <span class="string">'='</span> + <span class="built_in">encodeURIComponent</span>(val);
-    }).join(<span class="string">'&amp;'</span>) : <span class="string">''</span>;
-}
-
-
-fetch(url, {
-    method: <span class="string">'post'</span>,
-    body: toQueryString({ 
-        <span class="string">'firstParam'</span>: <span class="string">'yourValue'</span>,
-        <span class="string">'secondParam'</span>:<span class="string">'yourOtherValue'</span> 
-    })
-}) 
-</code></pre><p>这样，在后台就可以正常的用$_POST[‘firstParam’];接收了。</p>
-<p><a href="http://stackoverflow.com/questions/32448862/how-can-i-use-react-native-with-php-with-fetch-return-data-is-always-null" target="_blank" rel="external">Sending data as key-value pair using fetch polyfill in react-native</a></p>
-<p><a href="http://stackoverflow.com/questions/31201940/sending-data-as-key-value-pair-using-fetch-polyfill-in-react-native" target="_blank" rel="external">How can I use react-native with php with fetch return data is always null</a></p>
-]]></content>
-    <summary type="html">
-    <![CDATA[<p>先贴一个官方文档。<br><a href="https://facebook.github.io/react-native/docs/network.html#content" target="_blank" rel="external">Network</a></p>
-<]]>
-    </summary>
-    
-      <category term="fetch" scheme="http://www.qichengzx.com/tags/fetch/"/>
-    
-      <category term="react-native" scheme="http://www.qichengzx.com/tags/react-native/"/>
-    
-      <category term="网络请求" scheme="http://www.qichengzx.com/tags/%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/"/>
     
   </entry>
   
