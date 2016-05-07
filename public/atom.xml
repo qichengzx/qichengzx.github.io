@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="http://www.qichengzx.com/"/>
-  <updated>2016-05-07T14:00:19.000Z</updated>
+  <updated>2016-05-07T14:08:27.000Z</updated>
   <id>http://www.qichengzx.com/</id>
   
   <author>
@@ -19,7 +19,7 @@
     <link href="http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html"/>
     <id>http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html</id>
     <published>2016-05-03T06:35:20.000Z</published>
-    <updated>2016-05-07T14:00:19.000Z</updated>
+    <updated>2016-05-07T14:08:27.000Z</updated>
     <content type="html"><![CDATA[<h3 id="远程调用">远程调用</h3><p>在<a href="/2016/04/17/php-rabbitmq-tutorial-two.html">第二节</a>中，我们学习了如何使用工作队列在多个worker中分发耗时任务。</p>
 <p>但是如果我们需要在远程运行一个函数并等待返回结果怎么办？这是两码事，这个模式通常被称为远程过程调用（Remote Procedure Call，RPC）。</p>
 <p>在本节中我们准备使用RabbitMQ构建一个RPC系统：一个客户端和一个可扩展的RPC服务端。由于我们没有值得分发的耗时任务，我们准备创建一个假的返回<a href="https://en.wikipedia.org/wiki/Fibonacci_number" target="_blank" rel="external">斐波那契数列</a>的RPC服务。</p>
@@ -41,7 +41,7 @@
 <h3 id="Correlation_Id">Correlation Id</h3><p>在上面的方法中我们建议为每一个RPC请求创建一个回调队列。这样非常低效，但是幸运的是有更好的办法 - 我们可以为每一个客户端创建一个单独的回调队列。</p>
 <p>这样又带来一个新的问题，在队列接收到响应时，并不知道属于哪个请求。这也正是correlation_id属性要发挥的作用。我们为每一个请求的设定一个唯一的correlation_id值，然后，当在回调队列接收到消息时会查看它的属性，基于此，我们就可以把响应和请求进行匹配。如果发现一个未知的correlation_id值，可以安全的忽略掉这条消息 - 因为它不属于任何请求。</p>
 <p>也许你会问，为什么应该忽略回调队列里的未知消息，而不是返回一个错误？因为服务可能会出现紊乱的情况，虽然不太可能，但是如果发生这种情况，RPC服务会在发送完响应后挂掉，但是还没有进行消息确认。如果发生了，重启RPC服务后会再次处理这个请求。这就是为什么在客户端我们必须适当的处理重复请求，而RPC服务最好的幂等的。</p>
-<h3 id="总结">总结</h3><p><img src="/image/rabbitmq/python-six.png" alt=""></p>
+<h3 id="总结">总结</h3><p><img src="/images/rabbitmq/python-six.png" alt=""></p>
 <p>RPC工作流程：</p>
 <p>​    当客户端开始运行时会创建一个匿名独有回调队列。</p>
 <p>​    RPC请求中，客户端消息带有两个属性：reply_to用来设置回调队列，correlation_id用来唯一标识每一个请求。</p>
@@ -93,7 +93,7 @@
     <link href="http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html"/>
     <id>http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html</id>
     <published>2016-04-27T10:27:03.000Z</published>
-    <updated>2016-05-07T10:36:47.000Z</updated>
+    <updated>2016-05-07T14:06:15.000Z</updated>
     <content type="html"><![CDATA[<h3 id="主题">主题</h3><p>(<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">使用php-amqplib</a>)</p>
 <p>在<a href="/2016/04/24/php-rabbitmq-tutorial-four.html">上一节</a>我们改善了日志系统(logging system，以下简称日志系统)，为了替代fanout类型的交换器，我们使用了一个direct类型的交换器，带来的好处是可以有选择的接收日志。</p>
 <p>虽然使用direct交换器改善了系统，但是仍然有局限性 - 它不能根据多个条件进行路由。</p>
@@ -160,7 +160,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="http://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html"/>
     <id>http://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html</id>
     <published>2016-04-24T06:16:41.000Z</published>
-    <updated>2016-05-07T13:50:24.000Z</updated>
+    <updated>2016-05-07T14:06:15.000Z</updated>
     <content type="html"><![CDATA[<h3 id="路由">路由</h3><p>（使用<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">php-amqplib</a>）<br>在<a href="/2016/04/23/php-rabbitmq-tutorial-three.html">上一节</a>中，我们创建了一个简单的日志系统（logging system）。我们已经可以广播日志消息到多个接收者了。</p>
 <p>在本节中，我们要给它增加一个功能-使它能够只订阅消息的一个子集。比如，只把严重的错误信息写入到日志文件（存储到磁盘）中，但同时仍然会把所有日志信息输出到控制台中。</p>
 <h3 id="绑定">绑定</h3><p>在上一节中我们已经创建了绑定（bindings），代码如下：</p>
@@ -218,7 +218,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html"/>
     <id>http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html</id>
     <published>2016-04-23T11:58:17.000Z</published>
-    <updated>2016-05-07T13:50:37.000Z</updated>
+    <updated>2016-05-07T14:06:15.000Z</updated>
     <content type="html"><![CDATA[<h3 id="发布/订阅">发布/订阅</h3><p>我们在<a href="/2016/04/17/php-rabbitmq-tutorial-two.html">上一节</a>创建了一个工作队列，并假定队列对应的任务传送给了某个客户端。在这一章节我们会做一些完全不一样的东西–我们会发送一条消息到多个消费者，也称之为“发布/订阅”模式。</p>
 <p>为了说明这个模式，我们会创建一个简单的日志系统（logging system，以下简称日志系统），它由两个程序组成–第一个是发送日志信息，第二个是接收日志并打印。</p>
 <p>日志系统的每一个运行的接收端程序都会接收信息，这样就可以运行一个接收端就把日志保存到硬盘里，同时运行另一个接收端去实时显示日志到屏幕。</p>
@@ -296,7 +296,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html"/>
     <id>http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html</id>
     <published>2016-04-17T06:39:30.000Z</published>
-    <updated>2016-05-07T13:50:52.000Z</updated>
+    <updated>2016-05-07T14:06:15.000Z</updated>
     <content type="html"><![CDATA[<h3 id="工作队列">工作队列</h3><h5 id="（使用php-amqplib库）">（使用<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">php-amqplib</a>库）</h5><p><img src="/images/rabbitmq/python-two.png" alt=""></p>
 <p>在本教程<a href="/2016/02/28/php-rabbitmq-tutorial-one.html">第一部分</a> 我们已经写完了从一个指定队列发送和接收消息的程序。在这一章节中，我们会创建一个工作队列（Work Queue）来分发耗时的任务给多个工作者（worker）。</p>
 <p>工作队列（也被称为 任务队列-task queue）主要是避免立即执行资源密集型任务并且还要等待它执行完毕。相反，需要让任务稍后执行，我们把一个任务当做一条信息发送给队列，后台运行的工作者（worker）会取出任务并执行，当运行多个worker时任务会在它们之间共享。</p>
@@ -379,7 +379,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="http://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html"/>
     <id>http://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html</id>
     <published>2016-02-28T03:10:03.000Z</published>
-    <updated>2016-05-07T10:35:12.000Z</updated>
+    <updated>2016-05-07T14:06:15.000Z</updated>
     <content type="html"><![CDATA[<h2 id="准备工作">准备工作</h2><h3 id="先决条件">先决条件</h3><p>本教程先决条件是RabbitMQ已经安装并正在以5672端口运行在 localhost，如果你使用了不同的域，端口，用户，密码，连接配置需要适当改变。</p>
 <h3 id="获得帮助">获得帮助</h3><p>如果在本教程中遇到问题，可以通过邮件列表进行联系。</p>
 <h3 id="介绍">介绍</h3><p>RabbitMQ是一个消息代理，它的本质是，从producers（生产者）接收消息，然后发送给consumers（消费者），在这个过程中，可以根据自己的配置规则使用路由，缓冲区，保存消息。</p>

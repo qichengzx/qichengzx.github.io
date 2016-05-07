@@ -16,8 +16,8 @@
 <meta property="og:description" content="远程调用在第二节中，我们学习了如何使用工作队列在多个worker中分发耗时任务。
 但是如果我们需要在远程运行一个函数并等待返回结果怎么办？这是两码事，这个模式通常被称为远程过程调用（Remote Procedure Call，RPC）。
 在本节中我们准备使用RabbitMQ构建一个RPC系统：一个客户端和一个可扩展的RPC服务端。由于我们没有值得分发的耗时任务，我们准备创建一个假的返回斐波那契数列">
-<meta property="og:image" content="http://www.qichengzx.com/image/rabbitmq/python-six.png">
-<meta property="og:updated_time" content="2016-05-07T14:00:19.000Z">
+<meta property="og:image" content="http://www.qichengzx.com/images/rabbitmq/python-six.png">
+<meta property="og:updated_time" content="2016-05-07T14:08:27.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="PHP RabbitMQ 教程（六） - 远程调用">
 <meta name="twitter:description" content="远程调用在第二节中，我们学习了如何使用工作队列在多个worker中分发耗时任务。
@@ -116,7 +116,7 @@
 <h3 id="Correlation_Id">Correlation Id</h3><p>在上面的方法中我们建议为每一个RPC请求创建一个回调队列。这样非常低效，但是幸运的是有更好的办法 - 我们可以为每一个客户端创建一个单独的回调队列。</p>
 <p>这样又带来一个新的问题，在队列接收到响应时，并不知道属于哪个请求。这也正是correlation_id属性要发挥的作用。我们为每一个请求的设定一个唯一的correlation_id值，然后，当在回调队列接收到消息时会查看它的属性，基于此，我们就可以把响应和请求进行匹配。如果发现一个未知的correlation_id值，可以安全的忽略掉这条消息 - 因为它不属于任何请求。</p>
 <p>也许你会问，为什么应该忽略回调队列里的未知消息，而不是返回一个错误？因为服务可能会出现紊乱的情况，虽然不太可能，但是如果发生这种情况，RPC服务会在发送完响应后挂掉，但是还没有进行消息确认。如果发生了，重启RPC服务后会再次处理这个请求。这就是为什么在客户端我们必须适当的处理重复请求，而RPC服务最好的幂等的。</p>
-<h3 id="总结">总结</h3><p><img src="/image/rabbitmq/python-six.png" alt=""></p>
+<h3 id="总结">总结</h3><p><img src="/images/rabbitmq/python-six.png" alt=""></p>
 <p>RPC工作流程：</p>
 <p>​    当客户端开始运行时会创建一个匿名独有回调队列。</p>
 <p>​    RPC请求中，客户端消息带有两个属性：reply_to用来设置回调队列，correlation_id用来唯一标识每一个请求。</p>
@@ -153,7 +153,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html" data-id="cinx7wvgu0014rc0ra70y08v3" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html" data-id="cinx87dui0014lj0rh8q9puuz" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html#comments" class="article-comment-link">Comments</a>
       
@@ -179,7 +179,7 @@
 
 
 <section id="comments">
-  <div class="ds-thread" data-thread-key="cinx7wvgu0014rc0ra70y08v3" data-title="PHP RabbitMQ 教程（六） - 远程调用" data-url="http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html"></div>
+  <div class="ds-thread" data-thread-key="cinx87dui0014lj0rh8q9puuz" data-title="PHP RabbitMQ 教程（六） - 远程调用" data-url="http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html"></div>
   <script>
     var duoshuoQuery = {short_name:"qichengzx"};
     (function() {

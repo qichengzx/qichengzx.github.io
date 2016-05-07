@@ -75,7 +75,7 @@ AMQP协议定义了14个消息属性。大部分不常用，下面的除外：
 
 ### 总结
 
-![](/image/rabbitmq/python-six.png)
+![](/images/rabbitmq/python-six.png)
 
 RPC工作流程：
 

@@ -110,7 +110,7 @@
 <h3 id="Correlation_Id">Correlation Id</h3><p>在上面的方法中我们建议为每一个RPC请求创建一个回调队列。这样非常低效，但是幸运的是有更好的办法 - 我们可以为每一个客户端创建一个单独的回调队列。</p>
 <p>这样又带来一个新的问题，在队列接收到响应时，并不知道属于哪个请求。这也正是correlation_id属性要发挥的作用。我们为每一个请求的设定一个唯一的correlation_id值，然后，当在回调队列接收到消息时会查看它的属性，基于此，我们就可以把响应和请求进行匹配。如果发现一个未知的correlation_id值，可以安全的忽略掉这条消息 - 因为它不属于任何请求。</p>
 <p>也许你会问，为什么应该忽略回调队列里的未知消息，而不是返回一个错误？因为服务可能会出现紊乱的情况，虽然不太可能，但是如果发生这种情况，RPC服务会在发送完响应后挂掉，但是还没有进行消息确认。如果发生了，重启RPC服务后会再次处理这个请求。这就是为什么在客户端我们必须适当的处理重复请求，而RPC服务最好的幂等的。</p>
-<h3 id="总结">总结</h3><p><img src="/image/rabbitmq/python-six.png" alt=""></p>
+<h3 id="总结">总结</h3><p><img src="/images/rabbitmq/python-six.png" alt=""></p>
 <p>RPC工作流程：</p>
 <p>​    当客户端开始运行时会创建一个匿名独有回调队列。</p>
 <p>​    RPC请求中，客户端消息带有两个属性：reply_to用来设置回调队列，correlation_id用来唯一标识每一个请求。</p>
@@ -147,7 +147,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html" data-id="cinx7wvgu0014rc0ra70y08v3" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html" data-id="cinx87dui0014lj0rh8q9puuz" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html#comments" class="article-comment-link">Comments</a>
       
@@ -238,7 +238,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html" data-id="cinx7wvgz001grc0rglh9cht8" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html" data-id="cinx87dup001glj0ruqu5fetm" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html#comments" class="article-comment-link">Comments</a>
       
@@ -321,7 +321,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html" data-id="cinx7wvgy001crc0r2zmrblu8" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html" data-id="cinx87dun001clj0rnqv9tnhj" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html#comments" class="article-comment-link">Comments</a>
       
@@ -424,7 +424,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html" data-id="cinx7wvgq0010rc0r6u31a2yp" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html" data-id="cinx87duf0010lj0r4oaffrpm" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html#comments" class="article-comment-link">Comments</a>
       
@@ -532,7 +532,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html" data-id="cinx7wvgo000vrc0rpzloa229" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html" data-id="cinx87dud000vlj0rhjmbzypj" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html#comments" class="article-comment-link">Comments</a>
       
@@ -633,7 +633,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html" data-id="cinx7wvgw0018rc0rzh7ee1jn" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html" data-id="cinx87dul0018lj0rg1evxbxc" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html#comments" class="article-comment-link">Comments</a>
       
@@ -681,7 +681,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html" data-id="cinx7wvhj002nrc0rap16oveb" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html" data-id="cinx87dvc002nlj0rv9u0tbb8" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html#comments" class="article-comment-link">Comments</a>
       
@@ -739,7 +739,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html" data-id="cinx7wvhp0033rc0ras6nf20v" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html" data-id="cinx87dvp0033lj0rufo7un47" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html#comments" class="article-comment-link">Comments</a>
       
@@ -798,7 +798,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/02/03/MySQL实现row_number .html" data-id="cinx7wvhy0036rc0rn6zn975y" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/02/03/MySQL实现row_number .html" data-id="cinx87dvr0036lj0r2uh1erv5" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/02/03/MySQL实现row_number .html#comments" class="article-comment-link">Comments</a>
       
@@ -855,7 +855,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/01/19/echarts-pie.html" data-id="cinx7wvhb0021rc0refvqlwep" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/01/19/echarts-pie.html" data-id="cinx87dv30021lj0rtkh909ri" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/01/19/echarts-pie.html#comments" class="article-comment-link">Comments</a>
       
