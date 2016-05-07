@@ -83,7 +83,7 @@ foreach($severities as $severity){
 
 emit_log_direct.php类的代码为：
 
-```
+```php
 <?php
 require_once __DIR__ . '/vendor/autoload.php';
 use PhpAmqpLib\Connection\AMQPStreamConnection;
@@ -108,7 +108,7 @@ $connection->close();
 
 receive_logs_direct.php的代码为：
 
-```
+```php
 <?php
 
 require_once __DIR__ . '/vendor/autoload.php';
@@ -172,6 +172,7 @@ php emit_log_direct.php error "Run. Run. Or it will explode."
 
 转到第五节，查看如何监听基于模式的消息。
 
+原文地址：[Routing](https://www.rabbitmq.com/tutorials/tutorial-four-php.html)
 
 [image-1]: /images/rabbitmq/direct-exchange.png
 [image-2]: /images/rabbitmq/direct-exchange-multiple.png

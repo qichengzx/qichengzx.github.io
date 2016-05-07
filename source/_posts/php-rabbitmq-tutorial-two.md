@@ -125,7 +125,7 @@ RabbitMQ会默认按顺序把消息发送给下一个消费者，平均每个消
 
 消息响应默认是关闭的。可以通过设置basic_consume的第四个参数为false(true表示不开启应答)，然后在处理完任务的时候从worker发送一个正确的响应内容。
 
-```
+```php
 $callback = function($msg){
 	echo "[x] Received ",$msg->body,"\n";
 	sleep(substr_count($msg->body,'.'));
@@ -209,7 +209,7 @@ $channel->basic_qos(null,1,null);
 
 最终，new_task.php的代码如下：
 
-```
+```php
 <?php
 
 require_once __DIR__ .'/verdor/autoload.php';
@@ -241,7 +241,7 @@ $connection->close();
 
 worker.php
 
-```
+```php
 <?php
 
 require_once __DIR__ .'/vendor/autoload.php';
@@ -279,4 +279,4 @@ $connection->close();
 
 现在我们可以继续学习第三部分的内容，学习如何发送相同的消息给多个消费者。
 
-
+原文地址：[Work queues](https://www.rabbitmq.com/tutorials/tutorial-two-php.html)

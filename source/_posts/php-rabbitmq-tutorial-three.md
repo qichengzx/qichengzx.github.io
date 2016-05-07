@@ -126,7 +126,7 @@ $channel->queue_bind($queue_name,'logs');
 
 发送日志消息的生产者，与之前的代码看起来没什么不同，最重要的变化是现在想要发送消息到我们的 logs 交换器中，需要在发送时提供一个routing_key，但是在 fanout类型的交换器中这个值是可以忽略的。下边是emit_log.php的代码。
 
-```
+```php
 <?php
 
 require_once __DIR__ .'/verdor/autoload.php';
@@ -160,7 +160,7 @@ $connection->close();
 
 receive_logs.php：
 
-```
+```php
 <?php
 
 require_once __DIR__ .'/vendor/autoload.php';
@@ -221,3 +221,5 @@ logs    exchange        amq.gen-vso0PVvyiRIL2WoV3i48Yg  queue           []
 对于结果的解释很简单，logs交换器中的数据发送到两个服务器指定的队列，而这正是我们要实现的。
 
 想要弄明白怎样去监听部分消息，转到第四部分。
+
+原文地址：[Publish/Subscribe](https://www.rabbitmq.com/tutorials/tutorial-three-php.html)

@@ -188,3 +188,5 @@ receiver程序会把通过sender程序发送的内容打印出来，receiver程�
 Hello World！
 
 查看第二部分，建立一个简单的队列。
+
+原文地址：["Hello World!"](https://www.rabbitmq.com/tutorials/tutorial-one-php.html)

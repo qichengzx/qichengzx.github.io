@@ -182,3 +182,5 @@ php emit_log_topic.php "kern.critical" "A critical kernel error"
 [emit_log_topic.php完整代码](https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/emit_log_topic.php) [receive_logs_topic.php完整代码](https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/receive_logs_topic.php)
 
 下一步，在第六节中学习像远程过程调用一样完成消息往返。
+
+原文地址：[Topics](https://www.rabbitmq.com/tutorials/tutorial-five-php.html)
