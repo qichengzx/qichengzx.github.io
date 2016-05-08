@@ -1,6 +1,8 @@
 title: 解决Discuz无法发布爱奇艺视频的问题
+categories: javascript
 date: 2016-04-26 23:57:16
 tags:  [js,discuz,爱奇艺]
+
 ---
 
 ![](/images/discuz/201510148054_136.jpg)

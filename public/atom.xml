@@ -173,7 +173,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="http://www.qichengzx.com/2016/04/26/cant-post-iqiyi-video-to-discuz.html"/>
     <id>http://www.qichengzx.com/2016/04/26/cant-post-iqiyi-video-to-discuz.html</id>
     <published>2016-04-26T15:57:16.000Z</published>
-    <updated>2016-05-08T10:45:50.000Z</updated>
+    <updated>2016-05-08T10:51:13.000Z</updated>
     <content type="html"><![CDATA[<p><img src="/images/discuz/201510148054_136.jpg" alt=""></p>
 <p>最近碰到需要在Discuz论坛中插入爱奇艺视频的问题，之前没关注过，搜索后有些答案说DZ不支持爱奇艺，有些说爱奇艺不支持DZ，并没有真正能解决问题的。</p>
 <p>下午突然想到也许是DZ根据粘贴进来的flash地址生成的标签代码不对，试验后发现果然是这个原因。</p>
@@ -199,6 +199,8 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       <category term="js" scheme="http://www.qichengzx.com/tags/js/"/>
     
       <category term="爱奇艺" scheme="http://www.qichengzx.com/tags/%E7%88%B1%E5%A5%87%E8%89%BA/"/>
+    
+      <category term="javascript" scheme="http://www.qichengzx.com/categories/javascript/"/>
     
   </entry>
   
