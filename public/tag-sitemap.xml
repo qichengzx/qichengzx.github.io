@@ -121,13 +121,6 @@
     </url>
 
     <url>
-        <loc>http://www.qichengzx.com/tags/js/</loc>
-        <lastmod>2016-02-25T09:16:54.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>http://www.qichengzx.com/tags/mysql/</loc>
         <lastmod>2016-04-23T12:07:24.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -172,6 +165,27 @@
     <url>
         <loc>http://www.qichengzx.com/tags/rabbitmq/</loc>
         <lastmod>2016-05-07T14:08:27.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://www.qichengzx.com/tags/js/</loc>
+        <lastmod>2016-05-08T10:45:50.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://www.qichengzx.com/tags/discuz/</loc>
+        <lastmod>2016-05-08T10:45:50.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://www.qichengzx.com/tags/%E7%88%B1%E5%A5%87%E8%89%BA/</loc>
+        <lastmod>2016-05-08T10:45:50.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>

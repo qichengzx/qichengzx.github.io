@@ -63,6 +63,34 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-a-sample-redis-queue" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/05/08/a-sample-redis-queue.html" class="article-date">
+  <time datetime="2016-05-08T10:32:34.000Z" itemprop="datePublished">2016-05-08</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.qichengzx.com/2016/05/08/a-sample-redis-queue.html" data-id="cinygf8g9002uc00ry2tcf0td" class="article-share-link">Share</a>
+      
+        <a href="http://www.qichengzx.com/2016/05/08/a-sample-redis-queue.html#comments" class="article-comment-link">Comments</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-php-rabbitmq-tutorial-six" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2016/05/03/php-rabbitmq-tutorial-six.html" class="article-date">
@@ -147,7 +175,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html" data-id="cinx87dui0014lj0rh8q9puuz" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html" data-id="cinygf8f50014c00rapr2ggvr" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html#comments" class="article-comment-link">Comments</a>
       
@@ -238,12 +266,66 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html" data-id="cinx87dup001glj0ruqu5fetm" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html" data-id="cinygf8fb001gc00rusmrawed" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html#comments" class="article-comment-link">Comments</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/php/">php</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/rabbitmq/">rabbitmq</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-cant-post-iqiyi-video-to-discuz" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/04/26/cant-post-iqiyi-video-to-discuz.html" class="article-date">
+  <time datetime="2016-04-26T15:57:16.000Z" itemprop="datePublished">2016-04-26</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/04/26/cant-post-iqiyi-video-to-discuz.html">解决Discuz无法发布爱奇艺视频的问题</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="/images/discuz/201510148054_136.jpg" alt=""></p>
+<p>最近碰到需要在Discuz论坛中插入爱奇艺视频的问题，之前没关注过，搜索后有些答案说DZ不支持爱奇艺，有些说爱奇艺不支持DZ，并没有真正能解决问题的。</p>
+<p>下午突然想到也许是DZ根据粘贴进来的flash地址生成的标签代码不对，试验后发现果然是这个原因。</p>
+<p>打卡/static/js/editor.js 文件第1299行查看这段代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="string">'vid'</span>:</span><br><span class="line">	<span class="keyword">var</span> mediaUrl = $(ctrlid + <span class="string">'_param_1'</span>).value;</span><br><span class="line">	<span class="keyword">var</span> auto = <span class="string">''</span>;</span><br><span class="line">	<span class="keyword">var</span> posque = mediaUrl.lastIndexOf(<span class="string">'?'</span>);</span><br><span class="line">	posque = posque === -<span class="number">1</span> ? mb_strlen(mediaUrl) : posque;</span><br><span class="line">	<span class="keyword">var</span> ext = mediaUrl.lastIndexOf(<span class="string">'.'</span>) === -<span class="number">1</span> ? <span class="string">''</span> : mediaUrl.substring(mediaUrl.lastIndexOf(<span class="string">'.'</span>) + <span class="number">1</span>, posque).toLowerCase();</span><br><span class="line">	ext = in_array(ext, [<span class="string">'mp3'</span>, <span class="string">'wma'</span>, <span class="string">'ra'</span>, <span class="string">'rm'</span>, <span class="string">'ram'</span>, <span class="string">'mid'</span>, <span class="string">'asx'</span>, <span class="string">'wmv'</span>, <span class="string">'avi'</span>, <span class="string">'mpg'</span>, <span class="string">'mpeg'</span>, <span class="string">'rmvb'</span>, <span class="string">'asf'</span>, <span class="string">'mov'</span>, <span class="string">'flv'</span>, <span class="string">'swf'</span>]) ? ext : <span class="string">'x'</span>;</span><br><span class="line">	<span class="keyword">if</span>(ext == <span class="string">'x'</span>) &#123;</span><br><span class="line">		<span class="keyword">if</span>(<span class="regexp">/^mms:\/\//</span>.test(mediaUrl)) &#123;</span><br><span class="line">			ext = <span class="string">'mms'</span>;</span><br><span class="line">		&#125; <span class="keyword">else</span> <span class="keyword">if</span>(<span class="regexp">/^(rtsp|pnm):\/\//</span>.test(mediaUrl)) &#123;</span><br><span class="line">			ext = <span class="string">'rtsp'</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">var</span> str = <span class="string">'[media='</span> + ext + <span class="string">','</span> + $(ctrlid + <span class="string">'_param_2'</span>).value + <span class="string">','</span> + $(ctrlid + <span class="string">'_param_3'</span>).value + <span class="string">']'</span> + squarestrip(mediaUrl) + <span class="string">'[/media]'</span>;</span><br><span class="line">	insertText(str, str.length, <span class="number">0</span>, <span class="literal">false</span>, sel);</span><br><span class="line">	<span class="keyword">break</span>;</span><br></pre></td></tr></table></figure>
+<p>Discuz根据主流的视频网站的视频地址格式写的规则，生成discuz专用的[media]标签，在前台输出的时候再解析成embed这样的HTML代码。</p>
+<p>解析之后的差不多就是这样：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">embed</span> <span class="attribute">src</span>=<span class="value">"http://player.video.qiyi.com/7b42a1a27ff121c201ee5e6c6d757817/0/0/v_19rrklq2bs.swf-albumId=406283300-tvId=406283300-isPurchase=2-cnId=1"</span> <span class="attribute">allowFullScreen</span>=<span class="value">"true"</span> <span class="attribute">quality</span>=<span class="value">"high"</span> <span class="attribute">width</span>=<span class="value">"480"</span> <span class="attribute">height</span>=<span class="value">"350"</span> <span class="attribute">align</span>=<span class="value">"middle"</span> <span class="attribute">allowScriptAccess</span>=<span class="value">"always"</span> <span class="attribute">type</span>=<span class="value">"application/x-shockwave-flash"</span>&gt;</span><span class="tag">&lt;/<span class="title">embed</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>而不那么主流的爱奇艺的flash地址则是：”<a href="http://player.video.qiyi.com/7b42a1a27ff121c201ee5e6c6d757817/0/0/v_19rrklq2bs.swf-albumId=406283300-tvId=406283300-isPurchase=2-cnId=1”，查看上一段代码可以看到，discuz会用正则去看粘贴的地址最后一个&quot;.&quot;后的后缀，如果这个后缀不在自己的已知flash格式数组中，就把类型设为&quot;x&quot;，也就是生成的标签成了[media=x,500,350]。" target="_blank" rel="external">http://player.video.qiyi.com/7b42a1a27ff121c201ee5e6c6d757817/0/0/v_19rrklq2bs.swf-albumId=406283300-tvId=406283300-isPurchase=2-cnId=1”，查看上一段代码可以看到，discuz会用正则去看粘贴的地址最后一个&quot;.&quot;后的后缀，如果这个后缀不在自己的已知flash格式数组中，就把类型设为&quot;x&quot;，也就是生成的标签成了[media=x,500,350]。</a></p>
+<p>再到了前台解析，不认识，直接生成一个a标签。</p>
+<p>所以，我的解决办法是：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(ext == <span class="string">'x'</span>) &#123;</span><br><span class="line">	<span class="keyword">if</span>(<span class="regexp">/^mms:\/\//</span>.test(mediaUrl)) &#123;</span><br><span class="line">		ext = <span class="string">'mms'</span>;</span><br><span class="line">	&#125; <span class="keyword">else</span> <span class="keyword">if</span>(<span class="regexp">/^(rtsp|pnm):\/\//</span>.test(mediaUrl)) &#123;</span><br><span class="line">		ext = <span class="string">'rtsp'</span>;</span><br><span class="line">	&#125; <span class="keyword">else</span> <span class="keyword">if</span> (mediaUrl.indexOf(<span class="string">'player.video.qiyi.com'</span>)) &#123;</span><br><span class="line">  		ext = <span class="string">'swf'</span>;	</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>增加一个else if 判断是否包含爱奇艺播放器的域名，当用户粘贴的flash地址包含这个字符串时，就认为是粘贴了一个爱奇艺的视频，存储的格式也就成了[media=swf]。</p>
+<p>但是这里其实不是十分严谨，如果一个非法的flash地址很巧合的包含了这个字符串，也会认为是flash了，那这种情况下就会出错了。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.qichengzx.com/2016/04/26/cant-post-iqiyi-video-to-discuz.html" data-id="cinygf8g2002fc00rgsc9n6qx" class="article-share-link">Share</a>
+      
+        <a href="http://www.qichengzx.com/2016/04/26/cant-post-iqiyi-video-to-discuz.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/discuz/">discuz</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/爱奇艺/">爱奇艺</a></li></ul>
 
     </footer>
   </div>
@@ -321,7 +403,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html" data-id="cinx87dun001clj0rnqv9tnhj" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html" data-id="cinygf8f9001cc00rdjv28rvr" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html#comments" class="article-comment-link">Comments</a>
       
@@ -424,7 +506,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html" data-id="cinx87duf0010lj0r4oaffrpm" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html" data-id="cinygf8f20010c00rtbb6chlv" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html#comments" class="article-comment-link">Comments</a>
       
@@ -532,7 +614,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html" data-id="cinx87dud000vlj0rhjmbzypj" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html" data-id="cinygf8ey000vc00r88igbc26" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html#comments" class="article-comment-link">Comments</a>
       
@@ -633,7 +715,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html" data-id="cinx87dul0018lj0rg1evxbxc" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html" data-id="cinygf8f70018c00rk0wl7gki" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html#comments" class="article-comment-link">Comments</a>
       
@@ -681,7 +763,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html" data-id="cinx87dvc002nlj0rv9u0tbb8" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html" data-id="cinygf8gb002vc00ruudoln6d" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html#comments" class="article-comment-link">Comments</a>
       
@@ -739,128 +821,12 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html" data-id="cinx87dvp0033lj0rufo7un47" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html" data-id="cinygf8gh003ac00rofla0cmv" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html#comments" class="article-comment-link">Comments</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-MySQL实现row_number " class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2016/02/03/MySQL实现row_number .html" class="article-date">
-  <time datetime="2016-02-03T10:25:26.000Z" itemprop="datePublished">2016-02-03</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/mysql/">mysql</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/02/03/MySQL实现row_number .html">MySQL实现row_number</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>在本教程中，我们将在MySQL中实现一个非常实用的row_number功能。</p>
-<p>row_number是一个返回数据排序编号的排名方法，从1开始。我们经常需要用到row_number去生成某些报表，不幸的是，MySQL并不像MSSQL，Oracle一样支持这个方法。在MySQL中如果想实现这个功能需要临时变量。</p>
-<p>为了在MySQL中实现row_number，需要在查询中实用临时变量，下图中从employees表中查询出5条数据，并且从1开始，为每一行添加了编号(row number)。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator"><span class="keyword">SET</span> @row_number = <span class="number">0</span>;</span></span><br><span class="line"> </span><br><span class="line"><span class="operator"><span class="keyword">SELECT</span> </span><br><span class="line">    (@row_number:=@row_number + <span class="number">1</span>) <span class="keyword">AS</span> <span class="keyword">num</span>, firstName, lastName</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">    employees</span><br><span class="line"><span class="keyword">LIMIT</span> <span class="number">5</span>;</span></span><br></pre></td></tr></table></figure>
-<p><img src="/images/mysql-row_number-session-variables.jpg" alt=""></p>
-<p>在上面的查询中：</p>
-<pre><code>首先，我们定义了一个变量叫做row_number,初始值为<span class="number">0</span>，row_number是以@为前缀的一个临时变量。
-
-然后，在查询中，我们为这个变量每次+<span class="number">1</span>，LIMIT分句是为了限制返回的结果数，此处设为<span class="number">5.</span>
-</code></pre><p>另一个方法是使用临时变量作为派生表，联合主表。看下边的查询语句：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator"><span class="keyword">SELECT</span> </span><br><span class="line">    (@row_number:=@row_number + <span class="number">1</span>) <span class="keyword">AS</span> <span class="keyword">num</span>, firstName, lastName</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">    employees,(<span class="keyword">SELECT</span> @row_number:=<span class="number">0</span>) <span class="keyword">AS</span> <span class="keyword">t</span></span><br><span class="line"><span class="keyword">LIMIT</span> <span class="number">5</span>;</span></span><br></pre></td></tr></table></figure>
-<p>需要注意，派生表必须使用别名，以使查询语句在语法上没有问题。</p>
-<p>由于时间关系（回家过年），暂时到这里，文中部分内容可能翻译的有点不太顺，可以直接看下原文，原文中还有一部分讲分组查询中实用row_number。</p>
-<p>这个之后再写。</p>
-<p>原文地址：<a href="http://www.mysqltutorial.org/mysql-row_number/" target="_blank" rel="external">MySQL row_number, This Is How You Emulate It</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/02/03/MySQL实现row_number .html" data-id="cinx87dvr0036lj0r2uh1erv5" class="article-share-link">Share</a>
-      
-        <a href="http://www.qichengzx.com/2016/02/03/MySQL实现row_number .html#comments" class="article-comment-link">Comments</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-echarts-pie" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2016/01/19/echarts-pie.html" class="article-date">
-  <time datetime="2016-01-19T13:27:00.000Z" itemprop="datePublished">2016-01-19</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/javascript/">javascript</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/01/19/echarts-pie.html">ECharts饼图示例</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><img src="/images/BEEC6560-EC03-4027-969D-DBB584A47E69.png" alt=""></p>
-<p>今天写一个做地区分布的饼图的东西。</p>
-<p>由于数据库里本身没有存储地区数据，只有IP，所以也用到了<a href="http://www.ipip.net/" target="_blank" rel="external">高春辉老师目前的项目</a>里提供的IP地址数据库。可以在数据库下载页面下载到免费的数据库文件和一个PHP处理类。</p>
-<p>还用到了百度团队开源的<a href="http://echarts.baidu.com/index.html" target="_blank" rel="external">ECharts</a>，很简单很好用。</p>
-<p>其实事情本身并没有难度。</p>
-<h3 id="约定">约定</h3><p>默认为：此时已有一个静态页面，并且已引入echarts的js文件。</p>
-<h3 id="先读取数据">先读取数据</h3><figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="variable">$sql</span> = <span class="string">"SELECT id,ips FROM table order by id desc limit 100000"</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$pdo</span> = new PDO(<span class="string">'mysql:host=127.0.0.1;dbname=db1'</span>,<span class="string">'root'</span>,<span class="string">'root'</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$query</span> = <span class="variable">$pdo</span> -&gt; query(<span class="variable">$sql</span>);</span><br><span class="line"><span class="variable">$query-</span>&gt;setFetchMode(PDO::FETCH_ASSOC);</span><br><span class="line"><span class="variable">$rs</span> = <span class="variable">$query-</span>&gt;fetchAll();</span><br></pre></td></tr></table></figure>
-<h3 id="根据IP得出所在地信息">根据IP得出所在地信息</h3><figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">include <span class="string">'./IP.class.php'</span>;//ipip.net提供的IP处理类</span><br><span class="line"><span class="variable">$IP</span> = new IP();</span><br><span class="line">foreach (<span class="variable">$rs</span> <span class="keyword">as</span> <span class="variable">$key</span> =&gt; <span class="variable">$value</span>) &#123;</span><br><span class="line">	<span class="variable">$a</span> = <span class="variable">$IP-</span>&gt;find(<span class="variable">$value</span>[<span class="string">"ips"</span>]);</span><br><span class="line">	<span class="variable">$arr</span>[<span class="variable">$key</span>] = <span class="variable">$a</span>[<span class="number">1</span>].<span class="variable">$a</span>[<span class="number">2</span>]; //正确的IP返回的数据为:Array ( [<span class="number">0</span>] =&gt; 中国 [<span class="number">1</span>] =&gt; 黑龙江 [<span class="number">2</span>] =&gt; 鹤岗 [<span class="number">3</span>] =&gt; ) ,这里根据实际情况取对应字段即可。</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="生成echarts所需的数据">生成echarts所需的数据</h3><figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$data</span> = array_count_values(<span class="variable">$arr</span>);</span><br></pre></td></tr></table></figure>
-<p>嗯，一个非常简单粗暴的把同名地区数量算出来的方法。这样就生成了如array(‘北京’=&gt;2,’天津’=&gt;3)这样的数据。正是echarts所需的。</p>
-<h3 id="饼图区域">饼图区域</h3><figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;<span class="keyword">div</span> <span class="property">id</span>=<span class="string">"main"</span> style=<span class="string">"width: 1400px;height:1400px;"</span>&gt;&lt;/<span class="keyword">div</span>&gt;</span><br></pre></td></tr></table></figure>
-<h3 id="正经的JS来了">正经的JS来了</h3><figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">var myChart = echarts.init(document.getElementById(<span class="string">'main'</span>));</span><br><span class="line"></span><br><span class="line">var <span class="keyword">option</span> = &#123;</span><br><span class="line">      </span><br><span class="line">       title : &#123;</span><br><span class="line">        text: <span class="string">'IP分布地区'</span>,</span><br><span class="line">        x:<span class="string">'center'</span></span><br><span class="line">    &#125;,</span><br><span class="line">    tooltip : &#123;</span><br><span class="line">        trigger: <span class="string">'item'</span>,</span><br><span class="line">        formatter: <span class="string">"&#123;a&#125; &lt;br/&gt;&#123;b&#125; : &#123;c&#125; (&#123;d&#125;%)"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    legend: &#123;</span><br><span class="line">        orient: <span class="string">'vertical'</span>,</span><br><span class="line">        left: <span class="string">'left'</span>,</span><br><span class="line">        //简单起见此处直接foreach了</span><br><span class="line">        data: [&lt;?php foreach (<span class="variable">$keys</span> as <span class="variable">$key</span> =&gt; <span class="variable">$value</span>) &#123; echo <span class="string">'"'</span>.<span class="variable">$value</span>.<span class="string">'",'</span>; &#125;?&gt;]</span><br><span class="line">    &#125;,</span><br><span class="line">    series : [</span><br><span class="line">        &#123;</span><br><span class="line">            name: <span class="string">'IP所在地区'</span>,</span><br><span class="line">            type: <span class="string">'pie'</span>,</span><br><span class="line">            radius : <span class="string">'40%'</span>,</span><br><span class="line">            center: [<span class="string">'50%'</span>, <span class="string">'60%'</span>],</span><br><span class="line">            data:[</span><br><span class="line">            	//同上，</span><br><span class="line">            	&lt;?php </span><br><span class="line">            		//reset(<span class="variable">$data</span>);</span><br><span class="line">					while (list(<span class="variable">$key</span>, <span class="variable">$val</span>) = each(<span class="variable">$data</span>))&#123;</span><br><span class="line">						echo <span class="string">'&#123;value:'</span>.<span class="variable">$val</span>.<span class="string">',name:"'</span>.<span class="variable">$key</span>.<span class="string">'"&#125;,'</span>;</span><br><span class="line">					&#125;</span><br><span class="line">            	?&gt;</span><br><span class="line">            ],</span><br><span class="line">            itemStyle: &#123;</span><br><span class="line">                emphasis: &#123;</span><br><span class="line">                    shadowBlur: <span class="number">10</span>,</span><br><span class="line">                    shadowOffsetX: <span class="number">0</span>,</span><br><span class="line">                    shadowColor: <span class="string">'rgba(0, 0, 0, 0.5)'</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">   &#125;;</span><br><span class="line">   </span><br><span class="line">   // 使用刚指定的配置项和数据显示图表。</span><br><span class="line">   myChart.setOption(<span class="keyword">option</span>);</span><br></pre></td></tr></table></figure>
-<p>打开页面看一下吧。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/01/19/echarts-pie.html" data-id="cinx87dv30021lj0rtkh909ri" class="article-share-link">Share</a>
-      
-        <a href="http://www.qichengzx.com/2016/01/19/echarts-pie.html#comments" class="article-comment-link">Comments</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ECharts/">ECharts</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/javascript/">javascript</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/php/">php</a></li></ul>
 
     </footer>
   </div>
@@ -921,7 +887,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -930,7 +896,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/dropbox/" style="font-size: 12.5px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/hexo/" style="font-size: 15px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 15px;">javascript</a> <a href="/tags/js/" style="font-size: 10px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 17.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 17.5px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a>
+      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/dropbox/" style="font-size: 12.5px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/hexo/" style="font-size: 15px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 15px;">javascript</a> <a href="/tags/js/" style="font-size: 12.5px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 17.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 17.5px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a>
     </div>
   </div>
 
@@ -939,7 +905,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
     </div>
   </div>
 
@@ -951,6 +917,10 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       <ul>
         
           <li>
+            <a href="/2016/05/08/a-sample-redis-queue.html">(no title)</a>
+          </li>
+        
+          <li>
             <a href="/2016/05/03/php-rabbitmq-tutorial-six.html">PHP RabbitMQ 教程（六） - 远程调用</a>
           </li>
         
@@ -959,15 +929,11 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
           </li>
         
           <li>
+            <a href="/2016/04/26/cant-post-iqiyi-video-to-discuz.html">解决Discuz无法发布爱奇艺视频的问题</a>
+          </li>
+        
+          <li>
             <a href="/2016/04/24/php-rabbitmq-tutorial-four.html">PHP RabbitMQ 教程（四） - 路由</a>
-          </li>
-        
-          <li>
-            <a href="/2016/04/23/php-rabbitmq-tutorial-three.html">PHP RabbitMQ 教程（三） - 发布/订阅</a>
-          </li>
-        
-          <li>
-            <a href="/2016/04/17/php-rabbitmq-tutorial-two.html">PHP RabbitMQ 教程（二） - 工作队列</a>
           </li>
         
       </ul>

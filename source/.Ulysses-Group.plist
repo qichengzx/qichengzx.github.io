@@ -7,6 +7,7 @@
 		<string>_draft</string>
 		<string>_posts</string>
 		<string>images</string>
+		<string>static</string>
 	</array>
 	<key>createMarkedFile</key>
 	<false/>

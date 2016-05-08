@@ -1,16 +1,17 @@
-title: Discuz无法发布爱奇艺视频的bug
+title: 解决Discuz无法发布爱奇艺视频的问题
 date: 2016-04-26 23:57:16
 tags:  [js,discuz,爱奇艺]
 ---
 
+![](/images/discuz/201510148054_136.jpg)
 
-最近碰到需要在Discuz论坛中插入爱奇艺视频的问题，之前没关注过，搜索后有些答案说DZ不支持爱奇艺，有些说爱奇艺不支持DZ，也没有真正能解决问题的。
+最近碰到需要在Discuz论坛中插入爱奇艺视频的问题，之前没关注过，搜索后有些答案说DZ不支持爱奇艺，有些说爱奇艺不支持DZ，并没有真正能解决问题的。
 
-下午突然想到也许是DZ根据粘贴进来的flash地址生成的标签代码不对，查看后果然是这个原因。
+下午突然想到也许是DZ根据粘贴进来的flash地址生成的标签代码不对，试验后发现果然是这个原因。
 
-打卡/static/js/editor.js 文件第1299行查看这个case：
+打卡/static/js/editor.js 文件第1299行查看这段代码：
 
-```
+```js
 case 'vid':
 	var mediaUrl = $(ctrlid + '_param_1').value;
 	var auto = '';
@@ -31,21 +32,21 @@ case 'vid':
 ```
 
 
-Discuz默认根据主流的视频网站的flash地址写的规则，生成discuz专用的[media]标签，在前台输出的时候再解析成embed这样的HTML代码。
+Discuz根据主流的视频网站的视频地址格式写的规则，生成discuz专用的[media]标签，在前台输出的时候再解析成embed这样的HTML代码。
 
 解析之后的差不多就是这样：
 
-```
-<embed src="http://player.video.qiyi.com/9088e1bbcf9521211bef6cc499d18793/0/0/v_19rrlotgoc.swf-albumId=475960000-tvId=475960000-isPurchase=0-cnId=25" allowFullScreen="true" quality="high" width="480" height="350" align="middle" allowScriptAccess="always" type="application/x-shockwave-flash"></embed>
+```html
+<embed src="http://player.video.qiyi.com/7b42a1a27ff121c201ee5e6c6d757817/0/0/v_19rrklq2bs.swf-albumId=406283300-tvId=406283300-isPurchase=2-cnId=1" allowFullScreen="true" quality="high" width="480" height="350" align="middle" allowScriptAccess="always" type="application/x-shockwave-flash"></embed>
 ```
 
-而不那么主流的爱奇艺的flash地址则是：”http://player.video.qiyi.com/9088e1bbcf9521211bef6cc499d18793/0/0/v_19rrlotgoc.swf-albumId=475960000-tvId=475960000-isPurchase=0-cnId=25”，查看上一段代码可以看到，discuz会用正则去看粘贴的地址最后一个"."后的后缀，如果这个后缀不在自己的已知flash格式数组中，就把类型设为"x"，也就是生成的标签成了[media=x,500,350]。
+而不那么主流的爱奇艺的flash地址则是：”http://player.video.qiyi.com/7b42a1a27ff121c201ee5e6c6d757817/0/0/v_19rrklq2bs.swf-albumId=406283300-tvId=406283300-isPurchase=2-cnId=1”，查看上一段代码可以看到，discuz会用正则去看粘贴的地址最后一个"."后的后缀，如果这个后缀不在自己的已知flash格式数组中，就把类型设为"x"，也就是生成的标签成了[media=x,500,350]。
 
 再到了前台解析，不认识，直接生成一个a标签。
 
 所以，我的解决办法是：
 
-```
+```js
 if(ext == 'x') {
 	if(/^mms:\/\//.test(mediaUrl)) {
 		ext = 'mms';
