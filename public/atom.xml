@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="http://www.qichengzx.com/"/>
-  <updated>2016-05-08T10:57:25.000Z</updated>
+  <updated>2016-05-15T06:25:08.000Z</updated>
   <id>http://www.qichengzx.com/</id>
   
   <author>
@@ -13,6 +13,48 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[一个简单的php+redis队列示例]]></title>
+    <link href="http://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html"/>
+    <id>http://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html</id>
+    <published>2016-05-15T06:19:52.000Z</published>
+    <updated>2016-05-15T06:25:08.000Z</updated>
+    <content type="html"><![CDATA[<p><img src="/images/redis/redis-300dpi.png" alt=""></p>
+<p>虽然RabbitMQ的坑年前就开始填了，但是并没有机会在项目中实际使用，机缘巧合，换工作后第一个比较重要的事就是做一个直播的页面，如果数据直接插入或读取自数据库，数据库端的压力就太大了，当时RabbitMQ还没看完，而其他的队列程序更是没有用过，只是稍微对Redis熟悉些，于是就使用了Redis做。</p>
+<p><a href="http://redis.io/" target="_blank" rel="external">Redis</a>比较常见的是作为数据缓存工具使用，数据存储在内存中，减少了数据库的连接和查询，效率高，又方便。</p>
+<p>而其实Redis也可以用来做消息队列。</p>
+<h3 id="发送">发送</h3><p>发送端首先当然是做好数据的接收和检测，比如为空的情况下给个默认值或返回错误。</p>
+<p>特殊的情况下可能还要正则处理。</p>
+<p>处理完插入到Redis的list(<a href="http://www.redis.cn/topics/data-types-intro.html#lists" target="_blank" rel="external">列表</a>)中。如果插入失败抛出异常。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$redis</span> = <span class="keyword">new</span> Redis();</span><br><span class="line"><span class="variable">$redis</span>-&gt;connect(<span class="string">'127.0.0.1'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//如果redis需要认证</span></span><br><span class="line"><span class="variable">$redis</span>-&gt;auth(<span class="string">'redispasswd'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//命令行中使用，可以使用把信息作为参数的方式</span></span><br><span class="line"><span class="variable">$data</span> = <span class="variable">$argv</span>[<span class="number">1</span>];</span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">empty</span>(<span class="variable">$data</span>)) <span class="variable">$data</span> = <span class="string">"Hello World..!"</span>:</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line">	<span class="comment">//便于调试，在信息后边加上当前时间</span></span><br><span class="line">	<span class="variable">$data</span> .= <span class="string">'-at-'</span>.date(<span class="string">'Y-m-d H:i:s'</span>);</span><br><span class="line">	<span class="variable">$redis</span>-&gt;LPUSH(<span class="string">'redis_queue_1'</span>,json_encode(<span class="variable">$data</span>));</span><br><span class="line">&#125;<span class="keyword">catch</span>(<span class="keyword">Exception</span> <span class="variable">$e</span>)&#123;</span><br><span class="line">	<span class="keyword">echo</span> <span class="variable">$e</span>-&gt;getMessage().<span class="string">"\n"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="执行">执行</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php push.php &#34;testinfo&#34;</span><br></pre></td></tr></table></figure>
+<h3 id="接收">接收</h3><p>由于消息是源源不断发送到队列中，所以接收端程序一般会以后台进程的方式运行。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="variable">$redis</span> = <span class="keyword">new</span> Redis();</span><br><span class="line"><span class="variable">$redis</span>-&gt;connect(<span class="string">'127.0.0.1'</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$redis</span>-&gt;auth(<span class="string">'redispasswd'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		<span class="variable">$data</span> = <span class="variable">$redis</span>-&gt;rPopLPush(<span class="string">'redis_queue_1'</span>,<span class="string">'redis_queue_1_bak'</span>).<span class="string">"\n"</span>;</span><br><span class="line">		<span class="keyword">if</span>(<span class="variable">$data</span>)&#123;</span><br><span class="line">			<span class="keyword">echo</span> <span class="variable">$data</span>;</span><br><span class="line">		&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">			<span class="keyword">echo</span> <span class="string">"没有数据\n"</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125; <span class="keyword">catch</span> (<span class="keyword">Exception</span> <span class="variable">$e</span>) &#123;</span><br><span class="line">		<span class="keyword">echo</span> <span class="variable">$e</span>-&gt;getMessage().<span class="string">"\n"</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//每秒读取1次</span></span><br><span class="line">	sleep(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="执行-1">执行</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php get.php</span><br></pre></td></tr></table></figure>
+<h3 id="更进一步">更进一步</h3><p>如果想把数据写入到MySQL中，该怎么办？</p>
+<p>大多数情况下数据最终是需要持久化的，仅仅存在于redis中，也许内存会不够呢。</p>
+<p>改造一下get.php。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="variable">$redis</span> = <span class="keyword">new</span> Redis();</span><br><span class="line"><span class="variable">$redis</span>-&gt;connect(<span class="string">'127.0.0.1'</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$redis</span>-&gt;auth(<span class="string">'redispasswd'</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$dsn</span> = <span class="string">'mysql:dbname=test;host=127.0.0.1'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line">	<span class="variable">$pdo</span> = <span class="keyword">new</span> PDO(<span class="variable">$dsn</span>,<span class="string">'root'</span>,<span class="string">'mysqlpasswd'</span>,<span class="keyword">array</span>(PDO::MYSQL_ATTR_INIT_COMMAND =&gt; <span class="string">'SET NAMES utf8'</span>));</span><br><span class="line">&#125;<span class="keyword">catch</span>(PDOExcetion <span class="variable">$e</span>)&#123;</span><br><span class="line">	<span class="keyword">echo</span> <span class="variable">$e</span>-&gt;getMessage().<span class="string">"\n"</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">	<span class="variable">$data</span> = <span class="variable">$redis</span>-&gt;rPopLPush(<span class="string">'redis_queue_1'</span>,<span class="string">'redis_queue_1_bak'</span>);</span><br><span class="line">	<span class="keyword">if</span>(<span class="variable">$data</span>)&#123;</span><br><span class="line">		<span class="variable">$sth</span> = <span class="variable">$pdo</span>-&gt;prepare(<span class="string">"INSERT INTO tb_test(msg,time) VALUES (:msg,:time)"</span>);</span><br><span class="line">		</span><br><span class="line">		<span class="variable">$time</span> = time();</span><br><span class="line">		</span><br><span class="line">		<span class="variable">$sth</span>-&gt;bindParam(<span class="string">':msg'</span>,<span class="variable">$data</span>,PDO::PARAM_STR);</span><br><span class="line">		<span class="variable">$sth</span>-&gt;bindParam(<span class="string">':time'</span>,<span class="variable">$time</span>,PDO::PARAM_INT);</span><br><span class="line">		</span><br><span class="line">		<span class="variable">$sth</span>-&gt;execute();</span><br><span class="line">		<span class="variable">$id</span> = <span class="variable">$pdo</span>-&gt;lastInsertId();</span><br><span class="line">      </span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"插入成功，ID=$id \n"</span>;</span><br><span class="line">	&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"没有数据 \n"</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//实际任务中可能需要尽可能快的把数据导入到MySQL中</span></span><br><span class="line">	sleep(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="注意">注意</h4><p>​    这里使用了<a href="http://php.net/manual/zh/book.pdo.php" target="_blank" rel="external">PDO</a>;</p>
+<p>​    <a href="http://php.net/manual/zh/pdostatement.bindparam.php" target="_blank" rel="external">bindParam</a>方法的第一个参数对应insert语句中的对应顺序的值，如第一个bindParam方法对应第一个value值。</p>
+<p>​    bindParam方法第二个参数为实际的值，传入变量或固定值，传入方法调用时如time()会提示：</p>
+<p>Strict standards: Only variables should be passed by reference in /www/get.php on line 24。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p><img src="/images/redis/redis-300dpi.png" alt=""></p>
+<p>虽然RabbitMQ的坑年前就开始填了，但是并没有机会在项目中实际使用，机缘巧合，换工作后第一个比较重要的事就是做一个直播的页面，如果数据直接插入或读取自数据库]]>
+    </summary>
+    
+      <category term="php" scheme="http://www.qichengzx.com/tags/php/"/>
+    
+      <category term="redis" scheme="http://www.qichengzx.com/tags/redis/"/>
+    
+      <category term="队列" scheme="http://www.qichengzx.com/tags/%E9%98%9F%E5%88%97/"/>
+    
+      <category term="php" scheme="http://www.qichengzx.com/categories/php/"/>
+    
+  </entry>
   
   <entry>
     <title><![CDATA[解决Discuz无法发布爱奇艺视频的问题]]></title>
@@ -946,113 +988,6 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       <category term="标识符" scheme="http://www.qichengzx.com/tags/%E6%A0%87%E8%AF%86%E7%AC%A6/"/>
     
       <category term="javascript" scheme="http://www.qichengzx.com/categories/javascript/"/>
-    
-  </entry>
-  
-  <entry>
-    <title><![CDATA[利用Dropbox同步hexo的文章源文件并自动生成文章发布]]></title>
-    <link href="http://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html"/>
-    <id>http://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html</id>
-    <published>2015-11-13T06:12:35.000Z</published>
-    <updated>2015-12-19T07:50:01.000Z</updated>
-    <content type="html"><![CDATA[<p><strong> 阅读之前默认为已在服务器安装hexo，也默认服务器可以访问Dropbox </strong></p>
-<p><strong> 不建议服务器内存小于512M ，谁卡谁知道 </strong></p>
-<h3 id="最初的最初">最初的最初</h3><p>先说下我最终完成的结构：</p>
-<pre><code><span class="number">1.</span>本地有一个日志文件夹，用于存放md文件，或HTML文件，作为本地的Dropbox客户端同步的目录
-<span class="number">2.</span>服务器home文件夹中init一套hexo程序，用于接收本地的md文件，和generate，minify
-</code></pre><p>流程：</p>
-<pre><code><span class="number">1.</span>本地撰写，本地客户端自动同步
-<span class="number">2.</span>服务器Dropbox设置的同步目录接收本地的内容并cp到专门用于生成的hexo目录里
-<span class="number">3.</span>服务器用于生成的hexo生成新日志，cp到web目录中
-</code></pre><p>这么做的原因是，如果一共（是整个博客一共）只有一篇文章或几篇文章，那几乎没影响，如果，有几十篇了，据我观察，生成很耗时，可能会导致搜索引擎访问出现404，用户打开一个生成到一半的文件，用户打开一个木有样式的文章。</p>
-<h3 id="STEP_0_安装Dropbox">STEP 0 安装Dropbox</h3><p><a href="https://db.tt/mMNtRA6x" target="_blank" rel="external">注册Dropbox</a>。</p>
-<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>( ! has_dropbox_account() )&#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="string">"请先注册个账户啊亲"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>由于Dropbox默认安装在~，所以建议新建一个专用于同步的账户，如dbox。</p>
-<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">adduser </span>dbox</span><br><span class="line"><span class="label">passwd</span> dbox</span><br></pre></td></tr></table></figure>
-<p><strong> 请记住密码。请记住密码。请记住密码。 </strong></p>
-<p>然后，用新建的账户登录进去。</p>
-<p>终于可以安装Dropbox了。</p>
-<p>这里要区分一下你的系统，</p>
-<p><strong> 32位: </strong></p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">cd</span> <span class="regexp">~ &amp;&amp;</span> wget -O - <span class="string">"https://www.dropbox.com/download?plat=lnx.x86"</span> | tar xzf -</span><br></pre></td></tr></table></figure>
-<p><strong> 64位: </strong></p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">cd</span> <span class="regexp">~ &amp;&amp;</span> wget -O - <span class="string">"https://www.dropbox.com/download?plat=lnx.x86_64"</span> | tar xzf -</span><br></pre></td></tr></table></figure>
-<p>然后就可以运行Dropbox的守护程序了</p>
-<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">~<span class="regexp">/.dropbox-dist/dropboxd</span> &amp;</span><br></pre></td></tr></table></figure>
-<p>第一次在新的电脑上启动，会提示：</p>
-<pre><code>此电脑尚未与任何 Dropbox 帐户关联...
-
-请访问 https://www.dropbox.com/cli_link_nonce?nonce=95cd317d2<span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span> 来关联此设备。
-
-此电脑现在已与 Dropbox 关联。欢迎 yourname username
-</code></pre><p><strong> 注意在出现“此电脑现在已与 Dropbox 关联。欢迎 your username”前不要ctrl+c 退出这个程序。 </strong></p>
-<p>打开授权链接后会出现如下的提示，选择连接即可。</p>
-<p><img src="http://7b1hhm.com1.z0.glb.clouddn.com/hexo33B2BAAF-6996-41AA-BFA3-FC177106F62A.png" alt=""></p>
-<p>一定要注意，不然你都会奇怪为啥再次启动这个进程的时候还会出现“尚未关联的提示”</p>
-<p>验证成功后，会在当前用户的home目录中创建Dropbox目录，即Dropbox同步的目录。</p>
-<p>此时，如果你打开了 top，那应该发现此时服务器的内存有点捉急了，原因是Dropbox这个进程占的很多，所以一般情况下killall dropbox 退出就好了，壕请随意。</p>
-<h3 id="STEP_1_设置文件夹监测">STEP 1 设置文件夹监测</h3><p><strong>安装incron服务</strong></p>
-<p>incron是Linux下一个监测文件变化的服务</p>
-<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apt-get <span class="keyword">install</span> incron</span><br><span class="line">yum <span class="keyword">install</span> incron</span><br></pre></td></tr></table></figure>
-<p><strong> 设置开机启动 </strong></p>
-<p>安装sysv-rc-conf，用于管理服务的启动</p>
-<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apt-<span class="built_in">get</span> install sysv-rc-<span class="keyword">conf</span></span><br><span class="line">sysv-rc-<span class="keyword">conf</span> incron <span class="keyword">on</span></span><br></pre></td></tr></table></figure>
-<p><strong> 创建监测任务 </strong></p>
-<p>先修改下incron的编辑器</p>
-<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">vi</span> /etc/incron.<span class="keyword">conf</span></span><br></pre></td></tr></table></figure>
-<p>（此时可能需要sudo权限，因为是dbox用户）在文件的最后一行，去掉editor = vi前的#，保存退出。</p>
-<p>输入：incrontab -e</p>
-<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">/home/</span>dbox<span class="regexp">/Dropbox/y</span>ourfolder<span class="regexp">/ IN_ATTRIB,IN_MOVE /</span>home<span class="regexp">/dbox/</span>hexo.bash</span><br></pre></td></tr></table></figure>
-<p>第一个参数：用来接收Dropbox同步的文件夹</p>
-<p>第二个参数：指监测的动作</p>
-<p>第三个参数：处理脚本</p>
-<p>监测的动作可以用：</p>
-<pre><code>IN_ACCESS，即文件被访问
-IN_MODIFY，文件被 <span class="keyword">write</span>
-IN_ATTRIB，文件属性被修改，如 <span class="keyword">chmod</span>、<span class="keyword">chown</span>、touch 等
-IN_CLOSE_WRITE，可写文件被 <span class="keyword">close</span>
-IN_CLOSE_NOWRITE，不可写文件被 <span class="keyword">close</span>
-IN_OPEN，文件被 <span class="keyword">open</span>
-IN_MOVED_FROM，文件被移走,如 mv
-IN_MOVED_TO，文件被移来，如 mv、cp
-IN_CREATE，创建新文件
-IN_DELETE，文件被删除，如 rm
-IN_DELETE_SELF，自删除，即一个可执行文件在执行时删除自己
-IN_MOVE_SELF，自移动，即一个可执行文件在执行时移动自己
-IN_UNMOUNT，宿主文件系统被 umount
-IN_CLOSE，文件被关闭，等同于(IN_CLOSE_WRITE | IN_CLOSE_NOWRITE)
-IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
-<span class="comment">#上面所说的文件也包括目录。</span>
-</code></pre><p>可以选自己需要的动作</p>
-<p>接下来写处理脚本<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">vi</span> <span class="tag">hexo</span><span class="class">.bash</span></span><br></pre></td></tr></table></figure></p>
-<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cp</span> -R /home/dbox/Dropbox/yourfolder/* /home/dbox/dropasync/<span class="keyword">source</span>/_posts/;</span><br><span class="line"><span class="keyword">cd</span> /home/dbox/dropasync/ &amp;&amp; hexo gm</span><br><span class="line"><span class="keyword">cd</span> ~ &amp;&amp; ./.dropbox-dist/dropboxd</span><br></pre></td></tr></table></figure>
-<p>理论上到这里已经可以了。</p>
-<p><del>但是实际上我本人在测试的时候，512内存的服务器会只剩下4M内存，然后再执行任何命令都提示<br><code>-bash: fork: Cannot allocate memory</code>，持续很长时间，一开始以为是同时跑的进程太多导致内存不够，把没用的mongodb，redis都kill之后还是这样，后来干脆在执行这个脚本的时候把Dropbox的后台禁掉，也不行，之后想到了在这段脚本里echo一段数字到log中，执行的时候发现会写入多次，但是还是不清楚为什么会出现这种情况，进程里也是出现了两个或多个hexo，于是干脆就在这段脚本开始时先kill dropbox和hexo，在末尾再kill hexo。实际运行起来，内存还是会降到最低，但是持续时间明显减少到可以接受的程度。</del></p>
-<hr>
-<h2 id="2015-11-21_14:06:07_附截图">2015-11-21 14:06:07 附截图</h2><p><img src="http://7b1hhm.com1.z0.glb.clouddn.com/hexoF2A913D3-14C5-4FC9-B177-500AC0434036.png" alt=""></p>
-<hr>
-<p>2015-11-14 22:38:06 测试发现，上述带删除线的方法依然不行。内存依然会榨干很长时间。</p>
-<hr>
-<p>至于为何出现这个情况，咱不可知。。。总不能完全是因为内存太小吧……</p>
-<p>后续应该还会继续改进这个脚本。</p>
-<p><strong>另外，在安装这个用于生成日志的hexo程序的时候也出现了npm killed的问题，查了资料发现也是因为内存不足，npm install -d 可以查看安装过程，如果出错可以用来定位到底是什么原因引起错误</strong></p>
-<p>一些参考资料：</p>
-<p><a href="http://lucifr.com/2013/06/02/hexo-on-cloud-with-dropbox-and-vps/" target="_blank" rel="external">Hexo 服务器端布署及 Dropbox 同步</a></p>
-<p><a href="http://www.fanicy.com/2014/06/01/0001.hexowithvpsdropbox/" target="_blank" rel="external">用Hexo+Vps搭建博客并用Dropbox同步自动发布</a></p>
-<p><a href="http://linux.die.net/man/5/incrontab" target="_blank" rel="external">incrontab(5) - Linux man page</a></p>
-<p><a href="http://wlx.westgis.ac.cn/tag/incrontab/" target="_blank" rel="external">incron：linux下基于文件的事件触发</a></p>
-<p><a href="http://askubuntu.com/questions/221293/why-is-chkconfig-no-longer-available-in-ubuntu" target="_blank" rel="external">Why is chkconfig no longer available in Ubuntu?</a></p>
-<p><a href="https://www.garron.me/en/linux/use-incron-rsync-dropbox-backup.html" target="_blank" rel="external">Use incron to Trigger Action when File Changes 如果设置incrontab出现问题可以参考这篇</a></p>
-]]></content>
-    <summary type="html">
-    <![CDATA[<p><strong> 阅读之前默认为已在服务器安装hexo，也默认服务器可以访问Dropbox </strong></p>
-<p><strong> 不建议服务器内存小于512M ，谁卡谁知道 </strong></p>
-<h3 id="最初的最初">最初的最初</h3><p>先]]>
-    </summary>
-    
-      <category term="dropbox" scheme="http://www.qichengzx.com/tags/dropbox/"/>
-    
-      <category term="hexo" scheme="http://www.qichengzx.com/tags/hexo/"/>
     
   </entry>
   
