@@ -177,13 +177,6 @@
     </url>
 
     <url>
-        <loc>http://www.qichengzx.com/tags/php/</loc>
-        <lastmod>2016-05-15T06:25:08.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>http://www.qichengzx.com/tags/redis/</loc>
         <lastmod>2016-05-15T06:25:08.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -193,6 +186,13 @@
     <url>
         <loc>http://www.qichengzx.com/tags/%E9%98%9F%E5%88%97/</loc>
         <lastmod>2016-05-15T06:25:08.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://www.qichengzx.com/tags/php/</loc>
+        <lastmod>2016-07-03T01:14:00.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>

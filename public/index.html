@@ -63,6 +63,56 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-php-post-file-with-curl" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/07/02/php-post-file-with-curl.html" class="article-date">
+  <time datetime="2016-07-02T15:11:30.000Z" itemprop="datePublished">2016-07-02</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/php/">php</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/07/02/php-post-file-with-curl.html">PHP Curl 上传文件</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>有时候会遇到上传文件给第三方服务的情况，比如本身程序并不需要存储附件，而是把附件发送给一个公共的服务。</p>
+<p>最近正好碰到这个问题，记录一下。</p>
+<p>上代码。</p>
+<h4 id="发送端：">发送端：</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 接口地址</span></span><br><span class="line"><span class="variable">$api</span> = <span class="string">'http://api.example.com/uploadfile'</span>;</span><br><span class="line"><span class="variable">$file</span> = <span class="variable">$_FILES</span>[<span class="string">'file'</span>];<span class="comment">//保存$_FILES到变量中。</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 此处可能存在上传失败等问题，需验证$_FILES["file"]["error"]。</span></span><br><span class="line"><span class="comment">// 做业务对应的规则验证，如文件格式，文件大小等。</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建一个 cURL 句柄</span></span><br><span class="line"><span class="variable">$ch</span> = curl_init(<span class="variable">$api</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建一个 CURLFile 对象</span></span><br><span class="line"><span class="comment">// 上传文件的路径，文件的Mimetype，文件名</span></span><br><span class="line"><span class="variable">$cfile</span> = curl_file_create(<span class="variable">$file</span>[<span class="string">'tmp_name'</span>],<span class="variable">$file</span>[<span class="string">'type'</span>],<span class="variable">$file</span>[<span class="string">'name'</span>]);</span><br><span class="line"></span><br><span class="line"><span class="variable">$data</span> = [</span><br><span class="line">	<span class="string">'type'</span>=&gt;<span class="string">'image'</span>,</span><br><span class="line">	<span class="string">'data'</span>=&gt;<span class="variable">$cfile</span></span><br><span class="line">];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置 POST 数据</span></span><br><span class="line">curl_setopt(<span class="variable">$ch</span>, CURLOPT_POST,<span class="number">1</span>);</span><br><span class="line">curl_setopt(<span class="variable">$ch</span>, CURLOPT_POSTFIELDS, <span class="variable">$data</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$resp</span> = curl_exec(<span class="variable">$ch</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(!<span class="variable">$resp</span>) &#123;</span><br><span class="line">  <span class="keyword">die</span>(<span class="string">'Error: "'</span> . curl_error(<span class="variable">$ch</span>) . <span class="string">'" - Code: '</span> . curl_errno(<span class="variable">$ch</span>));</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  <span class="keyword">echo</span> <span class="string">"Response HTTP Status Code : "</span> . curl_getinfo(<span class="variable">$ch</span>, CURLINFO_HTTP_CODE);</span><br><span class="line">  <span class="keyword">echo</span> <span class="string">"\nResponse HTTP Body : "</span> . <span class="variable">$resp</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Close request to clear up some resources</span></span><br><span class="line">curl_close(<span class="variable">$ch</span>);</span><br></pre></td></tr></table></figure>
+<h4 id="接收端：">接收端：</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span> </span><br><span class="line">var_dump(<span class="variable">$_FILES</span>);<span class="comment">// 接收文件内容</span></span><br><span class="line">va_dump(<span class="variable">$_POST</span>);<span class="comment">// 接收type</span></span><br></pre></td></tr></table></figure>
+<h4 id="前端：">前端：</h4><p>前端可使用Form或其他Ajax方式上传。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html" data-id="ciq5wn18o001kit0rl6fy8wh0" class="article-share-link">Share</a>
+      
+        <a href="http://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/php/">php</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-a-sample-redis-queue" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2016/05/15/a-sample-redis-queue.html" class="article-date">
@@ -113,7 +163,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html" data-id="cio876cfe002v9b0rn9yqzeop" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html" data-id="ciq5wn19n002yit0rh25e371r" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html#comments" class="article-comment-link">Comments</a>
       
@@ -171,7 +221,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html" data-id="cio876cf4002f9b0rdhi17rmh" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html" data-id="ciq5wn19g002iit0rfqp1w6s2" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html#comments" class="article-comment-link">Comments</a>
       
@@ -269,7 +319,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html" data-id="cio876cef00149b0rtf1gj2om" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html" data-id="ciq5wn18g0014it0rsnpq81cp" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html#comments" class="article-comment-link">Comments</a>
       
@@ -360,7 +410,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html" data-id="cio876cel001g9b0rc1w17h55" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html" data-id="ciq5wn18m001git0r04g8x90w" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html#comments" class="article-comment-link">Comments</a>
       
@@ -443,7 +493,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html" data-id="cio876cej001c9b0r9ml6tqui" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html" data-id="ciq5wn18k001cit0rpdubeohe" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html#comments" class="article-comment-link">Comments</a>
       
@@ -546,7 +596,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html" data-id="cio876cec00109b0rn86juisb" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html" data-id="ciq5wn18e0010it0r6il4lc38" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html#comments" class="article-comment-link">Comments</a>
       
@@ -654,7 +704,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html" data-id="cio876cea000v9b0r3sisd9cy" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html" data-id="ciq5wn18b000vit0r66jj2a8a" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html#comments" class="article-comment-link">Comments</a>
       
@@ -755,7 +805,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html" data-id="cio876ceh00189b0rsfy44v9v" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html" data-id="ciq5wn18i0018it0rpcb9zo02" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html#comments" class="article-comment-link">Comments</a>
       
@@ -803,70 +853,12 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html" data-id="cio876cfg00319b0rdshj9s13" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html" data-id="ciq5wn19s0034it0rf8njxwei" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html#comments" class="article-comment-link">Comments</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-MySql-row_number-part-2" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2016/02/24/MySql-row_number-part-2.html" class="article-date">
-  <time datetime="2016-02-24T09:58:24.000Z" itemprop="datePublished">2016-02-24</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/mysql/">mysql</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/02/24/MySql-row_number-part-2.html">MySQL实现row_number第二部分</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>接上篇：<a href="https://www.qichengzx.com/2016/02/03/MySQL%E5%AE%9E%E7%8E%B0row_number%20.html">MySQL实现row_number</a></p>
-<h3 id="为分组增加row_number">为分组增加row number</h3><p>row_number的分析函数怎么样？（原文：How about  row_number “over partition by” functionality? ），比如，如果想为每一个组增加row number，并且在每一个新的分组重置它。</p>
-<p>查看下图中payments表。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator"><span class="keyword">SELECT</span></span><br><span class="line">    customerNumber, paymentDate, amount</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">    payments</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> customerNumber;</span></span><br></pre></td></tr></table></figure>
-<p><img src="/images/mysql-row-number/mysql-row_number-payments-table.jpg" alt=""></p>
-<p>设想下，为每一条customer数据增加一个当前行的编号，并且每当customer的number字段变化的时候行编号都被重置。</p>
-<p>为了实现这个，需要使用两个临时变量，一个作为当前行编号，另一个用来存 上一条customer number与当前行的number进行对比，查询语句如下。（这句有点绕，可能翻译的不太准确，请以原文为准。To achieve this, you have to use two session variables, one for the row number and the other for storing the old customer number to compare it with the current one as the following query:）</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator"><span class="keyword">SELECT</span> </span><br><span class="line">    @row_number:=<span class="keyword">CASE</span></span><br><span class="line">        <span class="keyword">WHEN</span> @customer_no = customerNumber <span class="keyword">THEN</span> @row_number + <span class="number">1</span></span><br><span class="line">        <span class="keyword">ELSE</span> <span class="number">1</span></span><br><span class="line">    <span class="keyword">END</span> <span class="keyword">AS</span> <span class="keyword">num</span>,</span><br><span class="line">    @customer_no:=customerNumber <span class="keyword">as</span> CustomerNumber,</span><br><span class="line">    paymentDate,</span><br><span class="line">    amount</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">    payments</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> customerNumber;</span></span><br></pre></td></tr></table></figure>
-<p>在这段查询代码中，我们使用了CASE声明，如果customer的number不变，就给row_number变量+1，否则，重置为1，结果如下：</p>
-<p><img src="/images/mysql-row-number/mysql-row_number-per-group.jpg" alt=""></p>
-<p>与为每一行记录生成row_number一样，也可以使用派生表（derived table）和交叉连接（cross join）生成同样的结果。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator"><span class="keyword">SELECT</span> </span><br><span class="line">    @row_number:=<span class="keyword">CASE</span></span><br><span class="line">        <span class="keyword">WHEN</span> @customer_no = customerNumber <span class="keyword">THEN</span> @row_number + <span class="number">1</span></span><br><span class="line">        <span class="keyword">ELSE</span> <span class="number">1</span></span><br><span class="line">    <span class="keyword">END</span> <span class="keyword">AS</span> <span class="keyword">num</span>,</span><br><span class="line">    @customer_no:=customerNumber <span class="keyword">as</span> CustomerNumber,</span><br><span class="line">    paymentDate,</span><br><span class="line">    amount</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">    payments,(<span class="keyword">SELECT</span> @customer_no:=<span class="number">0</span>,@row_number:=<span class="number">0</span>) <span class="keyword">as</span> <span class="keyword">t</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> customerNumber;</span></span><br></pre></td></tr></table></figure>
-<p>本教程中，我们展示了如何在MySQL中模仿row_number方法。</p>
-<p>原文地址：<a href="http://www.mysqltutorial.org/mysql-row_number/" target="_blank" rel="external">MySQL row_number, This Is How You Emulate It</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html" data-id="cio876cfm003g9b0rn9702w83" class="article-share-link">Share</a>
-      
-        <a href="http://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html#comments" class="article-comment-link">Comments</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li></ul>
 
     </footer>
   </div>
@@ -918,7 +910,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">8</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">9</span></li></ul>
     </div>
   </div>
 
@@ -927,7 +919,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -945,7 +937,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
     </div>
   </div>
 
@@ -955,6 +947,10 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <h3 class="widget-title">Recents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2016/07/02/php-post-file-with-curl.html">PHP Curl 上传文件</a>
+          </li>
         
           <li>
             <a href="/2016/05/15/a-sample-redis-queue.html">一个简单的php+redis队列示例</a>
@@ -970,10 +966,6 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
         
           <li>
             <a href="/2016/04/27/php-rabbitmq-tutorial-five.html">PHP RabbitMQ 教程（五） - 主题</a>
-          </li>
-        
-          <li>
-            <a href="/2016/04/24/php-rabbitmq-tutorial-four.html">PHP RabbitMQ 教程（四） - 路由</a>
           </li>
         
       </ul>

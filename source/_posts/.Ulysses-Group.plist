@@ -50,6 +50,9 @@
 			<string>php-rabbitmq-tutorial-two.md</string>
 		</array>
 		<array>
+			<string>php-rabbitmq-tutorial-four.md</string>
+		</array>
+		<array>
 			<string>php-use-pdo-cache-query-result-with-redis.md</string>
 		</array>
 		<array>
@@ -66,6 +69,9 @@
 		</array>
 		<array>
 			<string>time-widget-for-hexo.md</string>
+		</array>
+		<array>
+			<string>php-rabbitmq-tutorial-three.md</string>
 		</array>
 	</array>
 </dict>

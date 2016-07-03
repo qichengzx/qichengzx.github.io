@@ -3,18 +3,28 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Tag: time | 启程</title>
+  <title>PHP Curl 上传文件 | 启程</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta http-equiv="Access-Control-Allow-Origin" content="*">
-  <meta name="description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
-<meta property="og:type" content="website">
-<meta property="og:title" content="启程">
-<meta property="og:url" content="http://www.qichengzx.com/tags/time/index.html">
+  <meta name="description" content="有时候会遇到上传文件给第三方服务的情况，比如本身程序并不需要存储附件，而是把附件发送给一个公共的服务。
+最近正好碰到这个问题，记录一下。
+上代码。
+发送端：123456789101112131415161718192021222324252627282930313233343536&amp;lt;?php// 接口地址$api = &apos;http://api.example.com/uploadfile&apos;;$">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PHP Curl 上传文件">
+<meta property="og:url" content="http://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html">
 <meta property="og:site_name" content="启程">
-<meta property="og:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
+<meta property="og:description" content="有时候会遇到上传文件给第三方服务的情况，比如本身程序并不需要存储附件，而是把附件发送给一个公共的服务。
+最近正好碰到这个问题，记录一下。
+上代码。
+发送端：123456789101112131415161718192021222324252627282930313233343536&amp;lt;?php// 接口地址$api = &apos;http://api.example.com/uploadfile&apos;;$">
+<meta property="og:updated_time" content="2016-07-03T01:14:00.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="启程">
-<meta name="twitter:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
+<meta name="twitter:title" content="PHP Curl 上传文件">
+<meta name="twitter:description" content="有时候会遇到上传文件给第三方服务的情况，比如本身程序并不需要存储附件，而是把附件发送给一个公共的服务。
+最近正好碰到这个问题，记录一下。
+上代码。
+发送端：123456789101112131415161718192021222324252627282930313233343536&amp;lt;?php// 接口地址$api = &apos;http://api.example.com/uploadfile&apos;;$">
 <meta name="twitter:creator" content="@qichengzx">
   
     <link rel="alternative" href="/atom.xml" title="启程" type="application/atom+xml">
@@ -61,39 +71,81 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2015" class="archive-year">2015</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2015/11/11/time-widget-for-hexo.html" class="archive-article-date">
-  <time datetime="2015-11-11T06:16:29.000Z" itemprop="datePublished">Nov 11</time>
+        <section id="main"><article id="post-php-post-file-with-curl" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/07/02/php-post-file-with-curl.html" class="article-date">
+  <time datetime="2016-07-02T15:11:30.000Z" itemprop="datePublished">2016-07-02</time>
 </a>
-      
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/php/">php</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2015/11/11/time-widget-for-hexo.html">为hexo加一个时钟小挂件</a>
+    <h1 class="article-title" itemprop="name">
+      PHP Curl 上传文件
     </h1>
   
 
-    </header>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>有时候会遇到上传文件给第三方服务的情况，比如本身程序并不需要存储附件，而是把附件发送给一个公共的服务。</p>
+<p>最近正好碰到这个问题，记录一下。</p>
+<p>上代码。</p>
+<h4 id="发送端：">发送端：</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 接口地址</span></span><br><span class="line"><span class="variable">$api</span> = <span class="string">'http://api.example.com/uploadfile'</span>;</span><br><span class="line"><span class="variable">$file</span> = <span class="variable">$_FILES</span>[<span class="string">'file'</span>];<span class="comment">//保存$_FILES到变量中。</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 此处可能存在上传失败等问题，需验证$_FILES["file"]["error"]。</span></span><br><span class="line"><span class="comment">// 做业务对应的规则验证，如文件格式，文件大小等。</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建一个 cURL 句柄</span></span><br><span class="line"><span class="variable">$ch</span> = curl_init(<span class="variable">$api</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建一个 CURLFile 对象</span></span><br><span class="line"><span class="comment">// 上传文件的路径，文件的Mimetype，文件名</span></span><br><span class="line"><span class="variable">$cfile</span> = curl_file_create(<span class="variable">$file</span>[<span class="string">'tmp_name'</span>],<span class="variable">$file</span>[<span class="string">'type'</span>],<span class="variable">$file</span>[<span class="string">'name'</span>]);</span><br><span class="line"></span><br><span class="line"><span class="variable">$data</span> = [</span><br><span class="line">	<span class="string">'type'</span>=&gt;<span class="string">'image'</span>,</span><br><span class="line">	<span class="string">'data'</span>=&gt;<span class="variable">$cfile</span></span><br><span class="line">];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置 POST 数据</span></span><br><span class="line">curl_setopt(<span class="variable">$ch</span>, CURLOPT_POST,<span class="number">1</span>);</span><br><span class="line">curl_setopt(<span class="variable">$ch</span>, CURLOPT_POSTFIELDS, <span class="variable">$data</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$resp</span> = curl_exec(<span class="variable">$ch</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(!<span class="variable">$resp</span>) &#123;</span><br><span class="line">  <span class="keyword">die</span>(<span class="string">'Error: "'</span> . curl_error(<span class="variable">$ch</span>) . <span class="string">'" - Code: '</span> . curl_errno(<span class="variable">$ch</span>));</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  <span class="keyword">echo</span> <span class="string">"Response HTTP Status Code : "</span> . curl_getinfo(<span class="variable">$ch</span>, CURLINFO_HTTP_CODE);</span><br><span class="line">  <span class="keyword">echo</span> <span class="string">"\nResponse HTTP Body : "</span> . <span class="variable">$resp</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Close request to clear up some resources</span></span><br><span class="line">curl_close(<span class="variable">$ch</span>);</span><br></pre></td></tr></table></figure>
+<h4 id="接收端：">接收端：</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span> </span><br><span class="line">var_dump(<span class="variable">$_FILES</span>);<span class="comment">// 接收文件内容</span></span><br><span class="line">va_dump(<span class="variable">$_POST</span>);<span class="comment">// 接收type</span></span><br></pre></td></tr></table></figure>
+<h4 id="前端：">前端：</h4><p>前端可使用Form或其他Ajax方式上传。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html" data-id="ciq5wn18o001kit0rl6fy8wh0" class="article-share-link">Share</a>
+      
+        <a href="http://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/php/">php</a></li></ul>
+
+    </footer>
   </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2016/05/15/a-sample-redis-queue.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">一个简单的php+redis队列示例</div>
+    </a>
+  
+</nav>
+
+  
 </article>
-  
-  
-    </div></section>
-  
+
+
+<section id="comments">
+  <div class="ds-thread" data-thread-key="ciq5wn18o001kit0rl6fy8wh0" data-title="PHP Curl 上传文件" data-url="http://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html"></div>
+  <script>
+    var duoshuoQuery = {short_name:"qichengzx"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0] 
+       || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+</section>
 </section>
         
           <aside id="sidebar">
