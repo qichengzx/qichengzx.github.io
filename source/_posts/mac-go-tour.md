@@ -1,3 +1,10 @@
+title: Hello Go
+categories: golang
+date: 2016-09-11 17:21:03
+tags:  [go]
+
+---
+
 ##### Mac 安装 GO
 
 本人使用了Brew来安装。
