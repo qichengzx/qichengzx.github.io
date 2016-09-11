@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="http://www.qichengzx.com/"/>
-  <updated>2016-07-03T01:14:00.000Z</updated>
+  <updated>2016-09-11T08:56:20.000Z</updated>
   <id>http://www.qichengzx.com/</id>
   
   <author>
@@ -13,6 +13,45 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title></title>
+    <link href="http://www.qichengzx.com/2016/09/11/mac-go-tour.html"/>
+    <id>http://www.qichengzx.com/2016/09/11/mac-go-tour.html</id>
+    <published>2016-09-11T08:56:20.000Z</published>
+    <updated>2016-09-11T08:56:20.000Z</updated>
+    <content type="html"><![CDATA[<h5 id="Mac_安装_GO">Mac 安装 GO</h5><p>本人使用了Brew来安装。</p>
+<h5 id="安装前首先更新Brew。">安装前首先更新Brew。</h5><figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">brew </span>update &amp;&amp; <span class="keyword">brew </span>upgrade</span><br></pre></td></tr></table></figure>
+<h5 id="安装Go">安装Go</h5><p>使用brew安装go</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew <span class="operator"><span class="keyword">install</span> <span class="keyword">go</span></span></span><br></pre></td></tr></table></figure>
+<h5 id="设置$GOPATH">设置$GOPATH</h5><p>Go从1.1版本开始必须设置这个变量，也就是说通过以上方式安装后就必须要设置$GOPATH了。</p>
+<p>这个目录用来存放Go源码，可运行文件，和编译之后的包文件。</p>
+<p>Mac系统设置</p>
+<p>在bash中加入：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export GOPATH=/your/path</span><br></pre></td></tr></table></figure>
+<p>以上目录需要存在，不存在就自己手动创建一个。</p>
+<p>然后运行</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">source ~/.zshrc</span><br></pre></td></tr></table></figure>
+<p>替换成你自己使用的shell，如.bashrc等。</p>
+<p>然后，需要在/your/path目录下，新建 pkg，bin，src目录。</p>
+<p>​    src目录存放源代码，如hello.go</p>
+<p>​    pkg目录存放编译后的文件，如hello.a</p>
+<p>​    bin目录存放生成后的可执行文件</p>
+<p>src目录就是主要开发目录。如hello项目，则在src下新建hello目录。</p>
+<p>到这里，就可以开始Go之旅了。</p>
+<h5 id="Hello_Go">Hello Go</h5><p>需要注意的是，在Go中，包名和文件名是可以不同的，包名为main的时候即为可以独立运行的包。</p>
+<p>在src目录新建hello目录，创建hello.go文件。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main <span class="comment">//包名</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"fmt"</span> <span class="comment">//导入一个系统级别的fmt包</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//使用func定义函数</span></span><br><span class="line"><span class="comment">//main函数没有参数，没有返回值</span></span><br><span class="line"><span class="keyword">func</span> main() &#123;</span><br><span class="line">  fmt.Println(<span class="string">"Hello Go"</span>) <span class="comment">//调用包函数的方法为 pkgName.funcName</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>一个hello.go就写好了，在命令行输入</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">go</span> run hello.<span class="keyword">go</span></span><br></pre></td></tr></table></figure>
+<p>就可以看到输出Hello Go了。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<h5 id="Mac_安装_GO">Mac 安装 GO</h5><p>本人使用了Brew来安装。</p>
+<h5 id="安装前首先更新Brew。">安装前首先更新Brew。</h5><figure class="highlight armasm"><table><tr><td]]>
+    </summary>
+    
+  </entry>
   
   <entry>
     <title><![CDATA[PHP Curl 上传文件]]></title>
@@ -957,37 +996,6 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       <category term="node" scheme="http://www.qichengzx.com/tags/node/"/>
     
       <category term="javascript" scheme="http://www.qichengzx.com/categories/javascript/"/>
-    
-  </entry>
-  
-  <entry>
-    <title><![CDATA[MySQL命令行导出结果集到Excel]]></title>
-    <link href="http://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html"/>
-    <id>http://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html</id>
-    <published>2015-11-21T13:24:35.000Z</published>
-    <updated>2015-11-21T13:50:00.000Z</updated>
-    <content type="html"><![CDATA[<p><img src="http://7b1hhm.com1.z0.glb.clouddn.com/hexo1631785_mysql.gif" alt=""></p>
-<p>某个需求，为了简单单独建表存储，而且没有相关的后台管理方法，无法查看，或导出，但是又突然出现需要导出这个需求。</p>
-<p>所以突然想到MySQL是否带了这种直接导出到文件中的方法，查资料后发现果然有。</p>
-<p>只需要在命令行中执行如下查询即可。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> my_table <span class="keyword">INTO</span> <span class="keyword">OUTFILE</span> <span class="string">'file.csv'</span> <span class="keyword">FIELDS</span> <span class="keyword">TERMINATED</span> <span class="keyword">BY</span> <span class="string">','</span>;</span></span><br></pre></td></tr></table></figure>
-<p>有几点需要注意：</p>
-<pre><code><span class="number">0.</span>文件将在服务器上生成，所以需要需要MySQL进程有生成文件的权限。
-<span class="number">1.</span>必须为一个不存在的文件名。
-</code></pre><p>其实还有一些功能，或者说是说明，这里并没有写。</p>
-<p>官方文档：</p>
-<p><a href="http://dev.mysql.com/doc/refman/5.5/en/select-into.html" target="_blank" rel="external">13.2.9.1 SELECT … INTO Syntax</a></p>
-]]></content>
-    <summary type="html">
-    <![CDATA[<p><img src="http://7b1hhm.com1.z0.glb.clouddn.com/hexo1631785_mysql.gif" alt=""></p>
-<p>某个需求，为了简单单独建表存储，而且没有相关的后台管理方法，无法查看，或导出，但是又突然出现需要导出这]]>
-    </summary>
-    
-      <category term="excel" scheme="http://www.qichengzx.com/tags/excel/"/>
-    
-      <category term="mysql" scheme="http://www.qichengzx.com/tags/mysql/"/>
-    
-      <category term="mysql" scheme="http://www.qichengzx.com/categories/mysql/"/>
     
   </entry>
   

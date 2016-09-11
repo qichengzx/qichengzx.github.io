@@ -63,6 +63,61 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-export-results-of-mysql-to-excel" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/11/21/export-results-of-mysql-to-excel.html" class="article-date">
+  <time datetime="2015-11-21T13:24:35.000Z" itemprop="datePublished">2015-11-21</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mysql/">mysql</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/11/21/export-results-of-mysql-to-excel.html">MySQL命令行导出结果集到Excel</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="http://7b1hhm.com1.z0.glb.clouddn.com/hexo1631785_mysql.gif" alt=""></p>
+<p>某个需求，为了简单单独建表存储，而且没有相关的后台管理方法，无法查看，或导出，但是又突然出现需要导出这个需求。</p>
+<p>所以突然想到MySQL是否带了这种直接导出到文件中的方法，查资料后发现果然有。</p>
+<p>只需要在命令行中执行如下查询即可。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> my_table <span class="keyword">INTO</span> <span class="keyword">OUTFILE</span> <span class="string">'file.csv'</span> <span class="keyword">FIELDS</span> <span class="keyword">TERMINATED</span> <span class="keyword">BY</span> <span class="string">','</span>;</span></span><br></pre></td></tr></table></figure>
+<p>有几点需要注意：</p>
+<pre><code><span class="number">0.</span>文件将在服务器上生成，所以需要需要MySQL进程有生成文件的权限。
+<span class="number">1.</span>必须为一个不存在的文件名。
+</code></pre><p>其实还有一些功能，或者说是说明，这里并没有写。</p>
+<p>官方文档：</p>
+<p><a href="http://dev.mysql.com/doc/refman/5.5/en/select-into.html" target="_blank" rel="external">13.2.9.1 SELECT … INTO Syntax</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html" data-id="cisyeodqo001zyk0rv6dkgvxm" class="article-share-link">Share</a>
+      
+        <a href="http://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/excel/">excel</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-js-names" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2015/11/17/js-names.html" class="article-date">
@@ -99,7 +154,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2015/11/17/js-names.html" data-id="ciq5wn18u001sit0rwtio740z" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2015/11/17/js-names.html" data-id="cisyeodql001tyk0rc677mcke" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2015/11/17/js-names.html#comments" class="article-comment-link">Comments</a>
       
@@ -227,7 +282,7 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html" data-id="ciq5wn19b002fit0rsv9qepj8" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html" data-id="cisyeodqv002gyk0rignpjona" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html#comments" class="article-comment-link">Comments</a>
       
@@ -553,7 +608,7 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html" data-id="ciq5wn17s0001it0rzopw5zi3" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html" data-id="cisyeodpm0001yk0rgpo6l3eu" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html#comments" class="article-comment-link">Comments</a>
       
@@ -655,7 +710,7 @@ Your <span class="keyword">public</span> <span class="keyword">key</span> has be
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html" data-id="ciq5wn19u0037it0r8eefxrwi" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html" data-id="cisyeodr70038yk0rqs7zeepd" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html#comments" class="article-comment-link">Comments</a>
       
@@ -735,7 +790,7 @@ fetch(url, {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2015/11/06/React-Native-Fetch.html" data-id="ciq5wn1a0003cit0rgbwj52ei" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2015/11/06/React-Native-Fetch.html" data-id="cisyeodr9003dyk0rr1f9n7ip" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2015/11/06/React-Native-Fetch.html#comments" class="article-comment-link">Comments</a>
       
@@ -784,7 +839,7 @@ fetch(url, {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2015/11/06/hello-world.html" data-id="ciq5wn190001xit0ryloa09bi" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2015/11/06/hello-world.html" data-id="cisyeodqn001yyk0rr2uihwim" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2015/11/06/hello-world.html#comments" class="article-comment-link">Comments</a>
       
@@ -866,7 +921,7 @@ fetch(url, {
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
     </div>
   </div>
 
@@ -876,6 +931,10 @@ fetch(url, {
     <h3 class="widget-title">Recents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2016/09/11/mac-go-tour.html">(no title)</a>
+          </li>
         
           <li>
             <a href="/2016/07/02/php-post-file-with-curl.html">PHP Curl 上传文件</a>
@@ -891,10 +950,6 @@ fetch(url, {
         
           <li>
             <a href="/2016/05/03/php-rabbitmq-tutorial-six.html">PHP RabbitMQ 教程（六） - 远程调用</a>
-          </li>
-        
-          <li>
-            <a href="/2016/04/27/php-rabbitmq-tutorial-five.html">PHP RabbitMQ 教程（五） - 主题</a>
           </li>
         
       </ul>
