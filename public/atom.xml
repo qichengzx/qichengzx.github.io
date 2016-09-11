@@ -16,8 +16,8 @@
   
   <entry>
     <title><![CDATA[Hello Go]]></title>
-    <link href="http://www.qichengzx.com/2016/09/11/mac-go-tour.html"/>
-    <id>http://www.qichengzx.com/2016/09/11/mac-go-tour.html</id>
+    <link href="http://www.qichengzx.com/2016/09/11/Hello-Go.html"/>
+    <id>http://www.qichengzx.com/2016/09/11/Hello-Go.html</id>
     <published>2016-09-11T09:21:03.000Z</published>
     <updated>2016-09-11T09:21:09.000Z</updated>
     <content type="html"><![CDATA[<h5 id="Mac_安装_GO">Mac 安装 GO</h5><p>本人使用了Brew来安装。</p>
