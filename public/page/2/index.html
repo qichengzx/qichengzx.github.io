@@ -63,6 +63,107 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-php-rabbitmq-tutorial-one" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/02/28/php-rabbitmq-tutorial-one.html" class="article-date">
+  <time datetime="2016-02-28T03:10:03.000Z" itemprop="datePublished">2016-02-28</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/php/">php</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/02/28/php-rabbitmq-tutorial-one.html">PHP RabbitMQ 教程（一） - 介绍</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="准备工作">准备工作</h2><h3 id="先决条件">先决条件</h3><p>本教程先决条件是RabbitMQ已经安装并正在以5672端口运行在 localhost，如果你使用了不同的域，端口，用户，密码，连接配置需要适当改变。</p>
+<h3 id="获得帮助">获得帮助</h3><p>如果在本教程中遇到问题，可以通过邮件列表进行联系。</p>
+<h3 id="介绍">介绍</h3><p>RabbitMQ是一个消息代理，它的本质是，从producers（生产者）接收消息，然后发送给consumers（消费者），在这个过程中，可以根据自己的配置规则使用路由，缓冲区，保存消息。</p>
+<p>通常的，RabbitMQ，信息传送（messaging），使用一些专业术语。（RabbitMQ, and messaging in general, uses some jargon.）</p>
+<pre><code>&gt;生产（Producing）仅仅意味着发送，发送信息的程序叫做生产者（producers），以下图表示：
+</code></pre><p><img src="/images/rabbitmq/producer.png" alt=""></p>
+<pre><code>&gt;队列就是一个信箱的名字，存在于RabbitMQ内部，虽然消息在RabbitMQ和你的应用之间传输，但是只能存在于队列里，队列没有大小限制，它可以存储尽可能多的消息，本质上它是一个无限大的缓冲区，多个producers（生产者）可以通过一个队列发送消息，多个consumers（消费者）也可以尝试从一个队列接收消息，队列以下图表示，队列的名字在图的上边：
+</code></pre><p><img src="/images/rabbitmq/queue.png" alt="">    </p>
+<pre><code>&gt;consumers（消费者）的意思与接收相似，消费者主要是等待接收消息的程序，以下图表示：
+</code></pre><p><img src="/images/rabbitmq/consumer.png" alt="">    </p>
+<p>需要注意的是，生产者，消费者，和代理，不需要一定在一台机器上，事实上在大多数情况下他们确实不在一台机器上。</p>
+<h3 id="“Hello_World”">“Hello World”</h3><p>（使用<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">php-amqplib</a>库）</p>
+<p>在这一部分，我们使用PHP写两段程序，一个生产者发送一条消息，一个消费者接收消息并打印出来。我们会忽略一些php-amqplib API的细节，从简单的事情开始学习，这是一段内容为“Hello World”的消息。</p>
+<p>在下边的示意图中，“P”是生产者，“C”是消费者，中间的盒子是队列 — 一个RabbitMQ代表消费者的消息缓冲区。</p>
+<p><img src="/images/rabbitmq/python-one.png" alt=""></p>
+<h4 id="php-amqplib库">php-amqplib库</h4><p>RabbitMQ支持很多协议，本教程包含AMQP 0-9-1，一个开放，通用信息协议，RabbitMQ支持Python、Ruby、.NET、Java、JMS、C、PHP、ActionScript、XMPP、STOMP等多种语言（详见<a href="http://www.rabbitmq.com/devtools.html" target="_blank" rel="external">这里</a>），在本教程中我们使用php-amqplib，使用<a href="https://getcomposer.org/doc/00-intro.md" target="_blank" rel="external">Composer</a> 管理依赖。</p>
+<p>添加一个composer.json文件到你的项目目录。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    "<span class="attribute">require</span>": <span class="value">&#123;</span><br><span class="line">        "<span class="attribute">php-amqplib/php-amqplib</span>": <span class="value"><span class="string">"2.5.*"</span></span><br><span class="line">    </span>&#125;</span><br><span class="line"></span>&#125;</span><br></pre></td></tr></table></figure>
+<p>如果你已经安装了 Composer ，可以运行如下的代码：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">composer<span class="class">.phar</span> install</span><br></pre></td></tr></table></figure>
+<p>这是一个Windows系统下的Composer安装文件。</p>
+<p>现在我们已经安装了php-amqplib，可以写程序了。</p>
+<h3 id="发送">发送</h3><p><img src="/images/rabbitmq/sending.png" alt=""></p>
+<p>新建一个send.php作为发送端，receive.php作为接收端，发送端会连接RabbitMQ，发送一条信息，然后退出。</p>
+<p>在send.php中，需要引用php-amqplib库，和使用其中的一些必要的类。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">require_once</span> <span class="keyword">__DIR__</span> . <span class="string">'/vendor/autoload.php'</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Connection</span>\<span class="title">AMQPStreamConnection</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Message</span>\<span class="title">AMQPMessage</span>;</span><br></pre></td></tr></table></figure>
+<p>接下来，建立到RabbitMQ服务器的连接：</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$connection</span> = new AMQPStreamConnection(<span class="string">'localhost'</span>, <span class="number">5672</span>, <span class="string">'guest'</span>, <span class="string">'guest'</span>);</span><br><span class="line"><span class="variable">$channel</span> = <span class="variable">$connection-</span>&gt;channel();</span><br></pre></td></tr></table></figure>
+<p>这里我们使用socket进行连接，处理协议和鉴定，这样就已经连接到了本机的代理，如果想要连接不同的主机，只要更改localhost为该主机的名称或IP地址即可。</p>
+<p>下一步，建立频道，大部分API的工作都在这完成。</p>
+<p>要想发送信息，需要声明一个队列，之后可以向这个队列里发布消息。</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$channel-</span>&gt;queue_declare(<span class="string">'hello'</span>, <span class="literal">false</span>, <span class="literal">false</span>, <span class="literal">false</span>, <span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$msg</span> = new AMQPMessage(<span class="string">'Hello World!'</span>);</span><br><span class="line"><span class="variable">$channel-</span>&gt;basic_publish(<span class="variable">$msg</span>, <span class="string">''</span>, <span class="string">'hello'</span>);</span><br><span class="line"></span><br><span class="line">echo <span class="string">" [x] Sent 'Hello World!'\n"</span>;</span><br></pre></td></tr></table></figure>
+<p>声明队列是幂等的 — 它仅在不存在的时候才会被创建，如果存在也不会受影响。消息内容是一个字节数组（byte array），所以可以发送任何内容。</p>
+<p>最后，关闭频道和连接。</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$channel-</span>&gt;close();</span><br><span class="line"><span class="variable">$connection-</span>&gt;close();</span><br></pre></td></tr></table></figure>
+<p><a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/send.php" target="_blank" rel="external">这是send.php类的完整内容。</a></p>
+<h3 id="发送失败">发送失败</h3><p>如果这是第一次使用RabbitMQ，并且没有看到“Sent”信息（即“ [x] Sent ‘Hello World!”），也许你抓耳挠腮的想知道为什么出错了，也许是代理没有足够的硬盘空间（默认情况下需要至少1G的空间）导致拒绝接收信息。检查日志文件，有必要的花调低限值。<a href="http://www.rabbitmq.com/configure.html#config-items" target="_blank" rel="external">这个配置文件</a>文档将会展示给你如何设置disk_free_limit。</p>
+<h3 id="接收">接收</h3><p>收件人，与发送者只发送一条消息不同，接收者会一直运行以监听信息并输出。</p>
+<p><img src="/images/rabbitmq/receiving.png" alt=""></p>
+<p>receive.php中与send.php中的 include和use 部分的代码一样。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">require_once</span> <span class="keyword">__DIR__</span> . <span class="string">'/vendor/autoload.php'</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Connection</span>\<span class="title">AMQPStreamConnection</span>;</span><br></pre></td></tr></table></figure>
+<p>设置连接与send.php一样，打开连接和频道，命名一个队列，需要注意的是，队列名需要与send.php所发布的队列的名字一致。</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$connection</span> = new AMQPStreamConnection(<span class="string">'localhost'</span>, <span class="number">5672</span>, <span class="string">'guest'</span>, <span class="string">'guest'</span>);</span><br><span class="line"><span class="variable">$channel</span> = <span class="variable">$connection-</span>&gt;channel();</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel-</span>&gt;queue_declare(<span class="string">'hello'</span>, <span class="literal">false</span>, <span class="literal">false</span>, <span class="literal">false</span>, <span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">echo <span class="string">' [*] Waiting for messages. To exit press CTRL+C'</span>, <span class="string">"\n"</span>;</span><br></pre></td></tr></table></figure>
+<p>注意，我们在此声明了一个队列，因为有可能会在send程序开启前先开启receive程序，我们想要确保在试着接收消息之前队列就已经存在了。</p>
+<p>下一步，告诉服务器去从队列传送消息，我们会定义一个用于从服务器接收消息的函数，记住，消息会异步的从服务器发送到客户端。</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$callback</span> = <span class="keyword">function</span>(<span class="variable">$msg</span>) &#123;</span><br><span class="line">  echo <span class="string">" [x] Received "</span>, <span class="variable">$msg-</span>&gt;body, <span class="string">"\n"</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel-</span>&gt;basic_consume(<span class="string">'hello'</span>, <span class="string">''</span>, <span class="literal">false</span>, <span class="literal">true</span>, <span class="literal">false</span>, <span class="literal">false</span>, <span class="variable">$callback</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span>(count(<span class="variable">$channel-</span>&gt;callbacks)) &#123;</span><br><span class="line">    <span class="variable">$channel-</span>&gt;wait();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>此处使用while方法，当收到消息时，会把收到的消息传入到$callback方法里。</p>
+<p><a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/receive.php" target="_blank" rel="external">这是receive.php类的全部内容。</a></p>
+<p>现在我们可以运行两段脚本了，在命令行里，执行sender程序。</p>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php <span class="built_in">send</span>.php</span><br></pre></td></tr></table></figure>
+<p>然后，执行receiver程序</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">php</span> <span class="tag">receive</span><span class="class">.php</span></span><br></pre></td></tr></table></figure>
+<p>receiver程序会把通过sender程序发送的内容打印出来，receiver程序会一直运行，监听新消息（使用ctrl+c停止），所以试着运行sender程序从另一个命令行。</p>
+<p>如果想查看队列，可以运行rabbitmqctl list_queues。</p>
+<p>Hello World！</p>
+<p>查看第二部分，建立一个简单的队列。</p>
+<p>原文地址：<a href="https://www.rabbitmq.com/tutorials/tutorial-one-php.html" target="_blank" rel="external">“Hello World!”</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html" data-id="cit6nafv900189e0rmlxx2to1" class="article-share-link">Share</a>
+      
+        <a href="http://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/php/">php</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/rabbitmq/">rabbitmq</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-a-piece-of-interesting-code-of-js-for-function" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html" class="article-date">
@@ -97,7 +198,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html" data-id="cisyj3pmq0034t00rzf51itt1" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html" data-id="cit6nafw600399e0ragy6aawd" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html#comments" class="article-comment-link">Comments</a>
       
@@ -155,7 +256,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html" data-id="cisyj3pmw003jt00rvrv709p4" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html" data-id="cit6nafwe003o9e0rbrbhmhww" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html#comments" class="article-comment-link">Comments</a>
       
@@ -214,7 +315,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/02/03/MySQL实现row_number .html" data-id="cisyj3pmy003mt00r53yxzt4d" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/02/03/MySQL实现row_number .html" data-id="cit6nafwh003r9e0rrbi9o8os" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/02/03/MySQL实现row_number .html#comments" class="article-comment-link">Comments</a>
       
@@ -271,7 +372,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/01/19/echarts-pie.html" data-id="cisyj3pm80024t00rgbguotsw" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/01/19/echarts-pie.html" data-id="cit6nafvq00249e0rjeedftic" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/01/19/echarts-pie.html#comments" class="article-comment-link">Comments</a>
       
@@ -323,7 +424,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/01/11/placeholder-animate.html" data-id="cisyj3plb000dt00rc22m765c" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/01/11/placeholder-animate.html" data-id="cit6nafuw000d9e0rcq20l01h" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/01/11/placeholder-animate.html#comments" class="article-comment-link">Comments</a>
       
@@ -403,7 +504,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html" data-id="cisyj3pmk002qt00r5b5xmse9" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html" data-id="cit6nafw2002v9e0rmcexa8gg" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html#comments" class="article-comment-link">Comments</a>
       
@@ -475,7 +576,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html" data-id="cisyj3pm9002bt00rp4wtn815" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html" data-id="cit6nafvs002b9e0r67j5y4lh" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html#comments" class="article-comment-link">Comments</a>
       
@@ -561,7 +662,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html" data-id="cisyj3pl90008t00rx35t19ug" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html" data-id="cit6nafuu00089e0r2sijfy1h" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html#comments" class="article-comment-link">Comments</a>
       
@@ -619,78 +720,12 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html" data-id="cisyj3pld000kt00rbb2eei7l" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html" data-id="cit6nafuy000k9e0r35wp1k97" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html#comments" class="article-comment-link">Comments</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pdo/">pdo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/php/">php</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis/">redis</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-nodejs-mysql" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2015/12/03/nodejs-mysql.html" class="article-date">
-  <time datetime="2015-12-03T13:38:37.000Z" itemprop="datePublished">2015-12-03</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/javascript/">javascript</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2015/12/03/nodejs-mysql.html">Node.js连接MySQL并读取数据</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><img src="http://7b1hhm.com1.z0.glb.clouddn.com/hexo201312030901.jpg" alt=""></p>
-<p>文章部分代码与<a href="http://segmentfault.com/a/1190000002995355" target="_blank" rel="external">之前整理的一篇文章</a>一样。</p>
-<p>本文主要实现node连接MySQL并读取指定表的数据输出到ejs模板中。</p>
-<p>MySQL是一款非常常用的开源数据库，<a href="https://www.npmjs.com/package/mysql" target="_blank" rel="external">npm中也有MySQL的包</a>。</p>
-<p>###MySQL测试库的表结构：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> <span class="string">`news`</span>;</span></span><br><span class="line"><span class="operator"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`news`</span> (</span><br><span class="line">  <span class="string">`id`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">'0'</span>,</span><br><span class="line">  <span class="string">`title`</span> <span class="built_in">varchar</span>(<span class="number">45</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">''</span>,</span><br><span class="line">  <span class="string">`createtime`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">'0'</span>,</span><br><span class="line">  PRIMARY <span class="keyword">KEY</span> (<span class="string">`id`</span>)</span><br><span class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8;</span></span><br><span class="line"></span><br><span class="line"><span class="operator"><span class="keyword">LOCK</span> <span class="keyword">TABLES</span> <span class="string">`news`</span> WRITE;</span></span><br><span class="line"><span class="operator"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="string">`news`</span> <span class="keyword">VALUES</span> (<span class="number">1</span>,<span class="string">'news one'</span>,<span class="number">1449064787</span>),(<span class="number">2</span>,<span class="string">'news two'</span>,<span class="number">1449064790</span>),(<span class="number">3</span>,<span class="string">'news three'</span>,<span class="number">1449064900</span>);</span></span><br><span class="line"><span class="operator"><span class="keyword">UNLOCK</span> <span class="keyword">TABLES</span>;</span></span><br></pre></td></tr></table></figure>
-<h3 id="安装Node-js_MySQL包">安装Node.js MySQL包</h3><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm <span class="keyword">install</span> mysql</span><br></pre></td></tr></table></figure>
-<h3 id="server-js">server.js</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//server.js</span></span><br><span class="line"><span class="keyword">var</span> express = <span class="built_in">require</span>(<span class="string">'express'</span>);</span><br><span class="line"><span class="keyword">var</span> mysql = <span class="built_in">require</span>(<span class="string">'mysql'</span>);</span><br><span class="line"><span class="keyword">var</span> moment = <span class="built_in">require</span>(<span class="string">'moment'</span>);<span class="comment">//用来格式化UNIX时间戳</span></span><br><span class="line"><span class="keyword">var</span> app = express();</span><br></pre></td></tr></table></figure>
-<p>配置MySQL数据库</p>
-<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> connection = mysql.createConnection(&#123;</span><br><span class="line">	host:<span class="string">'localhost'</span>,</span><br><span class="line">	user:<span class="string">'root'</span>,</span><br><span class="line">	password:<span class="string">'root'</span>,</span><br><span class="line">	database:<span class="string">'node'</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<p>连接数据库，并在成功或失败时输出log</p>
-<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">connection.connect(function(<span class="keyword">err</span>)&#123;</span><br><span class="line">	<span class="keyword">if</span>(!<span class="keyword">err</span>)&#123;</span><br><span class="line">		console.<span class="literal">log</span>('Database is connected...\<span class="keyword">n</span>\<span class="keyword">n</span>');</span><br><span class="line">	&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">		console.<span class="literal">log</span>('<span class="keyword">Error</span> Connecting Database...\<span class="keyword">n</span>\<span class="keyword">n</span>');</span><br><span class="line">	&#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<p>定义表</p>
-<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> <span class="keyword">TABLE</span> = '<span class="keyword">news</span>';</span><br></pre></td></tr></table></figure>
-<p>设定模板引擎</p>
-<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">app.<span class="keyword">set</span>(<span class="string">'view engine'</span>,<span class="string">'ejs'</span>);</span><br></pre></td></tr></table></figure>
-<p>这就是很普通的路由，表示接收访问首页的请求</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">app.get(<span class="string">'/'</span>,<span class="function"><span class="keyword">function</span>(<span class="params">req,res</span>)</span>&#123;</span><br><span class="line">	<span class="comment">//定义一组数据</span></span><br><span class="line">	<span class="keyword">var</span> data = [</span><br><span class="line">					&#123; name : <span class="string">'Bloody Mary'</span> , drunkness : <span class="number">3</span> &#125;,</span><br><span class="line">					&#123; name : <span class="string">'Martini'</span> , drunkness : <span class="number">5</span> &#125;,</span><br><span class="line">					&#123; name : <span class="string">'Scotch'</span> , drunkness : <span class="number">10</span> &#125;</span><br><span class="line">				];</span><br><span class="line"></span><br><span class="line">	<span class="comment">//MySQL查询</span></span><br><span class="line">	connection.query(</span><br><span class="line">		<span class="comment">//普通的SQL</span></span><br><span class="line">		<span class="string">'select * from '</span> + TABLE,</span><br><span class="line">		<span class="comment">//查询回调</span></span><br><span class="line">		<span class="function"><span class="keyword">function</span>(<span class="params">err,results,fields</span>)</span>&#123;</span><br><span class="line">			<span class="keyword">if</span>(err)&#123;</span><br><span class="line">				<span class="comment">//输出错误</span></span><br><span class="line">				<span class="keyword">throw</span> err;</span><br><span class="line">			&#125;</span><br><span class="line">			</span><br><span class="line">			<span class="keyword">if</span>(results)&#123;</span><br><span class="line">				<span class="built_in">console</span>.log(results);</span><br><span class="line">				<span class="comment">//express render一个页面</span></span><br><span class="line">				res.render(<span class="string">'pages/index'</span>,&#123;</span><br><span class="line">					title:<span class="string">'test'</span>,</span><br><span class="line">					results:results,</span><br><span class="line">					data:data,</span><br><span class="line">					moment:moment</span><br><span class="line">				&#125;);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	)</span><br><span class="line"></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">app.listen(<span class="number">8888</span>);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'8888 is the magic port'</span>);</span><br></pre></td></tr></table></figure>
-<h3 id="index-ejs">index.ejs</h3><figure class="highlight nimrod"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">&lt;% <span class="keyword">include</span> ../partials/head %&gt;</span><br><span class="line"></span><br><span class="line">&lt;body class=<span class="string">"container"</span>&gt;</span><br><span class="line">	&lt;main&gt;</span><br><span class="line">		&lt;<span class="keyword">div</span> class=<span class="string">"jumbotron"</span>&gt;</span><br><span class="line">			&lt;h2&gt;data <span class="keyword">from</span> <span class="keyword">static</span>&lt;/h2&gt;</span><br><span class="line">			&lt;ul&gt;</span><br><span class="line">				&lt;% data.forEach(function(d) &#123; %&gt;</span><br><span class="line">				&lt;li&gt;</span><br><span class="line">					&lt;%= d.name %&gt;</span><br><span class="line">					&lt;span&gt;&lt;%= d.drunkness %&gt;&lt;/span&gt;</span><br><span class="line">				&lt;/li&gt;</span><br><span class="line">			    &lt;% &#125;); %&gt;</span><br><span class="line">			&lt;/ul&gt;</span><br><span class="line">		&lt;/<span class="keyword">div</span>&gt;</span><br><span class="line">		&lt;<span class="keyword">div</span> class=<span class="string">"jumbotron"</span>&gt;</span><br><span class="line">			&lt;h2&gt;data <span class="keyword">from</span> mysql&lt;/h2&gt;</span><br><span class="line">			&lt;ul&gt;</span><br><span class="line">				&lt;% results.forEach(function(<span class="literal">result</span>) &#123; %&gt;</span><br><span class="line">				&lt;li&gt;</span><br><span class="line">					&lt;%= <span class="literal">result</span>.id %&gt;</span><br><span class="line">					&lt;span&gt;&lt;%= <span class="literal">result</span>.title %&gt;&lt;/span&gt;</span><br><span class="line">					&lt;span&gt;&lt;%= moment(<span class="literal">result</span>.createtime*<span class="number">1000</span>).format('<span class="type">YYYY</span>-<span class="type">MM</span>-<span class="type">DD</span>, hh:mm:ss') %&gt;&lt;/span&gt;</span><br><span class="line">				&lt;/li&gt;</span><br><span class="line">			    &lt;% &#125;); %&gt;</span><br><span class="line">			&lt;/ul&gt;</span><br><span class="line">		&lt;/<span class="keyword">div</span>&gt;</span><br><span class="line">		</span><br><span class="line">	&lt;/main&gt;</span><br><span class="line"></span><br><span class="line">	&lt;footer&gt;</span><br><span class="line">		&lt;% <span class="keyword">include</span> ../partials/footer %&gt;</span><br><span class="line">	&lt;/footer&gt;</span><br><span class="line">	</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-<p>至此，就可以正常输出从数据库里读取出来的数据了。</p>
-<p><strong>小插曲</strong></p>
-<p>之前在练习的时候，require MySQL 之后npm install 只安装了require的几个包，昨天再写的时候装了一大堆。<br>另外之前在使用moment的时候并没有在render页面的时候传入moment，直接就可以用了，昨天也报错了。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2015/12/03/nodejs-mysql.html" data-id="cisyj3plx001nt00ruwl3di82" class="article-share-link">Share</a>
-      
-        <a href="http://www.qichengzx.com/2015/12/03/nodejs-mysql.html#comments" class="article-comment-link">Comments</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/node/">node</a></li></ul>
 
     </footer>
   </div>
@@ -742,7 +777,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">9</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">9</span></li></ul>
     </div>
   </div>
 
@@ -751,7 +786,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -760,7 +795,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/dropbox/" style="font-size: 12.5px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/go/" style="font-size: 10px;">go</a> <a href="/tags/hexo/" style="font-size: 15px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 15px;">javascript</a> <a href="/tags/js/" style="font-size: 12.5px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 17.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 17.5px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redis/" style="font-size: 12.5px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
+      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/dropbox/" style="font-size: 12.5px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/go/" style="font-size: 12.5px;">go</a> <a href="/tags/hexo/" style="font-size: 15px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 15px;">javascript</a> <a href="/tags/js/" style="font-size: 12.5px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 17.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 17.5px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redis/" style="font-size: 12.5px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
     </div>
   </div>
 
@@ -769,7 +804,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
     </div>
   </div>
 
@@ -779,6 +814,10 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
     <h3 class="widget-title">Recents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2016/09/16/convert-xml-to-json-in-golang.html">Golang XMl 转 JSON</a>
+          </li>
         
           <li>
             <a href="/2016/09/11/Hello-Go.html">Hello Go</a>
@@ -794,10 +833,6 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
         
           <li>
             <a href="/2016/05/08/cant-post-iqiyi-video-to-discuz.html">解决Discuz无法发布爱奇艺视频的问题</a>
-          </li>
-        
-          <li>
-            <a href="/2016/05/03/php-rabbitmq-tutorial-six.html">PHP RabbitMQ 教程（六） - 远程调用</a>
           </li>
         
       </ul>

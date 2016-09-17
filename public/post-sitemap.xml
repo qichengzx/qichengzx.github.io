@@ -7,6 +7,14 @@
     </url>
 
     <url>
+        <loc>http://www.qichengzx.com/2016/09/16/convert-xml-to-json-in-golang.html</loc>
+        <lastmod>2016-09-17T03:39:08.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>http://www.qichengzx.com/2016/09/11/Hello-Go.html</loc>
         <lastmod>2016-09-11T09:21:09.000Z</lastmod>
         <changefreq>weekly</changefreq>

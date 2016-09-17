@@ -63,6 +63,76 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-convert-xml-to-json-in-golang" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/09/16/convert-xml-to-json-in-golang.html" class="article-date">
+  <time datetime="2016-09-16T03:28:20.000Z" itemprop="datePublished">2016-09-16</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/golang/">golang</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/09/16/convert-xml-to-json-in-golang.html">Golang XMl 转 JSON</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="/images/golang.png" alt=""></p>
+<h4 id="起因">起因</h4><p>某个上古时代的API，依然在返回XML格式的数据，更奇葩的是，GBK格式的。</p>
+<p>用Go顺利的写到了发送数据，接收数据，然后取值有点麻烦啊。。。。</p>
+<p>各种Google后，终于解决，但是不保证是唯一，正确，最合适的答案。</p>
+<h4 id="说在前边">说在前边</h4><p>本文假设要解析的XMl数据为：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="pi">&lt;?xml version="1.0" encoding="GBK" ?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">response</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">status</span>&gt;</span>200<span class="tag">&lt;/<span class="title">status</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">response</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>要解决的问题是取出“200”这个状态值。</p>
+<h4 id="导入包">导入包</h4><p>解析XML使用了”encoding/xml”这个包。</p>
+<p>所以先导入这个包。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">"encoding/xml"</span></span><br></pre></td></tr></table></figure>
+<h4 id="定义struct">定义struct</h4><p>定义一个自定义类型的Response</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Response <span class="keyword">struct</span> &#123;</span><br><span class="line">    Status <span class="typename">int</span> <span class="string">`xml:"status" json:"status"`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>定义一个Response类型的变量</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> result Response</span><br></pre></td></tr></table></figure>
+<h4 id="偷懒转格式">偷懒转格式</h4><p>因为”encoding/xml”不支持GBK格式的XML，而返回的内容又固定标明了编码是GBK，所以这里偷懒，直接把GBK替换成UTF-8，本例中不影响结果。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">xmlstr := <span class="string">`?xml version="1.0" encoding="GBK" ?&gt;</span><br><span class="line">&lt;response&gt;</span><br><span class="line">    &lt;status&gt;200&lt;/status&gt;</span><br><span class="line">&lt;/response&gt;</span><br><span class="line">`</span></span><br><span class="line">xmlstr = strings.Replace(xmlstr, <span class="string">"GBK"</span>, <span class="string">"UTF-8"</span>, -<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+<p>使用strings包，替换“GBK”，相信根据参数顺序能看出各个参数的意义，最后一个参数：-1，为替换全部，即字符串中所有出现的第二个参数全部替换。</p>
+<h4 id="解析，转换，取值">解析，转换，取值</h4><p>使用encoding/jon，go-simplejson包</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//解析XML</span></span><br><span class="line">err := xml.Unmarshal([]<span class="typename">byte</span>(xmlstr), &amp;result)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="constant">nil</span> != err &#123;</span><br><span class="line">  log.Fatal(err)</span><br><span class="line">&#125;</span><br><span class="line">log.Printf(<span class="string">"XML:%v \n"</span>, result) </span><br><span class="line"></span><br><span class="line"><span class="comment">//转换成JSON</span></span><br><span class="line">res, err := json.Marshal(result)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="constant">nil</span> != err &#123;</span><br><span class="line">  log.Fatal(err)</span><br><span class="line">&#125;</span><br><span class="line">log.Printf(<span class="string">"JSON:%s \n"</span>, res)</span><br><span class="line"></span><br><span class="line">js, err := simplejson.NewJson([]<span class="typename">byte</span>(res))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="constant">nil</span> != err &#123;</span><br><span class="line">  log.Fatal(err)</span><br><span class="line">&#125;</span><br><span class="line">status, err := js.Get(<span class="string">"status"</span>).Int()</span><br><span class="line"></span><br><span class="line">log.Printf(<span class="string">"STATUS:%v \n"</span>, status)</span><br></pre></td></tr></table></figure>
+<p>以上是本人在处理XML 转 JSON 时的解决办法，应该还有更简单更合适的方案。仅供参考。</p>
+<h4 id="完整代码：">完整代码：</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"encoding/xml"</span></span><br><span class="line">    <span class="string">"encoding/json"</span></span><br><span class="line">    <span class="string">"log"</span></span><br><span class="line">    <span class="string">"strings"</span></span><br><span class="line">    simplejson <span class="string">"github.com/bitly/go-simplejson"</span></span><br><span class="line">)</span><br><span class="line"><span class="keyword">type</span> Response <span class="keyword">struct</span> &#123;</span><br><span class="line">    Status <span class="typename">int</span> <span class="string">`xml:"status" json:"status"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">func</span> main() &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">var</span> result Response</span><br><span class="line"></span><br><span class="line">    <span class="comment">//多行字符串，使用反引号`</span></span><br><span class="line">    xmlstr := <span class="string">`&lt;?xml version="1.0" encoding="GBK" ?&gt;</span><br><span class="line">&lt;response&gt;</span><br><span class="line">    &lt;status&gt;200&lt;/status&gt;</span><br><span class="line">&lt;/response&gt;`</span></span><br><span class="line"></span><br><span class="line">    xmlstr = strings.Replace(xmlstr, <span class="string">"GBK"</span>, <span class="string">"UTF-8"</span>, -<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">    err := xml.Unmarshal([]<span class="typename">byte</span>(xmlstr), &amp;result)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="constant">nil</span> &#123;</span><br><span class="line">        log.Fatal(err)</span><br><span class="line">    &#125;</span><br><span class="line">    log.Printf(<span class="string">"XML:%v"</span>,result)</span><br><span class="line"></span><br><span class="line">    r, err := json.Marshal(result)</span><br><span class="line">    <span class="keyword">if</span> <span class="constant">nil</span> != err &#123;</span><br><span class="line">        log.Fatal(err)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    log.Printf(<span class="string">"JSON:%s"</span>, r)</span><br><span class="line"></span><br><span class="line">    js, err := simplejson.NewJson([]<span class="typename">byte</span>(r))</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> <span class="constant">nil</span> != err &#123;</span><br><span class="line">        log.Fatal(err)</span><br><span class="line">    &#125;</span><br><span class="line">    status, err := js.Get(<span class="string">"status"</span>).Int()</span><br><span class="line">    log.Printf(<span class="string">"VALUE:%v"</span>,status)</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>参考文章：</p>
+<p><a href="http://blog.studygolang.com/2012/12/%e6%a0%87%e5%87%86%e5%ba%93-xml%e5%a4%84%e7%90%86%ef%bc%88%e4%b8%80%ef%bc%89/" target="_blank" rel="external">标准库—XML处理（一）</a></p>
+<p><a href="https://play.golang.org/p/7HNLEUnX-m" target="_blank" rel="external">https://play.golang.org/p/7HNLEUnX-m</a></p>
+<p><a href="https://play.golang.org/p/m99B12RaLe" target="_blank" rel="external">https://play.golang.org/p/m99B12RaLe</a></p>
+<p><a href="https://astaxie.gitbooks.io/build-web-application-with-golang/content/zh/07.1.html" target="_blank" rel="external">XML处理</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.qichengzx.com/2016/09/16/convert-xml-to-json-in-golang.html" data-id="cit6nafvy002i9e0rmnreledb" class="article-share-link">Share</a>
+      
+        <a href="http://www.qichengzx.com/2016/09/16/convert-xml-to-json-in-golang.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Hello-Go" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2016/09/11/Hello-Go.html" class="article-date">
@@ -118,7 +188,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/09/11/Hello-Go.html" data-id="cisyj3pn1003pt00rtmmcejzc" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/09/11/Hello-Go.html" data-id="cit6nafwl003u9e0rf1873k4r" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/09/11/Hello-Go.html#comments" class="article-comment-link">Comments</a>
       
@@ -168,7 +238,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html" data-id="cisyj3plv001kt00r683522lk" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html" data-id="cit6nafvf001k9e0rpfgcwnzj" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html#comments" class="article-comment-link">Comments</a>
       
@@ -232,7 +302,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html" data-id="cisyj3pmn002yt00rjpct2xo5" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html" data-id="cit6nafw400339e0r4c7ks2fd" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html#comments" class="article-comment-link">Comments</a>
       
@@ -290,7 +360,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html" data-id="cisyj3pmf002it00rrsvz1lbc" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html" data-id="cit6nafw0002n9e0r2yr5hwgb" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html#comments" class="article-comment-link">Comments</a>
       
@@ -388,7 +458,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html" data-id="cisyj3pln0014t00re8c4z1r2" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html" data-id="cit6nafv700149e0rtgs8v132" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html#comments" class="article-comment-link">Comments</a>
       
@@ -479,7 +549,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html" data-id="cisyj3plt001gt00r2tme4p1r" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html" data-id="cit6nafvd001g9e0r3xs2eeng" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html#comments" class="article-comment-link">Comments</a>
       
@@ -562,7 +632,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html" data-id="cisyj3pls001ct00rvy2mtnqx" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html" data-id="cit6nafvb001c9e0rzg7y9cdu" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html#comments" class="article-comment-link">Comments</a>
       
@@ -665,7 +735,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html" data-id="cisyj3plk0010t00r367e68k3" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html" data-id="cit6nafv500109e0rc43ogxeh" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html#comments" class="article-comment-link">Comments</a>
       
@@ -773,110 +843,9 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html" data-id="cisyj3plg000vt00rosw61ozt" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html" data-id="cit6nafv1000v9e0rp7drxpda" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html#comments" class="article-comment-link">Comments</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/php/">php</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/rabbitmq/">rabbitmq</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-php-rabbitmq-tutorial-one" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2016/02/28/php-rabbitmq-tutorial-one.html" class="article-date">
-  <time datetime="2016-02-28T03:10:03.000Z" itemprop="datePublished">2016-02-28</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/php/">php</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/02/28/php-rabbitmq-tutorial-one.html">PHP RabbitMQ 教程（一） - 介绍</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="准备工作">准备工作</h2><h3 id="先决条件">先决条件</h3><p>本教程先决条件是RabbitMQ已经安装并正在以5672端口运行在 localhost，如果你使用了不同的域，端口，用户，密码，连接配置需要适当改变。</p>
-<h3 id="获得帮助">获得帮助</h3><p>如果在本教程中遇到问题，可以通过邮件列表进行联系。</p>
-<h3 id="介绍">介绍</h3><p>RabbitMQ是一个消息代理，它的本质是，从producers（生产者）接收消息，然后发送给consumers（消费者），在这个过程中，可以根据自己的配置规则使用路由，缓冲区，保存消息。</p>
-<p>通常的，RabbitMQ，信息传送（messaging），使用一些专业术语。（RabbitMQ, and messaging in general, uses some jargon.）</p>
-<pre><code>&gt;生产（Producing）仅仅意味着发送，发送信息的程序叫做生产者（producers），以下图表示：
-</code></pre><p><img src="/images/rabbitmq/producer.png" alt=""></p>
-<pre><code>&gt;队列就是一个信箱的名字，存在于RabbitMQ内部，虽然消息在RabbitMQ和你的应用之间传输，但是只能存在于队列里，队列没有大小限制，它可以存储尽可能多的消息，本质上它是一个无限大的缓冲区，多个producers（生产者）可以通过一个队列发送消息，多个consumers（消费者）也可以尝试从一个队列接收消息，队列以下图表示，队列的名字在图的上边：
-</code></pre><p><img src="/images/rabbitmq/queue.png" alt="">    </p>
-<pre><code>&gt;consumers（消费者）的意思与接收相似，消费者主要是等待接收消息的程序，以下图表示：
-</code></pre><p><img src="/images/rabbitmq/consumer.png" alt="">    </p>
-<p>需要注意的是，生产者，消费者，和代理，不需要一定在一台机器上，事实上在大多数情况下他们确实不在一台机器上。</p>
-<h3 id="“Hello_World”">“Hello World”</h3><p>（使用<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">php-amqplib</a>库）</p>
-<p>在这一部分，我们使用PHP写两段程序，一个生产者发送一条消息，一个消费者接收消息并打印出来。我们会忽略一些php-amqplib API的细节，从简单的事情开始学习，这是一段内容为“Hello World”的消息。</p>
-<p>在下边的示意图中，“P”是生产者，“C”是消费者，中间的盒子是队列 — 一个RabbitMQ代表消费者的消息缓冲区。</p>
-<p><img src="/images/rabbitmq/python-one.png" alt=""></p>
-<h4 id="php-amqplib库">php-amqplib库</h4><p>RabbitMQ支持很多协议，本教程包含AMQP 0-9-1，一个开放，通用信息协议，RabbitMQ支持Python、Ruby、.NET、Java、JMS、C、PHP、ActionScript、XMPP、STOMP等多种语言（详见<a href="http://www.rabbitmq.com/devtools.html" target="_blank" rel="external">这里</a>），在本教程中我们使用php-amqplib，使用<a href="https://getcomposer.org/doc/00-intro.md" target="_blank" rel="external">Composer</a> 管理依赖。</p>
-<p>添加一个composer.json文件到你的项目目录。</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    "<span class="attribute">require</span>": <span class="value">&#123;</span><br><span class="line">        "<span class="attribute">php-amqplib/php-amqplib</span>": <span class="value"><span class="string">"2.5.*"</span></span><br><span class="line">    </span>&#125;</span><br><span class="line"></span>&#125;</span><br></pre></td></tr></table></figure>
-<p>如果你已经安装了 Composer ，可以运行如下的代码：</p>
-<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">composer<span class="class">.phar</span> install</span><br></pre></td></tr></table></figure>
-<p>这是一个Windows系统下的Composer安装文件。</p>
-<p>现在我们已经安装了php-amqplib，可以写程序了。</p>
-<h3 id="发送">发送</h3><p><img src="/images/rabbitmq/sending.png" alt=""></p>
-<p>新建一个send.php作为发送端，receive.php作为接收端，发送端会连接RabbitMQ，发送一条信息，然后退出。</p>
-<p>在send.php中，需要引用php-amqplib库，和使用其中的一些必要的类。</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">require_once</span> <span class="keyword">__DIR__</span> . <span class="string">'/vendor/autoload.php'</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Connection</span>\<span class="title">AMQPStreamConnection</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Message</span>\<span class="title">AMQPMessage</span>;</span><br></pre></td></tr></table></figure>
-<p>接下来，建立到RabbitMQ服务器的连接：</p>
-<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$connection</span> = new AMQPStreamConnection(<span class="string">'localhost'</span>, <span class="number">5672</span>, <span class="string">'guest'</span>, <span class="string">'guest'</span>);</span><br><span class="line"><span class="variable">$channel</span> = <span class="variable">$connection-</span>&gt;channel();</span><br></pre></td></tr></table></figure>
-<p>这里我们使用socket进行连接，处理协议和鉴定，这样就已经连接到了本机的代理，如果想要连接不同的主机，只要更改localhost为该主机的名称或IP地址即可。</p>
-<p>下一步，建立频道，大部分API的工作都在这完成。</p>
-<p>要想发送信息，需要声明一个队列，之后可以向这个队列里发布消息。</p>
-<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$channel-</span>&gt;queue_declare(<span class="string">'hello'</span>, <span class="literal">false</span>, <span class="literal">false</span>, <span class="literal">false</span>, <span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$msg</span> = new AMQPMessage(<span class="string">'Hello World!'</span>);</span><br><span class="line"><span class="variable">$channel-</span>&gt;basic_publish(<span class="variable">$msg</span>, <span class="string">''</span>, <span class="string">'hello'</span>);</span><br><span class="line"></span><br><span class="line">echo <span class="string">" [x] Sent 'Hello World!'\n"</span>;</span><br></pre></td></tr></table></figure>
-<p>声明队列是幂等的 — 它仅在不存在的时候才会被创建，如果存在也不会受影响。消息内容是一个字节数组（byte array），所以可以发送任何内容。</p>
-<p>最后，关闭频道和连接。</p>
-<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$channel-</span>&gt;close();</span><br><span class="line"><span class="variable">$connection-</span>&gt;close();</span><br></pre></td></tr></table></figure>
-<p><a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/send.php" target="_blank" rel="external">这是send.php类的完整内容。</a></p>
-<h3 id="发送失败">发送失败</h3><p>如果这是第一次使用RabbitMQ，并且没有看到“Sent”信息（即“ [x] Sent ‘Hello World!”），也许你抓耳挠腮的想知道为什么出错了，也许是代理没有足够的硬盘空间（默认情况下需要至少1G的空间）导致拒绝接收信息。检查日志文件，有必要的花调低限值。<a href="http://www.rabbitmq.com/configure.html#config-items" target="_blank" rel="external">这个配置文件</a>文档将会展示给你如何设置disk_free_limit。</p>
-<h3 id="接收">接收</h3><p>收件人，与发送者只发送一条消息不同，接收者会一直运行以监听信息并输出。</p>
-<p><img src="/images/rabbitmq/receiving.png" alt=""></p>
-<p>receive.php中与send.php中的 include和use 部分的代码一样。</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">require_once</span> <span class="keyword">__DIR__</span> . <span class="string">'/vendor/autoload.php'</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Connection</span>\<span class="title">AMQPStreamConnection</span>;</span><br></pre></td></tr></table></figure>
-<p>设置连接与send.php一样，打开连接和频道，命名一个队列，需要注意的是，队列名需要与send.php所发布的队列的名字一致。</p>
-<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$connection</span> = new AMQPStreamConnection(<span class="string">'localhost'</span>, <span class="number">5672</span>, <span class="string">'guest'</span>, <span class="string">'guest'</span>);</span><br><span class="line"><span class="variable">$channel</span> = <span class="variable">$connection-</span>&gt;channel();</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel-</span>&gt;queue_declare(<span class="string">'hello'</span>, <span class="literal">false</span>, <span class="literal">false</span>, <span class="literal">false</span>, <span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">echo <span class="string">' [*] Waiting for messages. To exit press CTRL+C'</span>, <span class="string">"\n"</span>;</span><br></pre></td></tr></table></figure>
-<p>注意，我们在此声明了一个队列，因为有可能会在send程序开启前先开启receive程序，我们想要确保在试着接收消息之前队列就已经存在了。</p>
-<p>下一步，告诉服务器去从队列传送消息，我们会定义一个用于从服务器接收消息的函数，记住，消息会异步的从服务器发送到客户端。</p>
-<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$callback</span> = <span class="keyword">function</span>(<span class="variable">$msg</span>) &#123;</span><br><span class="line">  echo <span class="string">" [x] Received "</span>, <span class="variable">$msg-</span>&gt;body, <span class="string">"\n"</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel-</span>&gt;basic_consume(<span class="string">'hello'</span>, <span class="string">''</span>, <span class="literal">false</span>, <span class="literal">true</span>, <span class="literal">false</span>, <span class="literal">false</span>, <span class="variable">$callback</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span>(count(<span class="variable">$channel-</span>&gt;callbacks)) &#123;</span><br><span class="line">    <span class="variable">$channel-</span>&gt;wait();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>此处使用while方法，当收到消息时，会把收到的消息传入到$callback方法里。</p>
-<p><a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/receive.php" target="_blank" rel="external">这是receive.php类的全部内容。</a></p>
-<p>现在我们可以运行两段脚本了，在命令行里，执行sender程序。</p>
-<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php <span class="built_in">send</span>.php</span><br></pre></td></tr></table></figure>
-<p>然后，执行receiver程序</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">php</span> <span class="tag">receive</span><span class="class">.php</span></span><br></pre></td></tr></table></figure>
-<p>receiver程序会把通过sender程序发送的内容打印出来，receiver程序会一直运行，监听新消息（使用ctrl+c停止），所以试着运行sender程序从另一个命令行。</p>
-<p>如果想查看队列，可以运行rabbitmqctl list_queues。</p>
-<p>Hello World！</p>
-<p>查看第二部分，建立一个简单的队列。</p>
-<p>原文地址：<a href="https://www.rabbitmq.com/tutorials/tutorial-one-php.html" target="_blank" rel="external">“Hello World!”</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html" data-id="cisyj3plq0018t00roomug3qw" class="article-share-link">Share</a>
-      
-        <a href="http://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html#comments" class="article-comment-link">Comments</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/php/">php</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/rabbitmq/">rabbitmq</a></li></ul>
@@ -931,7 +900,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">9</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">9</span></li></ul>
     </div>
   </div>
 
@@ -940,7 +909,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -949,7 +918,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/dropbox/" style="font-size: 12.5px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/go/" style="font-size: 10px;">go</a> <a href="/tags/hexo/" style="font-size: 15px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 15px;">javascript</a> <a href="/tags/js/" style="font-size: 12.5px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 17.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 17.5px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redis/" style="font-size: 12.5px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
+      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/dropbox/" style="font-size: 12.5px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/go/" style="font-size: 12.5px;">go</a> <a href="/tags/hexo/" style="font-size: 15px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 15px;">javascript</a> <a href="/tags/js/" style="font-size: 12.5px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 17.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 17.5px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redis/" style="font-size: 12.5px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
     </div>
   </div>
 
@@ -958,7 +927,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
     </div>
   </div>
 
@@ -968,6 +937,10 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <h3 class="widget-title">Recents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2016/09/16/convert-xml-to-json-in-golang.html">Golang XMl 转 JSON</a>
+          </li>
         
           <li>
             <a href="/2016/09/11/Hello-Go.html">Hello Go</a>
@@ -983,10 +956,6 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
         
           <li>
             <a href="/2016/05/08/cant-post-iqiyi-video-to-discuz.html">解决Discuz无法发布爱奇艺视频的问题</a>
-          </li>
-        
-          <li>
-            <a href="/2016/05/03/php-rabbitmq-tutorial-six.html">PHP RabbitMQ 教程（六） - 远程调用</a>
           </li>
         
       </ul>

@@ -63,6 +63,72 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-nodejs-mysql" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/12/03/nodejs-mysql.html" class="article-date">
+  <time datetime="2015-12-03T13:38:37.000Z" itemprop="datePublished">2015-12-03</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/javascript/">javascript</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/12/03/nodejs-mysql.html">Node.js连接MySQL并读取数据</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="http://7b1hhm.com1.z0.glb.clouddn.com/hexo201312030901.jpg" alt=""></p>
+<p>文章部分代码与<a href="http://segmentfault.com/a/1190000002995355" target="_blank" rel="external">之前整理的一篇文章</a>一样。</p>
+<p>本文主要实现node连接MySQL并读取指定表的数据输出到ejs模板中。</p>
+<p>MySQL是一款非常常用的开源数据库，<a href="https://www.npmjs.com/package/mysql" target="_blank" rel="external">npm中也有MySQL的包</a>。</p>
+<p>###MySQL测试库的表结构：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> <span class="string">`news`</span>;</span></span><br><span class="line"><span class="operator"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`news`</span> (</span><br><span class="line">  <span class="string">`id`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">'0'</span>,</span><br><span class="line">  <span class="string">`title`</span> <span class="built_in">varchar</span>(<span class="number">45</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">''</span>,</span><br><span class="line">  <span class="string">`createtime`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">'0'</span>,</span><br><span class="line">  PRIMARY <span class="keyword">KEY</span> (<span class="string">`id`</span>)</span><br><span class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8;</span></span><br><span class="line"></span><br><span class="line"><span class="operator"><span class="keyword">LOCK</span> <span class="keyword">TABLES</span> <span class="string">`news`</span> WRITE;</span></span><br><span class="line"><span class="operator"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="string">`news`</span> <span class="keyword">VALUES</span> (<span class="number">1</span>,<span class="string">'news one'</span>,<span class="number">1449064787</span>),(<span class="number">2</span>,<span class="string">'news two'</span>,<span class="number">1449064790</span>),(<span class="number">3</span>,<span class="string">'news three'</span>,<span class="number">1449064900</span>);</span></span><br><span class="line"><span class="operator"><span class="keyword">UNLOCK</span> <span class="keyword">TABLES</span>;</span></span><br></pre></td></tr></table></figure>
+<h3 id="安装Node-js_MySQL包">安装Node.js MySQL包</h3><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm <span class="keyword">install</span> mysql</span><br></pre></td></tr></table></figure>
+<h3 id="server-js">server.js</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//server.js</span></span><br><span class="line"><span class="keyword">var</span> express = <span class="built_in">require</span>(<span class="string">'express'</span>);</span><br><span class="line"><span class="keyword">var</span> mysql = <span class="built_in">require</span>(<span class="string">'mysql'</span>);</span><br><span class="line"><span class="keyword">var</span> moment = <span class="built_in">require</span>(<span class="string">'moment'</span>);<span class="comment">//用来格式化UNIX时间戳</span></span><br><span class="line"><span class="keyword">var</span> app = express();</span><br></pre></td></tr></table></figure>
+<p>配置MySQL数据库</p>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> connection = mysql.createConnection(&#123;</span><br><span class="line">	host:<span class="string">'localhost'</span>,</span><br><span class="line">	user:<span class="string">'root'</span>,</span><br><span class="line">	password:<span class="string">'root'</span>,</span><br><span class="line">	database:<span class="string">'node'</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>连接数据库，并在成功或失败时输出log</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">connection.connect(function(<span class="keyword">err</span>)&#123;</span><br><span class="line">	<span class="keyword">if</span>(!<span class="keyword">err</span>)&#123;</span><br><span class="line">		console.<span class="literal">log</span>('Database is connected...\<span class="keyword">n</span>\<span class="keyword">n</span>');</span><br><span class="line">	&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">		console.<span class="literal">log</span>('<span class="keyword">Error</span> Connecting Database...\<span class="keyword">n</span>\<span class="keyword">n</span>');</span><br><span class="line">	&#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>定义表</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> <span class="keyword">TABLE</span> = '<span class="keyword">news</span>';</span><br></pre></td></tr></table></figure>
+<p>设定模板引擎</p>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">app.<span class="keyword">set</span>(<span class="string">'view engine'</span>,<span class="string">'ejs'</span>);</span><br></pre></td></tr></table></figure>
+<p>这就是很普通的路由，表示接收访问首页的请求</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">app.get(<span class="string">'/'</span>,<span class="function"><span class="keyword">function</span>(<span class="params">req,res</span>)</span>&#123;</span><br><span class="line">	<span class="comment">//定义一组数据</span></span><br><span class="line">	<span class="keyword">var</span> data = [</span><br><span class="line">					&#123; name : <span class="string">'Bloody Mary'</span> , drunkness : <span class="number">3</span> &#125;,</span><br><span class="line">					&#123; name : <span class="string">'Martini'</span> , drunkness : <span class="number">5</span> &#125;,</span><br><span class="line">					&#123; name : <span class="string">'Scotch'</span> , drunkness : <span class="number">10</span> &#125;</span><br><span class="line">				];</span><br><span class="line"></span><br><span class="line">	<span class="comment">//MySQL查询</span></span><br><span class="line">	connection.query(</span><br><span class="line">		<span class="comment">//普通的SQL</span></span><br><span class="line">		<span class="string">'select * from '</span> + TABLE,</span><br><span class="line">		<span class="comment">//查询回调</span></span><br><span class="line">		<span class="function"><span class="keyword">function</span>(<span class="params">err,results,fields</span>)</span>&#123;</span><br><span class="line">			<span class="keyword">if</span>(err)&#123;</span><br><span class="line">				<span class="comment">//输出错误</span></span><br><span class="line">				<span class="keyword">throw</span> err;</span><br><span class="line">			&#125;</span><br><span class="line">			</span><br><span class="line">			<span class="keyword">if</span>(results)&#123;</span><br><span class="line">				<span class="built_in">console</span>.log(results);</span><br><span class="line">				<span class="comment">//express render一个页面</span></span><br><span class="line">				res.render(<span class="string">'pages/index'</span>,&#123;</span><br><span class="line">					title:<span class="string">'test'</span>,</span><br><span class="line">					results:results,</span><br><span class="line">					data:data,</span><br><span class="line">					moment:moment</span><br><span class="line">				&#125;);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	)</span><br><span class="line"></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">app.listen(<span class="number">8888</span>);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'8888 is the magic port'</span>);</span><br></pre></td></tr></table></figure>
+<h3 id="index-ejs">index.ejs</h3><figure class="highlight nimrod"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">&lt;% <span class="keyword">include</span> ../partials/head %&gt;</span><br><span class="line"></span><br><span class="line">&lt;body class=<span class="string">"container"</span>&gt;</span><br><span class="line">	&lt;main&gt;</span><br><span class="line">		&lt;<span class="keyword">div</span> class=<span class="string">"jumbotron"</span>&gt;</span><br><span class="line">			&lt;h2&gt;data <span class="keyword">from</span> <span class="keyword">static</span>&lt;/h2&gt;</span><br><span class="line">			&lt;ul&gt;</span><br><span class="line">				&lt;% data.forEach(function(d) &#123; %&gt;</span><br><span class="line">				&lt;li&gt;</span><br><span class="line">					&lt;%= d.name %&gt;</span><br><span class="line">					&lt;span&gt;&lt;%= d.drunkness %&gt;&lt;/span&gt;</span><br><span class="line">				&lt;/li&gt;</span><br><span class="line">			    &lt;% &#125;); %&gt;</span><br><span class="line">			&lt;/ul&gt;</span><br><span class="line">		&lt;/<span class="keyword">div</span>&gt;</span><br><span class="line">		&lt;<span class="keyword">div</span> class=<span class="string">"jumbotron"</span>&gt;</span><br><span class="line">			&lt;h2&gt;data <span class="keyword">from</span> mysql&lt;/h2&gt;</span><br><span class="line">			&lt;ul&gt;</span><br><span class="line">				&lt;% results.forEach(function(<span class="literal">result</span>) &#123; %&gt;</span><br><span class="line">				&lt;li&gt;</span><br><span class="line">					&lt;%= <span class="literal">result</span>.id %&gt;</span><br><span class="line">					&lt;span&gt;&lt;%= <span class="literal">result</span>.title %&gt;&lt;/span&gt;</span><br><span class="line">					&lt;span&gt;&lt;%= moment(<span class="literal">result</span>.createtime*<span class="number">1000</span>).format('<span class="type">YYYY</span>-<span class="type">MM</span>-<span class="type">DD</span>, hh:mm:ss') %&gt;&lt;/span&gt;</span><br><span class="line">				&lt;/li&gt;</span><br><span class="line">			    &lt;% &#125;); %&gt;</span><br><span class="line">			&lt;/ul&gt;</span><br><span class="line">		&lt;/<span class="keyword">div</span>&gt;</span><br><span class="line">		</span><br><span class="line">	&lt;/main&gt;</span><br><span class="line"></span><br><span class="line">	&lt;footer&gt;</span><br><span class="line">		&lt;% <span class="keyword">include</span> ../partials/footer %&gt;</span><br><span class="line">	&lt;/footer&gt;</span><br><span class="line">	</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<p>至此，就可以正常输出从数据库里读取出来的数据了。</p>
+<p><strong>小插曲</strong></p>
+<p>之前在练习的时候，require MySQL 之后npm install 只安装了require的几个包，昨天再写的时候装了一大堆。<br>另外之前在使用moment的时候并没有在render页面的时候传入moment，直接就可以用了，昨天也报错了。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.qichengzx.com/2015/12/03/nodejs-mysql.html" data-id="cit6nafvg001n9e0rlvgnznix" class="article-share-link">Share</a>
+      
+        <a href="http://www.qichengzx.com/2015/12/03/nodejs-mysql.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/node/">node</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-export-results-of-mysql-to-excel" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2015/11/21/export-results-of-mysql-to-excel.html" class="article-date">
@@ -104,7 +170,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html" data-id="cisyj3pm6001yt00rj3ddmzl9" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html" data-id="cit6nafvp001y9e0rfexzyvdm" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html#comments" class="article-comment-link">Comments</a>
       
@@ -154,7 +220,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2015/11/17/js-names.html" data-id="cisyj3plz001st00r7ibg605s" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2015/11/17/js-names.html" data-id="cit6nafvj001s9e0remchx6o0" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2015/11/17/js-names.html#comments" class="article-comment-link">Comments</a>
       
@@ -282,7 +348,7 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html" data-id="cisyj3pmd002ft00rw3gudfbn" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html" data-id="cit6nafvw002f9e0reyq4oluc" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html#comments" class="article-comment-link">Comments</a>
       
@@ -608,7 +674,7 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html" data-id="cisyj3pl00001t00rsfwf6ie5" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html" data-id="cit6nafum00019e0r0m5cf6wf" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html#comments" class="article-comment-link">Comments</a>
       
@@ -710,7 +776,7 @@ Your <span class="keyword">public</span> <span class="keyword">key</span> has be
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html" data-id="cisyj3pms0037t00rwpnwpzqc" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html" data-id="cit6nafw8003c9e0rrogv2rec" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html#comments" class="article-comment-link">Comments</a>
       
@@ -790,7 +856,7 @@ fetch(url, {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2015/11/06/React-Native-Fetch.html" data-id="cisyj3pmu003ct00r9qmirc3l" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2015/11/06/React-Native-Fetch.html" data-id="cit6nafwa003h9e0r4kmwu4kj" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2015/11/06/React-Native-Fetch.html#comments" class="article-comment-link">Comments</a>
       
@@ -839,7 +905,7 @@ fetch(url, {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2015/11/06/hello-world.html" data-id="cisyj3pm4001xt00rean0rfq4" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2015/11/06/hello-world.html" data-id="cit6nafvn001x9e0r5jnsnq5a" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2015/11/06/hello-world.html#comments" class="article-comment-link">Comments</a>
       
@@ -894,7 +960,7 @@ fetch(url, {
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">9</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">9</span></li></ul>
     </div>
   </div>
 
@@ -903,7 +969,7 @@ fetch(url, {
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -912,7 +978,7 @@ fetch(url, {
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/dropbox/" style="font-size: 12.5px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/go/" style="font-size: 10px;">go</a> <a href="/tags/hexo/" style="font-size: 15px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 15px;">javascript</a> <a href="/tags/js/" style="font-size: 12.5px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 17.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 17.5px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redis/" style="font-size: 12.5px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
+      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/dropbox/" style="font-size: 12.5px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/go/" style="font-size: 12.5px;">go</a> <a href="/tags/hexo/" style="font-size: 15px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 15px;">javascript</a> <a href="/tags/js/" style="font-size: 12.5px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 17.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 17.5px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redis/" style="font-size: 12.5px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
     </div>
   </div>
 
@@ -921,7 +987,7 @@ fetch(url, {
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
     </div>
   </div>
 
@@ -931,6 +997,10 @@ fetch(url, {
     <h3 class="widget-title">Recents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2016/09/16/convert-xml-to-json-in-golang.html">Golang XMl 转 JSON</a>
+          </li>
         
           <li>
             <a href="/2016/09/11/Hello-Go.html">Hello Go</a>
@@ -946,10 +1016,6 @@ fetch(url, {
         
           <li>
             <a href="/2016/05/08/cant-post-iqiyi-video-to-discuz.html">解决Discuz无法发布爱奇艺视频的问题</a>
-          </li>
-        
-          <li>
-            <a href="/2016/05/03/php-rabbitmq-tutorial-six.html">PHP RabbitMQ 教程（六） - 远程调用</a>
           </li>
         
       </ul>
