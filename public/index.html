@@ -110,6 +110,10 @@
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//解析XML</span></span><br><span class="line">err := xml.Unmarshal([]<span class="typename">byte</span>(xmlstr), &amp;result)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="constant">nil</span> != err &#123;</span><br><span class="line">  log.Fatal(err)</span><br><span class="line">&#125;</span><br><span class="line">log.Printf(<span class="string">"XML:%v \n"</span>, result) </span><br><span class="line"></span><br><span class="line"><span class="comment">//转换成JSON</span></span><br><span class="line">res, err := json.Marshal(result)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="constant">nil</span> != err &#123;</span><br><span class="line">  log.Fatal(err)</span><br><span class="line">&#125;</span><br><span class="line">log.Printf(<span class="string">"JSON:%s \n"</span>, res)</span><br><span class="line"></span><br><span class="line">js, err := simplejson.NewJson([]<span class="typename">byte</span>(res))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="constant">nil</span> != err &#123;</span><br><span class="line">  log.Fatal(err)</span><br><span class="line">&#125;</span><br><span class="line">status, err := js.Get(<span class="string">"status"</span>).Int()</span><br><span class="line"></span><br><span class="line">log.Printf(<span class="string">"STATUS:%v \n"</span>, status)</span><br></pre></td></tr></table></figure>
 <p>以上是本人在处理XML 转 JSON 时的解决办法，应该还有更简单更合适的方案。仅供参考。</p>
 <h4 id="完整代码：">完整代码：</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"encoding/xml"</span></span><br><span class="line">    <span class="string">"encoding/json"</span></span><br><span class="line">    <span class="string">"log"</span></span><br><span class="line">    <span class="string">"strings"</span></span><br><span class="line">    simplejson <span class="string">"github.com/bitly/go-simplejson"</span></span><br><span class="line">)</span><br><span class="line"><span class="keyword">type</span> Response <span class="keyword">struct</span> &#123;</span><br><span class="line">    Status <span class="typename">int</span> <span class="string">`xml:"status" json:"status"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">func</span> main() &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">var</span> result Response</span><br><span class="line"></span><br><span class="line">    <span class="comment">//多行字符串，使用反引号`</span></span><br><span class="line">    xmlstr := <span class="string">`&lt;?xml version="1.0" encoding="GBK" ?&gt;</span><br><span class="line">&lt;response&gt;</span><br><span class="line">    &lt;status&gt;200&lt;/status&gt;</span><br><span class="line">&lt;/response&gt;`</span></span><br><span class="line"></span><br><span class="line">    xmlstr = strings.Replace(xmlstr, <span class="string">"GBK"</span>, <span class="string">"UTF-8"</span>, -<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">    err := xml.Unmarshal([]<span class="typename">byte</span>(xmlstr), &amp;result)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="constant">nil</span> &#123;</span><br><span class="line">        log.Fatal(err)</span><br><span class="line">    &#125;</span><br><span class="line">    log.Printf(<span class="string">"XML:%v"</span>,result)</span><br><span class="line"></span><br><span class="line">    r, err := json.Marshal(result)</span><br><span class="line">    <span class="keyword">if</span> <span class="constant">nil</span> != err &#123;</span><br><span class="line">        log.Fatal(err)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    log.Printf(<span class="string">"JSON:%s"</span>, r)</span><br><span class="line"></span><br><span class="line">    js, err := simplejson.NewJson([]<span class="typename">byte</span>(r))</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> <span class="constant">nil</span> != err &#123;</span><br><span class="line">        log.Fatal(err)</span><br><span class="line">    &#125;</span><br><span class="line">    status, err := js.Get(<span class="string">"status"</span>).Int()</span><br><span class="line">    log.Printf(<span class="string">"VALUE:%v"</span>,status)</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="发现问题：">发现问题：</h4><p>今天（2016-09-18），再看这段代码，发现跟另一个程序里有些不一样。</p>
+<p>另一个程序里是这样的：<br><figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="typedef"><span class="keyword">type</span> <span class="type">Response</span> struct <span class="container">&#123;</span><br><span class="line">    <span class="type">Status</span> int `xml:"status"</span><br><span class="line">&#125;</span></span></span><br></pre></td></tr></table></figure></p>
+<p>也可以正常返回值，但是在本文中的示例却不能正常输出status值，而是会输出空，看了半天发现，使用 log 时：<br><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">log.<span class="function"><span class="title">Printf</span><span class="params">(<span class="string">"VALUE:%v"</span>,status)</span></span></span><br></pre></td></tr></table></figure></p>
+<p>如果struct没有写<br>“json:”status””，就不能输出，如果换成fmt，struct就可以不写“json:”status”。结果是一样的，其中的原因还要再查资料研究下。</p>
 <p>参考文章：</p>
 <p><a href="http://blog.studygolang.com/2012/12/%e6%a0%87%e5%87%86%e5%ba%93-xml%e5%a4%84%e7%90%86%ef%bc%88%e4%b8%80%ef%bc%89/" target="_blank" rel="external">标准库—XML处理（一）</a></p>
 <p><a href="https://play.golang.org/p/7HNLEUnX-m" target="_blank" rel="external">https://play.golang.org/p/7HNLEUnX-m</a></p>
@@ -119,7 +123,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/09/16/convert-xml-to-json-in-golang.html" data-id="cit6nafvy002i9e0rmnreledb" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/09/16/convert-xml-to-json-in-golang.html" data-id="cit8ng0aa002iek0ronn60b2i" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/09/16/convert-xml-to-json-in-golang.html#comments" class="article-comment-link">Comments</a>
       
@@ -188,7 +192,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/09/11/Hello-Go.html" data-id="cit6nafwl003u9e0rf1873k4r" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/09/11/Hello-Go.html" data-id="cit8ng0au003uek0rk58ntpgs" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/09/11/Hello-Go.html#comments" class="article-comment-link">Comments</a>
       
@@ -238,7 +242,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html" data-id="cit6nafvf001k9e0rpfgcwnzj" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html" data-id="cit8ng09t001kek0r4335iii6" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html#comments" class="article-comment-link">Comments</a>
       
@@ -302,7 +306,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html" data-id="cit6nafw400339e0r4c7ks2fd" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html" data-id="cit8ng0ah0033ek0rux4xwlzy" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html#comments" class="article-comment-link">Comments</a>
       
@@ -360,7 +364,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html" data-id="cit6nafw0002n9e0r2yr5hwgb" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html" data-id="cit8ng0ac002nek0rde7jvt7s" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html#comments" class="article-comment-link">Comments</a>
       
@@ -458,7 +462,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html" data-id="cit6nafv700149e0rtgs8v132" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html" data-id="cit8ng09l0014ek0r7ivvkcu6" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html#comments" class="article-comment-link">Comments</a>
       
@@ -549,7 +553,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html" data-id="cit6nafvd001g9e0r3xs2eeng" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html" data-id="cit8ng09s001gek0rta9fc04t" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html#comments" class="article-comment-link">Comments</a>
       
@@ -632,7 +636,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html" data-id="cit6nafvb001c9e0rzg7y9cdu" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html" data-id="cit8ng09q001cek0rzeg04kf4" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html#comments" class="article-comment-link">Comments</a>
       
@@ -735,7 +739,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html" data-id="cit6nafv500109e0rc43ogxeh" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html" data-id="cit8ng09j0010ek0ru3fjqhzj" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html#comments" class="article-comment-link">Comments</a>
       
@@ -843,7 +847,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html" data-id="cit6nafv1000v9e0rp7drxpda" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html" data-id="cit8ng09g000vek0r0lg0etrj" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html#comments" class="article-comment-link">Comments</a>
       

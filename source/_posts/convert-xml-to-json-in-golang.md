@@ -153,7 +153,21 @@ func main() {
 }
 ```
 
+#### 发现问题：
+今天（2016-09-18），再看这段代码，发现跟另一个程序里有些不一样。
 
+另一个程序里是这样的：
+```
+type Response struct {
+    Status int `xml:"status"
+}
+```
+也可以正常返回值，但是在本文中的示例却不能正常输出status值，而是会输出空，看了半天发现，使用 log 时：
+```
+log.Printf("VALUE:%v",status)
+```
+如果struct没有写
+“json:"status"”，就不能输出，如果换成fmt，struct就可以不写“json:"status"。结果是一样的，其中的原因还要再查资料研究下。
 
 参考文章：
 
