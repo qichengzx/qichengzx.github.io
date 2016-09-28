@@ -3,18 +3,28 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Tag: excel | 启程</title>
+  <title>Laravel 手动创建分页 | 启程</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta http-equiv="Access-Control-Allow-Origin" content="*">
-  <meta name="description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
-<meta property="og:type" content="website">
-<meta property="og:title" content="启程">
-<meta property="og:url" content="http://www.qichengzx.com/tags/excel/index.html">
+  <meta name="description" content="有些情况下会从接口读取数据，数据较多时会用到分页，Laravel为这种需求提供了很方便的方法。
+官方文档里几句略过，并没有详细说明，经过查找资料，发现如下方法可行。
+首先use LengthAwarePaginator12use Illuminate\Pagination\LengthAwarePaginator;use Illuminate\Support\Collection;
+假设原内容是：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Laravel 手动创建分页">
+<meta property="og:url" content="http://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html">
 <meta property="og:site_name" content="启程">
-<meta property="og:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
+<meta property="og:description" content="有些情况下会从接口读取数据，数据较多时会用到分页，Laravel为这种需求提供了很方便的方法。
+官方文档里几句略过，并没有详细说明，经过查找资料，发现如下方法可行。
+首先use LengthAwarePaginator12use Illuminate\Pagination\LengthAwarePaginator;use Illuminate\Support\Collection;
+假设原内容是：">
+<meta property="og:updated_time" content="2016-09-28T08:01:54.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="启程">
-<meta name="twitter:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
+<meta name="twitter:title" content="Laravel 手动创建分页">
+<meta name="twitter:description" content="有些情况下会从接口读取数据，数据较多时会用到分页，Laravel为这种需求提供了很方便的方法。
+官方文档里几句略过，并没有详细说明，经过查找资料，发现如下方法可行。
+首先use LengthAwarePaginator12use Illuminate\Pagination\LengthAwarePaginator;use Illuminate\Support\Collection;
+假设原内容是：">
 <meta name="twitter:creator" content="@qichengzx">
   
     <link rel="alternative" href="/atom.xml" title="启程" type="application/atom+xml">
@@ -61,39 +71,93 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2015" class="archive-year">2015</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2015/11/21/export-results-of-mysql-to-excel.html" class="archive-article-date">
-  <time datetime="2015-11-21T13:24:35.000Z" itemprop="datePublished">Nov 21</time>
+        <section id="main"><article id="post-custom-data-pagination-in-laravel-with-arrays" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html" class="article-date">
+  <time datetime="2016-09-28T07:43:13.000Z" itemprop="datePublished">2016-09-28</time>
 </a>
-      
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/php/">php</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2015/11/21/export-results-of-mysql-to-excel.html">MySQL命令行导出结果集到Excel</a>
+    <h1 class="article-title" itemprop="name">
+      Laravel 手动创建分页
     </h1>
   
 
-    </header>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>有些情况下会从接口读取数据，数据较多时会用到分页，Laravel为这种需求提供了很方便的方法。</p>
+<p><a href="https://laravel.com/docs/5.2/pagination" target="_blank" rel="external">官方文档</a>里几句略过，并没有详细说明，经过查找资料，发现如下方法可行。</p>
+<h3 id="首先use_LengthAwarePaginator">首先use LengthAwarePaginator</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> <span class="title">Illuminate</span>\<span class="title">Pagination</span>\<span class="title">LengthAwarePaginator</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">Illuminate</span>\<span class="title">Support</span>\<span class="title">Collection</span>;</span><br></pre></td></tr></table></figure>
+<p>假设原内容是：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$result</span> = [</span><br><span class="line">    <span class="string">'item1'</span>,</span><br><span class="line">    <span class="string">'item2'</span>,</span><br><span class="line">    <span class="string">'item3'</span>,</span><br><span class="line">    <span class="string">'item4'</span>,</span><br><span class="line">    <span class="string">'item5'</span>,</span><br><span class="line">    <span class="string">'item6'</span>,</span><br><span class="line">];</span><br></pre></td></tr></table></figure>
+<p>对于一个列表来说，item一般会是个array，这里忽略。</p>
+<h3 id="情况1，已知总数，只有部分数据">情况1，已知总数，只有部分数据</h3><p>由于本人所使用的接口有页码和每页数量的参数，所以每次查询返回的其实就是每一页的内容了，而接口又返回了符合条件的总数count，所以使用如下方式即可：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$perPage</span> = <span class="number">10</span>;</span><br><span class="line"><span class="variable">$count</span> = <span class="number">100</span>;<span class="comment">//假设这里是接口返回的总数</span></span><br><span class="line"><span class="comment">//创建collection</span></span><br><span class="line"><span class="variable">$collection</span> = <span class="keyword">new</span> Collection(<span class="variable">$data</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$currentPageResults</span> = <span class="variable">$collection</span>-&gt;all();</span><br><span class="line"></span><br><span class="line"><span class="comment">//生成分页</span></span><br><span class="line"><span class="variable">$data</span> = <span class="keyword">new</span> LengthAwarePaginator(<span class="variable">$currentPageResults</span>, <span class="variable">$count</span>, <span class="variable">$perPage</span>);</span><br><span class="line"><span class="comment">//设置分页的链接</span></span><br><span class="line"><span class="variable">$data</span>-&gt;setPath(<span class="variable">$request</span>-&gt;url());</span><br></pre></td></tr></table></figure>
+<h3 id="情况2，未知总数，有全部数据">情况2，未知总数，有全部数据</h3><p>而如果$data是全部数据呢，比如100条数据全部返回，然后要生成一个每页10条记录的分页，可以这样做：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//获取当前页码</span></span><br><span class="line"><span class="variable">$currentPage</span> = LengthAwarePaginator::resolveCurrentPage();</span><br><span class="line"></span><br><span class="line"><span class="comment">//从数组创建一个laravel collection</span></span><br><span class="line"><span class="variable">$collection</span> = <span class="keyword">new</span> Collection(<span class="variable">$searchResults</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//设置每页数量</span></span><br><span class="line"><span class="variable">$perPage</span> = <span class="number">10</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//从collection分割数据</span></span><br><span class="line"><span class="variable">$currentPageSearchResults</span> = <span class="variable">$collection</span>-&gt;slice(<span class="variable">$currentPage</span> * <span class="variable">$perPage</span>, <span class="variable">$perPage</span>)-&gt;all();</span><br><span class="line"></span><br><span class="line"><span class="comment">//生成分页</span></span><br><span class="line"><span class="variable">$paginatedSearchResults</span>= <span class="keyword">new</span> LengthAwarePaginator(<span class="variable">$currentPageSearchResults</span>, count(<span class="variable">$collection</span>), <span class="variable">$perPage</span>);</span><br><span class="line"><span class="comment">//设置分页的链接</span></span><br><span class="line"><span class="variable">$data</span>-&gt;setPath(<span class="variable">$request</span>-&gt;url());</span><br></pre></td></tr></table></figure>
+<h3 id="区别">区别</h3><p>其实两者只是相差了一次分割数据。</p>
+<h3 id="最后">最后</h3><p>在视图里依然使用</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;!! <span class="variable">$data-</span>&gt;render() !!&#125;</span><br></pre></td></tr></table></figure>
+<p>输出分页组件。</p>
+<p>看起来还挺简单的。</p>
+<h3 id="参考链接：">参考链接：</h3><p><a href="https://laravel.com/docs/5.2/pagination" target="_blank" rel="external">官方文档pagination</a></p>
+<p><a href="http://psampaz.github.io/custom-data-pagination-with-laravel-5/" target="_blank" rel="external">Custom data pagination with Laravel 5</a></p>
+<p><a href="http://www.acekyd.com/2016/02/28/custom-pagination-view-in-laravel-5-with-arrays/" target="_blank" rel="external">CUSTOM PAGINATION VIEW IN LARAVEL 5 WITH ARRAYS</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html" data-id="citmmiplh002icc3g5oswc37y" class="article-share-link">Share</a>
+      
+        <a href="http://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/laravel/">laravel</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/php/">php</a></li></ul>
+
+    </footer>
   </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2016/09/16/convert-xml-to-json-in-golang.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Golang XMl 转 JSON</div>
+    </a>
+  
+</nav>
+
+  
 </article>
-  
-  
-    </div></section>
-  
+
+
+<section id="comments">
+  <div class="ds-thread" data-thread-key="citmmiplh002icc3g5oswc37y" data-title="Laravel 手动创建分页" data-url="http://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html"></div>
+  <script>
+    var duoshuoQuery = {short_name:"qichengzx"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0] 
+       || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+</section>
 </section>
         
           <aside id="sidebar">

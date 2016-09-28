@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="http://www.qichengzx.com/"/>
-  <updated>2016-09-18T13:19:05.000Z</updated>
+  <updated>2016-09-28T08:01:54.000Z</updated>
   <id>http://www.qichengzx.com/</id>
   
   <author>
@@ -15,11 +15,49 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title><![CDATA[Laravel 手动创建分页]]></title>
+    <link href="http://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html"/>
+    <id>http://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html</id>
+    <published>2016-09-28T07:43:13.000Z</published>
+    <updated>2016-09-28T08:01:54.000Z</updated>
+    <content type="html"><![CDATA[<p>有些情况下会从接口读取数据，数据较多时会用到分页，Laravel为这种需求提供了很方便的方法。</p>
+<p><a href="https://laravel.com/docs/5.2/pagination" target="_blank" rel="external">官方文档</a>里几句略过，并没有详细说明，经过查找资料，发现如下方法可行。</p>
+<h3 id="首先use_LengthAwarePaginator">首先use LengthAwarePaginator</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> <span class="title">Illuminate</span>\<span class="title">Pagination</span>\<span class="title">LengthAwarePaginator</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">Illuminate</span>\<span class="title">Support</span>\<span class="title">Collection</span>;</span><br></pre></td></tr></table></figure>
+<p>假设原内容是：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$result</span> = [</span><br><span class="line">    <span class="string">'item1'</span>,</span><br><span class="line">    <span class="string">'item2'</span>,</span><br><span class="line">    <span class="string">'item3'</span>,</span><br><span class="line">    <span class="string">'item4'</span>,</span><br><span class="line">    <span class="string">'item5'</span>,</span><br><span class="line">    <span class="string">'item6'</span>,</span><br><span class="line">];</span><br></pre></td></tr></table></figure>
+<p>对于一个列表来说，item一般会是个array，这里忽略。</p>
+<h3 id="情况1，已知总数，只有部分数据">情况1，已知总数，只有部分数据</h3><p>由于本人所使用的接口有页码和每页数量的参数，所以每次查询返回的其实就是每一页的内容了，而接口又返回了符合条件的总数count，所以使用如下方式即可：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$perPage</span> = <span class="number">10</span>;</span><br><span class="line"><span class="variable">$count</span> = <span class="number">100</span>;<span class="comment">//假设这里是接口返回的总数</span></span><br><span class="line"><span class="comment">//创建collection</span></span><br><span class="line"><span class="variable">$collection</span> = <span class="keyword">new</span> Collection(<span class="variable">$data</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$currentPageResults</span> = <span class="variable">$collection</span>-&gt;all();</span><br><span class="line"></span><br><span class="line"><span class="comment">//生成分页</span></span><br><span class="line"><span class="variable">$data</span> = <span class="keyword">new</span> LengthAwarePaginator(<span class="variable">$currentPageResults</span>, <span class="variable">$count</span>, <span class="variable">$perPage</span>);</span><br><span class="line"><span class="comment">//设置分页的链接</span></span><br><span class="line"><span class="variable">$data</span>-&gt;setPath(<span class="variable">$request</span>-&gt;url());</span><br></pre></td></tr></table></figure>
+<h3 id="情况2，未知总数，有全部数据">情况2，未知总数，有全部数据</h3><p>而如果$data是全部数据呢，比如100条数据全部返回，然后要生成一个每页10条记录的分页，可以这样做：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//获取当前页码</span></span><br><span class="line"><span class="variable">$currentPage</span> = LengthAwarePaginator::resolveCurrentPage();</span><br><span class="line"></span><br><span class="line"><span class="comment">//从数组创建一个laravel collection</span></span><br><span class="line"><span class="variable">$collection</span> = <span class="keyword">new</span> Collection(<span class="variable">$searchResults</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//设置每页数量</span></span><br><span class="line"><span class="variable">$perPage</span> = <span class="number">10</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//从collection分割数据</span></span><br><span class="line"><span class="variable">$currentPageSearchResults</span> = <span class="variable">$collection</span>-&gt;slice(<span class="variable">$currentPage</span> * <span class="variable">$perPage</span>, <span class="variable">$perPage</span>)-&gt;all();</span><br><span class="line"></span><br><span class="line"><span class="comment">//生成分页</span></span><br><span class="line"><span class="variable">$paginatedSearchResults</span>= <span class="keyword">new</span> LengthAwarePaginator(<span class="variable">$currentPageSearchResults</span>, count(<span class="variable">$collection</span>), <span class="variable">$perPage</span>);</span><br><span class="line"><span class="comment">//设置分页的链接</span></span><br><span class="line"><span class="variable">$data</span>-&gt;setPath(<span class="variable">$request</span>-&gt;url());</span><br></pre></td></tr></table></figure>
+<h3 id="区别">区别</h3><p>其实两者只是相差了一次分割数据。</p>
+<h3 id="最后">最后</h3><p>在视图里依然使用</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;!! <span class="variable">$data-</span>&gt;render() !!&#125;</span><br></pre></td></tr></table></figure>
+<p>输出分页组件。</p>
+<p>看起来还挺简单的。</p>
+<h3 id="参考链接：">参考链接：</h3><p><a href="https://laravel.com/docs/5.2/pagination" target="_blank" rel="external">官方文档pagination</a></p>
+<p><a href="http://psampaz.github.io/custom-data-pagination-with-laravel-5/" target="_blank" rel="external">Custom data pagination with Laravel 5</a></p>
+<p><a href="http://www.acekyd.com/2016/02/28/custom-pagination-view-in-laravel-5-with-arrays/" target="_blank" rel="external">CUSTOM PAGINATION VIEW IN LARAVEL 5 WITH ARRAYS</a></p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>有些情况下会从接口读取数据，数据较多时会用到分页，Laravel为这种需求提供了很方便的方法。</p>
+<p><a href="https://laravel.com/docs/5.2/pagination" target="_blank" rel="external">官]]>
+    </summary>
+    
+      <category term="laravel" scheme="http://www.qichengzx.com/tags/laravel/"/>
+    
+      <category term="php" scheme="http://www.qichengzx.com/tags/php/"/>
+    
+      <category term="php" scheme="http://www.qichengzx.com/categories/php/"/>
+    
+  </entry>
+  
+  <entry>
     <title><![CDATA[Golang XMl 转 JSON]]></title>
     <link href="http://www.qichengzx.com/2016/09/16/convert-xml-to-json-in-golang.html"/>
     <id>http://www.qichengzx.com/2016/09/16/convert-xml-to-json-in-golang.html</id>
     <published>2016-09-16T03:28:20.000Z</published>
-    <updated>2016-09-18T13:19:05.000Z</updated>
+    <updated>2016-09-28T07:41:42.000Z</updated>
     <content type="html"><![CDATA[<p><img src="/images/golang.png" alt=""></p>
 <h4 id="起因">起因</h4><p>某个上古时代的API，依然在返回XML格式的数据，更奇葩的是，GBK格式的。</p>
 <p>用Go顺利的写到了发送数据，接收数据，然后取值有点麻烦啊。。。。</p>
@@ -68,7 +106,7 @@
     <link href="http://www.qichengzx.com/2016/09/11/Hello-Go.html"/>
     <id>http://www.qichengzx.com/2016/09/11/Hello-Go.html</id>
     <published>2016-09-11T09:21:03.000Z</published>
-    <updated>2016-09-11T09:21:09.000Z</updated>
+    <updated>2016-09-28T07:41:42.000Z</updated>
     <content type="html"><![CDATA[<h5 id="Mac_安装_GO">Mac 安装 GO</h5><p>本人使用了Brew来安装。</p>
 <h5 id="安装前首先更新Brew。">安装前首先更新Brew。</h5><figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">brew </span>update &amp;&amp; <span class="keyword">brew </span>upgrade</span><br></pre></td></tr></table></figure>
 <h5 id="安装Go">安装Go</h5><p>使用brew安装go</p>
@@ -111,7 +149,7 @@
     <link href="http://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html"/>
     <id>http://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html</id>
     <published>2016-07-02T15:11:30.000Z</published>
-    <updated>2016-07-03T01:14:00.000Z</updated>
+    <updated>2016-09-28T07:41:42.000Z</updated>
     <content type="html"><![CDATA[<p>有时候会遇到上传文件给第三方服务的情况，比如本身程序并不需要存储附件，而是把附件发送给一个公共的服务。</p>
 <p>最近正好碰到这个问题，记录一下。</p>
 <p>上代码。</p>
@@ -137,7 +175,7 @@
     <link href="http://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html"/>
     <id>http://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html</id>
     <published>2016-05-15T06:19:52.000Z</published>
-    <updated>2016-05-15T06:25:08.000Z</updated>
+    <updated>2016-09-28T07:41:42.000Z</updated>
     <content type="html"><![CDATA[<p><img src="/images/redis/redis-300dpi.png" alt=""></p>
 <p>虽然RabbitMQ的坑年前就开始填了，但是并没有机会在项目中实际使用，机缘巧合，换工作后第一个比较重要的事就是做一个直播的页面，如果数据直接插入或读取自数据库，数据库端的压力就太大了，当时RabbitMQ还没看完，而其他的队列程序更是没有用过，只是稍微对Redis熟悉些，于是就使用了Redis做。</p>
 <p><a href="http://redis.io/" target="_blank" rel="external">Redis</a>比较常见的是作为数据缓存工具使用，数据存储在内存中，减少了数据库的连接和查询，效率高，又方便。</p>
@@ -179,7 +217,7 @@
     <link href="http://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html"/>
     <id>http://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html</id>
     <published>2016-05-08T10:57:24.000Z</published>
-    <updated>2016-05-08T10:57:25.000Z</updated>
+    <updated>2016-09-28T07:41:42.000Z</updated>
     <content type="html"><![CDATA[<p><img src="/images/discuz/201510148054_136.jpg" alt=""></p>
 <p>最近碰到需要在Discuz论坛中插入爱奇艺视频的问题，之前没关注过，搜索后有些答案说DZ不支持爱奇艺，有些说爱奇艺不支持DZ，并没有真正能解决问题的。</p>
 <p>下午突然想到也许是DZ根据粘贴进来的flash地址生成的标签代码不对，试验后发现果然是这个原因。</p>
@@ -215,7 +253,7 @@
     <link href="http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html"/>
     <id>http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html</id>
     <published>2016-05-03T06:35:20.000Z</published>
-    <updated>2016-05-07T14:08:27.000Z</updated>
+    <updated>2016-09-28T07:41:43.000Z</updated>
     <content type="html"><![CDATA[<h3 id="远程调用">远程调用</h3><p>在<a href="/2016/04/17/php-rabbitmq-tutorial-two.html">第二节</a>中，我们学习了如何使用工作队列在多个worker中分发耗时任务。</p>
 <p>但是如果我们需要在远程运行一个函数并等待返回结果怎么办？这是两码事，这个模式通常被称为远程过程调用（Remote Procedure Call，RPC）。</p>
 <p>在本节中我们准备使用RabbitMQ构建一个RPC系统：一个客户端和一个可扩展的RPC服务端。由于我们没有值得分发的耗时任务，我们准备创建一个假的返回<a href="https://en.wikipedia.org/wiki/Fibonacci_number" target="_blank" rel="external">斐波那契数列</a>的RPC服务。</p>
@@ -289,7 +327,7 @@
     <link href="http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html"/>
     <id>http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html</id>
     <published>2016-04-27T10:27:03.000Z</published>
-    <updated>2016-05-07T14:06:15.000Z</updated>
+    <updated>2016-09-28T07:41:43.000Z</updated>
     <content type="html"><![CDATA[<h3 id="主题">主题</h3><p>(<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">使用php-amqplib</a>)</p>
 <p>在<a href="/2016/04/24/php-rabbitmq-tutorial-four.html">上一节</a>我们改善了日志系统(logging system，以下简称日志系统)，为了替代fanout类型的交换器，我们使用了一个direct类型的交换器，带来的好处是可以有选择的接收日志。</p>
 <p>虽然使用direct交换器改善了系统，但是仍然有局限性 - 它不能根据多个条件进行路由。</p>
@@ -356,7 +394,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="http://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html"/>
     <id>http://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html</id>
     <published>2016-04-24T06:16:41.000Z</published>
-    <updated>2016-05-07T14:06:15.000Z</updated>
+    <updated>2016-09-28T07:41:43.000Z</updated>
     <content type="html"><![CDATA[<h3 id="路由">路由</h3><p>（使用<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">php-amqplib</a>）<br>在<a href="/2016/04/23/php-rabbitmq-tutorial-three.html">上一节</a>中，我们创建了一个简单的日志系统（logging system）。我们已经可以广播日志消息到多个接收者了。</p>
 <p>在本节中，我们要给它增加一个功能-使它能够只订阅消息的一个子集。比如，只把严重的错误信息写入到日志文件（存储到磁盘）中，但同时仍然会把所有日志信息输出到控制台中。</p>
 <h3 id="绑定">绑定</h3><p>在上一节中我们已经创建了绑定（bindings），代码如下：</p>
@@ -414,7 +452,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html"/>
     <id>http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html</id>
     <published>2016-04-23T11:58:17.000Z</published>
-    <updated>2016-05-07T14:06:15.000Z</updated>
+    <updated>2016-09-28T07:41:43.000Z</updated>
     <content type="html"><![CDATA[<h3 id="发布/订阅">发布/订阅</h3><p>我们在<a href="/2016/04/17/php-rabbitmq-tutorial-two.html">上一节</a>创建了一个工作队列，并假定队列对应的任务传送给了某个客户端。在这一章节我们会做一些完全不一样的东西–我们会发送一条消息到多个消费者，也称之为“发布/订阅”模式。</p>
 <p>为了说明这个模式，我们会创建一个简单的日志系统（logging system，以下简称日志系统），它由两个程序组成–第一个是发送日志信息，第二个是接收日志并打印。</p>
 <p>日志系统的每一个运行的接收端程序都会接收信息，这样就可以运行一个接收端就把日志保存到硬盘里，同时运行另一个接收端去实时显示日志到屏幕。</p>
@@ -492,7 +530,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html"/>
     <id>http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html</id>
     <published>2016-04-17T06:39:30.000Z</published>
-    <updated>2016-05-07T14:06:15.000Z</updated>
+    <updated>2016-09-28T07:41:43.000Z</updated>
     <content type="html"><![CDATA[<h3 id="工作队列">工作队列</h3><h5 id="（使用php-amqplib库）">（使用<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">php-amqplib</a>库）</h5><p><img src="/images/rabbitmq/python-two.png" alt=""></p>
 <p>在本教程<a href="/2016/02/28/php-rabbitmq-tutorial-one.html">第一部分</a> 我们已经写完了从一个指定队列发送和接收消息的程序。在这一章节中，我们会创建一个工作队列（Work Queue）来分发耗时的任务给多个工作者（worker）。</p>
 <p>工作队列（也被称为 任务队列-task queue）主要是避免立即执行资源密集型任务并且还要等待它执行完毕。相反，需要让任务稍后执行，我们把一个任务当做一条信息发送给队列，后台运行的工作者（worker）会取出任务并执行，当运行多个worker时任务会在它们之间共享。</p>
@@ -575,7 +613,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="http://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html"/>
     <id>http://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html</id>
     <published>2016-02-28T03:10:03.000Z</published>
-    <updated>2016-05-07T14:06:15.000Z</updated>
+    <updated>2016-09-28T07:41:43.000Z</updated>
     <content type="html"><![CDATA[<h2 id="准备工作">准备工作</h2><h3 id="先决条件">先决条件</h3><p>本教程先决条件是RabbitMQ已经安装并正在以5672端口运行在 localhost，如果你使用了不同的域，端口，用户，密码，连接配置需要适当改变。</p>
 <h3 id="获得帮助">获得帮助</h3><p>如果在本教程中遇到问题，可以通过邮件列表进行联系。</p>
 <h3 id="介绍">介绍</h3><p>RabbitMQ是一个消息代理，它的本质是，从producers（生产者）接收消息，然后发送给consumers（消费者），在这个过程中，可以根据自己的配置规则使用路由，缓冲区，保存消息。</p>
@@ -652,7 +690,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="http://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html"/>
     <id>http://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html</id>
     <published>2016-02-25T09:10:43.000Z</published>
-    <updated>2016-02-25T09:16:54.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">var a =<span class="number">0</span>;</span><br><span class="line"><span class="keyword">for</span> (var i =<span class="number">0</span>,j =<span class="number">0</span>; i &lt;<span class="number">10</span>,j&lt;<span class="number">6</span>;i++,j++) &#123;</span><br><span class="line">	a = i+j;</span><br><span class="line">	console.<span class="built_in">log</span>(<span class="string">"i="</span>+i);</span><br><span class="line">	console.<span class="built_in">log</span>(<span class="string">"j="</span>+j);</span><br><span class="line">	console.<span class="built_in">log</span>(<span class="string">"a="</span>+a);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>朋友面试，遇到的面试题，电话跟我说完就回来写下来试了一下，结果与自己预想的一样。</p>
 <p>没写之前，电话里说的思路是，因为 j 限制了 小于 6，那么应该只循环6次，实际上也确实是这样。</p>
@@ -673,7 +711,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="http://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html"/>
     <id>http://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html</id>
     <published>2016-02-24T09:58:24.000Z</published>
-    <updated>2016-02-25T03:35:21.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<p>接上篇：<a href="https://www.qichengzx.com/2016/02/03/MySQL%E5%AE%9E%E7%8E%B0row_number%20.html">MySQL实现row_number</a></p>
 <h3 id="为分组增加row_number">为分组增加row number</h3><p>row_number的分析函数怎么样？（原文：How about  row_number “over partition by” functionality? ），比如，如果想为每一个组增加row number，并且在每一个新的分组重置它。</p>
 <p>查看下图中payments表。</p>
@@ -705,7 +743,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="http://www.qichengzx.com/2016/02/03/MySQL%E5%AE%9E%E7%8E%B0row_number%20.html"/>
     <id>http://www.qichengzx.com/2016/02/03/MySQL实现row_number .html</id>
     <published>2016-02-03T10:25:26.000Z</published>
-    <updated>2016-02-03T10:27:20.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<p>在本教程中，我们将在MySQL中实现一个非常实用的row_number功能。</p>
 <p>row_number是一个返回数据排序编号的排名方法，从1开始。我们经常需要用到row_number去生成某些报表，不幸的是，MySQL并不像MSSQL，Oracle一样支持这个方法。在MySQL中如果想实现这个功能需要临时变量。</p>
 <p>为了在MySQL中实现row_number，需要在查询中实用临时变量，下图中从employees表中查询出5条数据，并且从1开始，为每一行添加了编号(row number)。</p>
@@ -738,7 +776,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="http://www.qichengzx.com/2016/01/19/echarts-pie.html"/>
     <id>http://www.qichengzx.com/2016/01/19/echarts-pie.html</id>
     <published>2016-01-19T13:27:00.000Z</published>
-    <updated>2016-01-19T14:25:04.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<p><img src="/images/BEEC6560-EC03-4027-969D-DBB584A47E69.png" alt=""></p>
 <p>今天写一个做地区分布的饼图的东西。</p>
 <p>由于数据库里本身没有存储地区数据，只有IP，所以也用到了<a href="http://www.ipip.net/" target="_blank" rel="external">高春辉老师目前的项目</a>里提供的IP地址数据库。可以在数据库下载页面下载到免费的数据库文件和一个PHP处理类。</p>
@@ -774,7 +812,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="http://www.qichengzx.com/2016/01/11/placeholder-animate.html"/>
     <id>http://www.qichengzx.com/2016/01/11/placeholder-animate.html</id>
     <published>2016-01-11T13:42:58.000Z</published>
-    <updated>2016-01-12T13:33:24.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<p>以前经常见到的一种页面表单效果，但是并没有在项目中用过，前几天在sf上看到相关问题，顺手写了一个，还挺简单，没什么含量。</p>
 <p>此处省略HTML头信息等内容。</p>
 <h3 id="HTML">HTML</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"text"</span> <span class="attribute">id</span>=<span class="value">"uname"</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="title">label</span>&gt;</span>Name<span class="tag">&lt;/<span class="title">label</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
@@ -803,7 +841,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="http://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html"/>
     <id>http://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html</id>
     <published>2016-01-10T10:52:55.000Z</published>
-    <updated>2016-04-23T12:07:24.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<p><img src="/images/backup-database-with-crontab/crontab.jpg" alt=""></p>
 <p>crontab命令之前写过了，在<a href="http://segmentfault.com/a/1190000003953826" target="_blank" rel="external">Linux crontab 访问PHP URL完成定时任务</a>，今天写了一个用来备份数据库的脚本。</p>
 <p>主要会用到以下几个命令：</p>
@@ -861,7 +899,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="http://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html"/>
     <id>http://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html</id>
     <published>2015-12-27T13:47:09.000Z</published>
-    <updated>2016-04-23T12:08:10.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<p><img src="/images/dropbox/20130702165945-558672261.jpg" alt=""></p>
 <p>继之前<a href="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html">那次失败的尝试</a>之后（只在当时写的时候实验过几次，每次都以服务器卡死结束），后来在又多了几篇日志之后连generate也不能愉快的完成了。索性就在本地生成然后git push到服务器。</p>
 <p>现在想更激进一些，git只管理日志以外的东西，比如hexo的升级，或模板的调整和日志源文件。而生成的静态文件直接通过Dropbox客户端同步到服务器。</p>
@@ -911,7 +949,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="http://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html"/>
     <id>http://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html</id>
     <published>2015-12-19T08:38:37.000Z</published>
-    <updated>2015-12-19T13:31:45.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<p><img src="https://s.qichengzx.com/img/201512/https.png" alt=""></p>
 <p>Let’s Encrypt是一个新的CA机构，提供非常简单并且免费的TLS／SSL证书服务。</p>
 <p>可谓万众期待。</p>
@@ -969,44 +1007,6 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       <category term="https" scheme="http://www.qichengzx.com/tags/https/"/>
     
       <category term="ssl" scheme="http://www.qichengzx.com/tags/ssl/"/>
-    
-  </entry>
-  
-  <entry>
-    <title><![CDATA[PHP使用Redis作为缓存使用PDO读取MySQL数据]]></title>
-    <link href="http://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html"/>
-    <id>http://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html</id>
-    <published>2015-12-05T14:37:09.000Z</published>
-    <updated>2015-12-06T01:31:01.000Z</updated>
-    <content type="html"><![CDATA[<p><img src="http://7b1hhm.com1.z0.glb.clouddn.com/hexo1414772222.jpg" alt=""></p>
-<p>图片转自：<a href="http://blog.encodez.com/blog/using-pdofetchall-examples-with-codes-and-output-results" target="_blank" rel="external">Using PDO::fetchAll – Examples with codes and output results</a></p>
-<p>一个简单的例子。</p>
-<p><strong>实现功能：</strong></p>
-<pre><code><span class="number">1.</span>使用PDO读取数据
-
-<span class="number">2.</span>使用Redis缓存结果
-
-<span class="number">3.</span>再次查询时会从Redis查询，减少MySQL查询
-</code></pre><p>没有注意代码的逻辑，仅实现思路。</p>
-<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"></span><br><span class="line">//一上来肯定是配置pdo的连接信息。其实这步在这个示例中可以放到第一个<span class="keyword">else</span>中。</span><br><span class="line"><span class="variable">$dsn</span> = <span class="string">'mysql:dbname=node;host=127.0.0.1'</span>;</span><br><span class="line"><span class="variable">$user</span> = <span class="string">'root'</span>;</span><br><span class="line"><span class="variable">$password</span> = <span class="string">''</span>;</span><br><span class="line"></span><br><span class="line">//连接Redis</span><br><span class="line"><span class="variable">$redis</span>= new Redis();</span><br><span class="line"><span class="variable">$redis-</span>&gt;connect(<span class="string">'127.0.0.1'</span>,<span class="number">6379</span>);</span><br><span class="line"></span><br><span class="line">//接收查询参数</span><br><span class="line"><span class="variable">$id</span> = intval($_GET[<span class="string">'id'</span>]);</span><br><span class="line"></span><br><span class="line">//设置在Redis中存储的KEY</span><br><span class="line"><span class="variable">$MY</span>_NODE_KEY<span class="number">_</span> = <span class="string">'TEST_PDO_REDIS_ID_'</span>;</span><br><span class="line"></span><br><span class="line">//拼接KEY和查询ID，读取Redis，</span><br><span class="line"><span class="variable">$cache</span> = <span class="variable">$redis-</span>&gt;get(<span class="variable">$MY</span>_NODE_KEY<span class="number">_</span>.<span class="variable">$id</span>);</span><br><span class="line"></span><br><span class="line">//用来插入log的时间参数</span><br><span class="line"><span class="variable">$date</span> = date(<span class="string">"Y-m-d H:i:s"</span>);</span><br><span class="line"><span class="keyword">if</span>(<span class="variable">$cache</span>)&#123;</span><br><span class="line">	//Redis缓存存在则直接输出</span><br><span class="line">	print_r(json_decode(<span class="variable">$cache</span>,true));</span><br><span class="line">	//并记录log</span><br><span class="line">	error_log(<span class="variable">$date</span>.<span class="string">"---read from redis \r\n"</span>, <span class="number">3</span>, <span class="string">'./debug.txt'</span>);</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">	//缓存不存在，则连接PDO</span><br><span class="line">	try &#123;</span><br><span class="line">    	<span class="variable">$pdo</span> = new PDO(<span class="variable">$dsn</span>, <span class="variable">$user</span>, <span class="variable">$password</span>);</span><br><span class="line">    	error_log(<span class="variable">$date</span>.<span class="string">"---Connection Succcess \r\n"</span>, <span class="number">3</span>, <span class="string">'./debug.txt'</span>);</span><br><span class="line">		</span><br><span class="line">		//查询</span><br><span class="line">	    <span class="variable">$query</span> = <span class="variable">$pdo</span> -&gt; query(<span class="string">"select * from news where id = '$id'"</span>);</span><br><span class="line">		//设置结果集为数组</span><br><span class="line">	    // [PDOStatement::fetch](http://php.net/manual/zh/pdostatement.fetch.php)</span><br><span class="line">	    <span class="variable">$query-</span>&gt;setFetchMode(PDO::FETCH_ASSOC);</span><br><span class="line">	    </span><br><span class="line">	    <span class="variable">$rs</span> = <span class="variable">$query-</span>&gt;fetch();</span><br><span class="line">	</span><br><span class="line">	    if (is_array(<span class="variable">$rs</span>)) &#123;</span><br><span class="line">	    	//查询完成，以json格式写入Redis中。</span><br><span class="line">			<span class="variable">$redis-</span>&gt;set(<span class="variable">$MY</span>_NODE_KEY<span class="number">_</span>.<span class="variable">$rs</span>[<span class="string">'id'</span>],json_encode(<span class="variable">$rs</span>));</span><br><span class="line">			print_r(<span class="variable">$rs</span>);</span><br><span class="line">			error_log(<span class="variable">$date</span>.<span class="string">"read from mysql \r\n"</span>, <span class="number">3</span>, <span class="string">'./debug.txt'</span>);</span><br><span class="line">	    &#125;</span><br><span class="line">	    </span><br><span class="line">	//PDO连接出错</span><br><span class="line">	&#125; catch (PDOException <span class="variable">$e</span>) &#123;</span><br><span class="line">		//输出错误信息，并记录log中</span><br><span class="line">    	echo <span class="string">'Connection failed: '</span> . <span class="variable">$e-</span>&gt;getMessage();</span><br><span class="line">    	error_log(<span class="variable">$date</span>.<span class="string">"---Connection failed \r\n"</span>, <span class="number">3</span>, <span class="string">'./debug.txt'</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>写的很糙，逻辑已经简单到没有逻辑了。</p>
-<p>一句话说一下思路就是：<br>    先看有没有缓存<br>    木有就查数据库，写入缓存</p>
-<p>参考资料：<br>    <a href="http://php.net/manual/zh/book.pdo.php" target="_blank" rel="external">PHP 数据对象</a><br>    <a href="http://www.cnblogs.com/zemliu/archive/2012/05/08/2490953.html" target="_blank" rel="external">PHP PDO的简单使用(query(),exec(),prepare(),Transaction,行锁)</a></p>
-]]></content>
-    <summary type="html">
-    <![CDATA[<p><img src="http://7b1hhm.com1.z0.glb.clouddn.com/hexo1414772222.jpg" alt=""></p>
-<p>图片转自：<a href="http://blog.encodez.com/blog/using-pdofe]]>
-    </summary>
-    
-      <category term="mysql" scheme="http://www.qichengzx.com/tags/mysql/"/>
-    
-      <category term="pdo" scheme="http://www.qichengzx.com/tags/pdo/"/>
-    
-      <category term="php" scheme="http://www.qichengzx.com/tags/php/"/>
-    
-      <category term="redis" scheme="http://www.qichengzx.com/tags/redis/"/>
-    
-      <category term="php" scheme="http://www.qichengzx.com/categories/php/"/>
     
   </entry>
   

@@ -63,6 +63,114 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-php-rabbitmq-tutorial-two" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/04/17/php-rabbitmq-tutorial-two.html" class="article-date">
+  <time datetime="2016-04-17T06:39:30.000Z" itemprop="datePublished">2016-04-17</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/php/">php</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/04/17/php-rabbitmq-tutorial-two.html">PHP RabbitMQ 教程（二） - 工作队列</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="工作队列">工作队列</h3><h5 id="（使用php-amqplib库）">（使用<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">php-amqplib</a>库）</h5><p><img src="/images/rabbitmq/python-two.png" alt=""></p>
+<p>在本教程<a href="/2016/02/28/php-rabbitmq-tutorial-one.html">第一部分</a> 我们已经写完了从一个指定队列发送和接收消息的程序。在这一章节中，我们会创建一个工作队列（Work Queue）来分发耗时的任务给多个工作者（worker）。</p>
+<p>工作队列（也被称为 任务队列-task queue）主要是避免立即执行资源密集型任务并且还要等待它执行完毕。相反，需要让任务稍后执行，我们把一个任务当做一条信息发送给队列，后台运行的工作者（worker）会取出任务并执行，当运行多个worker时任务会在它们之间共享。</p>
+<p>这个概念在web应用中非常有用，可以在短暂的HTTP请求期间处理一些复杂的任务。</p>
+<h3 id="准备工作">准备工作</h3><p>在前面的部分我们发送了一条内容为“Hello World”的信息，现在我们会发送一些字符串，把这些字符串当做复杂的任务，我们并没有一个实际的任务，像是图片缩放，或者转换PDF文件，所以我们使用sleep方法来假设任务很繁忙。我们会在字符串中加入一些“.”来表示复杂复杂程度；每一个“.”表示需要耗时1秒，比如，“Hello …”代表需要耗时3秒。</p>
+<p>我们从上一节的基础上稍微改动了一下send.php，来允许消息可以从命令行发送，这个程序会发送任务到队列中，把它命名为new_task.php</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$data</span> = impllode(<span class="string">' '</span>,array_slice(<span class="variable">$argv</span>,<span class="number">1</span>));</span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">empty</span>(<span class="variable">$data</span>))<span class="variable">$data</span> = <span class="string">"Hello World"</span>;</span><br><span class="line"><span class="variable">$msg</span> = <span class="keyword">new</span> AMQPMessage(<span class="variable">$data</span>,</span><br><span class="line">	<span class="keyword">array</span>(<span class="string">'delivery_mode'</span>=&gt;<span class="number">2</span>)<span class="comment">#设置消息持久化，下边会讲到。</span></span><br><span class="line">);</span><br><span class="line"><span class="variable">$channel</span>-&gt;basic_publish(<span class="variable">$msg</span>,<span class="string">''</span>,<span class="string">'task_queue'</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="string">"[x] Sent "</span>,<span class="variable">$data</span>,<span class="string">"\n"</span>;</span><br></pre></td></tr></table></figure>
+<p>上一节的receive.php也需要一些改动：需要为消息中的每一个“.”模拟1秒的工作。它会从队列中取出消息并运行，把它命名为worker.php：</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$callback</span> = <span class="keyword">function</span>(<span class="variable">$msg</span>)&#123;</span><br><span class="line">	echo <span class="string">"[x] Received "</span>,<span class="variable">$msg-</span>&gt;body,<span class="string">"\n"</span>;</span><br><span class="line">	sleep(substr_count(<span class="variable">$msg-</span>&gt;body,<span class="string">'.'</span>));</span><br><span class="line">	echo <span class="string">"[x] Done"</span>,<span class="string">"\n"</span>;</span><br><span class="line">	<span class="variable">$msg-</span>&gt;delivery_info[<span class="string">'channel]-&gt;basic_ack($msg-&gt;delivery_info['</span>delivery_tag<span class="string">']);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">$channel-&gt;basic_gos(null,1,null);</span><br><span class="line">$channel-&gt;basic_consume('</span>task_queue<span class="string">','',false,false,false,false,$callback);</span></span><br></pre></td></tr></table></figure>
+<p>注意我们伪造的任务需要花费时间（即发送的字符串中要有一些”.”）</p>
+<p>然后运行：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">php new_task<span class="class">.php</span> <span class="string">"A very hard task which takes two seconds.."</span></span><br><span class="line">php wordker.php</span><br></pre></td></tr></table></figure>
+<h3 id="轮询分发">轮询分发</h3><p>使用工作队列的一个好处就是它能够并行的处理队列。如果有太多工作需要处理，只需要添加新的worker就可以了。</p>
+<p>首先，我们试着同时运行两个worker.php，它们都会从队列接收到消息，但是到底是不是这样呢？我们看一下。</p>
+<p>此时需要打开3个终端，其中两个运行worker.php，这两个就是我们的消费者 - C1和C2。</p>
+<p>shell1</p>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">php worker.php</span><br><span class="line">[*] Waiting <span class="keyword">for</span> messages. <span class="keyword">To</span> <span class="keyword">exit</span> press CTRL+C</span><br></pre></td></tr></table></figure>
+<p>shell2</p>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">php worker.php</span><br><span class="line">[*] Waiting <span class="keyword">for</span> messages. <span class="keyword">To</span> <span class="keyword">exit</span> press CTRL+C</span><br></pre></td></tr></table></figure>
+<p>在第三个终端中我们会发送新的任务，消费者程序开始运行后就可以发送一些消息了。</p>
+<p>shell3</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">php new_task<span class="class">.php</span> First message.</span><br><span class="line">php new_task<span class="class">.php</span> Second message..</span><br><span class="line">php new_task<span class="class">.php</span> Third message...</span><br><span class="line">php new_task<span class="class">.php</span> Fourth message....</span><br><span class="line">php new_task<span class="class">.php</span> Fifth message.....</span><br></pre></td></tr></table></figure>
+<p>我们看一下发送给worker的是什么:</p>
+<p>shell1</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">php worker<span class="class">.php</span></span><br><span class="line">[*] Waiting <span class="keyword">for</span> messages<span class="class">.To</span> exit press CTRL+C</span><br><span class="line">[x]Received <span class="string">'First message.'</span></span><br><span class="line">[x]Received <span class="string">'Third message...'</span></span><br><span class="line">[x]Received <span class="string">'Fifth message.....'</span></span><br></pre></td></tr></table></figure>
+<p>shell2</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">php worker<span class="class">.php</span></span><br><span class="line">[*] Waiting <span class="keyword">for</span> messages<span class="class">.To</span> exit press CTRL+C</span><br><span class="line">[x]Received <span class="string">'Second message.'</span></span><br><span class="line">[x]Received <span class="string">'Fourth message...'</span></span><br></pre></td></tr></table></figure>
+<p>RabbitMQ会默认按顺序把消息发送给下一个消费者，平均每个消费者都会得到一样多数量的消息，这种分发消息的方式叫做轮询。试着添加三个或更多个worker来运行。</p>
+<h3 id="消息响应">消息响应</h3><p>执行一个任务会消耗一定的时间，也许你想知道如果一个消费者在执行一个耗时较长的任务时但是在执行一部分的时候挂掉会发生什么。在我们当前的代码中，一旦RabbitMQ把消息分发给消费者便会立即从内存中移除。这种情况下，如果停止一个worker，它正在处理的消息就会丢失。同时其他所有发送给这个worker的还没有处理的消息也会丢失。</p>
+<p>但是我们不想丢失任何任务，如果一个worker挂掉，需要把任务发送到另一个worker。</p>
+<p>为了确保消息永不丢失，RabbitMQ支持消息响应（message acknowledgements），消费者会发送一个响应告诉RabbitMQ已经收到了某条消息，并且已经处理，这样RabbitMQ就可以删掉它了。</p>
+<p>如果一个消费者程序在未发送响应之前挂掉了（频道关闭，链接关闭，或者TCP连接丢失），RabbitMQ会认为消息没有完全处理然后会重新推送到队列中。如果此时有其他的消费者程序在运行，RabbitMQ会很快把消息发送给另一个消费者。这样就可以确保消息不会丢失，即使worker偶尔挂掉。</p>
+<p>消息是没有超时的概念的，当worker断开连接的时候，RabbitMQ会重新发送消息，这样在处理一个耗时较长的消息任务时就不会出现问题了。</p>
+<p>消息响应默认是关闭的。可以通过设置basic_consume的第四个参数为false(true表示不开启应答)，然后在处理完任务的时候从worker发送一个正确的响应内容。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$callback</span> = <span class="function"><span class="keyword">function</span><span class="params">(<span class="variable">$msg</span>)</span></span>&#123;</span><br><span class="line">	<span class="keyword">echo</span> <span class="string">"[x] Received "</span>,<span class="variable">$msg</span>-&gt;body,<span class="string">"\n"</span>;</span><br><span class="line">	sleep(substr_count(<span class="variable">$msg</span>-&gt;body,<span class="string">'.'</span>));</span><br><span class="line">	<span class="keyword">echo</span> <span class="string">"[x] Done"</span>,<span class="string">"\n"</span>;</span><br><span class="line">	<span class="variable">$msg</span>-&gt;delivery_info[<span class="string">'channel]-&gt;basic_ack($msg-&gt;delivery_info['</span>delivery_tag]);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="variable">$channel</span>-&gt;basic_consume(<span class="string">'task_queue'</span>,<span class="string">''</span>,<span class="keyword">false</span>,<span class="keyword">false</span>,<span class="keyword">false</span>,<span class="keyword">false</span>,<span class="variable">$callback</span>);</span><br></pre></td></tr></table></figure>
+<p>这样我们就可以确保当你CTRL+C杀掉一个正在处理消息的worker的时候，消息并不会丢失。在这个worker挂掉之后，所有未响应的消息就会发送。</p>
+<h3 id="忘了响应">忘了响应</h3><p>一个很容易犯的错误就是忘了basic_ack，后果很严重。消息会在程序退出后重新发送（可能看起来像是随机返还 原文：which may look like random redelivery），但是如果它不释放未响应的消息，RabbitMQ就会占用越来越多的内存。</p>
+<p>为了排除这种错误可以使用rabbitmqctl来打印messages_unacknowledges字段：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo rabbitmqctl list_queues name messages_ready messages_unacknowledged</span><br><span class="line"></span><br><span class="line">Listing queues ...</span><br><span class="line">hello    <span class="number">0</span>       <span class="number">0</span></span><br><span class="line">...done.</span><br></pre></td></tr></table></figure>
+<h3 id="消息持久化">消息持久化</h3><p>我们已经学习了确保即使消费者程序挂掉，任务也不会丢失。但是任务还是会在RabbitMQ服务停止的时候丢失。</p>
+<p>当RabbitMQ退出或崩溃，它会丢失之前所有的队列和消息，除非你特意告诉它。所以我们必须把队列和消息设为持久化。</p>
+<p>首先，为了队列不丢失，需要把它声明为<i>持久化（durable）</i>，所以修改queue_declare的第三个参数为true：</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$channel-</span>&gt;queue_declare(<span class="string">'hello'</span>,<span class="literal">false</span>,<span class="literal">true</span>,<span class="literal">false</span>,<span class="literal">false</span>);</span><br></pre></td></tr></table></figure>
+<p>尽管这行代码本身是正确的，但是仍然不会正确运行。因为在之前已经定义过一个非持久化的 hello 队列。RabbitＭＱ不允许使用不同参数重新定义一个已经存在的队列，它会返回一个错误。但是可以用一个快捷的方法去解决，定义一个不同名字的队列，比如 task_queue：</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$channel-</span>&gt;queue_declare(<span class="string">'task_queue'</span>,<span class="literal">false</span>,<span class="literal">true</span>,<span class="literal">false</span>,<span class="literal">false</span>);</span><br></pre></td></tr></table></figure>
+<p>需要把生产者和消费者程序都设置为 true。</p>
+<p>这时候，我们就可以确保在RabbitMQ重启之后task_queue队列不会丢失。现在需要设置消息持久化了 - 通过设置AMQPMessage的属性数组中消息属性 delivery_mode = 2来达到。</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$msg</span> = new AMQPMessage(<span class="variable">$data</span>,</span><br><span class="line">		<span class="keyword">array</span>(<span class="string">'delivery_mode'</span>=&gt;<span class="number">2</span>) //设置消息持久化</span><br><span class="line">	);</span><br></pre></td></tr></table></figure>
+<h3 id="关于消息持久化的说明">关于消息持久化的说明</h3><p>设置消息持久化并不能完全保证消息不会丢失。这只是告诉让RabbitMQ要把消息保存到硬盘，但是从RabbitMQ接收到消息到保存完成仍然还有一个短暂的间隔时间。因为RabbitMQ并不是每一条消息都会使用fsync(2)，可能只是保存到缓存中而不是真正的写到磁盘里。并不能保证消息真正的持久化，但是对于简单的工作队列已经足够了。如果你需要更健壮的持久化，可以使用<a href="https://www.rabbitmq.com/confirms.html" target="_blank" rel="external">publisher confirms</a>机制。</p>
+<h3 id="公平分发">公平分发</h3><p>也许你注意到它仍没有像我们想的那样去派发任务，比如在两个worker的情况下，处理奇数消息的比较繁忙，处理偶数消息的比较轻松，一个worker不断的忙碌而另一个几乎不需要工作，但是RabbitmQ并不知道这些，并且继续一如既往的派发消息。</p>
+<p>这是因为RabbitMQ在消息进入队列的时候只管去派发，并不管消费者未做出响应的消息数。它只是把每第n条消息发送给第n个消费者。</p>
+<p>我们可以使用basic_qos方法，并设置prefetch_count = 1。这样是告诉RabbitMQ在同一时刻不要发送超过1条消息给一个worker，或者说，不要发送新的消息给worker直到它已处理完上一条消息并作出了响应。这样，它就会把消息发送给下一个空闲的worker了。</p>
+<p><img src="/images/rabbitmq/prefetch-count.png" alt=""></p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$channel-</span>&gt;basic_qos(null,<span class="number">1</span>,null);</span><br></pre></td></tr></table></figure>
+<h3 id="注意队列长度">注意队列长度</h3><p>如果所有的worker都处于忙碌状态，队列就会填满，你需要留意，添加更多的worker，或者使用其他的策略。</p>
+<h3 id="整合">整合</h3><p>最终，new_task.php的代码如下：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">require_once</span> <span class="keyword">__DIR__</span> .<span class="string">'/verdor/autoload.php'</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Connection</span>\<span class="title">AMQPStreamConnection</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Message</span>\<span class="title">AMQPMessage</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$connection</span> = <span class="keyword">new</span> AMQPStreamConnection(<span class="string">'localhost'</span>,<span class="number">5672</span>,<span class="string">'guest'</span>,<span class="string">'guest'</span>);</span><br><span class="line"><span class="variable">$channel</span> = <span class="variable">$connection</span>-&gt;channel();</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel</span>-&gt;queue_declare(<span class="string">'task_queue'</span>,<span class="keyword">false</span>,<span class="keyword">true</span>,<span class="keyword">false</span>,<span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$data</span> = implode(<span class="string">' '</span>,array_slice(<span class="variable">$argv</span>,<span class="number">1</span>));</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">empty</span>(<span class="variable">$data</span>)) <span class="variable">$data</span> = <span class="string">"Hello World!"</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$msg</span> = <span class="keyword">new</span> AMQPMessage(<span class="variable">$data</span>,</span><br><span class="line">	<span class="keyword">array</span>(<span class="string">'delivery_mode'</span>=&gt;<span class="number">2</span>) <span class="comment">// 消息持久化</span></span><br><span class="line">);</span><br><span class="line"><span class="variable">$channel</span>-&gt;basic_publish(<span class="variable">$msg</span>,<span class="string">''</span>,<span class="string">'task_queue'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> <span class="string">"[x]Sent "</span>, <span class="variable">$data</span>, <span class="string">"\n"</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel</span>-&gt;close();</span><br><span class="line"><span class="variable">$connection</span>-&gt;close();</span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p><a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/new_task.php" target="_blank" rel="external">new_task.php源码</a></p>
+<p>worker.php</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">require_once</span> <span class="keyword">__DIR__</span> .<span class="string">'/vendor/autoload.php'</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Connection</span>\<span class="title">AMQPStreamConnection</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$connection</span> = <span class="keyword">new</span> AMQPStreamConnection(<span class="string">'localhost'</span>,<span class="number">5672</span>,<span class="string">'guest'</span>,<span class="string">'guest'</span>);</span><br><span class="line"><span class="variable">$channel</span> = <span class="variable">$connection</span>-&gt;channel();</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel</span>-&gt;queue_declare(<span class="string">'task_queue'</span>,<span class="keyword">false</span>,<span class="keyword">true</span>,<span class="keyword">false</span>,<span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> <span class="string">'[*] Waiting for messages.To exit press CTRL+C'</span>,<span class="string">"\n"</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$callback</span> = <span class="function"><span class="keyword">function</span><span class="params">(<span class="variable">$msg</span>)</span></span>&#123;</span><br><span class="line">	<span class="keyword">echo</span> <span class="string">"[x]Received "</span>,<span class="variable">$msg</span>-&gt;body,<span class="string">"\n"</span>;</span><br><span class="line">	sleep(substr_count(<span class="variable">$msg</span>-&gt;body,<span class="string">'.'</span>));</span><br><span class="line">	<span class="keyword">echo</span> <span class="string">"[x]Done"</span>,<span class="string">"\n"</span>;</span><br><span class="line">	<span class="variable">$msg</span>-&gt;delivery_info[<span class="string">'chennel'</span>]-&gt;basic_ack(<span class="variable">$msg</span>-&gt;delivery_info[<span class="string">'delivery_tag'</span>]);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel</span>-&gt;basic_qos(<span class="keyword">null</span>,<span class="number">1</span>,<span class="keyword">null</span>);</span><br><span class="line"><span class="variable">$channel</span>-&gt;basic_consume(<span class="string">'task_queue'</span>,<span class="string">''</span>,<span class="keyword">false</span>,<span class="keyword">false</span>,<span class="keyword">false</span>,<span class="keyword">false</span>,<span class="variable">$callback</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span>(count(<span class="variable">$channel</span>-&gt;callbacks))&#123;</span><br><span class="line">	<span class="variable">$channel</span>-&gt;wait();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel</span>-&gt;close();</span><br><span class="line"><span class="variable">$connection</span>-&gt;close();</span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p><a href="http://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/worker.php" target="_blank" rel="external">worker.php</a></p>
+<p>使用消息应答和prefetch_count=1后，就可以运行一个工作队列了，持久模式选项会在即使RabbitMQ重启的情况下保留任务。</p>
+<p>现在我们可以继续学习第三部分的内容，学习如何发送相同的消息给多个消费者。</p>
+<p>原文地址：<a href="https://www.rabbitmq.com/tutorials/tutorial-two-php.html" target="_blank" rel="external">Work queues</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html" data-id="citmmipk1000vcc3ge2en3mqq" class="article-share-link">Share</a>
+      
+        <a href="http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/php/">php</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/rabbitmq/">rabbitmq</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-php-rabbitmq-tutorial-one" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2016/02/28/php-rabbitmq-tutorial-one.html" class="article-date">
@@ -150,7 +258,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html" data-id="cit8ng09p0018ek0ru2zo5xry" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html" data-id="citmmipkg0018cc3g08mv0gde" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html#comments" class="article-comment-link">Comments</a>
       
@@ -198,7 +306,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html" data-id="cit8ng0aj0039ek0rkzf97pdu" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html" data-id="citmmiply003ecc3ggbzf9yjj" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html#comments" class="article-comment-link">Comments</a>
       
@@ -256,7 +364,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html" data-id="cit8ng0ap003oek0rm2gqkt8o" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html" data-id="citmmipm9003tcc3gjw3lht8t" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html#comments" class="article-comment-link">Comments</a>
       
@@ -315,7 +423,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/02/03/MySQL实现row_number .html" data-id="cit8ng0ar003rek0rm6ir4ios" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/02/03/MySQL实现row_number .html" data-id="citmmipmd003wcc3gw34rbjo0" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/02/03/MySQL实现row_number .html#comments" class="article-comment-link">Comments</a>
       
@@ -372,7 +480,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/01/19/echarts-pie.html" data-id="cit8ng0a40024ek0rcqvungyq" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/01/19/echarts-pie.html" data-id="citmmipl50024cc3gm3bvqjup" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/01/19/echarts-pie.html#comments" class="article-comment-link">Comments</a>
       
@@ -424,7 +532,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/01/11/placeholder-animate.html" data-id="cit8ng09c000dek0rc4f3nceq" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/01/11/placeholder-animate.html" data-id="citmmipjo000dcc3ga6wog5fo" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/01/11/placeholder-animate.html#comments" class="article-comment-link">Comments</a>
       
@@ -504,7 +612,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html" data-id="cit8ng0ae002vek0rfsb1xkfg" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html" data-id="citmmiplr0030cc3gdo9vhzsn" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html#comments" class="article-comment-link">Comments</a>
       
@@ -576,7 +684,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html" data-id="cit8ng0a5002bek0rww5ca226" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html" data-id="citmmipl9002bcc3glj8guofn" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html#comments" class="article-comment-link">Comments</a>
       
@@ -662,70 +770,12 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html" data-id="cit8ng09a0008ek0rxoozoawn" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html" data-id="citmmipjl0008cc3gljzdbej8" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html#comments" class="article-comment-link">Comments</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/https/">https</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ssl/">ssl</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-php-use-pdo-cache-query-result-with-redis" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2015/12/05/php-use-pdo-cache-query-result-with-redis.html" class="article-date">
-  <time datetime="2015-12-05T14:37:09.000Z" itemprop="datePublished">2015-12-05</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/php/">php</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2015/12/05/php-use-pdo-cache-query-result-with-redis.html">PHP使用Redis作为缓存使用PDO读取MySQL数据</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><img src="http://7b1hhm.com1.z0.glb.clouddn.com/hexo1414772222.jpg" alt=""></p>
-<p>图片转自：<a href="http://blog.encodez.com/blog/using-pdofetchall-examples-with-codes-and-output-results" target="_blank" rel="external">Using PDO::fetchAll – Examples with codes and output results</a></p>
-<p>一个简单的例子。</p>
-<p><strong>实现功能：</strong></p>
-<pre><code><span class="number">1.</span>使用PDO读取数据
-
-<span class="number">2.</span>使用Redis缓存结果
-
-<span class="number">3.</span>再次查询时会从Redis查询，减少MySQL查询
-</code></pre><p>没有注意代码的逻辑，仅实现思路。</p>
-<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"></span><br><span class="line">//一上来肯定是配置pdo的连接信息。其实这步在这个示例中可以放到第一个<span class="keyword">else</span>中。</span><br><span class="line"><span class="variable">$dsn</span> = <span class="string">'mysql:dbname=node;host=127.0.0.1'</span>;</span><br><span class="line"><span class="variable">$user</span> = <span class="string">'root'</span>;</span><br><span class="line"><span class="variable">$password</span> = <span class="string">''</span>;</span><br><span class="line"></span><br><span class="line">//连接Redis</span><br><span class="line"><span class="variable">$redis</span>= new Redis();</span><br><span class="line"><span class="variable">$redis-</span>&gt;connect(<span class="string">'127.0.0.1'</span>,<span class="number">6379</span>);</span><br><span class="line"></span><br><span class="line">//接收查询参数</span><br><span class="line"><span class="variable">$id</span> = intval($_GET[<span class="string">'id'</span>]);</span><br><span class="line"></span><br><span class="line">//设置在Redis中存储的KEY</span><br><span class="line"><span class="variable">$MY</span>_NODE_KEY<span class="number">_</span> = <span class="string">'TEST_PDO_REDIS_ID_'</span>;</span><br><span class="line"></span><br><span class="line">//拼接KEY和查询ID，读取Redis，</span><br><span class="line"><span class="variable">$cache</span> = <span class="variable">$redis-</span>&gt;get(<span class="variable">$MY</span>_NODE_KEY<span class="number">_</span>.<span class="variable">$id</span>);</span><br><span class="line"></span><br><span class="line">//用来插入log的时间参数</span><br><span class="line"><span class="variable">$date</span> = date(<span class="string">"Y-m-d H:i:s"</span>);</span><br><span class="line"><span class="keyword">if</span>(<span class="variable">$cache</span>)&#123;</span><br><span class="line">	//Redis缓存存在则直接输出</span><br><span class="line">	print_r(json_decode(<span class="variable">$cache</span>,true));</span><br><span class="line">	//并记录log</span><br><span class="line">	error_log(<span class="variable">$date</span>.<span class="string">"---read from redis \r\n"</span>, <span class="number">3</span>, <span class="string">'./debug.txt'</span>);</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">	//缓存不存在，则连接PDO</span><br><span class="line">	try &#123;</span><br><span class="line">    	<span class="variable">$pdo</span> = new PDO(<span class="variable">$dsn</span>, <span class="variable">$user</span>, <span class="variable">$password</span>);</span><br><span class="line">    	error_log(<span class="variable">$date</span>.<span class="string">"---Connection Succcess \r\n"</span>, <span class="number">3</span>, <span class="string">'./debug.txt'</span>);</span><br><span class="line">		</span><br><span class="line">		//查询</span><br><span class="line">	    <span class="variable">$query</span> = <span class="variable">$pdo</span> -&gt; query(<span class="string">"select * from news where id = '$id'"</span>);</span><br><span class="line">		//设置结果集为数组</span><br><span class="line">	    // [PDOStatement::fetch](http://php.net/manual/zh/pdostatement.fetch.php)</span><br><span class="line">	    <span class="variable">$query-</span>&gt;setFetchMode(PDO::FETCH_ASSOC);</span><br><span class="line">	    </span><br><span class="line">	    <span class="variable">$rs</span> = <span class="variable">$query-</span>&gt;fetch();</span><br><span class="line">	</span><br><span class="line">	    if (is_array(<span class="variable">$rs</span>)) &#123;</span><br><span class="line">	    	//查询完成，以json格式写入Redis中。</span><br><span class="line">			<span class="variable">$redis-</span>&gt;set(<span class="variable">$MY</span>_NODE_KEY<span class="number">_</span>.<span class="variable">$rs</span>[<span class="string">'id'</span>],json_encode(<span class="variable">$rs</span>));</span><br><span class="line">			print_r(<span class="variable">$rs</span>);</span><br><span class="line">			error_log(<span class="variable">$date</span>.<span class="string">"read from mysql \r\n"</span>, <span class="number">3</span>, <span class="string">'./debug.txt'</span>);</span><br><span class="line">	    &#125;</span><br><span class="line">	    </span><br><span class="line">	//PDO连接出错</span><br><span class="line">	&#125; catch (PDOException <span class="variable">$e</span>) &#123;</span><br><span class="line">		//输出错误信息，并记录log中</span><br><span class="line">    	echo <span class="string">'Connection failed: '</span> . <span class="variable">$e-</span>&gt;getMessage();</span><br><span class="line">    	error_log(<span class="variable">$date</span>.<span class="string">"---Connection failed \r\n"</span>, <span class="number">3</span>, <span class="string">'./debug.txt'</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>写的很糙，逻辑已经简单到没有逻辑了。</p>
-<p>一句话说一下思路就是：<br>    先看有没有缓存<br>    木有就查数据库，写入缓存</p>
-<p>参考资料：<br>    <a href="http://php.net/manual/zh/book.pdo.php" target="_blank" rel="external">PHP 数据对象</a><br>    <a href="http://www.cnblogs.com/zemliu/archive/2012/05/08/2490953.html" target="_blank" rel="external">PHP PDO的简单使用(query(),exec(),prepare(),Transaction,行锁)</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html" data-id="cit8ng09e000kek0r7oals89h" class="article-share-link">Share</a>
-      
-        <a href="http://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html#comments" class="article-comment-link">Comments</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pdo/">pdo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/php/">php</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis/">redis</a></li></ul>
 
     </footer>
   </div>
@@ -777,7 +827,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">9</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">10</span></li></ul>
     </div>
   </div>
 
@@ -786,7 +836,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -795,7 +845,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/dropbox/" style="font-size: 12.5px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/go/" style="font-size: 12.5px;">go</a> <a href="/tags/hexo/" style="font-size: 15px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 15px;">javascript</a> <a href="/tags/js/" style="font-size: 12.5px;">js</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 17.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 17.5px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redis/" style="font-size: 12.5px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
+      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/dropbox/" style="font-size: 12.5px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/go/" style="font-size: 12.5px;">go</a> <a href="/tags/hexo/" style="font-size: 15px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 15px;">javascript</a> <a href="/tags/js/" style="font-size: 12.5px;">js</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 17.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 17.5px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redis/" style="font-size: 12.5px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
     </div>
   </div>
 
@@ -804,7 +854,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
     </div>
   </div>
 
@@ -814,6 +864,10 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
     <h3 class="widget-title">Recents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html">Laravel 手动创建分页</a>
+          </li>
         
           <li>
             <a href="/2016/09/16/convert-xml-to-json-in-golang.html">Golang XMl 转 JSON</a>
@@ -829,10 +883,6 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
         
           <li>
             <a href="/2016/05/15/a-sample-redis-queue.html">一个简单的php+redis队列示例</a>
-          </li>
-        
-          <li>
-            <a href="/2016/05/08/cant-post-iqiyi-video-to-discuz.html">解决Discuz无法发布爱奇艺视频的问题</a>
           </li>
         
       </ul>
