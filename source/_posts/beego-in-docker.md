@@ -1,4 +1,4 @@
-title: golang Beego框架Docker环境配置
+title: 用Docker部署Golang Beego框架应用
 categories: golang
 date: 2016-10-21 10:02:02
 tags: [go]
@@ -6,10 +6,10 @@ tags: [go]
 ---
 
 Docker是什么就不说了。
-golang是什么也不说了。
+Golang是什么也不说了。
 Beego是什么就更不用说了。
 
-昨天API项目基本完成，研究怎么部署。因为Docker部署起来更简单更快速，所以就说下怎么在docker里部署beego应用。
+最近Beego项目完成，研究怎么部署。因为Docker部署起来更简单更快速，所以就说下怎么在docker里部署beego应用。
 
 #### 写在前面
 

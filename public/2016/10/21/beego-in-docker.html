@@ -3,18 +3,25 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Tag: hexo | 启程</title>
+  <title>用Docker部署Golang Beego框架应用 | 启程</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta http-equiv="Access-Control-Allow-Origin" content="*">
-  <meta name="description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
-<meta property="og:type" content="website">
-<meta property="og:title" content="启程">
-<meta property="og:url" content="http://www.qichengzx.com/tags/hexo/index.html">
+  <meta name="description" content="Docker是什么就不说了。Golang是什么也不说了。Beego是什么就更不用说了。
+最近Beego项目完成，研究怎么部署。因为Docker部署起来更简单更快速，所以就说下怎么在docker里部署beego应用。
+写在前面假设你的应用路径为 /go/app；假设已配置好docker的相关东西。假设使用 godep 作为依赖管理工具示例中开放端口为80，需要与app.conf中的端口一致，可以自行">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用Docker部署Golang Beego框架应用">
+<meta property="og:url" content="http://www.qichengzx.com/2016/10/21/beego-in-docker.html">
 <meta property="og:site_name" content="启程">
-<meta property="og:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
+<meta property="og:description" content="Docker是什么就不说了。Golang是什么也不说了。Beego是什么就更不用说了。
+最近Beego项目完成，研究怎么部署。因为Docker部署起来更简单更快速，所以就说下怎么在docker里部署beego应用。
+写在前面假设你的应用路径为 /go/app；假设已配置好docker的相关东西。假设使用 godep 作为依赖管理工具示例中开放端口为80，需要与app.conf中的端口一致，可以自行">
+<meta property="og:updated_time" content="2016-10-30T02:49:27.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="启程">
-<meta name="twitter:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
+<meta name="twitter:title" content="用Docker部署Golang Beego框架应用">
+<meta name="twitter:description" content="Docker是什么就不说了。Golang是什么也不说了。Beego是什么就更不用说了。
+最近Beego项目完成，研究怎么部署。因为Docker部署起来更简单更快速，所以就说下怎么在docker里部署beego应用。
+写在前面假设你的应用路径为 /go/app；假设已配置好docker的相关东西。假设使用 godep 作为依赖管理工具示例中开放端口为80，需要与app.conf中的端口一致，可以自行">
 <meta name="twitter:creator" content="@qichengzx">
   
     <link rel="alternative" href="/atom.xml" title="启程" type="application/atom+xml">
@@ -61,77 +68,86 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2015" class="archive-year">2015</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2015/12/27/dropbox-sync-hexo-article.html" class="archive-article-date">
-  <time datetime="2015-12-27T13:47:09.000Z" itemprop="datePublished">Dec 27</time>
+        <section id="main"><article id="post-beego-in-docker" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/10/21/beego-in-docker.html" class="article-date">
+  <time datetime="2016-10-21T02:02:02.000Z" itemprop="datePublished">2016-10-21</time>
 </a>
-      
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/golang/">golang</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2015/12/27/dropbox-sync-hexo-article.html">使用Dropbox同步hexo文章</a>
+    <h1 class="article-title" itemprop="name">
+      用Docker部署Golang Beego框架应用
     </h1>
   
 
-    </header>
-  </div>
-</article>
-  
+      </header>
     
-    
-    <article class="archive-article archive-type-photo">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html" class="archive-article-date">
-  <time datetime="2015-11-13T06:12:35.000Z" itemprop="datePublished">Nov 13</time>
-</a>
+    <div class="article-entry" itemprop="articleBody">
       
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html">利用Dropbox同步hexo的文章源文件并自动生成文章发布</a>
-    </h1>
-  
+        <p>Docker是什么就不说了。<br>Golang是什么也不说了。<br>Beego是什么就更不用说了。</p>
+<p>最近Beego项目完成，研究怎么部署。因为Docker部署起来更简单更快速，所以就说下怎么在docker里部署beego应用。</p>
+<h4 id="写在前面">写在前面</h4><p>假设你的应用路径为 /go/app；<br>假设已配置好docker的相关东西。<br>假设使用 <a href="https://github.com/tools/godep" target="_blank" rel="external">godep</a> 作为依赖管理工具<br>示例中开放端口为80，需要与app.conf中的端口一致，可以自行修改。</p>
+<h4 id="配置">配置</h4><p>在 /go/app 目录新建Dockerfile。</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">FROM golan<span class="variable">g:1</span>.<span class="number">7.1</span>-alpine</span><br><span class="line"></span><br><span class="line">MAINTAINER youremail &lt;youremail@xxx.<span class="keyword">com</span>&gt;</span><br><span class="line"></span><br><span class="line">RUN apk <span class="built_in">add</span> --<span class="keyword">update</span> <span class="keyword">go</span> git</span><br><span class="line"></span><br><span class="line">ADD ./ /<span class="keyword">go</span>/src/app</span><br><span class="line"></span><br><span class="line">RUN <span class="keyword">cd</span> /<span class="keyword">go</span>/src/app \</span><br><span class="line">	&amp;&amp; <span class="keyword">go</span> <span class="built_in">get</span> github.<span class="keyword">com</span>/astaxie/beego \</span><br><span class="line">	&amp;&amp; <span class="keyword">go</span> <span class="built_in">get</span> github.<span class="keyword">com</span>/tools/godep \</span><br><span class="line">	&amp;&amp; godep <span class="keyword">update</span> -goversion \</span><br><span class="line">	&amp;&amp; godep <span class="built_in">get</span> \</span><br><span class="line">	&amp;&amp; godep save \</span><br><span class="line">	&amp;&amp; <span class="keyword">go</span> build</span><br><span class="line"></span><br><span class="line">EXPOSE <span class="number">80</span></span><br><span class="line"></span><br><span class="line">EXTRYPOINT /<span class="keyword">go</span>/src/app/app</span><br></pre></td></tr></table></figure>
+<p>本例使用 golang:1.7.1-alpine 作为基础镜像。golang的所有镜像见<a href="https://hub.docker.com/_/golang/" target="_blank" rel="external">这里</a>。</p>
+<h4 id="构建">构建</h4><figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="label">docker</span> <span class="keyword">build </span>-t app .</span><br></pre></td></tr></table></figure>
+<h4 id="运行">运行</h4><figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="keyword">run</span> -<span class="keyword">d</span> -p 8080:80 <span class="keyword">app</span></span><br></pre></td></tr></table></figure>
+<h4 id="访问">访问</h4><p>使用nginx反向代理访问docker中的go应用。</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen       <span class="number">80</span>;</span><br><span class="line">    server_name  app.com;</span><br><span class="line"></span><br><span class="line">    charset utf-<span class="number">8</span>;</span><br><span class="line">    access_log  logs/app.access.log;</span><br><span class="line"></span><br><span class="line">    location / &#123;</span><br><span class="line">        try_files /_not_exists<span class="number">_</span> @backend;</span><br><span class="line">    &#125;</span><br><span class="line">    if (!-e <span class="variable">$request</span>_filename) &#123;</span><br><span class="line">        return <span class="number">404</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    location @backend &#123;</span><br><span class="line">        proxy_set_header X-Forwarded-For <span class="variable">$remote</span>_addr;</span><br><span class="line">        proxy_set_header Host            <span class="variable">$http</span>_host;</span><br><span class="line"></span><br><span class="line">        proxy_pass http://<span class="number">192.168</span>.<span class="number">99.100</span>:<span class="number">8080</span>; // <span class="number">192.168</span>.<span class="number">99.100</span>为docker machine的ip,<span class="number">8080</span>为 docker run 时指定的本地端口。</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="相关资料">相关资料</h4><p><a href="https://yq.aliyun.com/articles/57247" target="_blank" rel="external">如何使用Docker快速部署go-web应用程序</a><br><a href="https://blog.golang.org/docker" target="_blank" rel="external">Deploying Go servers with Docker</a><br><a href="http://www.infoq.com/cn/articles/how-to-deploy-a-go-web-application-with-docker?utm_source=infoq&amp;utm_medium=related_content_link&amp;utm_campaign=relatedContent_articles_clk" target="_blank" rel="external">如何使用Docker部署Go Web应用程序</a><br><a href="https://www.iron.io/the-easiest-way-to-develop-with-go%E2%80%8A-%E2%80%8Aintroducing-a-docker-based-go-tool/" target="_blank" rel="external">The Easiest Way to Develop with Go — Introducing a Docker Based Go Tool</a><br><a href="https://semaphoreci.com/community/tutorials/how-to-deploy-a-go-web-application-with-docker" target="_blank" rel="external">How To Deploy a Go Web Application with Docker</a><br><a href="https://beego.me/docs/deploy/nginx.md" target="_blank" rel="external">nginx 部署</a></p>
 
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2015/11/11/time-widget-for-hexo.html" class="archive-article-date">
-  <time datetime="2015-11-11T06:16:29.000Z" itemprop="datePublished">Nov 11</time>
-</a>
       
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2015/11/11/time-widget-for-hexo.html">为hexo加一个时钟小挂件</a>
-    </h1>
-  
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.qichengzx.com/2016/10/21/beego-in-docker.html" data-id="ciuw1g2gd0030oa0rqot6f211" class="article-share-link">Share</a>
+      
+        <a href="http://www.qichengzx.com/2016/10/21/beego-in-docker.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li></ul>
 
-    </header>
+    </footer>
   </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Laravel 手动创建分页</div>
+    </a>
+  
+</nav>
+
+  
 </article>
-  
-  
-    </div></section>
-  
+
+
+<section id="comments">
+  <div class="ds-thread" data-thread-key="ciuw1g2gd0030oa0rqot6f211" data-title="用Docker部署Golang Beego框架应用" data-url="http://www.qichengzx.com/2016/10/21/beego-in-docker.html"></div>
+  <script>
+    var duoshuoQuery = {short_name:"qichengzx"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0] 
+       || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+</section>
 </section>
         
           <aside id="sidebar">
