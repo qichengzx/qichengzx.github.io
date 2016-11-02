@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="http://www.qichengzx.com/"/>
-  <updated>2016-10-30T02:49:27.000Z</updated>
+  <updated>2016-11-02T10:17:59.000Z</updated>
   <id>http://www.qichengzx.com/</id>
   
   <author>
@@ -15,11 +15,41 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title><![CDATA[Mac brew php7.1环境下安装Yaf]]></title>
+    <link href="http://www.qichengzx.com/2016/11/02/install-yaf-on-mac.html"/>
+    <id>http://www.qichengzx.com/2016/11/02/install-yaf-on-mac.html</id>
+    <published>2016-11-02T09:57:38.000Z</published>
+    <updated>2016-11-02T10:17:59.000Z</updated>
+    <content type="html"><![CDATA[<p><img src="/images/php/think201-emergence-of-php7.jpg" alt=""></p>
+<p>开发机一直使用brew来安装PHP及其他的环境，今天把PHP升到7.1，由于7.1版本下还没有<a href="http://www.laruence.com/manual/" target="_blank" rel="external">yaf</a>的源，所以无法使用brew安装，只能编译安装了。</p>
+<p>首先下载yaf，解压，进入目录。</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">git clone git<span class="annotation">@github</span>.<span class="string">com:</span>laruence/yaf.git</span><br><span class="line"></span><br><span class="line">$(brew --prefix homebrew<span class="regexp">/php/</span>php71)<span class="regexp">/bin/</span>phpize</span><br><span class="line"></span><br><span class="line">.<span class="regexp">/configure --with-php-config=$(brew --prefix homebrew/</span>php<span class="regexp">/php71)/</span>bin/php-config</span><br><span class="line"></span><br><span class="line">make &amp;&amp; make install</span><br><span class="line"></span><br><span class="line">make test</span><br></pre></td></tr></table></figure>
+<p>$(brew –prefix homebrew/php/php71) 即 brew info php71结果中的path值。</p>
+<p>由于brew安装PHP会在php.ini同级目录创建conf.d目录，并把扩展的配置文件写在这里，一目了然知道都安装了哪些扩展，所以也以同样方式在此目录创建ext-yaf.ini。</p>
+<p>make install 后会显示，具体路径可能会不一样。</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="constant">Installing</span> shared <span class="symbol">extensions:</span>     /usr/local/<span class="constant">Cellar</span>/php71/<span class="number">7.1</span>.<span class="number">0</span>-rc.<span class="number">5_9</span>/<span class="class"><span class="keyword">lib</span>/<span class="title">php</span>/<span class="title">extensions</span>/<span class="title">no</span>-<span class="title">debug</span>-<span class="title">non</span>-<span class="title">zts</span>-20160303/</span></span><br></pre></td></tr></table></figure>
+<p>这个目录即扩展.so的存放目录。下边会用到。</p>
+<figure class="highlight accesslog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">[yaf]</span></span><br><span class="line">extension=<span class="string">"/usr/local/opt/php71/lib/php/extensions/no-debug-non-zts-20160303/yaf.so"</span></span><br><span class="line">yaf.environ=<span class="string">"dev"</span></span><br><span class="line">;yaf.use_namespace = <span class="number">1</span></span><br></pre></td></tr></table></figure>
+<p>至此，重启php-fpm就可以了。</p>
+<p>####<br>图片来自：<a href="https://think201.com/blog/2016/emergence-of-php7/" target="_blank" rel="external">Emergence of PHP7</a></p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p><img src="/images/php/think201-emergence-of-php7.jpg" alt=""></p>
+<p>开发机一直使用brew来安装PHP及其他的环境，今天把PHP升到7.1，由于7.1版本下还没有<a href="http://www.l]]>
+    </summary>
+    
+      <category term="php" scheme="http://www.qichengzx.com/tags/php/"/>
+    
+      <category term="php" scheme="http://www.qichengzx.com/categories/php/"/>
+    
+  </entry>
+  
+  <entry>
     <title><![CDATA[用Docker部署Golang Beego框架应用]]></title>
     <link href="http://www.qichengzx.com/2016/10/21/beego-in-docker.html"/>
     <id>http://www.qichengzx.com/2016/10/21/beego-in-docker.html</id>
     <published>2016-10-21T02:02:02.000Z</published>
-    <updated>2016-10-30T02:49:27.000Z</updated>
+    <updated>2016-11-02T10:12:42.000Z</updated>
     <content type="html"><![CDATA[<p>Docker是什么就不说了。<br>Golang是什么也不说了。<br>Beego是什么就更不用说了。</p>
 <p>最近Beego项目完成，研究怎么部署。因为Docker部署起来更简单更快速，所以就说下怎么在docker里部署beego应用。</p>
 <h4 id="写在前面">写在前面</h4><p>假设你的应用路径为 /go/app；<br>假设已配置好docker的相关东西。<br>假设使用 <a href="https://github.com/tools/godep" target="_blank" rel="external">godep</a> 作为依赖管理工具<br>示例中开放端口为80，需要与app.conf中的端口一致，可以自行修改。</p>
@@ -49,7 +79,7 @@
     <link href="http://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html"/>
     <id>http://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html</id>
     <published>2016-09-28T07:43:13.000Z</published>
-    <updated>2016-10-30T02:43:04.000Z</updated>
+    <updated>2016-09-28T08:01:54.000Z</updated>
     <content type="html"><![CDATA[<p>有些情况下会从接口读取数据，数据较多时会用到分页，Laravel为这种需求提供了很方便的方法。</p>
 <p><a href="https://laravel.com/docs/5.2/pagination" target="_blank" rel="external">官方文档</a>里几句略过，并没有详细说明，经过查找资料，发现如下方法可行。</p>
 <h3 id="首先use_LengthAwarePaginator">首先use LengthAwarePaginator</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> <span class="title">Illuminate</span>\<span class="title">Pagination</span>\<span class="title">LengthAwarePaginator</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">Illuminate</span>\<span class="title">Support</span>\<span class="title">Collection</span>;</span><br></pre></td></tr></table></figure>
@@ -87,7 +117,7 @@
     <link href="http://www.qichengzx.com/2016/09/16/convert-xml-to-json-in-golang.html"/>
     <id>http://www.qichengzx.com/2016/09/16/convert-xml-to-json-in-golang.html</id>
     <published>2016-09-16T03:28:20.000Z</published>
-    <updated>2016-09-18T13:19:05.000Z</updated>
+    <updated>2016-09-28T07:41:42.000Z</updated>
     <content type="html"><![CDATA[<p><img src="/images/golang.png" alt=""></p>
 <h4 id="起因">起因</h4><p>某个上古时代的API，依然在返回XML格式的数据，更奇葩的是，GBK格式的。</p>
 <p>用Go顺利的写到了发送数据，接收数据，然后取值有点麻烦啊。。。。</p>
@@ -136,7 +166,7 @@
     <link href="http://www.qichengzx.com/2016/09/11/Hello-Go.html"/>
     <id>http://www.qichengzx.com/2016/09/11/Hello-Go.html</id>
     <published>2016-09-11T09:21:03.000Z</published>
-    <updated>2016-09-11T09:21:09.000Z</updated>
+    <updated>2016-09-28T07:41:42.000Z</updated>
     <content type="html"><![CDATA[<h5 id="Mac_安装_GO">Mac 安装 GO</h5><p>本人使用了Brew来安装。</p>
 <h5 id="安装前首先更新Brew。">安装前首先更新Brew。</h5><figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">brew </span>update &amp;&amp; <span class="keyword">brew </span>upgrade</span><br></pre></td></tr></table></figure>
 <h5 id="安装Go">安装Go</h5><p>使用brew安装go</p>
@@ -179,7 +209,7 @@
     <link href="http://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html"/>
     <id>http://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html</id>
     <published>2016-07-02T15:11:30.000Z</published>
-    <updated>2016-07-03T01:14:00.000Z</updated>
+    <updated>2016-09-28T07:41:42.000Z</updated>
     <content type="html"><![CDATA[<p>有时候会遇到上传文件给第三方服务的情况，比如本身程序并不需要存储附件，而是把附件发送给一个公共的服务。</p>
 <p>最近正好碰到这个问题，记录一下。</p>
 <p>上代码。</p>
@@ -205,7 +235,7 @@
     <link href="http://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html"/>
     <id>http://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html</id>
     <published>2016-05-15T06:19:52.000Z</published>
-    <updated>2016-05-15T06:25:08.000Z</updated>
+    <updated>2016-09-28T07:41:42.000Z</updated>
     <content type="html"><![CDATA[<p><img src="/images/redis/redis-300dpi.png" alt=""></p>
 <p>虽然RabbitMQ的坑年前就开始填了，但是并没有机会在项目中实际使用，机缘巧合，换工作后第一个比较重要的事就是做一个直播的页面，如果数据直接插入或读取自数据库，数据库端的压力就太大了，当时RabbitMQ还没看完，而其他的队列程序更是没有用过，只是稍微对Redis熟悉些，于是就使用了Redis做。</p>
 <p><a href="http://redis.io/" target="_blank" rel="external">Redis</a>比较常见的是作为数据缓存工具使用，数据存储在内存中，减少了数据库的连接和查询，效率高，又方便。</p>
@@ -247,7 +277,7 @@
     <link href="http://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html"/>
     <id>http://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html</id>
     <published>2016-05-08T10:57:24.000Z</published>
-    <updated>2016-05-08T10:57:25.000Z</updated>
+    <updated>2016-09-28T07:41:42.000Z</updated>
     <content type="html"><![CDATA[<p><img src="/images/discuz/201510148054_136.jpg" alt=""></p>
 <p>最近碰到需要在Discuz论坛中插入爱奇艺视频的问题，之前没关注过，搜索后有些答案说DZ不支持爱奇艺，有些说爱奇艺不支持DZ，并没有真正能解决问题的。</p>
 <p>下午突然想到也许是DZ根据粘贴进来的flash地址生成的标签代码不对，试验后发现果然是这个原因。</p>
@@ -283,7 +313,7 @@
     <link href="http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html"/>
     <id>http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html</id>
     <published>2016-05-03T06:35:20.000Z</published>
-    <updated>2016-05-07T14:08:27.000Z</updated>
+    <updated>2016-09-28T07:41:43.000Z</updated>
     <content type="html"><![CDATA[<h3 id="远程调用">远程调用</h3><p>在<a href="/2016/04/17/php-rabbitmq-tutorial-two.html">第二节</a>中，我们学习了如何使用工作队列在多个worker中分发耗时任务。</p>
 <p>但是如果我们需要在远程运行一个函数并等待返回结果怎么办？这是两码事，这个模式通常被称为远程过程调用（Remote Procedure Call，RPC）。</p>
 <p>在本节中我们准备使用RabbitMQ构建一个RPC系统：一个客户端和一个可扩展的RPC服务端。由于我们没有值得分发的耗时任务，我们准备创建一个假的返回<a href="https://en.wikipedia.org/wiki/Fibonacci_number" target="_blank" rel="external">斐波那契数列</a>的RPC服务。</p>
@@ -357,7 +387,7 @@
     <link href="http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html"/>
     <id>http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html</id>
     <published>2016-04-27T10:27:03.000Z</published>
-    <updated>2016-05-07T14:06:15.000Z</updated>
+    <updated>2016-09-28T07:41:43.000Z</updated>
     <content type="html"><![CDATA[<h3 id="主题">主题</h3><p>(<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">使用php-amqplib</a>)</p>
 <p>在<a href="/2016/04/24/php-rabbitmq-tutorial-four.html">上一节</a>我们改善了日志系统(logging system，以下简称日志系统)，为了替代fanout类型的交换器，我们使用了一个direct类型的交换器，带来的好处是可以有选择的接收日志。</p>
 <p>虽然使用direct交换器改善了系统，但是仍然有局限性 - 它不能根据多个条件进行路由。</p>
@@ -424,7 +454,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="http://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html"/>
     <id>http://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html</id>
     <published>2016-04-24T06:16:41.000Z</published>
-    <updated>2016-05-07T14:06:15.000Z</updated>
+    <updated>2016-09-28T07:41:43.000Z</updated>
     <content type="html"><![CDATA[<h3 id="路由">路由</h3><p>（使用<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">php-amqplib</a>）<br>在<a href="/2016/04/23/php-rabbitmq-tutorial-three.html">上一节</a>中，我们创建了一个简单的日志系统（logging system）。我们已经可以广播日志消息到多个接收者了。</p>
 <p>在本节中，我们要给它增加一个功能-使它能够只订阅消息的一个子集。比如，只把严重的错误信息写入到日志文件（存储到磁盘）中，但同时仍然会把所有日志信息输出到控制台中。</p>
 <h3 id="绑定">绑定</h3><p>在上一节中我们已经创建了绑定（bindings），代码如下：</p>
@@ -482,7 +512,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html"/>
     <id>http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html</id>
     <published>2016-04-23T11:58:17.000Z</published>
-    <updated>2016-05-07T14:06:15.000Z</updated>
+    <updated>2016-09-28T07:41:43.000Z</updated>
     <content type="html"><![CDATA[<h3 id="发布/订阅">发布/订阅</h3><p>我们在<a href="/2016/04/17/php-rabbitmq-tutorial-two.html">上一节</a>创建了一个工作队列，并假定队列对应的任务传送给了某个客户端。在这一章节我们会做一些完全不一样的东西–我们会发送一条消息到多个消费者，也称之为“发布/订阅”模式。</p>
 <p>为了说明这个模式，我们会创建一个简单的日志系统（logging system，以下简称日志系统），它由两个程序组成–第一个是发送日志信息，第二个是接收日志并打印。</p>
 <p>日志系统的每一个运行的接收端程序都会接收信息，这样就可以运行一个接收端就把日志保存到硬盘里，同时运行另一个接收端去实时显示日志到屏幕。</p>
@@ -560,7 +590,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html"/>
     <id>http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html</id>
     <published>2016-04-17T06:39:30.000Z</published>
-    <updated>2016-05-07T14:06:15.000Z</updated>
+    <updated>2016-09-28T07:41:43.000Z</updated>
     <content type="html"><![CDATA[<h3 id="工作队列">工作队列</h3><h5 id="（使用php-amqplib库）">（使用<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">php-amqplib</a>库）</h5><p><img src="/images/rabbitmq/python-two.png" alt=""></p>
 <p>在本教程<a href="/2016/02/28/php-rabbitmq-tutorial-one.html">第一部分</a> 我们已经写完了从一个指定队列发送和接收消息的程序。在这一章节中，我们会创建一个工作队列（Work Queue）来分发耗时的任务给多个工作者（worker）。</p>
 <p>工作队列（也被称为 任务队列-task queue）主要是避免立即执行资源密集型任务并且还要等待它执行完毕。相反，需要让任务稍后执行，我们把一个任务当做一条信息发送给队列，后台运行的工作者（worker）会取出任务并执行，当运行多个worker时任务会在它们之间共享。</p>
@@ -643,7 +673,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="http://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html"/>
     <id>http://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html</id>
     <published>2016-02-28T03:10:03.000Z</published>
-    <updated>2016-05-07T14:06:15.000Z</updated>
+    <updated>2016-09-28T07:41:43.000Z</updated>
     <content type="html"><![CDATA[<h2 id="准备工作">准备工作</h2><h3 id="先决条件">先决条件</h3><p>本教程先决条件是RabbitMQ已经安装并正在以5672端口运行在 localhost，如果你使用了不同的域，端口，用户，密码，连接配置需要适当改变。</p>
 <h3 id="获得帮助">获得帮助</h3><p>如果在本教程中遇到问题，可以通过邮件列表进行联系。</p>
 <h3 id="介绍">介绍</h3><p>RabbitMQ是一个消息代理，它的本质是，从producers（生产者）接收消息，然后发送给consumers（消费者），在这个过程中，可以根据自己的配置规则使用路由，缓冲区，保存消息。</p>
@@ -720,7 +750,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="http://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html"/>
     <id>http://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html</id>
     <published>2016-02-25T09:10:43.000Z</published>
-    <updated>2016-02-25T09:16:54.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">var a =<span class="number">0</span>;</span><br><span class="line"><span class="keyword">for</span> (var i =<span class="number">0</span>,j =<span class="number">0</span>; i &lt;<span class="number">10</span>,j&lt;<span class="number">6</span>;i++,j++) &#123;</span><br><span class="line">	a = i+j;</span><br><span class="line">	console.<span class="built_in">log</span>(<span class="string">"i="</span>+i);</span><br><span class="line">	console.<span class="built_in">log</span>(<span class="string">"j="</span>+j);</span><br><span class="line">	console.<span class="built_in">log</span>(<span class="string">"a="</span>+a);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>朋友面试，遇到的面试题，电话跟我说完就回来写下来试了一下，结果与自己预想的一样。</p>
 <p>没写之前，电话里说的思路是，因为 j 限制了 小于 6，那么应该只循环6次，实际上也确实是这样。</p>
@@ -741,7 +771,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="http://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html"/>
     <id>http://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html</id>
     <published>2016-02-24T09:58:24.000Z</published>
-    <updated>2016-02-25T03:35:21.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<p>接上篇：<a href="https://www.qichengzx.com/2016/02/03/MySQL%E5%AE%9E%E7%8E%B0row_number%20.html">MySQL实现row_number</a></p>
 <h3 id="为分组增加row_number">为分组增加row number</h3><p>row_number的分析函数怎么样？（原文：How about  row_number “over partition by” functionality? ），比如，如果想为每一个组增加row number，并且在每一个新的分组重置它。</p>
 <p>查看下图中payments表。</p>
@@ -773,7 +803,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="http://www.qichengzx.com/2016/02/03/MySQL%E5%AE%9E%E7%8E%B0row_number%20.html"/>
     <id>http://www.qichengzx.com/2016/02/03/MySQL实现row_number .html</id>
     <published>2016-02-03T10:25:26.000Z</published>
-    <updated>2016-02-03T10:27:20.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<p>在本教程中，我们将在MySQL中实现一个非常实用的row_number功能。</p>
 <p>row_number是一个返回数据排序编号的排名方法，从1开始。我们经常需要用到row_number去生成某些报表，不幸的是，MySQL并不像MSSQL，Oracle一样支持这个方法。在MySQL中如果想实现这个功能需要临时变量。</p>
 <p>为了在MySQL中实现row_number，需要在查询中实用临时变量，下图中从employees表中查询出5条数据，并且从1开始，为每一行添加了编号(row number)。</p>
@@ -806,7 +836,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="http://www.qichengzx.com/2016/01/19/echarts-pie.html"/>
     <id>http://www.qichengzx.com/2016/01/19/echarts-pie.html</id>
     <published>2016-01-19T13:27:00.000Z</published>
-    <updated>2016-01-19T14:25:04.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<p><img src="/images/BEEC6560-EC03-4027-969D-DBB584A47E69.png" alt=""></p>
 <p>今天写一个做地区分布的饼图的东西。</p>
 <p>由于数据库里本身没有存储地区数据，只有IP，所以也用到了<a href="http://www.ipip.net/" target="_blank" rel="external">高春辉老师目前的项目</a>里提供的IP地址数据库。可以在数据库下载页面下载到免费的数据库文件和一个PHP处理类。</p>
@@ -842,7 +872,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="http://www.qichengzx.com/2016/01/11/placeholder-animate.html"/>
     <id>http://www.qichengzx.com/2016/01/11/placeholder-animate.html</id>
     <published>2016-01-11T13:42:58.000Z</published>
-    <updated>2016-01-12T13:33:24.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<p>以前经常见到的一种页面表单效果，但是并没有在项目中用过，前几天在sf上看到相关问题，顺手写了一个，还挺简单，没什么含量。</p>
 <p>此处省略HTML头信息等内容。</p>
 <h3 id="HTML">HTML</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"text"</span> <span class="attribute">id</span>=<span class="value">"uname"</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="title">label</span>&gt;</span>Name<span class="tag">&lt;/<span class="title">label</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
@@ -871,7 +901,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="http://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html"/>
     <id>http://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html</id>
     <published>2016-01-10T10:52:55.000Z</published>
-    <updated>2016-04-23T12:07:24.000Z</updated>
+    <updated>2016-04-26T04:29:40.000Z</updated>
     <content type="html"><![CDATA[<p><img src="/images/backup-database-with-crontab/crontab.jpg" alt=""></p>
 <p>crontab命令之前写过了，在<a href="http://segmentfault.com/a/1190000003953826" target="_blank" rel="external">Linux crontab 访问PHP URL完成定时任务</a>，今天写了一个用来备份数据库的脚本。</p>
 <p>主要会用到以下几个命令：</p>
@@ -921,56 +951,6 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       <category term="mysql" scheme="http://www.qichengzx.com/tags/mysql/"/>
     
       <category term="linux" scheme="http://www.qichengzx.com/categories/linux/"/>
-    
-  </entry>
-  
-  <entry>
-    <title><![CDATA[使用Dropbox同步hexo文章]]></title>
-    <link href="http://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html"/>
-    <id>http://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html</id>
-    <published>2015-12-27T13:47:09.000Z</published>
-    <updated>2016-04-23T12:08:10.000Z</updated>
-    <content type="html"><![CDATA[<p><img src="/images/dropbox/20130702165945-558672261.jpg" alt=""></p>
-<p>继之前<a href="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html">那次失败的尝试</a>之后（只在当时写的时候实验过几次，每次都以服务器卡死结束），后来在又多了几篇日志之后连generate也不能愉快的完成了。索性就在本地生成然后git push到服务器。</p>
-<p>现在想更激进一些，git只管理日志以外的东西，比如hexo的升级，或模板的调整和日志源文件。而生成的静态文件直接通过Dropbox客户端同步到服务器。</p>
-<p>话不多说。</p>
-<p>以下为前提：</p>
-<pre><code>本地已安装hexo，和Dropbox客户端，并且客户端的同步目录已经选择到hexo的目录。
-服务器已安装dropbox服务，及相应的用户。
-</code></pre><p>Dropbox的同步目录选hexo根目录或public都行，只是在服务器的处理脚本那同步修改下就行了。</p>
-<p>以下内容假设已在服务器添加dbox用户用于dropbox服务的同步处理。并且也已经设置了与dropbox账户的关联。</p>
-<h4 id="启动dropboxd">启动dropboxd</h4><p>用dbox用户登录服务器。</p>
-<p>然后，启动dropboxd进程。</p>
-<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">~<span class="regexp">/dropbox-dist/dropboxd</span> &amp;</span><br></pre></td></tr></table></figure>
-<h4 id="设置文件夹监测">设置文件夹监测</h4><h5 id="先安装incron服务。">先安装incron服务。</h5><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apt-get <span class="keyword">install</span> incron</span><br><span class="line">yum <span class="keyword">install</span> incron</span><br></pre></td></tr></table></figure>
-<h5 id="开机启动">开机启动</h5><p>安装sysv-rc-conf，用于管理服务的启动</p>
-<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">apt-get install sysv-rc-<span class="keyword">conf</span></span><br><span class="line">sysv-rc-<span class="keyword">conf</span> incron <span class="keyword">on</span></span><br><span class="line">sysv-rc-<span class="keyword">conf</span> --<span class="keyword">list</span> <span class="comment">//用于查看所有服务的状态</span></span><br></pre></td></tr></table></figure>
-<h5 id="创建监测服务">创建监测服务</h5><p>先修改下incron的编辑器</p>
-<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo <span class="keyword">vi</span> /etc/incron.<span class="keyword">conf</span></span><br></pre></td></tr></table></figure>
-<p>在文件的最后一行，去掉editor = vi前的#，保存退出。</p>
-<p>输入：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">incrontab <span class="operator">-e</span></span><br></pre></td></tr></table></figure>
-<p>如果当前登录的不是dbox用户，可以使用<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">incrontab -udbox <span class="operator">-e</span></span><br></pre></td></tr></table></figure></p>
-<p>然后输入：</p>
-<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">/home/</span>dbox<span class="regexp">/Dropbox/y</span>ourfolder<span class="regexp">/ IN_ATTRIB,IN_MOVE /</span>home<span class="regexp">/dbox/</span>dbox.sh</span><br></pre></td></tr></table></figure>
-<p>第一个参数：用来接收Dropbox同步的文件夹</p>
-<p>第二个参数：指监测的动作</p>
-<p>第三个参数：处理脚本</p>
-<p>监测的动作可以用：</p>
-<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">IN_ACCESS，即文件被访问</span><br><span class="line">IN_MODIFY，文件被 <span class="keyword">write</span></span><br><span class="line">IN_ATTRIB，文件属性被修改，如 <span class="keyword">chmod</span>、<span class="keyword">chown</span>、touch 等</span><br><span class="line">IN_CLOSE_WRITE，可写文件被 <span class="keyword">close</span></span><br><span class="line">IN_CLOSE_NOWRITE，不可写文件被 <span class="keyword">close</span></span><br><span class="line">IN_OPEN，文件被 <span class="keyword">open</span></span><br><span class="line">IN_MOVED_FROM，文件被移走,如 mv</span><br><span class="line">IN_MOVED_TO，文件被移来，如 mv、cp</span><br><span class="line">IN_CREATE，创建新文件</span><br><span class="line">IN_DELETE，文件被删除，如 rm</span><br><span class="line">IN_DELETE_SELF，自删除，即一个可执行文件在执行时删除自己</span><br><span class="line">IN_MOVE_SELF，自移动，即一个可执行文件在执行时移动自己</span><br><span class="line">IN_UNMOUNT，宿主文件系统被 umount</span><br><span class="line">IN_CLOSE，文件被关闭，等同于(IN_CLOSE_WRITE | IN_CLOSE_NOWRITE)</span><br><span class="line">IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)</span><br><span class="line"><span class="comment">#上面所说的文件也包括目录。</span></span><br></pre></td></tr></table></figure>
-<h5 id="处理同步后的文件的脚本">处理同步后的文件的脚本</h5><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cd <span class="regexp">/home/</span>dbox/</span><br><span class="line">vi dbox.sh</span><br><span class="line"></span><br><span class="line">cd <span class="regexp">/home/</span>dbox<span class="regexp">/Dropbox/</span>yoursite/</span><br><span class="line">cp -R <span class="keyword">public</span><span class="regexp">/ /</span>var<span class="regexp">/www/</span>yoursite/</span><br></pre></td></tr></table></figure>
-<p>最后一句要注意看你本地同步了哪些内容，还要注意与网站的目录对应。</p>
-<p>还要注意dbox.sh要有执行权限，和yoursite的写入权限。</p>
-<p>至此，完成。</p>
-]]></content>
-    <summary type="html">
-    <![CDATA[<p><img src="/images/dropbox/20130702165945-558672261.jpg" alt=""></p>
-<p>继之前<a href="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo]]>
-    </summary>
-    
-      <category term="dropbox" scheme="http://www.qichengzx.com/tags/dropbox/"/>
-    
-      <category term="hexo" scheme="http://www.qichengzx.com/tags/hexo/"/>
     
   </entry>
   

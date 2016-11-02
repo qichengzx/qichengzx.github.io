@@ -63,6 +63,62 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-install-yaf-on-mac" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/11/02/install-yaf-on-mac.html" class="article-date">
+  <time datetime="2016-11-02T09:57:38.000Z" itemprop="datePublished">2016-11-02</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/php/">php</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/11/02/install-yaf-on-mac.html">Mac brew php7.1环境下安装Yaf</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="/images/php/think201-emergence-of-php7.jpg" alt=""></p>
+<p>开发机一直使用brew来安装PHP及其他的环境，今天把PHP升到7.1，由于7.1版本下还没有<a href="http://www.laruence.com/manual/" target="_blank" rel="external">yaf</a>的源，所以无法使用brew安装，只能编译安装了。</p>
+<p>首先下载yaf，解压，进入目录。</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">git clone git<span class="annotation">@github</span>.<span class="string">com:</span>laruence/yaf.git</span><br><span class="line"></span><br><span class="line">$(brew --prefix homebrew<span class="regexp">/php/</span>php71)<span class="regexp">/bin/</span>phpize</span><br><span class="line"></span><br><span class="line">.<span class="regexp">/configure --with-php-config=$(brew --prefix homebrew/</span>php<span class="regexp">/php71)/</span>bin/php-config</span><br><span class="line"></span><br><span class="line">make &amp;&amp; make install</span><br><span class="line"></span><br><span class="line">make test</span><br></pre></td></tr></table></figure>
+<p>$(brew –prefix homebrew/php/php71) 即 brew info php71结果中的path值。</p>
+<p>由于brew安装PHP会在php.ini同级目录创建conf.d目录，并把扩展的配置文件写在这里，一目了然知道都安装了哪些扩展，所以也以同样方式在此目录创建ext-yaf.ini。</p>
+<p>make install 后会显示，具体路径可能会不一样。</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="constant">Installing</span> shared <span class="symbol">extensions:</span>     /usr/local/<span class="constant">Cellar</span>/php71/<span class="number">7.1</span>.<span class="number">0</span>-rc.<span class="number">5_9</span>/<span class="class"><span class="keyword">lib</span>/<span class="title">php</span>/<span class="title">extensions</span>/<span class="title">no</span>-<span class="title">debug</span>-<span class="title">non</span>-<span class="title">zts</span>-20160303/</span></span><br></pre></td></tr></table></figure>
+<p>这个目录即扩展.so的存放目录。下边会用到。</p>
+<figure class="highlight accesslog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">[yaf]</span></span><br><span class="line">extension=<span class="string">"/usr/local/opt/php71/lib/php/extensions/no-debug-non-zts-20160303/yaf.so"</span></span><br><span class="line">yaf.environ=<span class="string">"dev"</span></span><br><span class="line">;yaf.use_namespace = <span class="number">1</span></span><br></pre></td></tr></table></figure>
+<p>至此，重启php-fpm就可以了。</p>
+<p>####<br>图片来自：<a href="https://think201.com/blog/2016/emergence-of-php7/" target="_blank" rel="external">Emergence of PHP7</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.qichengzx.com/2016/11/02/install-yaf-on-mac.html" data-id="civ0rskac001x1s3g3mrj2xd1" class="article-share-link">Share</a>
+      
+        <a href="http://www.qichengzx.com/2016/11/02/install-yaf-on-mac.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/php/">php</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-beego-in-docker" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2016/10/21/beego-in-docker.html" class="article-date">
@@ -104,7 +160,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/10/21/beego-in-docker.html" data-id="ciuw1g2gd0030oa0rqot6f211" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/10/21/beego-in-docker.html" data-id="civ0rskbf00331s3g1mvraf43" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/10/21/beego-in-docker.html#comments" class="article-comment-link">Comments</a>
       
@@ -166,7 +222,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html" data-id="ciuw1g2g6002ioa0r3hhof2qd" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html" data-id="civ0rskb5002l1s3gxddffcs8" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html#comments" class="article-comment-link">Comments</a>
       
@@ -240,7 +296,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/09/16/convert-xml-to-json-in-golang.html" data-id="ciuw1g2g8002noa0rnpff7tz1" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/09/16/convert-xml-to-json-in-golang.html" data-id="civ0rskb8002q1s3g9hbrpwbw" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/09/16/convert-xml-to-json-in-golang.html#comments" class="article-comment-link">Comments</a>
       
@@ -309,7 +365,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/09/11/Hello-Go.html" data-id="ciuw1g2gu0042oa0rcu0nfa5g" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/09/11/Hello-Go.html" data-id="civ0rskch00451s3gquy4c09h" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/09/11/Hello-Go.html#comments" class="article-comment-link">Comments</a>
       
@@ -359,7 +415,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html" data-id="ciuw1g2fm001koa0rzq0s8ddh" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html" data-id="civ0rsk9u001k1s3g4m9w6cfq" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html#comments" class="article-comment-link">Comments</a>
       
@@ -423,7 +479,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html" data-id="ciuw1g2gh003boa0r6o7w5cvu" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html" data-id="civ0rskbk003e1s3gvekff4ja" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html#comments" class="article-comment-link">Comments</a>
       
@@ -481,7 +537,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html" data-id="ciuw1g2gb002soa0rl7wuoc18" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html" data-id="civ0rskbb002v1s3gjlu7fzjy" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html#comments" class="article-comment-link">Comments</a>
       
@@ -579,7 +635,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html" data-id="ciuw1g2fe0014oa0rguyiqd7q" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html" data-id="civ0rsk9c00141s3gt4936twt" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html#comments" class="article-comment-link">Comments</a>
       
@@ -670,7 +726,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html" data-id="ciuw1g2fk001goa0rpfy35wkk" class="article-share-link">Share</a>
+      <a data-url="http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html" data-id="civ0rsk9o001g1s3glo53ifxh" class="article-share-link">Share</a>
       
         <a href="http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html#comments" class="article-comment-link">Comments</a>
       
@@ -684,92 +740,9 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
 
 
   
-    <article id="post-php-rabbitmq-tutorial-four" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2016/04/24/php-rabbitmq-tutorial-four.html" class="article-date">
-  <time datetime="2016-04-24T06:16:41.000Z" itemprop="datePublished">2016-04-24</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/php/">php</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/04/24/php-rabbitmq-tutorial-four.html">PHP RabbitMQ 教程（四） - 路由</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="路由">路由</h3><p>（使用<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">php-amqplib</a>）<br>在<a href="/2016/04/23/php-rabbitmq-tutorial-three.html">上一节</a>中，我们创建了一个简单的日志系统（logging system）。我们已经可以广播日志消息到多个接收者了。</p>
-<p>在本节中，我们要给它增加一个功能-使它能够只订阅消息的一个子集。比如，只把严重的错误信息写入到日志文件（存储到磁盘）中，但同时仍然会把所有日志信息输出到控制台中。</p>
-<h3 id="绑定">绑定</h3><p>在上一节中我们已经创建了绑定（bindings），代码如下：</p>
-<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$channel-</span>&gt;queue_bind(<span class="variable">$queue</span>_name,<span class="string">'logs'</span>);</span><br></pre></td></tr></table></figure>
-<p>绑定（bindings）是指交换器（exchange）和队列（queue）的关系。可以简单的理解为：这个队列对这个交换器中的消息感兴趣。</p>
-<p>绑定的时候可以带一个额外的 routing_key 参数。为了避免与$channel::basic_publish的参数混淆，我们把它叫做 binding_key，所以我们这样使用key创建一个绑定：</p>
-<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$binding</span>_key = <span class="string">'black'</span>;</span><br><span class="line"><span class="variable">$channel-</span>&gt;queue_bind(<span class="variable">$queue</span>_name,<span class="variable">$exchange</span>_name,<span class="variable">$binding</span>_key);</span><br></pre></td></tr></table></figure>
-<p>binding key的意义取决于交换器的类型。我们之前使用过的fanout类型的交换器，会忽略这个值。</p>
-<h3 id="Direct_交换器">Direct 交换器</h3><p>之前创建的日志系统分发所有消息到所有的消费者。我们打算扩展一下，使它可以过滤严重的消息。比如，我们只想在接收到严重错误的时候才写入到磁盘中，不在警告或普通的消息上浪费磁盘空间。</p>
-<p>我们使用的是没有太多扩展性的fanout交换器，它仅能够简单的广播消息。</p>
-<p>我们将要使用一个direct交换器代替fanout交换器。路由算法很简单-只有binding key完全匹配routing key的消息会进入队列。</p>
-<p>为了说明，考虑如下的场景：</p>
-<p><img src="/images/rabbitmq/direct-exchange.png" alt=""></p>
-<p>在这个场景中，我们可以看到direct类型的交换器X有两个队列，第一个队列使用orange作为binding key，第二个队列有两个绑定，一个是black另一个是green。</p>
-<p>在这个场景中，当routing key为orange的消息发送到交换器，将会被路由到队列Q1。routing key为black或green的消息将会发送到Q2。其他的消息则会被丢弃。</p>
-<h3 id="多个绑定">多个绑定</h3><p><img src="/images/rabbitmq/direct-exchange-multiple.png" alt=""></p>
-<p>使用相同的binding key绑定多个队列是合法的。在这个例子中，我们会使用black作为binding key为X和Q1之间添加一个绑定。这样一来，direct 交换器就表现得跟fanout交换器一样，分发消息到匹配的队列。routing key为black的消息就会被分发到Q1和Q2。</p>
-<h3 id="发送日志">发送日志</h3><p>我们将要对日志系统使用这个模型，我们将要发送消息到一个direct交换器。将日志级别作为routing key。这样一来接收端程序就可以选择它想要接收的消息了。首先来看看发送日志。</p>
-<p>和以往一样，需要创建一个交换器：</p>
-<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$channel-</span>&gt;exchange_declare(<span class="string">'direct_logs'</span>,<span class="string">'direct'</span>,<span class="literal">false</span>,<span class="literal">false</span>,<span class="literal">false</span>);</span><br></pre></td></tr></table></figure>
-<p>然后准备发送消息：</p>
-<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$channel-</span>&gt;exchange_declare(<span class="string">'direct_logs'</span>,<span class="string">'direct'</span>,<span class="literal">false</span>,<span class="literal">false</span>,<span class="literal">false</span>);</span><br><span class="line"><span class="variable">$channel-</span>&gt;basic_publish(<span class="variable">$msg</span>,<span class="string">'direct_logs'</span>,<span class="variable">$severity</span>);</span><br></pre></td></tr></table></figure>
-<p>为了简化，我们可以假定’severity’的值可以是’info’,’warning’,’error’中的一个。</p>
-<h3 id="订阅">订阅</h3><p>接收消息的脚本会跟之前一样正常工作，但是我们准备为每一个我们感兴趣的日志级别创建一个新的绑定。</p>
-<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">foreach(<span class="variable">$severities</span> <span class="keyword">as</span> <span class="variable">$severity</span>)&#123;</span><br><span class="line">	<span class="variable">$channel-</span>&gt;queue_bind(<span class="variable">$queue</span>_name,<span class="string">'direct_logs'</span>,<span class="variable">$severity</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="整合">整合</h3><p><img src="/images/rabbitmq/python-four.png" alt=""></p>
-<p>emit_log_direct.php类的代码为：</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="keyword">require_once</span> <span class="keyword">__DIR__</span> . <span class="string">'/vendor/autoload.php'</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Connection</span>\<span class="title">AMQPStreamConnection</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Message</span>\<span class="title">AMQPMessage</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$connection</span> = <span class="keyword">new</span> AMQPStremConnection(<span class="string">'localhost'</span>,<span class="number">5672</span>,<span class="string">'guest'</span>,<span class="string">'guest'</span>);</span><br><span class="line"><span class="variable">$channel</span> = <span class="variable">$connection</span>-&gt;channel();</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel</span>-&gt;exchange_declare(<span class="string">'direct_logs'</span>,<span class="string">'direct'</span>,<span class="keyword">false</span>,<span class="keyword">false</span>,<span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$severity</span> = <span class="keyword">isset</span>(<span class="variable">$argv</span>[<span class="number">1</span>]) &amp;&amp; !<span class="keyword">empty</span>(<span class="variable">$argv</span>[<span class="number">1</span>]) ? <span class="variable">$argv</span>[<span class="number">1</span>] : <span class="string">'info'</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$data</span> = implode(<span class="string">' '</span>,array_slice(<span class="variable">$argv</span>,<span class="number">2</span>));</span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">empty</span>(<span class="variable">$data</span>)) <span class="variable">$data</span> = “Hello World!”;</span><br><span class="line"></span><br><span class="line"><span class="variable">$msg</span> = “[x] Sent ”,<span class="variable">$severity</span>,<span class="string">':'</span>,<span class="variable">$data</span>,” \n”;</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel</span>-&gt;close();</span><br><span class="line"><span class="variable">$connection</span>-&gt;close();</span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure>
-<p>receive_logs_direct.php的代码为：</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">require_once</span> <span class="keyword">__DIR__</span> . <span class="string">'/vendor/autoload.php'</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Connection</span>\<span class="title">AMQPStreamConnection</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$connection</span> = <span class="keyword">new</span> AMQPStreamConnection(<span class="string">'localhost'</span>,<span class="number">5672</span>,<span class="string">'guest'</span>,<span class="string">'guest'</span>);</span><br><span class="line"><span class="variable">$channel</span> = <span class="variable">$connection</span>-&gt;channel();</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel</span>-&gt;exchange_declare(<span class="string">'direct_logs'</span>,<span class="string">'direct'</span>,<span class="keyword">false</span>,<span class="keyword">false</span>,<span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">list</span>(<span class="variable">$queue_name</span>, ,) = <span class="variable">$channel</span>-&gt;queue_declare(“”,<span class="keyword">false</span>,<span class="keyword">false</span>,<span class="keyword">true</span>,<span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$severities</span> = array_slice(<span class="variable">$argv</span>,<span class="number">1</span>);</span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">empty</span>(<span class="variable">$severities</span>))&#123;</span><br><span class="line">	file_put_contents(<span class="string">'php://stderr'</span>,”Usage:<span class="variable">$argv</span>[<span class="number">0</span>][info][warning][error]\n”);</span><br><span class="line">	<span class="keyword">exit</span>(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">foreach</span>(<span class="variable">$severities</span> <span class="keyword">as</span> <span class="variable">$severity</span>)&#123;</span><br><span class="line">	<span class="variable">$channel</span>-&gt;queue_bind(<span class="variable">$queue_name</span>,<span class="string">'direct_logs'</span>,<span class="variable">$severity</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> <span class="string">'[*]Waiting for logs.To exit press CTRL+C'</span>,”\n”;</span><br><span class="line"></span><br><span class="line"><span class="variable">$callback</span> = <span class="function"><span class="keyword">function</span><span class="params">(<span class="variable">$msg</span>)</span></span>&#123;</span><br><span class="line">	<span class="keyword">echo</span> <span class="string">'[*]'</span>,<span class="variable">$msg</span>-&gt;delivery_info[<span class="string">'routing_key'</span>],<span class="string">':'</span>,<span class="variable">$msg</span>-&gt;body,”\n”;	</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel</span>-&gt;basic_consume(<span class="variable">$queue_name</span>,<span class="string">''</span>,<span class="keyword">false</span>,<span class="keyword">true</span>,<span class="keyword">false</span>,<span class="keyword">false</span>,<span class="variable">$callback</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span>(count(<span class="variable">$channel</span>-&gt;callbacks))&#123;</span><br><span class="line">	<span class="variable">$channel</span>-&gt;wait();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel</span>-&gt;close();</span><br><span class="line"><span class="variable">$connection</span>-&gt;close();</span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure>
-<p>如果你想只保存’warning’或’error’（而不是’info’）级别的消息，只需要打开命令行输入：</p>
-<figure class="highlight mel"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php receive_logs_direct.php <span class="keyword">warning</span> <span class="keyword">error</span> &gt; logs_from_rabbit.<span class="keyword">log</span></span><br></pre></td></tr></table></figure>
-<p>如果你想在屏幕上输出所有的消息，打开一个新的终端，输入：</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">php receive_logs_direct.php info warning error</span><br><span class="line">[*]Waiting <span class="keyword">for</span> logs.To <span class="keyword">exit</span> press CTRL+C</span><br></pre></td></tr></table></figure>
-<p>例如，发送error消息，输入：</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">php</span> emit_log_direct.php <span class="built_in">error</span> <span class="string">"Run. Run. Or it will explode."</span></span><br><span class="line">[x] Sent <span class="string">'error'</span>:<span class="string">'Run. Run. Or it will explode.'</span></span><br></pre></td></tr></table></figure>
-<p><a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/emit_log_direct.php" target="_blank" rel="external">emit_log_direct.php源码</a>  <a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/receive_logs_direct.php" target="_blank" rel="external">receive_logs_direct.php源码</a></p>
-<p>转到第五节，查看如何监听基于模式的消息。</p>
-<p>原文地址：<a href="https://www.rabbitmq.com/tutorials/tutorial-four-php.html" target="_blank" rel="external">Routing</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html" data-id="ciuw1g2fj001coa0rm02jlyx5" class="article-share-link">Share</a>
-      
-        <a href="http://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html#comments" class="article-comment-link">Comments</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/php/">php</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/rabbitmq/">rabbitmq</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
   
     <nav id="page-nav">
-      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
     </nav>
   
 </section>
@@ -810,7 +783,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">10</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">11</span></li></ul>
     </div>
   </div>
 
@@ -819,7 +792,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -837,7 +810,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
     </div>
   </div>
 
@@ -847,6 +820,10 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <h3 class="widget-title">Recents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2016/11/02/install-yaf-on-mac.html">Mac brew php7.1环境下安装Yaf</a>
+          </li>
         
           <li>
             <a href="/2016/10/21/beego-in-docker.html">用Docker部署Golang Beego框架应用</a>
@@ -862,10 +839,6 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
         
           <li>
             <a href="/2016/09/11/Hello-Go.html">Hello Go</a>
-          </li>
-        
-          <li>
-            <a href="/2016/07/02/php-post-file-with-curl.html">PHP Curl 上传文件</a>
           </li>
         
       </ul>
