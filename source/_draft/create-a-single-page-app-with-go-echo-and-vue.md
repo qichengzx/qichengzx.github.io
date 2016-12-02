@@ -227,6 +227,40 @@ type H map[string]interface{}
 
 此文件的主要部分就是处理方法。使用db连接作为一个参数，Echo 路由的处理方法还需要一个 Echo.HandlerFunc 接口。
 
+```
+// handlers/tasks.go
+
+// GetTasks endpoint
+func GetTasks(db *sql.DB) echo.HandlerFunc {
+    return func(c echo.Context) error {
+        return c.JSON(http.StatusOK, "tasks")
+    }
+}
+
+// PutTask endpoint
+func PutTask(db *sql.DB) echo.HandlerFunc {
+    return func(c echo.Context) error {
+        return c.JSON(http.StatusCreated, H{
+            "created": 123,
+    }
+}
+
+// DeleteTask endpoint
+func DeleteTask(db *sql.DB) echo.HandlerFunc {
+    return func(c echo.Context) error {
+        id, _ := strconv.Atoi(c.Param("id"))
+        return c.JSON(http.StatusOK, H{
+            "deleted": id,
+        })
+    }
+}
+```
+闭包中使用 http 包的一些状态码作为JSON响应值，使用 strconv 包的Atoi转换id到int类型。
+
+## MODEL
+
+
+
 
 
 ## 原文链接:[create-a-single-page-app-with-go-echo-and-vue](https://scotch.io/tutorials/create-a-single-page-app-with-go-echo-and-vue)
