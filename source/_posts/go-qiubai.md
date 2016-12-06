@@ -103,6 +103,7 @@ r.GET("/", Index)
 到这里，文档的抓取，解析，构造数据就已经完成，下一步，看一下怎么显示到页面中。
 
 ```
+{% raw %}
 <div class="col-md-12">
     <h2>{{ .title }}</h2>
     <table class="table table-striped table-bordered table-hover">
@@ -113,19 +114,23 @@ r.GET("/", Index)
         {{ end }}
     </table>
 </div>
+{% endraw %}
 ```
 
-使用 ```{{ }}``` 输出后端发送过来的数据。使用 range 迭代数据。与
+使用 "{% raw %}{{ }}{% endraw %}" 输出后端发送过来的数据。使用 range 迭代数据。与
 
 ```
 for pos, char := range str {
 ...
 }
 ```
+
 一样。
 
 完整的模板代码：
+
 ```
+{% raw %}
 <!-- public/index.html -->
 
 <html>
@@ -155,6 +160,7 @@ for pos, char := range str {
         </div>
     </body>
 </html>
+{% endraw %}
 ```
 
 这样，运行一下，就可以了。
@@ -163,4 +169,12 @@ gin框架默认使用8080端口，打开http://localhost:8080就可以看到一�
 
 问题来了，怎么增加一个分页呢？
 
+完整代码见:
+
 [Github地址](https://github.com/qichengzx/goqiubai)
+
+#### 后记
+
+其实早就写完了这篇，但是hexo生成的时候由于 ["{% raw %}{{{% endraw %}"的问题](https://hexo.io/docs/troubleshooting.html#Escape-Contents)，生成一直失败，一直拖到现在。
+
+实际代码中需要去掉 "{ % raw % }" 相关部分。
