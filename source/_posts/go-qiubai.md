@@ -1,4 +1,5 @@
 title: Go语言写爬取糗百热门帖子
+categories: golang
 date: 2016-12-04 15:49:04
 tags:  [go,糗百,goquery,gin]
 ---

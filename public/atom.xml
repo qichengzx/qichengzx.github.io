@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="http://www.qichengzx.com/"/>
-  <updated>2016-12-06T03:10:31.000Z</updated>
+  <updated>2016-12-06T03:24:55.000Z</updated>
   <id>http://www.qichengzx.com/</id>
   
   <author>
@@ -19,7 +19,7 @@
     <link href="http://www.qichengzx.com/2016/12/04/go-qiubai.html"/>
     <id>http://www.qichengzx.com/2016/12/04/go-qiubai.html</id>
     <published>2016-12-04T07:49:04.000Z</published>
-    <updated>2016-12-06T03:10:31.000Z</updated>
+    <updated>2016-12-06T03:24:55.000Z</updated>
     <content type="html"><![CDATA[<p>闲来无事，想着也用Go来写个爬虫之类的东西，我并不知道这算不算严格意义上的爬虫。</p>
 <p>思前想后，觉得写个爬糗百热门的脚本吧，一来足够简单，二来大概熟悉下流程。</p>
 <p>首先，选了<a href="https://github.com/PuerkitoBio/goquery" target="_blank" rel="external">goquery</a>这个包来解析HTML，声称与jquery相似的用法，事实上也确实是这样，非常方便。</p>
@@ -61,6 +61,8 @@
       <category term="goquery" scheme="http://www.qichengzx.com/tags/goquery/"/>
     
       <category term="gin" scheme="http://www.qichengzx.com/tags/gin/"/>
+    
+      <category term="golang" scheme="http://www.qichengzx.com/categories/golang/"/>
     
   </entry>
   
@@ -312,9 +314,9 @@
 <p>虽然RabbitMQ的坑年前就开始填了，但是并没有机会在项目中实际使用，机缘巧合，换工作后第一个比较重要的事就是做一个直播的页面，如果数据直接插入或读取自数据库]]>
     </summary>
     
-      <category term="redis" scheme="http://www.qichengzx.com/tags/redis/"/>
-    
       <category term="php" scheme="http://www.qichengzx.com/tags/php/"/>
+    
+      <category term="redis" scheme="http://www.qichengzx.com/tags/redis/"/>
     
       <category term="队列" scheme="http://www.qichengzx.com/tags/%E9%98%9F%E5%88%97/"/>
     
