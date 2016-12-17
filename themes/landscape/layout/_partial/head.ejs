@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <%
   var title = page.title;
 
@@ -29,7 +29,6 @@
   <% if (theme.favicon){ %>
     <link rel="icon" href="<%- theme.favicon %>">
   <% } %>
-  <!-- <link href="//fonts.useso.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css"> -->
   <%- css('css/style') %>
   <%- partial('google-analytics') %>
 </head>
