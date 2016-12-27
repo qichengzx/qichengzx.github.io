@@ -219,13 +219,6 @@
     </url>
 
     <url>
-        <loc>http://www.qichengzx.com/tags/go/</loc>
-        <lastmod>2016-12-16T13:38:03.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>http://www.qichengzx.com/tags/goquery/</loc>
         <lastmod>2016-12-16T13:38:03.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -235,6 +228,20 @@
     <url>
         <loc>http://www.qichengzx.com/tags/%E4%BB%8A%E6%97%A5%E5%A4%B4%E6%9D%A1/</loc>
         <lastmod>2016-12-16T13:38:03.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://www.qichengzx.com/tags/go/</loc>
+        <lastmod>2016-12-27T14:22:31.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>http://www.qichengzx.com/tags/%E7%9F%AD%E7%BD%91%E5%9D%80/</loc>
+        <lastmod>2016-12-27T14:22:31.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>

@@ -7,6 +7,14 @@
     </url>
 
     <url>
+        <loc>http://www.qichengzx.com/2016/12/27/shortlen-url-by-go.html</loc>
+        <lastmod>2016-12-27T14:22:31.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>http://www.qichengzx.com/2016/12/14/toutiao-images-spider-by-golang.html</loc>
         <lastmod>2016-12-16T13:38:03.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -119,7 +127,7 @@
     </url>
 
     <url>
-        <loc>http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html</loc>
+        <loc>http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html</loc>
         <lastmod>2016-05-07T14:06:15.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -127,7 +135,7 @@
     </url>
 
     <url>
-        <loc>http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html</loc>
+        <loc>http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html</loc>
         <lastmod>2016-05-07T14:06:15.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>

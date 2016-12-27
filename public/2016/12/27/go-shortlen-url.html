@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <title>Go语言的一个短网址服务 | 启程</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta http-equiv="Access-Control-Allow-Origin" content="*">
+  <meta name="description" content="题图来自http://www.dwtricks.com/
+
+“缩址，又称短址、短网址、网址缩短、缩短网址、URL缩短等，指的是一种互联网上的技术与服务。此服务可以提供一个非常短小的URL以代替原来的可能较长的URL，将长的URL地址缩短。用户访问缩短后的URL时，通常将会重定向到原来的URL。”
+– Wikipedia
+
+
+虽然短网址早已不再那么受广泛关注。但是不妨拿来练手。
+根据公开可以搜索到">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go语言的一个短网址服务">
+<meta property="og:url" content="http://www.qichengzx.com/2016/12/27/go-shortlen-url.html">
+<meta property="og:site_name" content="启程">
+<meta property="og:description" content="题图来自http://www.dwtricks.com/
+
+“缩址，又称短址、短网址、网址缩短、缩短网址、URL缩短等，指的是一种互联网上的技术与服务。此服务可以提供一个非常短小的URL以代替原来的可能较长的URL，将长的URL地址缩短。用户访问缩短后的URL时，通常将会重定向到原来的URL。”
+– Wikipedia
+
+
+虽然短网址早已不再那么受广泛关注。但是不妨拿来练手。
+根据公开可以搜索到">
+<meta property="og:image" content="http://www.qichengzx.com/images/go/best-url-shortener-to-make-earn-money.png">
+<meta property="og:updated_time" content="2016-12-27T14:21:48.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Go语言的一个短网址服务">
+<meta name="twitter:description" content="题图来自http://www.dwtricks.com/
+
+“缩址，又称短址、短网址、网址缩短、缩短网址、URL缩短等，指的是一种互联网上的技术与服务。此服务可以提供一个非常短小的URL以代替原来的可能较长的URL，将长的URL地址缩短。用户访问缩短后的URL时，通常将会重定向到原来的URL。”
+– Wikipedia
+
+
+虽然短网址早已不再那么受广泛关注。但是不妨拿来练手。
+根据公开可以搜索到">
+<meta name="twitter:image" content="http://www.qichengzx.com/images/go/best-url-shortener-to-make-earn-money.png">
+<meta name="twitter:creator" content="@qichengzx">
+  
+    <link rel="alternative" href="/atom.xml" title="启程" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">启程</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.qichengzx.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-go-shortlen-url" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/12/27/go-shortlen-url.html" class="article-date">
+  <time datetime="2016-12-27T13:27:34.000Z" itemprop="datePublished">2016-12-27</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/golang/">golang</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Go语言的一个短网址服务
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="/images/go/best-url-shortener-to-make-earn-money.png" alt=""></p>
+<center>题图来自<a href="http://www.dwtricks.com/2015/05/best-10-url-shortener-networks-to-earn-money-2015.html/" target="_blank" rel="external">http://www.dwtricks.com/</a></center>
+
+<p>“缩址，又称短址、短网址、网址缩短、缩短网址、URL缩短等，指的是一种互联网上的技术与服务。此服务可以提供一个非常短小的URL以代替原来的可能较长的URL，将长的URL地址缩短。<br>用户访问缩短后的URL时，通常将会重定向到原来的URL。”</p>
+<right>– Wikipedia</right>
+
+
+<p>虽然短网址早已不再那么受广泛关注。但是不妨拿来练手。</p>
+<p>根据公开可以搜索到的资料，短网址一般是将一个ID转换到一串字母，生成短的网址用于传播，实际访问会重定向到原网址。如上所述。</p>
+<p>那么使用Go来写这个有什么优势呢，优势之一当然是，Go部署简单，只需要copy执行文件即可。执行速度也快，甚至连HTTP服务器都不需要。</p>
+<h5 id="下边就边写边说明。">下边就边写边说明。</h5><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> main</div><div class="line"></div><div class="line"><span class="keyword">import</span> (</div><div class="line">	<span class="string">"fmt"</span></div><div class="line">	<span class="string">"strings"</span></div><div class="line">	<span class="string">"time"</span></div><div class="line">	<span class="string">"net/http"</span></div><div class="line">	<span class="string">"database/sql"</span></div><div class="line"></div><div class="line">	<span class="string">"github.com/gin-gonic/gin"</span></div><div class="line"></div><div class="line">	<span class="string">"github.com/garyburd/redigo/redis"</span></div><div class="line">	_ <span class="string">"github.com/go-sql-driver/mysql"</span></div><div class="line"></div><div class="line">	<span class="string">"github.com/speps/go-hashids"</span></div><div class="line">)</div></pre></td></tr></table></figure>
+<h6 id="定义hashid包需要的salt，即生成字符串的最短位数。">定义hashid包需要的salt，即生成字符串的最短位数。</h6><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> (</div><div class="line">	hdSalt        = <span class="string">"mysalt"</span></div><div class="line">	hdMinLength   = <span class="number">5</span></div><div class="line">	defaultDomain = <span class="string">"http://localhost:8000/"</span></div><div class="line">)</div></pre></td></tr></table></figure>
+<h6 id="定义redis和MySQL的配置信息">定义redis和MySQL的配置信息</h6><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> (</div><div class="line">	RedisClient *redis.Pool</div><div class="line">	RedisHost   = <span class="string">"127.0.0.1:6379"</span></div><div class="line">	RedisDb     = <span class="number">0</span></div><div class="line">	RedisPwd    = <span class="string">""</span></div><div class="line"></div><div class="line">	db      *sql.DB</div><div class="line">	DB_HOST = <span class="string">"tcp(127.0.0.1:3306)"</span></div><div class="line">	DB_NAME = <span class="string">"short"</span></div><div class="line">	DB_USER = <span class="string">"root"</span></div><div class="line">	DB_PASS = <span class="string">""</span></div><div class="line">)</div></pre></td></tr></table></figure>
+<h5 id="main函数，首先连接redis和MySQL。定义如下路由：">main函数，首先连接redis和MySQL。定义如下路由：</h5><ul>
+<li>访问首页</li>
+<li>访问hash</li>
+<li>访问短网址信息页</li>
+<li>生成短网址接口</li>
+</ul>
+<p>熟悉的朋友应该都知道，访问短网址服务的首页一般会跳转到一个固定的网址，比如渣浪微博会跳转到微博首页，Twitter则是给出“Twitter uses the t.co domain as part of a service to protect users from harmful activity”的提示。这里我们也让它跳转到一个指定的网页。</p>
+<p>最后，以8080端口运行，实际线上会使用80端口，可以自行修改。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</div><div class="line">	initRedis()</div><div class="line">	initMysql()</div><div class="line"></div><div class="line">	gin.SetMode(gin.DebugMode)</div><div class="line">	r := gin.Default()</div><div class="line"></div><div class="line">	r.GET(<span class="string">"/"</span>, <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</div><div class="line">		<span class="comment">//http code can be StatusFound or StatusMovedPermanently </span></div><div class="line">		c.Redirect(http.StatusFound, defaultDomain)</div><div class="line">	&#125;)</div><div class="line">	r.GET(<span class="string">"/:hash"</span>, expandUrl)</div><div class="line">	r.GET(<span class="string">"/:hash/info"</span>, expandUrlApi)</div><div class="line">	r.POST(<span class="string">"/short"</span>, shortUrl)</div><div class="line"></div><div class="line">	r.Run(<span class="string">":8000"</span>)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="连接redis和MySQL">连接redis和MySQL</h5><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">initRedis</span><span class="params">()</span></span> &#123;</div><div class="line">	<span class="comment">// 建立连接池</span></div><div class="line">	RedisClient = &amp;redis.Pool&#123;</div><div class="line">		MaxIdle:     <span class="number">1</span>,</div><div class="line">		MaxActive:   <span class="number">10</span>,</div><div class="line">		IdleTimeout: <span class="number">180</span> * time.Second,</div><div class="line">		Dial: <span class="function"><span class="keyword">func</span><span class="params">()</span> <span class="params">(redis.Conn, error)</span></span> &#123;</div><div class="line">			c, err := redis.Dial(<span class="string">"tcp"</span>, RedisHost)</div><div class="line">			<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</div><div class="line">				<span class="keyword">return</span> <span class="literal">nil</span>, err</div><div class="line">			&#125;</div><div class="line">			<span class="keyword">if</span> _, err := c.Do(<span class="string">"AUTH"</span>, RedisPwd); err != <span class="literal">nil</span> &#123;</div><div class="line">				c.Close()</div><div class="line">				<span class="keyword">return</span> <span class="literal">nil</span>, err</div><div class="line">			&#125;</div><div class="line">			c.Do(<span class="string">"SELECT"</span>, RedisDb)</div><div class="line">			<span class="keyword">return</span> c, <span class="literal">nil</span></div><div class="line">		&#125;,</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">initMysql</span><span class="params">()</span></span> &#123;</div><div class="line">	dsn := DB_USER + <span class="string">":"</span> + DB_PASS + <span class="string">"@"</span> + DB_HOST + <span class="string">"/"</span> + DB_NAME + <span class="string">"?charset=utf8"</span></div><div class="line">	db, _ = sql.Open(<span class="string">"mysql"</span>, dsn)</div><div class="line">	db.SetMaxOpenConns(<span class="number">5</span>)</div><div class="line">	db.SetMaxIdleConns(<span class="number">20</span>)</div><div class="line">	db.Ping()</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="生成短网址的接口函数。">生成短网址的接口函数。</h5><p>根据传入的URL参数，进行简单的验证后，写入数据库。根据写入后生成的ID，再生成一个字符串，然后返回给调用方。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">shortUrl</span><span class="params">(c *gin.Context)</span></span> &#123;</div><div class="line">	longUrl := c.PostForm(<span class="string">"url"</span>)</div><div class="line"></div><div class="line">	<span class="keyword">if</span> longUrl == <span class="string">""</span> &#123;</div><div class="line">		c.JSON(<span class="number">200</span>, gin.H&#123;</div><div class="line">			<span class="string">"status"</span>:  <span class="number">500</span>,</div><div class="line">			<span class="string">"message"</span>: <span class="string">"请传入网址"</span>,</div><div class="line">		&#125;)</div><div class="line">		<span class="keyword">return</span></div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="keyword">if</span> !strings.HasPrefix(longUrl, <span class="string">"http"</span>) &#123;</div><div class="line">		longUrl = <span class="string">"http://"</span> + longUrl</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="keyword">if</span> hash, ok := insert(longUrl); ok &#123;</div><div class="line">		c.JSON(<span class="number">200</span>, gin.H&#123;</div><div class="line">			<span class="string">"status"</span>:  <span class="number">200</span>,</div><div class="line">			<span class="string">"message"</span>: <span class="string">"ok"</span>,</div><div class="line">			<span class="string">"short"</span>:   defaultDomain + hash,</div><div class="line">		&#125;)</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="根据HASH解析并跳转到对应的长URL，不存在则跳转到默认地址">根据HASH解析并跳转到对应的长URL，不存在则跳转到默认地址</h5><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">expandUrl</span><span class="params">(c *gin.Context)</span></span> &#123;</div><div class="line">	hash := c.Param(<span class="string">"hash"</span>)</div><div class="line"></div><div class="line">	<span class="keyword">if</span> url, ok := findByHash(hash); ok &#123;</div><div class="line">		c.Redirect(http.StatusMovedPermanently, url)</div><div class="line">	&#125;</div><div class="line">	<span class="comment">// 注意:</span></div><div class="line">	<span class="comment">// 	实际中，此应用的运行域名可能与默认域名不同，如a.com运行此程序，默认域名为b.com</span></div><div class="line">	<span class="comment">// 	当访问一个不存在的HASH或a.com时，可以跳转到任意域名，即defaultDomain</span></div><div class="line">	c.Redirect(http.StatusMovedPermanently, defaultDomain)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="根据HASH在redis中查找并返回结果，不存在则返回404状态">根据HASH在redis中查找并返回结果，不存在则返回404状态</h5><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">expandUrlApi</span><span class="params">(c *gin.Context)</span></span> &#123;</div><div class="line">	hash := c.Param(<span class="string">"hash"</span>)</div><div class="line"></div><div class="line">	<span class="keyword">if</span> url, ok := findByHash(hash); ok &#123;</div><div class="line">		c.JSON(<span class="number">200</span>, gin.H&#123;</div><div class="line">			<span class="string">"status"</span>:  <span class="number">200</span>,</div><div class="line">			<span class="string">"message"</span>: <span class="string">"ok"</span>,</div><div class="line">			<span class="string">"data"</span>:    url,</div><div class="line">		&#125;)</div><div class="line">		<span class="keyword">return</span></div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="comment">// 此处可以尝试在MySQL中再次查询</span></div><div class="line">	c.JSON(<span class="number">200</span>, gin.H&#123;</div><div class="line">		<span class="string">"status"</span>:  <span class="number">404</span>,</div><div class="line">		<span class="string">"message"</span>: <span class="string">"url of hash is not exist"</span>,</div><div class="line">	&#125;)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="将ID转换成对应的HASH值，hdSalt与hdMinLength_会影响生成结果，确定后不要改动">将ID转换成对应的HASH值，hdSalt与hdMinLength 会影响生成结果，确定后不要改动</h5><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">shortenURL</span><span class="params">(id <span class="keyword">int</span>)</span> <span class="title">string</span></span> &#123;</div><div class="line">	hd := hashids.NewData()</div><div class="line">	hd.Salt = hdSalt</div><div class="line">	hd.MinLength = hdMinLength</div><div class="line"></div><div class="line">	h := hashids.NewWithData(hd)</div><div class="line">	e, _ := h.Encode([]<span class="keyword">int</span>&#123;id&#125;)</div><div class="line"></div><div class="line">	<span class="keyword">return</span> e</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="根据HASH解析出对应的ID值,_hdSalt与hdMinLength_会影响生成结果，确定后不要改动">根据HASH解析出对应的ID值, hdSalt与hdMinLength 会影响生成结果，确定后不要改动</h5><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">expand</span><span class="params">(hash <span class="keyword">string</span>)</span> <span class="title">int</span></span> &#123;</div><div class="line">	hd := hashids.NewData()</div><div class="line">	hd.Salt = hdSalt</div><div class="line">	hd.MinLength = hdMinLength</div><div class="line"></div><div class="line">	h := hashids.NewWithData(hd)</div><div class="line">	d, _ := h.DecodeWithError(hash)</div><div class="line"></div><div class="line">	<span class="keyword">return</span> d[<span class="number">0</span>]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="数据库中根据ID查找">数据库中根据ID查找</h5><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">find</span><span class="params">(id <span class="keyword">int</span>)</span> <span class="params">(<span class="keyword">string</span>, <span class="keyword">bool</span>)</span></span> &#123;</div><div class="line">	<span class="keyword">var</span> url <span class="keyword">string</span></div><div class="line">	err := db.QueryRow(<span class="string">"SELECT url FROM url WHERE id = ?"</span>, id).Scan(&amp;url)</div><div class="line">	<span class="keyword">if</span> err == <span class="literal">nil</span> &#123;</div><div class="line">		<span class="keyword">return</span> url, <span class="literal">true</span></div><div class="line">	&#125; <span class="keyword">else</span> &#123;</div><div class="line">		<span class="keyword">return</span> <span class="string">""</span>, <span class="literal">false</span></div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="在redis中根据HASH查找">在redis中根据HASH查找</h5><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">findByHash</span><span class="params">(h <span class="keyword">string</span>)</span> <span class="params">(<span class="keyword">string</span>, <span class="keyword">bool</span>)</span></span> &#123;</div><div class="line">	rc := RedisClient.Get()</div><div class="line"></div><div class="line">	<span class="keyword">defer</span> rc.Close()</div><div class="line">	url, _ := redis.String(rc.Do(<span class="string">"GET"</span>, <span class="string">"URL:"</span>+h))</div><div class="line"></div><div class="line">	<span class="keyword">if</span> url != <span class="string">""</span> &#123;</div><div class="line">		<span class="keyword">return</span> url, <span class="literal">true</span></div><div class="line">	&#125;</div><div class="line"></div><div class="line">	id := expand(h)</div><div class="line">	<span class="keyword">if</span> urldb, ok := find(id); ok &#123;</div><div class="line">		<span class="keyword">return</span> urldb, <span class="literal">true</span></div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="keyword">return</span> <span class="string">""</span>, <span class="literal">false</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="将长网址插入到数据库中，并把返回的ID生成HASH和长网址存入redis">将长网址插入到数据库中，并把返回的ID生成HASH和长网址存入redis</h5><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">insert</span><span class="params">(url <span class="keyword">string</span>)</span> <span class="params">(<span class="keyword">string</span>, <span class="keyword">bool</span>)</span></span> &#123;</div><div class="line">	stmt, _ := db.Prepare(<span class="string">`INSERT INTO url (url) values (?)`</span>)</div><div class="line">	res, err := stmt.Exec(url)</div><div class="line">	checkErr(err)</div><div class="line"></div><div class="line">	id, _ := res.LastInsertId()</div><div class="line"></div><div class="line">	rc := RedisClient.Get()</div><div class="line">	<span class="keyword">defer</span> rc.Close()</div><div class="line"></div><div class="line">	hash := shortenURL(<span class="keyword">int</span>(id))</div><div class="line">	rc.Do(<span class="string">"SET"</span>, <span class="string">"URL:"</span>+hash, url)</div><div class="line"></div><div class="line">	<span class="keyword">return</span> hash, <span class="literal">true</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="打印方法，和检查错误的方法">打印方法，和检查错误的方法</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">Log</span><span class="params">(v ...<span class="keyword">interface</span>&#123;&#125;)</span></span> &#123;</div><div class="line">	fmt.Println(v...)</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">checkErr</span><span class="params">(err error)</span></span> &#123;</div><div class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</div><div class="line">		<span class="built_in">panic</span>(err)</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>有些地方还需修改，就算是抛砖引玉吧。</p>
+<p>感谢<a href="http://hashids.org/" target="_blank" rel="external">hashids</a></p>
+<h4 id="Github地址_：_shortme">Github地址 ： <a href="https://github.com/qichengzx/shortme" target="_blank" rel="external">shortme</a></h4><p>相关资料：</p>
+<p><a href="http://mashable.com/2008/01/08/url-shortening-services/#CgEzOrfnzPqb" target="_blank" rel="external">URL Toolbox: 90+ URL Shortening Services</a><br><a href="http://tinyurl.com/" target="_blank" rel="external">TinyURL</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.qichengzx.com/2016/12/27/go-shortlen-url.html" data-id="cix7lpvee001fob0r98o2aco5" class="article-share-link">Share</a>
+      
+        <a href="http://www.qichengzx.com/2016/12/27/go-shortlen-url.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/短网址/">短网址</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2016/12/14/toutiao-images-spider-by-golang.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Go 福利小爬虫 爬取今日头条美女图</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<section id="comments">
+  <div class="ds-thread" data-thread-key="cix7lpvee001fob0r98o2aco5" data-title="Go语言的一个短网址服务" data-url="http://www.qichengzx.com/2016/12/27/go-shortlen-url.html"></div>
+  <script>
+    var duoshuoQuery = {short_name:"qichengzx"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0] 
+       || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+</section>
+</section>
+        
+          <aside id="sidebar">
+  
+      <div class="widget-wrap">
+    <h3 class="widget-title">Time</h3>
+    <div class="widget time">
+      <style id="clock-animations"></style>
+      <div class="clock-wrapper">
+        <div class="clock-base">
+            <div class="clock-indicator">
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+            </div>
+            <div class="clock-hour"></div>
+            <div class="clock-minute"></div>
+            <div class="clock-second"></div>
+            <div class="clock-center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">11</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/dropbox/" style="font-size: 12.5px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/gin/" style="font-size: 10px;">gin</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/go/" style="font-size: 17.5px;">go</a> <a href="/tags/goquery/" style="font-size: 12.5px;">goquery</a> <a href="/tags/hexo/" style="font-size: 15px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 15px;">javascript</a> <a href="/tags/js/" style="font-size: 12.5px;">js</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 17.5px;">mysql</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 17.5px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redis/" style="font-size: 12.5px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/今日头条/" style="font-size: 10px;">今日头条</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/短网址/" style="font-size: 10px;">短网址</a> <a href="/tags/糗百/" style="font-size: 10px;">糗百</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2016/12/27/go-shortlen-url.html">Go语言的一个短网址服务</a>
+          </li>
+        
+          <li>
+            <a href="/2016/12/14/toutiao-images-spider-by-golang.html">Go 福利小爬虫 爬取今日头条美女图</a>
+          </li>
+        
+          <li>
+            <a href="/2016/12/04/go-qiubai.html">Go语言写爬取糗百热门帖子</a>
+          </li>
+        
+          <li>
+            <a href="/2016/11/02/install-yaf-on-mac.html">Mac brew php7.1环境下安装Yaf</a>
+          </li>
+        
+          <li>
+            <a href="/2016/10/21/beego-in-docker.html">用Docker部署Golang Beego框架应用</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2016 qichengzx<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+      Hosted by <a href="https://www.digitalocean.com/?refcode=2cb067f6a1f0" target="_blank">DigitalOcean</a>
+    </div>
+  </div>
+</footer>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?199f8980952ead3f1af440507b4b2a7c";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<script src="//tajs.qq.com/stats?sId=59998269"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//cdn.bootcss.com/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
