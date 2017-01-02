@@ -3,9 +3,9 @@
   <title><![CDATA[启程]]></title>
   
   <link href="/atom.xml" rel="self"/>
-  <link href="http://www.qichengzx.com/"/>
-  <updated>2016-12-27T14:22:31.000Z</updated>
-  <id>http://www.qichengzx.com/</id>
+  <link href="https://www.qichengzx.com/"/>
+  <updated>2016-12-27T14:26:51.000Z</updated>
+  <id>https://www.qichengzx.com/</id>
   
   <author>
     <name><![CDATA[qichengzx]]></name>
@@ -16,10 +16,10 @@
   
   <entry>
     <title><![CDATA[Go语言写的一个短网址服务]]></title>
-    <link href="http://www.qichengzx.com/2016/12/27/shortlen-url-by-go.html"/>
-    <id>http://www.qichengzx.com/2016/12/27/shortlen-url-by-go.html</id>
+    <link href="https://www.qichengzx.com/2016/12/27/shortlen-url-by-go.html"/>
+    <id>https://www.qichengzx.com/2016/12/27/shortlen-url-by-go.html</id>
     <published>2016-12-27T13:27:34.000Z</published>
-    <updated>2016-12-27T14:22:31.000Z</updated>
+    <updated>2016-12-27T14:26:51.000Z</updated>
     <content type="html"><![CDATA[<p><img src="/images/go/best-url-shortener-to-make-earn-money.png" alt=""></p>
 <center>题图来自<a href="http://www.dwtricks.com/2015/05/best-10-url-shortener-networks-to-earn-money-2015.html/" target="_blank" rel="external">http://www.dwtricks.com/</a></center>
 
@@ -61,18 +61,18 @@
 <center>题图来自<a href="http://www.dwtricks.com/2015/05/best-10-]]>
     </summary>
     
-      <category term="go" scheme="http://www.qichengzx.com/tags/go/"/>
+      <category term="go" scheme="https://www.qichengzx.com/tags/go/"/>
     
-      <category term="短网址" scheme="http://www.qichengzx.com/tags/%E7%9F%AD%E7%BD%91%E5%9D%80/"/>
+      <category term="短网址" scheme="https://www.qichengzx.com/tags/%E7%9F%AD%E7%BD%91%E5%9D%80/"/>
     
-      <category term="golang" scheme="http://www.qichengzx.com/categories/golang/"/>
+      <category term="golang" scheme="https://www.qichengzx.com/categories/golang/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[Go 福利小爬虫 爬取今日头条美女图]]></title>
-    <link href="http://www.qichengzx.com/2016/12/14/toutiao-images-spider-by-golang.html"/>
-    <id>http://www.qichengzx.com/2016/12/14/toutiao-images-spider-by-golang.html</id>
+    <link href="https://www.qichengzx.com/2016/12/14/toutiao-images-spider-by-golang.html"/>
+    <id>https://www.qichengzx.com/2016/12/14/toutiao-images-spider-by-golang.html</id>
     <published>2016-12-14T08:28:36.000Z</published>
     <updated>2016-12-16T13:38:03.000Z</updated>
     <content type="html"><![CDATA[<p><img src="/images/go/toutiao.gif" alt=""></p>
@@ -120,20 +120,20 @@
 <p>写完爬取糗百热门后没几天，又开始写了爬取今日头条图片的<a href="https://github.com/qichengzx/toutiaoSpider" target="]]>
     </summary>
     
-      <category term="go" scheme="http://www.qichengzx.com/tags/go/"/>
+      <category term="go" scheme="https://www.qichengzx.com/tags/go/"/>
     
-      <category term="goquery" scheme="http://www.qichengzx.com/tags/goquery/"/>
+      <category term="goquery" scheme="https://www.qichengzx.com/tags/goquery/"/>
     
-      <category term="今日头条" scheme="http://www.qichengzx.com/tags/%E4%BB%8A%E6%97%A5%E5%A4%B4%E6%9D%A1/"/>
+      <category term="今日头条" scheme="https://www.qichengzx.com/tags/%E4%BB%8A%E6%97%A5%E5%A4%B4%E6%9D%A1/"/>
     
-      <category term="golang" scheme="http://www.qichengzx.com/categories/golang/"/>
+      <category term="golang" scheme="https://www.qichengzx.com/categories/golang/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[Go语言写爬取糗百热门帖子]]></title>
-    <link href="http://www.qichengzx.com/2016/12/04/go-qiubai.html"/>
-    <id>http://www.qichengzx.com/2016/12/04/go-qiubai.html</id>
+    <link href="https://www.qichengzx.com/2016/12/04/go-qiubai.html"/>
+    <id>https://www.qichengzx.com/2016/12/04/go-qiubai.html</id>
     <published>2016-12-04T07:49:04.000Z</published>
     <updated>2016-12-07T12:31:33.000Z</updated>
     <content type="html"><![CDATA[<p>闲来无事，想着也用Go来写个爬虫之类的东西，我并不知道这算不算严格意义上的爬虫。</p>
@@ -170,22 +170,22 @@
 <p>首先，选了<a href="https://github.com/PuerkitoBio/]]>
     </summary>
     
-      <category term="go" scheme="http://www.qichengzx.com/tags/go/"/>
+      <category term="go" scheme="https://www.qichengzx.com/tags/go/"/>
     
-      <category term="糗百" scheme="http://www.qichengzx.com/tags/%E7%B3%97%E7%99%BE/"/>
+      <category term="糗百" scheme="https://www.qichengzx.com/tags/%E7%B3%97%E7%99%BE/"/>
     
-      <category term="goquery" scheme="http://www.qichengzx.com/tags/goquery/"/>
+      <category term="goquery" scheme="https://www.qichengzx.com/tags/goquery/"/>
     
-      <category term="gin" scheme="http://www.qichengzx.com/tags/gin/"/>
+      <category term="gin" scheme="https://www.qichengzx.com/tags/gin/"/>
     
-      <category term="golang" scheme="http://www.qichengzx.com/categories/golang/"/>
+      <category term="golang" scheme="https://www.qichengzx.com/categories/golang/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[Mac brew php7.1环境下安装Yaf]]></title>
-    <link href="http://www.qichengzx.com/2016/11/02/install-yaf-on-mac.html"/>
-    <id>http://www.qichengzx.com/2016/11/02/install-yaf-on-mac.html</id>
+    <link href="https://www.qichengzx.com/2016/11/02/install-yaf-on-mac.html"/>
+    <id>https://www.qichengzx.com/2016/11/02/install-yaf-on-mac.html</id>
     <published>2016-11-02T09:57:38.000Z</published>
     <updated>2016-11-30T13:16:37.000Z</updated>
     <content type="html"><![CDATA[<p><img src="/images/php/think201-emergence-of-php7.jpg" alt=""></p>
@@ -206,16 +206,16 @@
 <p>开发机一直使用brew来安装PHP及其他的环境，今天把PHP升到7.1，由于7.1版本下还没有<a href="http://www.l]]>
     </summary>
     
-      <category term="php" scheme="http://www.qichengzx.com/tags/php/"/>
+      <category term="php" scheme="https://www.qichengzx.com/tags/php/"/>
     
-      <category term="php" scheme="http://www.qichengzx.com/categories/php/"/>
+      <category term="php" scheme="https://www.qichengzx.com/categories/php/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[用Docker部署Golang Beego框架应用]]></title>
-    <link href="http://www.qichengzx.com/2016/10/21/beego-in-docker.html"/>
-    <id>http://www.qichengzx.com/2016/10/21/beego-in-docker.html</id>
+    <link href="https://www.qichengzx.com/2016/10/21/beego-in-docker.html"/>
+    <id>https://www.qichengzx.com/2016/10/21/beego-in-docker.html</id>
     <published>2016-10-21T02:02:02.000Z</published>
     <updated>2016-10-30T02:49:27.000Z</updated>
     <content type="html"><![CDATA[<p>Docker是什么就不说了。<br>Golang是什么也不说了。<br>Beego是什么就更不用说了。</p>
@@ -236,16 +236,16 @@
 <h4 id="写在]]>
     </summary>
     
-      <category term="go" scheme="http://www.qichengzx.com/tags/go/"/>
+      <category term="go" scheme="https://www.qichengzx.com/tags/go/"/>
     
-      <category term="golang" scheme="http://www.qichengzx.com/categories/golang/"/>
+      <category term="golang" scheme="https://www.qichengzx.com/categories/golang/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[Laravel 手动创建分页]]></title>
-    <link href="http://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html"/>
-    <id>http://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html</id>
+    <link href="https://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html"/>
+    <id>https://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html</id>
     <published>2016-09-28T07:43:13.000Z</published>
     <updated>2016-10-30T02:43:04.000Z</updated>
     <content type="html"><![CDATA[<p>有些情况下会从接口读取数据，数据较多时会用到分页，Laravel为这种需求提供了很方便的方法。</p>
@@ -272,18 +272,18 @@
 <p><a href="https://laravel.com/docs/5.2/pagination" target="_blank" rel="external">官]]>
     </summary>
     
-      <category term="php" scheme="http://www.qichengzx.com/tags/php/"/>
+      <category term="php" scheme="https://www.qichengzx.com/tags/php/"/>
     
-      <category term="laravel" scheme="http://www.qichengzx.com/tags/laravel/"/>
+      <category term="laravel" scheme="https://www.qichengzx.com/tags/laravel/"/>
     
-      <category term="php" scheme="http://www.qichengzx.com/categories/php/"/>
+      <category term="php" scheme="https://www.qichengzx.com/categories/php/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[Golang XMl 转 JSON]]></title>
-    <link href="http://www.qichengzx.com/2016/09/16/convert-xml-to-json-in-golang.html"/>
-    <id>http://www.qichengzx.com/2016/09/16/convert-xml-to-json-in-golang.html</id>
+    <link href="https://www.qichengzx.com/2016/09/16/convert-xml-to-json-in-golang.html"/>
+    <id>https://www.qichengzx.com/2016/09/16/convert-xml-to-json-in-golang.html</id>
     <published>2016-09-16T03:28:20.000Z</published>
     <updated>2016-09-18T13:19:05.000Z</updated>
     <content type="html"><![CDATA[<p><img src="/images/golang.png" alt=""></p>
@@ -323,16 +323,16 @@
 <p>用Go顺利的写到了发送数据，接收数据，然后取值有点麻烦]]>
     </summary>
     
-      <category term="go" scheme="http://www.qichengzx.com/tags/go/"/>
+      <category term="go" scheme="https://www.qichengzx.com/tags/go/"/>
     
-      <category term="golang" scheme="http://www.qichengzx.com/categories/golang/"/>
+      <category term="golang" scheme="https://www.qichengzx.com/categories/golang/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[Hello Go]]></title>
-    <link href="http://www.qichengzx.com/2016/09/11/Hello-Go.html"/>
-    <id>http://www.qichengzx.com/2016/09/11/Hello-Go.html</id>
+    <link href="https://www.qichengzx.com/2016/09/11/Hello-Go.html"/>
+    <id>https://www.qichengzx.com/2016/09/11/Hello-Go.html</id>
     <published>2016-09-11T09:21:03.000Z</published>
     <updated>2016-09-11T09:21:09.000Z</updated>
     <content type="html"><![CDATA[<h5 id="Mac_安装_GO">Mac 安装 GO</h5><p>本人使用了Brew来安装。</p>
@@ -366,16 +366,16 @@
 <h5 id="安装前首先更新Brew。">安装前首先更新Brew。</h5><figure class="highlight armasm"><table><tr><td]]>
     </summary>
     
-      <category term="go" scheme="http://www.qichengzx.com/tags/go/"/>
+      <category term="go" scheme="https://www.qichengzx.com/tags/go/"/>
     
-      <category term="golang" scheme="http://www.qichengzx.com/categories/golang/"/>
+      <category term="golang" scheme="https://www.qichengzx.com/categories/golang/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[PHP Curl 上传文件]]></title>
-    <link href="http://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html"/>
-    <id>http://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html</id>
+    <link href="https://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html"/>
+    <id>https://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html</id>
     <published>2016-07-02T15:11:30.000Z</published>
     <updated>2016-07-03T01:14:00.000Z</updated>
     <content type="html"><![CDATA[<p>有时候会遇到上传文件给第三方服务的情况，比如本身程序并不需要存储附件，而是把附件发送给一个公共的服务。</p>
@@ -392,16 +392,16 @@
 <h4 id="发送端：">发送端：</h4><figure class="highlig]]>
     </summary>
     
-      <category term="php" scheme="http://www.qichengzx.com/tags/php/"/>
+      <category term="php" scheme="https://www.qichengzx.com/tags/php/"/>
     
-      <category term="php" scheme="http://www.qichengzx.com/categories/php/"/>
+      <category term="php" scheme="https://www.qichengzx.com/categories/php/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[一个简单的php+redis队列示例]]></title>
-    <link href="http://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html"/>
-    <id>http://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html</id>
+    <link href="https://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html"/>
+    <id>https://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html</id>
     <published>2016-05-15T06:19:52.000Z</published>
     <updated>2016-05-15T06:25:08.000Z</updated>
     <content type="html"><![CDATA[<p><img src="/images/redis/redis-300dpi.png" alt=""></p>
@@ -430,20 +430,20 @@
 <p>虽然RabbitMQ的坑年前就开始填了，但是并没有机会在项目中实际使用，机缘巧合，换工作后第一个比较重要的事就是做一个直播的页面，如果数据直接插入或读取自数据库]]>
     </summary>
     
-      <category term="redis" scheme="http://www.qichengzx.com/tags/redis/"/>
+      <category term="redis" scheme="https://www.qichengzx.com/tags/redis/"/>
     
-      <category term="php" scheme="http://www.qichengzx.com/tags/php/"/>
+      <category term="php" scheme="https://www.qichengzx.com/tags/php/"/>
     
-      <category term="队列" scheme="http://www.qichengzx.com/tags/%E9%98%9F%E5%88%97/"/>
+      <category term="队列" scheme="https://www.qichengzx.com/tags/%E9%98%9F%E5%88%97/"/>
     
-      <category term="php" scheme="http://www.qichengzx.com/categories/php/"/>
+      <category term="php" scheme="https://www.qichengzx.com/categories/php/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[解决Discuz无法发布爱奇艺视频的问题]]></title>
-    <link href="http://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html"/>
-    <id>http://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html</id>
+    <link href="https://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html"/>
+    <id>https://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html</id>
     <published>2016-05-08T10:57:24.000Z</published>
     <updated>2016-05-08T10:57:25.000Z</updated>
     <content type="html"><![CDATA[<p><img src="/images/discuz/201510148054_136.jpg" alt=""></p>
@@ -466,20 +466,20 @@
 <p>最近碰到需要在Discuz论坛中插入爱奇艺视频的问题，之前没关注过，搜索后有些答案说DZ不支持爱奇艺，有些说爱奇艺不支持DZ，并没有真正能解决问题的。]]>
     </summary>
     
-      <category term="js" scheme="http://www.qichengzx.com/tags/js/"/>
+      <category term="js" scheme="https://www.qichengzx.com/tags/js/"/>
     
-      <category term="discuz" scheme="http://www.qichengzx.com/tags/discuz/"/>
+      <category term="discuz" scheme="https://www.qichengzx.com/tags/discuz/"/>
     
-      <category term="爱奇艺" scheme="http://www.qichengzx.com/tags/%E7%88%B1%E5%A5%87%E8%89%BA/"/>
+      <category term="爱奇艺" scheme="https://www.qichengzx.com/tags/%E7%88%B1%E5%A5%87%E8%89%BA/"/>
     
-      <category term="javascript" scheme="http://www.qichengzx.com/categories/javascript/"/>
+      <category term="javascript" scheme="https://www.qichengzx.com/categories/javascript/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[PHP RabbitMQ 教程（六） - 远程调用]]></title>
-    <link href="http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html"/>
-    <id>http://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html</id>
+    <link href="https://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html"/>
+    <id>https://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html</id>
     <published>2016-05-03T06:35:20.000Z</published>
     <updated>2016-05-07T14:08:27.000Z</updated>
     <content type="html"><![CDATA[<h3 id="远程调用">远程调用</h3><p>在<a href="/2016/04/17/php-rabbitmq-tutorial-two.html">第二节</a>中，我们学习了如何使用工作队列在多个worker中分发耗时任务。</p>
@@ -542,18 +542,18 @@
 <p>但是如果我们需要在远程运行]]>
     </summary>
     
-      <category term="php" scheme="http://www.qichengzx.com/tags/php/"/>
+      <category term="php" scheme="https://www.qichengzx.com/tags/php/"/>
     
-      <category term="rabbitmq" scheme="http://www.qichengzx.com/tags/rabbitmq/"/>
+      <category term="rabbitmq" scheme="https://www.qichengzx.com/tags/rabbitmq/"/>
     
-      <category term="php" scheme="http://www.qichengzx.com/categories/php/"/>
+      <category term="php" scheme="https://www.qichengzx.com/categories/php/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[PHP RabbitMQ 教程（五） - 主题]]></title>
-    <link href="http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html"/>
-    <id>http://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html</id>
+    <link href="https://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html"/>
+    <id>https://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html</id>
     <published>2016-04-27T10:27:03.000Z</published>
     <updated>2016-05-07T14:06:15.000Z</updated>
     <content type="html"><![CDATA[<h3 id="主题">主题</h3><p>(<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">使用php-amqplib</a>)</p>
@@ -609,18 +609,18 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
 <p>在<a hre]]>
     </summary>
     
-      <category term="php" scheme="http://www.qichengzx.com/tags/php/"/>
+      <category term="php" scheme="https://www.qichengzx.com/tags/php/"/>
     
-      <category term="rabbitmq" scheme="http://www.qichengzx.com/tags/rabbitmq/"/>
+      <category term="rabbitmq" scheme="https://www.qichengzx.com/tags/rabbitmq/"/>
     
-      <category term="php" scheme="http://www.qichengzx.com/categories/php/"/>
+      <category term="php" scheme="https://www.qichengzx.com/categories/php/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[PHP RabbitMQ 教程（四） - 路由]]></title>
-    <link href="http://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html"/>
-    <id>http://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html</id>
+    <link href="https://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html"/>
+    <id>https://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html</id>
     <published>2016-04-24T06:16:41.000Z</published>
     <updated>2016-05-07T14:06:15.000Z</updated>
     <content type="html"><![CDATA[<h3 id="路由">路由</h3><p>（使用<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">php-amqplib</a>）<br>在<a href="/2016/04/23/php-rabbitmq-tutorial-three.html">上一节</a>中，我们创建了一个简单的日志系统（logging system）。我们已经可以广播日志消息到多个接收者了。</p>
@@ -667,18 +667,18 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <![CDATA[<h3 id="路由">路由</h3><p>（使用<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">php-amqplib</a>）<br>在<a href="/]]>
     </summary>
     
-      <category term="php" scheme="http://www.qichengzx.com/tags/php/"/>
+      <category term="php" scheme="https://www.qichengzx.com/tags/php/"/>
     
-      <category term="rabbitmq" scheme="http://www.qichengzx.com/tags/rabbitmq/"/>
+      <category term="rabbitmq" scheme="https://www.qichengzx.com/tags/rabbitmq/"/>
     
-      <category term="php" scheme="http://www.qichengzx.com/categories/php/"/>
+      <category term="php" scheme="https://www.qichengzx.com/categories/php/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[PHP RabbitMQ 教程（三） - 发布/订阅]]></title>
-    <link href="http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html"/>
-    <id>http://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html</id>
+    <link href="https://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html"/>
+    <id>https://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html</id>
     <published>2016-04-23T11:58:17.000Z</published>
     <updated>2016-05-07T14:06:15.000Z</updated>
     <content type="html"><![CDATA[<h3 id="发布/订阅">发布/订阅</h3><p>我们在<a href="/2016/04/17/php-rabbitmq-tutorial-two.html">上一节</a>创建了一个工作队列，并假定队列对应的任务传送给了某个客户端。在这一章节我们会做一些完全不一样的东西–我们会发送一条消息到多个消费者，也称之为“发布/订阅”模式。</p>
@@ -745,18 +745,18 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <![CDATA[<h3 id="发布/订阅">发布/订阅</h3><p>我们在<a href="/2016/04/17/php-rabbitmq-tutorial-two.html">上一节</a>创建了一个工作队列，并假定队列对应的任务传送给了某个客户端。在这一章节我们会做一些完全不一样的东西]]>
     </summary>
     
-      <category term="php" scheme="http://www.qichengzx.com/tags/php/"/>
+      <category term="php" scheme="https://www.qichengzx.com/tags/php/"/>
     
-      <category term="rabbitmq" scheme="http://www.qichengzx.com/tags/rabbitmq/"/>
+      <category term="rabbitmq" scheme="https://www.qichengzx.com/tags/rabbitmq/"/>
     
-      <category term="php" scheme="http://www.qichengzx.com/categories/php/"/>
+      <category term="php" scheme="https://www.qichengzx.com/categories/php/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[PHP RabbitMQ 教程（二） - 工作队列]]></title>
-    <link href="http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html"/>
-    <id>http://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html</id>
+    <link href="https://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html"/>
+    <id>https://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html</id>
     <published>2016-04-17T06:39:30.000Z</published>
     <updated>2016-05-07T14:06:15.000Z</updated>
     <content type="html"><![CDATA[<h3 id="工作队列">工作队列</h3><h5 id="（使用php-amqplib库）">（使用<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">php-amqplib</a>库）</h5><p><img src="/images/rabbitmq/python-two.png" alt=""></p>
@@ -828,18 +828,18 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <![CDATA[<h3 id="工作队列">工作队列</h3><h5 id="（使用php-amqplib库）">（使用<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">php-]]>
     </summary>
     
-      <category term="php" scheme="http://www.qichengzx.com/tags/php/"/>
+      <category term="php" scheme="https://www.qichengzx.com/tags/php/"/>
     
-      <category term="rabbitmq" scheme="http://www.qichengzx.com/tags/rabbitmq/"/>
+      <category term="rabbitmq" scheme="https://www.qichengzx.com/tags/rabbitmq/"/>
     
-      <category term="php" scheme="http://www.qichengzx.com/categories/php/"/>
+      <category term="php" scheme="https://www.qichengzx.com/categories/php/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[PHP RabbitMQ 教程（一） - 介绍]]></title>
-    <link href="http://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html"/>
-    <id>http://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html</id>
+    <link href="https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html"/>
+    <id>https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html</id>
     <published>2016-02-28T03:10:03.000Z</published>
     <updated>2016-05-07T14:06:15.000Z</updated>
     <content type="html"><![CDATA[<h2 id="准备工作">准备工作</h2><h3 id="先决条件">先决条件</h3><p>本教程先决条件是RabbitMQ已经安装并正在以5672端口运行在 localhost，如果你使用了不同的域，端口，用户，密码，连接配置需要适当改变。</p>
@@ -905,18 +905,18 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
 <h3 id="获得帮]]>
     </summary>
     
-      <category term="php" scheme="http://www.qichengzx.com/tags/php/"/>
+      <category term="php" scheme="https://www.qichengzx.com/tags/php/"/>
     
-      <category term="rabbitmq" scheme="http://www.qichengzx.com/tags/rabbitmq/"/>
+      <category term="rabbitmq" scheme="https://www.qichengzx.com/tags/rabbitmq/"/>
     
-      <category term="php" scheme="http://www.qichengzx.com/categories/php/"/>
+      <category term="php" scheme="https://www.qichengzx.com/categories/php/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[一段有意思的JS For循环代码]]></title>
-    <link href="http://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html"/>
-    <id>http://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html</id>
+    <link href="https://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html"/>
+    <id>https://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html</id>
     <published>2016-02-25T09:10:43.000Z</published>
     <updated>2016-02-25T09:16:54.000Z</updated>
     <content type="html"><![CDATA[<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">var a =<span class="number">0</span><span class="comment">;</span></div><div class="line">for (var i =<span class="number">0</span>,<span class="keyword">j </span>=<span class="number">0</span><span class="comment">; i &lt;10,j&lt;6;i++,j++) &#123;</span></div><div class="line">	a = i+<span class="keyword">j;</span></div><div class="line">	console.log(<span class="string">"i="</span>+i)<span class="comment">;</span></div><div class="line">	console.log(<span class="string">"j="</span>+<span class="keyword">j);</span></div><div class="line">	console.log(<span class="string">"a="</span>+a)<span class="comment">;</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
@@ -928,16 +928,16 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <![CDATA[<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</]]>
     </summary>
     
-      <category term="js" scheme="http://www.qichengzx.com/tags/js/"/>
+      <category term="js" scheme="https://www.qichengzx.com/tags/js/"/>
     
-      <category term="javascript" scheme="http://www.qichengzx.com/categories/javascript/"/>
+      <category term="javascript" scheme="https://www.qichengzx.com/categories/javascript/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[MySQL实现row_number第二部分]]></title>
-    <link href="http://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html"/>
-    <id>http://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html</id>
+    <link href="https://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html"/>
+    <id>https://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html</id>
     <published>2016-02-24T09:58:24.000Z</published>
     <updated>2016-02-25T03:35:21.000Z</updated>
     <content type="html"><![CDATA[<p>接上篇：<a href="https://www.qichengzx.com/2016/02/03/MySQL%E5%AE%9E%E7%8E%B0row_number%20.html">MySQL实现row_number</a></p>
@@ -960,16 +960,16 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
 <h3 id="为分组增加row_n]]>
     </summary>
     
-      <category term="mysql" scheme="http://www.qichengzx.com/tags/mysql/"/>
+      <category term="mysql" scheme="https://www.qichengzx.com/tags/mysql/"/>
     
-      <category term="mysql" scheme="http://www.qichengzx.com/categories/mysql/"/>
+      <category term="mysql" scheme="https://www.qichengzx.com/categories/mysql/"/>
     
   </entry>
   
   <entry>
     <title><![CDATA[MySQL实现row_number]]></title>
-    <link href="http://www.qichengzx.com/2016/02/03/MySQL%E5%AE%9E%E7%8E%B0row_number%20.html"/>
-    <id>http://www.qichengzx.com/2016/02/03/MySQL实现row_number .html</id>
+    <link href="https://www.qichengzx.com/2016/02/03/MySQL%E5%AE%9E%E7%8E%B0row_number%20.html"/>
+    <id>https://www.qichengzx.com/2016/02/03/MySQL实现row_number .html</id>
     <published>2016-02-03T10:25:26.000Z</published>
     <updated>2016-02-03T10:27:20.000Z</updated>
     <content type="html"><![CDATA[<p>在本教程中，我们将在MySQL中实现一个非常实用的row_number功能。</p>
@@ -993,9 +993,9 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
 <p>row_number是一个返回数据排序编号的排名方法，从1开始。我们经常需要用到row_number去生成某些报表，不幸的是，MySQL并不像MSSQL，Oracle一样支持这个方法]]>
     </summary>
     
-      <category term="mysql" scheme="http://www.qichengzx.com/tags/mysql/"/>
+      <category term="mysql" scheme="https://www.qichengzx.com/tags/mysql/"/>
     
-      <category term="mysql" scheme="http://www.qichengzx.com/categories/mysql/"/>
+      <category term="mysql" scheme="https://www.qichengzx.com/categories/mysql/"/>
     
   </entry>
   
