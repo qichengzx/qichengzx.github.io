@@ -3,18 +3,31 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   
-  <title>Category: javascript | 启程</title>
+  <title>Beego中使用过滤器 | 启程</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta http-equiv="Access-Control-Allow-Origin" content="*">
-  <meta name="description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
-<meta property="og:type" content="website">
-<meta property="og:title" content="启程">
-<meta property="og:url" content="https://www.qichengzx.com/categories/javascript/index.html">
+  <meta name="description" content="为了方便调试和排错，决定在现有的beego程序里加上requestID。
+查了些资料发现写的并不是特别清楚和详细，在此总结一下，也算是加深下印象。
+astaxie说可以用过滤器实现，就是在Beego运行时在特定的步骤前加入。而由于我的需求比较简单，就选在了BeforeRouter。
+在main.go中:
+12import &quot;github.com/astaxie/beego/context&quot;impo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Beego中使用过滤器">
+<meta property="og:url" content="https://www.qichengzx.com/2017/03/06/insert-filter-in-beego.html">
 <meta property="og:site_name" content="启程">
-<meta property="og:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
+<meta property="og:description" content="为了方便调试和排错，决定在现有的beego程序里加上requestID。
+查了些资料发现写的并不是特别清楚和详细，在此总结一下，也算是加深下印象。
+astaxie说可以用过滤器实现，就是在Beego运行时在特定的步骤前加入。而由于我的需求比较简单，就选在了BeforeRouter。
+在main.go中:
+12import &quot;github.com/astaxie/beego/context&quot;impo">
+<meta property="og:updated_time" content="2017-03-06T07:48:49.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="启程">
-<meta name="twitter:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
+<meta name="twitter:title" content="Beego中使用过滤器">
+<meta name="twitter:description" content="为了方便调试和排错，决定在现有的beego程序里加上requestID。
+查了些资料发现写的并不是特别清楚和详细，在此总结一下，也算是加深下印象。
+astaxie说可以用过滤器实现，就是在Beego运行时在特定的步骤前加入。而由于我的需求比较简单，就选在了BeforeRouter。
+在main.go中:
+12import &quot;github.com/astaxie/beego/context&quot;impo">
 <meta name="twitter:creator" content="@qichengzx">
   
     <link rel="alternative" href="/atom.xml" title="启程" type="application/atom+xml">
@@ -60,144 +73,89 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2016" class="archive-year">2016</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2016/05/08/cant-post-iqiyi-video-to-discuz.html" class="archive-article-date">
-  <time datetime="2016-05-08T10:57:24.000Z" itemprop="datePublished">May 8</time>
+        <section id="main"><article id="post-insert-filter-in-beego" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/03/06/insert-filter-in-beego.html" class="article-date">
+  <time datetime="2017-03-06T00:23:47.000Z" itemprop="datePublished">2017-03-06</time>
 </a>
-      
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/golang/">golang</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/05/08/cant-post-iqiyi-video-to-discuz.html">解决Discuz无法发布爱奇艺视频的问题</a>
+    <h1 class="article-title" itemprop="name">
+      Beego中使用过滤器
     </h1>
   
 
-    </header>
-  </div>
-</article>
-  
+      </header>
     
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html" class="archive-article-date">
-  <time datetime="2016-02-25T09:10:43.000Z" itemprop="datePublished">Feb 25</time>
-</a>
+    <div class="article-entry" itemprop="articleBody">
       
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html">一段有意思的JS For循环代码</a>
-    </h1>
-  
+        <p>为了方便调试和排错，决定在现有的beego程序里加上requestID。</p>
+<p>查了些资料发现写的并不是特别清楚和详细，在此总结一下，也算是加深下印象。</p>
+<p>astaxie说可以用过滤器实现，就是在Beego运行时在特定的步骤前加入。而由于我的需求比较简单，就选在了BeforeRouter。</p>
+<p>在main.go中:</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> <span class="string">"github.com/astaxie/beego/context"</span></div><div class="line"><span class="keyword">import</span> <span class="string">"github.com/satori/go.uuid"</span></div></pre></td></tr></table></figure>
+<p>在main函数中加入:</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> FilterRequestID = <span class="function"><span class="keyword">func</span><span class="params">(ctx *context.Context)</span></span> &#123;</div><div class="line">	requestId := uuid.NewV4().String()</div><div class="line">	ctx.Input.SetData(<span class="string">"requestId"</span>, requestId)</div><div class="line">&#125;</div><div class="line"></div><div class="line">beego.InsertFilter(<span class="string">"/*"</span>, beego.BeforeRouter, FilterRequestID)</div></pre></td></tr></table></figure>
+<p>在需要使用的地方，如</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// @router /requestid [get]</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *MyController)</span> <span class="title">Requestid</span><span class="params">()</span></span> &#123;</div><div class="line">	<span class="comment">//读取requestId</span></div><div class="line">	rid := this.Ctx.Input.GetData(<span class="string">"requestId"</span>).(<span class="keyword">string</span>)</div><div class="line"></div><div class="line">	fmt.Println(<span class="string">"requestId:"</span>,rid)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>或者</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(m *MyController)</span> <span class="title">Requestid</span><span class="params">()</span></span> &#123;</div><div class="line">	rid := m.Ctx.Input.GetData(<span class="string">"requestId"</span>).(<span class="keyword">string</span>)</div><div class="line"></div><div class="line">	fmt.Println(<span class="string">"requestId:"</span>,rid)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其实很简单，但是文档和查到的资料中都没有明确的说需要引用 “github.com/astaxie/beego/context”，导致写的时候浪费了一些时间。</p>
+<p>参考资料:</p>
+<p><a href="https://beego.me/docs/mvc/controller/filter.md" target="_blank" rel="external">过滤器</a><br><a href="https://gocn.io/article/95" target="_blank" rel="external">beego log中增加request id的一种方式</a></p>
 
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2016/01/19/echarts-pie.html" class="archive-article-date">
-  <time datetime="2016-01-19T13:27:00.000Z" itemprop="datePublished">Jan 19</time>
-</a>
       
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/01/19/echarts-pie.html">ECharts饼图示例</a>
-    </h1>
-  
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://www.qichengzx.com/2017/03/06/insert-filter-in-beego.html" data-id="cizxt29ow001flpfyeb7gpes0" class="article-share-link">Share</a>
+      
+        <a href="https://www.qichengzx.com/2017/03/06/insert-filter-in-beego.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li></ul>
 
-    </header>
+    </footer>
   </div>
-</article>
   
     
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2016/01/11/placeholder-animate.html" class="archive-article-date">
-  <time datetime="2016-01-11T13:42:58.000Z" itemprop="datePublished">Jan 11</time>
-</a>
-      
+<nav id="article-nav">
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/01/11/placeholder-animate.html">一个简单的input获得焦点时的小动画效果</a>
-    </h1>
   
+    <a href="/2016/12/27/shortlen-url-by-go.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Go语言写的一个短网址服务</div>
+    </a>
+  
+</nav>
 
-    </header>
-  </div>
+  
 </article>
-  
-    
-    
-      
-        </div></section>
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2015" class="archive-year">2015</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2015/12/03/nodejs-mysql.html" class="archive-article-date">
-  <time datetime="2015-12-03T13:38:37.000Z" itemprop="datePublished">Dec 3</time>
-</a>
-      
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2015/12/03/nodejs-mysql.html">Node.js连接MySQL并读取数据</a>
-    </h1>
-  
 
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2015/11/17/js-names.html" class="archive-article-date">
-  <time datetime="2015-11-17T14:07:21.000Z" itemprop="datePublished">Nov 17</time>
-</a>
-      
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2015/11/17/js-names.html">JS标识符</a>
-    </h1>
-  
 
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
+<section id="comments">
+  <div class="ds-thread" data-thread-key="cizxt29ow001flpfyeb7gpes0" data-title="Beego中使用过滤器" data-url="https://www.qichengzx.com/2017/03/06/insert-filter-in-beego.html"></div>
+  <script>
+    var duoshuoQuery = {short_name:"qichengzx"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0] 
+       || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+</section>
 </section>
         
           <aside id="sidebar">
