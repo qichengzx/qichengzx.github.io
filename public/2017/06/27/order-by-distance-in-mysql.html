@@ -3,18 +3,24 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   
-  <title>Category: golang | 启程</title>
+  <title>MySQL实现按经纬度做距离排序 | 启程</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta http-equiv="Access-Control-Allow-Origin" content="*">
-  <meta name="description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
-<meta property="og:type" content="website">
-<meta property="og:title" content="启程">
-<meta property="og:url" content="https://www.qichengzx.com/categories/golang/index.html">
+  <meta name="description" content="题图来自网络
+工作中某些业务需要用到按距离排序返回结果，之前的方式是根据前端传过来来的经纬度，和指定范围的距离，算出一个坐标区间，再用这个区间的值去MySQL中查找，类似“where lat between (lat1, lat2) and lng between (lng1,lng2)”，查出数据后，再遍历数据计算每一条数据到这个经纬度的距离，然后根据得出的距离排序返回。低效，麻烦，不方便分页。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL实现按经纬度做距离排序">
+<meta property="og:url" content="https://www.qichengzx.com/2017/06/27/order-by-distance-in-mysql.html">
 <meta property="og:site_name" content="启程">
-<meta property="og:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
+<meta property="og:description" content="题图来自网络
+工作中某些业务需要用到按距离排序返回结果，之前的方式是根据前端传过来来的经纬度，和指定范围的距离，算出一个坐标区间，再用这个区间的值去MySQL中查找，类似“where lat between (lat1, lat2) and lng between (lng1,lng2)”，查出数据后，再遍历数据计算每一条数据到这个经纬度的距离，然后根据得出的距离排序返回。低效，麻烦，不方便分页。">
+<meta property="og:image" content="https://www.qichengzx.com/images/geolocation.png">
+<meta property="og:updated_time" content="2017-06-27T14:25:53.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="启程">
-<meta name="twitter:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
+<meta name="twitter:title" content="MySQL实现按经纬度做距离排序">
+<meta name="twitter:description" content="题图来自网络
+工作中某些业务需要用到按距离排序返回结果，之前的方式是根据前端传过来来的经纬度，和指定范围的距离，算出一个坐标区间，再用这个区间的值去MySQL中查找，类似“where lat between (lat1, lat2) and lng between (lng1,lng2)”，查出数据后，再遍历数据计算每一条数据到这个经纬度的距离，然后根据得出的距离排序返回。低效，麻烦，不方便分页。">
+<meta name="twitter:image" content="https://www.qichengzx.com/images/geolocation.png">
 <meta name="twitter:creator" content="@qichengzx">
   
     <link rel="alternative" href="/atom.xml" title="启程" type="application/atom+xml">
@@ -60,163 +66,92 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2017" class="archive-year">2017</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2017/03/06/insert-filter-in-beego.html" class="archive-article-date">
-  <time datetime="2017-03-06T00:23:47.000Z" itemprop="datePublished">Mar 6</time>
+        <section id="main"><article id="post-order-by-distance-in-mysql" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/06/27/order-by-distance-in-mysql.html" class="article-date">
+  <time datetime="2017-06-27T14:18:19.000Z" itemprop="datePublished">2017-06-27</time>
 </a>
-      
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mysql/">mysql</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/03/06/insert-filter-in-beego.html">Beego中使用过滤器</a>
+    <h1 class="article-title" itemprop="name">
+      MySQL实现按经纬度做距离排序
     </h1>
   
 
-    </header>
-  </div>
-</article>
-  
+      </header>
     
-    
+    <div class="article-entry" itemprop="articleBody">
       
-        </div></section>
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2016" class="archive-year">2016</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2016/12/27/shortlen-url-by-go.html" class="archive-article-date">
-  <time datetime="2016-12-27T13:27:34.000Z" itemprop="datePublished">Dec 27</time>
-</a>
-      
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/12/27/shortlen-url-by-go.html">Go语言写的一个短网址服务</a>
-    </h1>
-  
+        <p><img src="/images/geolocation.png" alt=""><br>题图来自网络</p>
+<p>工作中某些业务需要用到按距离排序返回结果，之前的方式是根据前端传过来来的经纬度，和指定范围的距离，算出一个坐标区间，再用这个区间的值去MySQL中查找，类似“where lat between (lat1, lat2) and lng between (lng1,lng2)”，查出数据后，再遍历数据计算每一条数据到这个经纬度的距离，然后根据得出的距离排序返回。低效，麻烦，不方便分页。</p>
+<p>于是决定直接从MySQL中算出距离后返回，省事，方便，还可以直接分页了。</p>
+<p>查资料后发现还挺简单的，下方的示例是从<a href="https://developers.google.com/maps/articles/phpsqlsearch_v3" target="_blank" rel="external">Google官方的文档</a>中摘取出来。</p>
+<p>创建如下数据表：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">CREATE TABLE `markers` (</div><div class="line">  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,</div><div class="line">  `name` VARCHAR( 60 ) NOT NULL ,</div><div class="line">  `address` VARCHAR( 80 ) NOT NULL ,</div><div class="line">  `lat` FLOAT( 10, 6 ) NOT NULL ,</div><div class="line">  `lng` FLOAT( 10, 6 ) NOT NULL</div><div class="line">) ENGINE = MYISAM ;</div></pre></td></tr></table></figure>
+<p>填充数据：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">INSERT INTO `markers` (`name`, `address`, `lat`, `lng`) VALUES (&apos;Frankie Johnnie &amp; Luigo Too&apos;,&apos;939 W El Camino Real, Mountain View, CA&apos;,&apos;37.386339&apos;,&apos;-122.085823&apos;);</div><div class="line">INSERT INTO `markers` (`name`, `address`, `lat`, `lng`) VALUES (&apos;Amici\&apos;s East Coast Pizzeria&apos;,&apos;790 Castro St, Mountain View, CA&apos;,&apos;37.38714&apos;,&apos;-122.083235&apos;);</div><div class="line">INSERT INTO `markers` (`name`, `address`, `lat`, `lng`) VALUES (&apos;Kapp\&apos;s Pizza Bar &amp; Grill&apos;,&apos;191 Castro St, Mountain View, CA&apos;,&apos;37.393885&apos;,&apos;-122.078916&apos;);</div><div class="line">INSERT INTO `markers` (`name`, `address`, `lat`, `lng`) VALUES (&apos;Round Table Pizza: Mountain View&apos;,&apos;570 N Shoreline Blvd, Mountain View, CA&apos;,&apos;37.402653&apos;,&apos;-122.079354&apos;);</div><div class="line">INSERT INTO `markers` (`name`, `address`, `lat`, `lng`) VALUES (&apos;Tony &amp; Alba\&apos;s Pizza &amp; Pasta&apos;,&apos;619 Escuela Ave, Mountain View, CA&apos;,&apos;37.394011&apos;,&apos;-122.095528&apos;);</div><div class="line">INSERT INTO `markers` (`name`, `address`, `lat`, `lng`) VALUES (&apos;Oregano\&apos;s Wood-Fired Pizza&apos;,&apos;4546 El Camino Real, Los Altos, CA&apos;,&apos;37.401724&apos;,&apos;-122.114646&apos;);</div></pre></td></tr></table></figure>
+<p>下面，开始从表中查询数据。</p>
+<p>根据latitude，longitude值，基于<a href="http://en.wikipedia.org/wiki/Haversine_formula" target="_blank" rel="external">Haversine公式</a>从表中查询数据。</p>
+<p>假设我们要查询latitude=37.38714,longitude=-122.083235，范围在25英里内的前20条数据，可以这样：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">SELECT id, ( 3959 * acos( cos( radians(&apos;37.38714&apos;) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians(&apos;-122.083235&apos;) ) + sin( radians(&apos;37.38714&apos;) ) * sin( radians( lat ) ) ) ) AS distance FROM markers HAVING distance &lt; 25 ORDER BY distance LIMIT 0, 20;</div></pre></td></tr></table></figure>
+<p>如果想使用“公里”代替“英里”，将3959换成6371即可。</p>
+<p>特别简单。</p>
+<p>参考资料：</p>
+<p><a href="https://developers.google.com/maps/articles/phpsqlsearch_v3" target="_blank" rel="external">Creating a Store Locator with PHP, MySQL &amp; Google Maps</a></p>
+<p><a href="https://zh.scribd.com/presentation/2569355/Geo-Distance-Search-with-MySQL" target="_blank" rel="external">Geo/Spatial Search with MySQL</a></p>
 
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2016/12/14/toutiao-images-spider-by-golang.html" class="archive-article-date">
-  <time datetime="2016-12-14T08:28:36.000Z" itemprop="datePublished">Dec 14</time>
-</a>
       
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/12/14/toutiao-images-spider-by-golang.html">Go 福利小爬虫 爬取今日头条美女图</a>
-    </h1>
-  
-
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2016/12/04/go-qiubai.html" class="archive-article-date">
-  <time datetime="2016-12-04T07:49:04.000Z" itemprop="datePublished">Dec 4</time>
-</a>
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://www.qichengzx.com/2017/06/27/order-by-distance-in-mysql.html" data-id="cj4fp0g6s001go60r47l49ven" class="article-share-link">Share</a>
       
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/12/04/go-qiubai.html">Go语言写爬取糗百热门帖子</a>
-    </h1>
-  
-
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2016/10/21/beego-in-docker.html" class="archive-article-date">
-  <time datetime="2016-10-21T02:02:02.000Z" itemprop="datePublished">Oct 21</time>
-</a>
+        <a href="https://www.qichengzx.com/2017/06/27/order-by-distance-in-mysql.html#comments" class="article-comment-link">Comments</a>
       
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/10/21/beego-in-docker.html">用Docker部署Golang Beego框架应用</a>
-    </h1>
-  
-
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2016/09/16/convert-xml-to-json-in-golang.html" class="archive-article-date">
-  <time datetime="2016-09-16T03:28:20.000Z" itemprop="datePublished">Sep 16</time>
-</a>
       
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/09/16/convert-xml-to-json-in-golang.html">Golang XMl 转 JSON</a>
-    </h1>
-  
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li></ul>
 
-    </header>
+    </footer>
   </div>
-</article>
   
     
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2016/09/11/Hello-Go.html" class="archive-article-date">
-  <time datetime="2016-09-11T09:21:03.000Z" itemprop="datePublished">Sep 11</time>
-</a>
-      
+<nav id="article-nav">
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/09/11/Hello-Go.html">Hello Go</a>
-    </h1>
   
+    <a href="/2017/03/06/insert-filter-in-beego.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Beego中使用过滤器</div>
+    </a>
+  
+</nav>
 
-    </header>
-  </div>
+  
 </article>
-  
-  
-    </div></section>
-  
+
+
+<section id="comments">
+  <div class="ds-thread" data-thread-key="cj4fp0g6s001go60r47l49ven" data-title="MySQL实现按经纬度做距离排序" data-url="https://www.qichengzx.com/2017/06/27/order-by-distance-in-mysql.html"></div>
+  <script>
+    var duoshuoQuery = {short_name:"qichengzx"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0] 
+       || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+</section>
 </section>
         
           <aside id="sidebar">

@@ -62,6 +62,64 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-MySql-row_number-part-2" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/02/24/MySql-row_number-part-2.html" class="article-date">
+  <time datetime="2016-02-24T09:58:24.000Z" itemprop="datePublished">2016-02-24</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mysql/">mysql</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/02/24/MySql-row_number-part-2.html">MySQL实现row_number第二部分</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>接上篇：<a href="https://www.qichengzx.com/2016/02/03/MySQL%E5%AE%9E%E7%8E%B0row_number%20.html">MySQL实现row_number</a></p>
+<h3 id="为分组增加row_number">为分组增加row number</h3><p>row_number的分析函数怎么样？（原文：How about  row_number “over partition by” functionality? ），比如，如果想为每一个组增加row number，并且在每一个新的分组重置它。</p>
+<p>查看下图中payments表。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span></div><div class="line">    customerNumber, paymentDate, amount</div><div class="line"><span class="keyword">FROM</span></div><div class="line">    payments</div><div class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> customerNumber;</div></pre></td></tr></table></figure>
+<p><img src="/images/mysql-row-number/mysql-row_number-payments-table.jpg" alt=""></p>
+<p>设想下，为每一条customer数据增加一个当前行的编号，并且每当customer的number字段变化的时候行编号都被重置。</p>
+<p>为了实现这个，需要使用两个临时变量，一个作为当前行编号，另一个用来存 上一条customer number与当前行的number进行对比，查询语句如下。（这句有点绕，可能翻译的不太准确，请以原文为准。To achieve this, you have to use two session variables, one for the row number and the other for storing the old customer number to compare it with the current one as the following query:）</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span> </div><div class="line">    @row_number:=<span class="keyword">CASE</span></div><div class="line">        <span class="keyword">WHEN</span> @customer_no = customerNumber <span class="keyword">THEN</span> @row_number + <span class="number">1</span></div><div class="line">        <span class="keyword">ELSE</span> <span class="number">1</span></div><div class="line">    <span class="keyword">END</span> <span class="keyword">AS</span> <span class="keyword">num</span>,</div><div class="line">    @customer_no:=customerNumber <span class="keyword">as</span> CustomerNumber,</div><div class="line">    paymentDate,</div><div class="line">    amount</div><div class="line"><span class="keyword">FROM</span></div><div class="line">    payments</div><div class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> customerNumber;</div></pre></td></tr></table></figure>
+<p>在这段查询代码中，我们使用了CASE声明，如果customer的number不变，就给row_number变量+1，否则，重置为1，结果如下：</p>
+<p><img src="/images/mysql-row-number/mysql-row_number-per-group.jpg" alt=""></p>
+<p>与为每一行记录生成row_number一样，也可以使用派生表（derived table）和交叉连接（cross join）生成同样的结果。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span> </div><div class="line">    @row_number:=<span class="keyword">CASE</span></div><div class="line">        <span class="keyword">WHEN</span> @customer_no = customerNumber <span class="keyword">THEN</span> @row_number + <span class="number">1</span></div><div class="line">        <span class="keyword">ELSE</span> <span class="number">1</span></div><div class="line">    <span class="keyword">END</span> <span class="keyword">AS</span> <span class="keyword">num</span>,</div><div class="line">    @customer_no:=customerNumber <span class="keyword">as</span> CustomerNumber,</div><div class="line">    paymentDate,</div><div class="line">    amount</div><div class="line"><span class="keyword">FROM</span></div><div class="line">    payments,(<span class="keyword">SELECT</span> @customer_no:=<span class="number">0</span>,@row_number:=<span class="number">0</span>) <span class="keyword">as</span> t</div><div class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> customerNumber;</div></pre></td></tr></table></figure>
+<p>本教程中，我们展示了如何在MySQL中模仿row_number方法。</p>
+<p>原文地址：<a href="http://www.mysqltutorial.org/mysql-row_number/" target="_blank" rel="external">MySQL row_number, This Is How You Emulate It</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html" data-id="cj4fp0g5v0004o60rzlwymm7h" class="article-share-link">Share</a>
+      
+        <a href="https://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-MySQL实现row_number " class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2016/02/03/MySQL实现row_number .html" class="article-date">
@@ -107,7 +165,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/02/03/MySQL实现row_number .html" data-id="cizxt29ml0001lpfytqc8w99h" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/02/03/MySQL实现row_number .html" data-id="cj4fp0g5o0000o60rp1bsm528" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/02/03/MySQL实现row_number .html#comments" class="article-comment-link">Comments</a>
       
@@ -164,7 +222,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/01/19/echarts-pie.html" data-id="cizxt29ok0011lpfymeddzcjw" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/01/19/echarts-pie.html" data-id="cj4fp0g6k0012o60rg130dzzx" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/01/19/echarts-pie.html#comments" class="article-comment-link">Comments</a>
       
@@ -216,7 +274,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/01/11/placeholder-animate.html" data-id="cizxt29pw002elpfycwm8vb4l" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/01/11/placeholder-animate.html" data-id="cj4fp0g7b002ho60r02shwat2" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/01/11/placeholder-animate.html#comments" class="article-comment-link">Comments</a>
       
@@ -296,7 +354,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html" data-id="cizxt29nl000flpfyfh5ib0o2" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html" data-id="cj4fp0g68000fo60ru5s0inp0" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html#comments" class="article-comment-link">Comments</a>
       
@@ -368,7 +426,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html" data-id="cizxt29o6000vlpfyya2a8cqr" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html" data-id="cj4fp0g6j000zo60rs6exhjhi" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html#comments" class="article-comment-link">Comments</a>
       
@@ -454,7 +512,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html" data-id="cizxt29py002ilpfyfpum661l" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html" data-id="cj4fp0g7a002do60r1u7lu7r7" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html#comments" class="article-comment-link">Comments</a>
       
@@ -512,7 +570,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html" data-id="cizxt29pt002blpfybo2sl3x1" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html" data-id="cj4fp0g7d002ko60ryvjmsvsk" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html#comments" class="article-comment-link">Comments</a>
       
@@ -578,7 +636,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/03/nodejs-mysql.html" data-id="cizxt29p5001olpfya6gntsp1" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/12/03/nodejs-mysql.html" data-id="cj4fp0g6w001qo60rl8f09m57" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/12/03/nodejs-mysql.html#comments" class="article-comment-link">Comments</a>
       
@@ -633,62 +691,12 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html" data-id="cizxt29oq0018lpfyl9qaqy2x" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html" data-id="cj4fp0g6n0018o60re2az90yy" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html#comments" class="article-comment-link">Comments</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/excel/">excel</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-js-names" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2015/11/17/js-names.html" class="article-date">
-  <time datetime="2015-11-17T14:07:21.000Z" itemprop="datePublished">2015-11-17</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/javascript/">javascript</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2015/11/17/js-names.html">JS标识符</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>标识符由一个字母开头，其后可以选择性的加上一个或多个字母、数字或下划线。但是，不能使用下面这些保留字：</p>
-<figure class="highlight d"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">abstract</span></div><div class="line">boolean <span class="keyword">break</span> <span class="keyword">byte</span></div><div class="line"><span class="keyword">case</span> <span class="keyword">catch</span> <span class="built_in">char</span> <span class="keyword">class</span> <span class="keyword">const</span> <span class="keyword">continue</span></div><div class="line">debugger <span class="keyword">default</span> <span class="keyword">delete</span> <span class="keyword">do</span> <span class="built_in">double</span></div><div class="line"><span class="keyword">else</span> <span class="keyword">enum</span> <span class="keyword">export</span> extends</div><div class="line"><span class="literal">false</span> <span class="keyword">final</span> <span class="keyword">finally</span> <span class="built_in">float</span> <span class="keyword">for</span> <span class="built_in">function</span></div><div class="line"><span class="keyword">goto</span></div><div class="line"><span class="keyword">if</span> implements <span class="keyword">import</span> <span class="keyword">in</span> instanceof <span class="keyword">int</span> <span class="keyword">interface</span> </div><div class="line"><span class="built_in">long</span></div><div class="line">native <span class="keyword">new</span> <span class="literal">null</span></div><div class="line"><span class="keyword">package</span> <span class="keyword">private</span> <span class="keyword">protected</span> <span class="keyword">public</span></div><div class="line"><span class="keyword">return</span></div><div class="line"><span class="built_in">short</span> <span class="keyword">static</span> <span class="keyword">super</span> <span class="keyword">switch</span> <span class="keyword">synchronized</span></div><div class="line"><span class="keyword">this</span> <span class="keyword">throw</span> throws transient <span class="literal">true</span> <span class="keyword">try</span> <span class="keyword">typeof</span></div><div class="line">var <span class="keyword">volatile</span> <span class="keyword">void</span></div><div class="line"><span class="keyword">while</span> <span class="keyword">with</span></div></pre></td></tr></table></figure>
-<p>这个列表里的大部分并未用在JS语言里，有一些已经逐渐在新标准中出现，但是这个列表也不包括一些本应该保留的字，如undefined,NaN,Infinity。</p>
-<p>JS不允许使用保留字来命名变量或参数，也不允许在对象字面量中，或者用 点运算符(.)提取对象属性时，使用保留字作为对象的属性名。</p>
-<p>标识符被用于语句，变量，参数，属性名，运算符和标记。</p>
-<p>注:实际中，JS也允许 (_),($)开头。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/17/js-names.html" data-id="cizxt29p3001llpfy8st8uxml" class="article-share-link">Share</a>
-      
-        <a href="https://www.qichengzx.com/2015/11/17/js-names.html#comments" class="article-comment-link">Comments</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/javascript/">javascript</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/标识符/">标识符</a></li></ul>
 
     </footer>
   </div>
@@ -740,7 +748,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">11</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">11</span></li></ul>
     </div>
   </div>
 
@@ -749,7 +757,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -758,7 +766,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/dropbox/" style="font-size: 12px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/gin/" style="font-size: 10px;">gin</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/go/" style="font-size: 18px;">go</a> <a href="/tags/goquery/" style="font-size: 12px;">goquery</a> <a href="/tags/hexo/" style="font-size: 14px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 14px;">javascript</a> <a href="/tags/js/" style="font-size: 12px;">js</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 16px;">mysql</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 16px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redis/" style="font-size: 12px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/今日头条/" style="font-size: 10px;">今日头条</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/短网址/" style="font-size: 10px;">短网址</a> <a href="/tags/糗百/" style="font-size: 10px;">糗百</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
+      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/dropbox/" style="font-size: 12px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/gin/" style="font-size: 10px;">gin</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/go/" style="font-size: 18px;">go</a> <a href="/tags/goquery/" style="font-size: 12px;">goquery</a> <a href="/tags/hexo/" style="font-size: 14px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 14px;">javascript</a> <a href="/tags/js/" style="font-size: 12px;">js</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 18px;">mysql</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 16px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redis/" style="font-size: 12px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/今日头条/" style="font-size: 10px;">今日头条</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/短网址/" style="font-size: 10px;">短网址</a> <a href="/tags/糗百/" style="font-size: 10px;">糗百</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
     </div>
   </div>
 
@@ -767,7 +775,7 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
     </div>
   </div>
 
@@ -777,6 +785,10 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
     <h3 class="widget-title">Recents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2017/06/27/order-by-distance-in-mysql.html">MySQL实现按经纬度做距离排序</a>
+          </li>
         
           <li>
             <a href="/2017/03/06/insert-filter-in-beego.html">Beego中使用过滤器</a>
@@ -792,10 +804,6 @@ Nginx <span class="number">1.4</span><span class="number">.6</span>
         
           <li>
             <a href="/2016/12/04/go-qiubai.html">Go语言写爬取糗百热门帖子</a>
-          </li>
-        
-          <li>
-            <a href="/2016/11/02/install-yaf-on-mac.html">Mac brew php7.1环境下安装Yaf</a>
           </li>
         
       </ul>

@@ -4,7 +4,7 @@
   
   <link href="/atom.xml" rel="self"/>
   <link href="https://www.qichengzx.com/"/>
-  <updated>2017-03-06T07:48:49.000Z</updated>
+  <updated>2017-06-27T14:25:53.000Z</updated>
   <id>https://www.qichengzx.com/</id>
   
   <author>
@@ -15,11 +15,46 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title><![CDATA[MySQL实现按经纬度做距离排序]]></title>
+    <link href="https://www.qichengzx.com/2017/06/27/order-by-distance-in-mysql.html"/>
+    <id>https://www.qichengzx.com/2017/06/27/order-by-distance-in-mysql.html</id>
+    <published>2017-06-27T14:18:19.000Z</published>
+    <updated>2017-06-27T14:25:53.000Z</updated>
+    <content type="html"><![CDATA[<p><img src="/images/geolocation.png" alt=""><br>题图来自网络</p>
+<p>工作中某些业务需要用到按距离排序返回结果，之前的方式是根据前端传过来来的经纬度，和指定范围的距离，算出一个坐标区间，再用这个区间的值去MySQL中查找，类似“where lat between (lat1, lat2) and lng between (lng1,lng2)”，查出数据后，再遍历数据计算每一条数据到这个经纬度的距离，然后根据得出的距离排序返回。低效，麻烦，不方便分页。</p>
+<p>于是决定直接从MySQL中算出距离后返回，省事，方便，还可以直接分页了。</p>
+<p>查资料后发现还挺简单的，下方的示例是从<a href="https://developers.google.com/maps/articles/phpsqlsearch_v3" target="_blank" rel="external">Google官方的文档</a>中摘取出来。</p>
+<p>创建如下数据表：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">CREATE TABLE `markers` (</div><div class="line">  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,</div><div class="line">  `name` VARCHAR( 60 ) NOT NULL ,</div><div class="line">  `address` VARCHAR( 80 ) NOT NULL ,</div><div class="line">  `lat` FLOAT( 10, 6 ) NOT NULL ,</div><div class="line">  `lng` FLOAT( 10, 6 ) NOT NULL</div><div class="line">) ENGINE = MYISAM ;</div></pre></td></tr></table></figure>
+<p>填充数据：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">INSERT INTO `markers` (`name`, `address`, `lat`, `lng`) VALUES (&apos;Frankie Johnnie &amp; Luigo Too&apos;,&apos;939 W El Camino Real, Mountain View, CA&apos;,&apos;37.386339&apos;,&apos;-122.085823&apos;);</div><div class="line">INSERT INTO `markers` (`name`, `address`, `lat`, `lng`) VALUES (&apos;Amici\&apos;s East Coast Pizzeria&apos;,&apos;790 Castro St, Mountain View, CA&apos;,&apos;37.38714&apos;,&apos;-122.083235&apos;);</div><div class="line">INSERT INTO `markers` (`name`, `address`, `lat`, `lng`) VALUES (&apos;Kapp\&apos;s Pizza Bar &amp; Grill&apos;,&apos;191 Castro St, Mountain View, CA&apos;,&apos;37.393885&apos;,&apos;-122.078916&apos;);</div><div class="line">INSERT INTO `markers` (`name`, `address`, `lat`, `lng`) VALUES (&apos;Round Table Pizza: Mountain View&apos;,&apos;570 N Shoreline Blvd, Mountain View, CA&apos;,&apos;37.402653&apos;,&apos;-122.079354&apos;);</div><div class="line">INSERT INTO `markers` (`name`, `address`, `lat`, `lng`) VALUES (&apos;Tony &amp; Alba\&apos;s Pizza &amp; Pasta&apos;,&apos;619 Escuela Ave, Mountain View, CA&apos;,&apos;37.394011&apos;,&apos;-122.095528&apos;);</div><div class="line">INSERT INTO `markers` (`name`, `address`, `lat`, `lng`) VALUES (&apos;Oregano\&apos;s Wood-Fired Pizza&apos;,&apos;4546 El Camino Real, Los Altos, CA&apos;,&apos;37.401724&apos;,&apos;-122.114646&apos;);</div></pre></td></tr></table></figure>
+<p>下面，开始从表中查询数据。</p>
+<p>根据latitude，longitude值，基于<a href="http://en.wikipedia.org/wiki/Haversine_formula" target="_blank" rel="external">Haversine公式</a>从表中查询数据。</p>
+<p>假设我们要查询latitude=37.38714,longitude=-122.083235，范围在25英里内的前20条数据，可以这样：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">SELECT id, ( 3959 * acos( cos( radians(&apos;37.38714&apos;) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians(&apos;-122.083235&apos;) ) + sin( radians(&apos;37.38714&apos;) ) * sin( radians( lat ) ) ) ) AS distance FROM markers HAVING distance &lt; 25 ORDER BY distance LIMIT 0, 20;</div></pre></td></tr></table></figure>
+<p>如果想使用“公里”代替“英里”，将3959换成6371即可。</p>
+<p>特别简单。</p>
+<p>参考资料：</p>
+<p><a href="https://developers.google.com/maps/articles/phpsqlsearch_v3" target="_blank" rel="external">Creating a Store Locator with PHP, MySQL &amp; Google Maps</a></p>
+<p><a href="https://zh.scribd.com/presentation/2569355/Geo-Distance-Search-with-MySQL" target="_blank" rel="external">Geo/Spatial Search with MySQL</a></p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p><img src="/images/geolocation.png" alt=""><br>题图来自网络</p>
+<p>工作中某些业务需要用到按距离排序返回结果，之前的方式是根据前端传过来来的经纬度，和指定范围的距离，算出一个坐标区间，再用这个区间的值去MySQL中查找，类]]>
+    </summary>
+    
+      <category term="mysql" scheme="https://www.qichengzx.com/tags/mysql/"/>
+    
+      <category term="mysql" scheme="https://www.qichengzx.com/categories/mysql/"/>
+    
+  </entry>
+  
+  <entry>
     <title><![CDATA[Beego中使用过滤器]]></title>
     <link href="https://www.qichengzx.com/2017/03/06/insert-filter-in-beego.html"/>
     <id>https://www.qichengzx.com/2017/03/06/insert-filter-in-beego.html</id>
     <published>2017-03-06T00:23:47.000Z</published>
-    <updated>2017-03-06T07:48:49.000Z</updated>
+    <updated>2017-06-27T14:53:11.000Z</updated>
     <content type="html"><![CDATA[<p>为了方便调试和排错，决定在现有的beego程序里加上requestID。</p>
 <p>查了些资料发现写的并不是特别清楚和详细，在此总结一下，也算是加深下印象。</p>
 <p>astaxie说可以用过滤器实现，就是在Beego运行时在特定的步骤前加入。而由于我的需求比较简单，就选在了BeforeRouter。</p>
@@ -52,7 +87,7 @@
     <link href="https://www.qichengzx.com/2016/12/27/shortlen-url-by-go.html"/>
     <id>https://www.qichengzx.com/2016/12/27/shortlen-url-by-go.html</id>
     <published>2016-12-27T13:27:34.000Z</published>
-    <updated>2016-12-28T06:14:21.000Z</updated>
+    <updated>2016-12-27T14:26:51.000Z</updated>
     <content type="html"><![CDATA[<p><img src="/images/go/best-url-shortener-to-make-earn-money.png" alt=""></p>
 <center>题图来自<a href="http://www.dwtricks.com/2015/05/best-10-url-shortener-networks-to-earn-money-2015.html/" target="_blank" rel="external">http://www.dwtricks.com/</a></center>
 
@@ -107,7 +142,7 @@
     <link href="https://www.qichengzx.com/2016/12/14/toutiao-images-spider-by-golang.html"/>
     <id>https://www.qichengzx.com/2016/12/14/toutiao-images-spider-by-golang.html</id>
     <published>2016-12-14T08:28:36.000Z</published>
-    <updated>2016-12-14T09:58:39.000Z</updated>
+    <updated>2016-12-16T13:38:03.000Z</updated>
     <content type="html"><![CDATA[<p><img src="/images/go/toutiao.gif" alt=""></p>
 <p>写完爬取糗百热门后没几天，又开始写了爬取今日头条图片的<a href="https://github.com/qichengzx/toutiaoSpider" target="_blank" rel="external">工具</a>。</p>
 <p>灵感来源于<a href="http://www.jianshu.com/p/d67b1d4b99ad" target="_blank" rel="external">Python 福利小爬虫，爬取今日头条街拍美女图</a>，作者很详细的分析了今日头条一个搜索接口，并列出了步骤。</p>
@@ -168,7 +203,7 @@
     <link href="https://www.qichengzx.com/2016/12/04/go-qiubai.html"/>
     <id>https://www.qichengzx.com/2016/12/04/go-qiubai.html</id>
     <published>2016-12-04T07:49:04.000Z</published>
-    <updated>2016-12-06T03:24:55.000Z</updated>
+    <updated>2016-12-07T12:31:33.000Z</updated>
     <content type="html"><![CDATA[<p>闲来无事，想着也用Go来写个爬虫之类的东西，我并不知道这算不算严格意义上的爬虫。</p>
 <p>思前想后，觉得写个爬糗百热门的脚本吧，一来足够简单，二来大概熟悉下流程。</p>
 <p>首先，选了<a href="https://github.com/PuerkitoBio/goquery" target="_blank" rel="external">goquery</a>这个包来解析HTML，声称与jquery相似的用法，事实上也确实是这样，非常方便。</p>
@@ -220,7 +255,7 @@
     <link href="https://www.qichengzx.com/2016/11/02/install-yaf-on-mac.html"/>
     <id>https://www.qichengzx.com/2016/11/02/install-yaf-on-mac.html</id>
     <published>2016-11-02T09:57:38.000Z</published>
-    <updated>2016-12-06T02:43:40.000Z</updated>
+    <updated>2016-11-30T13:16:37.000Z</updated>
     <content type="html"><![CDATA[<p><img src="/images/php/think201-emergence-of-php7.jpg" alt=""></p>
 <p>开发机一直使用brew来安装PHP及其他的环境，今天把PHP升到7.1，由于7.1版本下还没有<a href="http://www.laruence.com/manual/" target="_blank" rel="external">yaf</a>的源，所以无法使用brew安装，只能编译安装了。</p>
 <p>首先下载yaf，解压，进入目录。</p>
@@ -250,7 +285,7 @@
     <link href="https://www.qichengzx.com/2016/10/21/beego-in-docker.html"/>
     <id>https://www.qichengzx.com/2016/10/21/beego-in-docker.html</id>
     <published>2016-10-21T02:02:02.000Z</published>
-    <updated>2016-12-06T02:43:40.000Z</updated>
+    <updated>2016-10-30T02:49:27.000Z</updated>
     <content type="html"><![CDATA[<p>Docker是什么就不说了。<br>Golang是什么也不说了。<br>Beego是什么就更不用说了。</p>
 <p>最近Beego项目完成，研究怎么部署。因为Docker部署起来更简单更快速，所以就说下怎么在docker里部署beego应用。</p>
 <h4 id="写在前面">写在前面</h4><p>假设你的应用路径为 /go/app；<br>假设已配置好docker的相关东西。<br>假设使用 <a href="https://github.com/tools/godep" target="_blank" rel="external">godep</a> 作为依赖管理工具<br>示例中开放端口为80，需要与app.conf中的端口一致，可以自行修改。</p>
@@ -280,7 +315,7 @@
     <link href="https://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html"/>
     <id>https://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html</id>
     <published>2016-09-28T07:43:13.000Z</published>
-    <updated>2016-12-06T02:43:40.000Z</updated>
+    <updated>2016-10-30T02:43:04.000Z</updated>
     <content type="html"><![CDATA[<p>有些情况下会从接口读取数据，数据较多时会用到分页，Laravel为这种需求提供了很方便的方法。</p>
 <p><a href="https://laravel.com/docs/5.2/pagination" target="_blank" rel="external">官方文档</a>里几句略过，并没有详细说明，经过查找资料，发现如下方法可行。</p>
 <h3 id="首先use_LengthAwarePaginator">首先use LengthAwarePaginator</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">use</span> <span class="title">Illuminate</span>\<span class="title">Pagination</span>\<span class="title">LengthAwarePaginator</span>;</div><div class="line"><span class="keyword">use</span> <span class="title">Illuminate</span>\<span class="title">Support</span>\<span class="title">Collection</span>;</div></pre></td></tr></table></figure>
@@ -318,7 +353,7 @@
     <link href="https://www.qichengzx.com/2016/09/16/convert-xml-to-json-in-golang.html"/>
     <id>https://www.qichengzx.com/2016/09/16/convert-xml-to-json-in-golang.html</id>
     <published>2016-09-16T03:28:20.000Z</published>
-    <updated>2016-12-06T02:43:40.000Z</updated>
+    <updated>2016-09-18T13:19:05.000Z</updated>
     <content type="html"><![CDATA[<p><img src="/images/golang.png" alt=""></p>
 <h4 id="起因">起因</h4><p>某个上古时代的API，依然在返回XML格式的数据，更奇葩的是，GBK格式的。</p>
 <p>用Go顺利的写到了发送数据，接收数据，然后取值有点麻烦啊。。。。</p>
@@ -367,7 +402,7 @@
     <link href="https://www.qichengzx.com/2016/09/11/Hello-Go.html"/>
     <id>https://www.qichengzx.com/2016/09/11/Hello-Go.html</id>
     <published>2016-09-11T09:21:03.000Z</published>
-    <updated>2016-12-06T02:43:40.000Z</updated>
+    <updated>2016-09-11T09:21:09.000Z</updated>
     <content type="html"><![CDATA[<h5 id="Mac_安装_GO">Mac 安装 GO</h5><p>本人使用了Brew来安装。</p>
 <h5 id="安装前首先更新Brew。">安装前首先更新Brew。</h5><figure class="highlight armasm"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">brew </span>update &amp;&amp; <span class="keyword">brew </span>upgrade</div></pre></td></tr></table></figure>
 <h5 id="安装Go">安装Go</h5><p>使用brew安装go</p>
@@ -410,7 +445,7 @@
     <link href="https://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html"/>
     <id>https://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html</id>
     <published>2016-07-02T15:11:30.000Z</published>
-    <updated>2016-12-06T02:43:40.000Z</updated>
+    <updated>2016-07-03T01:14:00.000Z</updated>
     <content type="html"><![CDATA[<p>有时候会遇到上传文件给第三方服务的情况，比如本身程序并不需要存储附件，而是把附件发送给一个公共的服务。</p>
 <p>最近正好碰到这个问题，记录一下。</p>
 <p>上代码。</p>
@@ -436,7 +471,7 @@
     <link href="https://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html"/>
     <id>https://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html</id>
     <published>2016-05-15T06:19:52.000Z</published>
-    <updated>2016-12-06T02:43:40.000Z</updated>
+    <updated>2016-05-15T06:25:08.000Z</updated>
     <content type="html"><![CDATA[<p><img src="/images/redis/redis-300dpi.png" alt=""></p>
 <p>虽然RabbitMQ的坑年前就开始填了，但是并没有机会在项目中实际使用，机缘巧合，换工作后第一个比较重要的事就是做一个直播的页面，如果数据直接插入或读取自数据库，数据库端的压力就太大了，当时RabbitMQ还没看完，而其他的队列程序更是没有用过，只是稍微对Redis熟悉些，于是就使用了Redis做。</p>
 <p><a href="http://redis.io/" target="_blank" rel="external">Redis</a>比较常见的是作为数据缓存工具使用，数据存储在内存中，减少了数据库的连接和查询，效率高，又方便。</p>
@@ -478,7 +513,7 @@
     <link href="https://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html"/>
     <id>https://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html</id>
     <published>2016-05-08T10:57:24.000Z</published>
-    <updated>2016-12-06T02:43:40.000Z</updated>
+    <updated>2016-05-08T10:57:25.000Z</updated>
     <content type="html"><![CDATA[<p><img src="/images/discuz/201510148054_136.jpg" alt=""></p>
 <p>最近碰到需要在Discuz论坛中插入爱奇艺视频的问题，之前没关注过，搜索后有些答案说DZ不支持爱奇艺，有些说爱奇艺不支持DZ，并没有真正能解决问题的。</p>
 <p>下午突然想到也许是DZ根据粘贴进来的flash地址生成的标签代码不对，试验后发现果然是这个原因。</p>
@@ -514,7 +549,7 @@
     <link href="https://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html"/>
     <id>https://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html</id>
     <published>2016-05-03T06:35:20.000Z</published>
-    <updated>2016-12-06T02:43:40.000Z</updated>
+    <updated>2016-05-07T14:08:27.000Z</updated>
     <content type="html"><![CDATA[<h3 id="远程调用">远程调用</h3><p>在<a href="/2016/04/17/php-rabbitmq-tutorial-two.html">第二节</a>中，我们学习了如何使用工作队列在多个worker中分发耗时任务。</p>
 <p>但是如果我们需要在远程运行一个函数并等待返回结果怎么办？这是两码事，这个模式通常被称为远程过程调用（Remote Procedure Call，RPC）。</p>
 <p>在本节中我们准备使用RabbitMQ构建一个RPC系统：一个客户端和一个可扩展的RPC服务端。由于我们没有值得分发的耗时任务，我们准备创建一个假的返回<a href="https://en.wikipedia.org/wiki/Fibonacci_number" target="_blank" rel="external">斐波那契数列</a>的RPC服务。</p>
@@ -588,7 +623,7 @@
     <link href="https://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html"/>
     <id>https://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html</id>
     <published>2016-04-27T10:27:03.000Z</published>
-    <updated>2016-12-06T02:43:40.000Z</updated>
+    <updated>2016-05-07T14:06:15.000Z</updated>
     <content type="html"><![CDATA[<h3 id="主题">主题</h3><p>(<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">使用php-amqplib</a>)</p>
 <p>在<a href="/2016/04/24/php-rabbitmq-tutorial-four.html">上一节</a>我们改善了日志系统(logging system，以下简称日志系统)，为了替代fanout类型的交换器，我们使用了一个direct类型的交换器，带来的好处是可以有选择的接收日志。</p>
 <p>虽然使用direct交换器改善了系统，但是仍然有局限性 - 它不能根据多个条件进行路由。</p>
@@ -655,7 +690,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="https://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html"/>
     <id>https://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html</id>
     <published>2016-04-24T06:16:41.000Z</published>
-    <updated>2016-12-06T02:43:40.000Z</updated>
+    <updated>2016-05-07T14:06:15.000Z</updated>
     <content type="html"><![CDATA[<h3 id="路由">路由</h3><p>（使用<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">php-amqplib</a>）<br>在<a href="/2016/04/23/php-rabbitmq-tutorial-three.html">上一节</a>中，我们创建了一个简单的日志系统（logging system）。我们已经可以广播日志消息到多个接收者了。</p>
 <p>在本节中，我们要给它增加一个功能-使它能够只订阅消息的一个子集。比如，只把严重的错误信息写入到日志文件（存储到磁盘）中，但同时仍然会把所有日志信息输出到控制台中。</p>
 <h3 id="绑定">绑定</h3><p>在上一节中我们已经创建了绑定（bindings），代码如下：</p>
@@ -713,7 +748,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="https://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html"/>
     <id>https://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html</id>
     <published>2016-04-23T11:58:17.000Z</published>
-    <updated>2016-12-06T02:43:40.000Z</updated>
+    <updated>2016-05-07T14:06:15.000Z</updated>
     <content type="html"><![CDATA[<h3 id="发布/订阅">发布/订阅</h3><p>我们在<a href="/2016/04/17/php-rabbitmq-tutorial-two.html">上一节</a>创建了一个工作队列，并假定队列对应的任务传送给了某个客户端。在这一章节我们会做一些完全不一样的东西–我们会发送一条消息到多个消费者，也称之为“发布/订阅”模式。</p>
 <p>为了说明这个模式，我们会创建一个简单的日志系统（logging system，以下简称日志系统），它由两个程序组成–第一个是发送日志信息，第二个是接收日志并打印。</p>
 <p>日志系统的每一个运行的接收端程序都会接收信息，这样就可以运行一个接收端就把日志保存到硬盘里，同时运行另一个接收端去实时显示日志到屏幕。</p>
@@ -791,7 +826,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="https://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html"/>
     <id>https://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html</id>
     <published>2016-04-17T06:39:30.000Z</published>
-    <updated>2016-12-06T02:43:40.000Z</updated>
+    <updated>2016-05-07T14:06:15.000Z</updated>
     <content type="html"><![CDATA[<h3 id="工作队列">工作队列</h3><h5 id="（使用php-amqplib库）">（使用<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">php-amqplib</a>库）</h5><p><img src="/images/rabbitmq/python-two.png" alt=""></p>
 <p>在本教程<a href="/2016/02/28/php-rabbitmq-tutorial-one.html">第一部分</a> 我们已经写完了从一个指定队列发送和接收消息的程序。在这一章节中，我们会创建一个工作队列（Work Queue）来分发耗时的任务给多个工作者（worker）。</p>
 <p>工作队列（也被称为 任务队列-task queue）主要是避免立即执行资源密集型任务并且还要等待它执行完毕。相反，需要让任务稍后执行，我们把一个任务当做一条信息发送给队列，后台运行的工作者（worker）会取出任务并执行，当运行多个worker时任务会在它们之间共享。</p>
@@ -874,7 +909,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html"/>
     <id>https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html</id>
     <published>2016-02-28T03:10:03.000Z</published>
-    <updated>2016-12-06T02:43:40.000Z</updated>
+    <updated>2016-05-07T14:06:15.000Z</updated>
     <content type="html"><![CDATA[<h2 id="准备工作">准备工作</h2><h3 id="先决条件">先决条件</h3><p>本教程先决条件是RabbitMQ已经安装并正在以5672端口运行在 localhost，如果你使用了不同的域，端口，用户，密码，连接配置需要适当改变。</p>
 <h3 id="获得帮助">获得帮助</h3><p>如果在本教程中遇到问题，可以通过邮件列表进行联系。</p>
 <h3 id="介绍">介绍</h3><p>RabbitMQ是一个消息代理，它的本质是，从producers（生产者）接收消息，然后发送给consumers（消费者），在这个过程中，可以根据自己的配置规则使用路由，缓冲区，保存消息。</p>
@@ -951,7 +986,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
     <link href="https://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html"/>
     <id>https://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html</id>
     <published>2016-02-25T09:10:43.000Z</published>
-    <updated>2016-12-06T02:43:40.000Z</updated>
+    <updated>2016-02-25T09:16:54.000Z</updated>
     <content type="html"><![CDATA[<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">var a =<span class="number">0</span><span class="comment">;</span></div><div class="line">for (var i =<span class="number">0</span>,<span class="keyword">j </span>=<span class="number">0</span><span class="comment">; i &lt;10,j&lt;6;i++,j++) &#123;</span></div><div class="line">	a = i+<span class="keyword">j;</span></div><div class="line">	console.log(<span class="string">"i="</span>+i)<span class="comment">;</span></div><div class="line">	console.log(<span class="string">"j="</span>+<span class="keyword">j);</span></div><div class="line">	console.log(<span class="string">"a="</span>+a)<span class="comment">;</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>朋友面试，遇到的面试题，电话跟我说完就回来写下来试了一下，结果与自己预想的一样。</p>
 <p>没写之前，电话里说的思路是，因为 j 限制了 小于 6，那么应该只循环6次，实际上也确实是这样。</p>
@@ -964,38 +999,6 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（<span class="keywor
       <category term="js" scheme="https://www.qichengzx.com/tags/js/"/>
     
       <category term="javascript" scheme="https://www.qichengzx.com/categories/javascript/"/>
-    
-  </entry>
-  
-  <entry>
-    <title><![CDATA[MySQL实现row_number第二部分]]></title>
-    <link href="https://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html"/>
-    <id>https://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html</id>
-    <published>2016-02-24T09:58:24.000Z</published>
-    <updated>2016-12-06T02:43:40.000Z</updated>
-    <content type="html"><![CDATA[<p>接上篇：<a href="https://www.qichengzx.com/2016/02/03/MySQL%E5%AE%9E%E7%8E%B0row_number%20.html">MySQL实现row_number</a></p>
-<h3 id="为分组增加row_number">为分组增加row number</h3><p>row_number的分析函数怎么样？（原文：How about  row_number “over partition by” functionality? ），比如，如果想为每一个组增加row number，并且在每一个新的分组重置它。</p>
-<p>查看下图中payments表。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span></div><div class="line">    customerNumber, paymentDate, amount</div><div class="line"><span class="keyword">FROM</span></div><div class="line">    payments</div><div class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> customerNumber;</div></pre></td></tr></table></figure>
-<p><img src="/images/mysql-row-number/mysql-row_number-payments-table.jpg" alt=""></p>
-<p>设想下，为每一条customer数据增加一个当前行的编号，并且每当customer的number字段变化的时候行编号都被重置。</p>
-<p>为了实现这个，需要使用两个临时变量，一个作为当前行编号，另一个用来存 上一条customer number与当前行的number进行对比，查询语句如下。（这句有点绕，可能翻译的不太准确，请以原文为准。To achieve this, you have to use two session variables, one for the row number and the other for storing the old customer number to compare it with the current one as the following query:）</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span> </div><div class="line">    @row_number:=<span class="keyword">CASE</span></div><div class="line">        <span class="keyword">WHEN</span> @customer_no = customerNumber <span class="keyword">THEN</span> @row_number + <span class="number">1</span></div><div class="line">        <span class="keyword">ELSE</span> <span class="number">1</span></div><div class="line">    <span class="keyword">END</span> <span class="keyword">AS</span> <span class="keyword">num</span>,</div><div class="line">    @customer_no:=customerNumber <span class="keyword">as</span> CustomerNumber,</div><div class="line">    paymentDate,</div><div class="line">    amount</div><div class="line"><span class="keyword">FROM</span></div><div class="line">    payments</div><div class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> customerNumber;</div></pre></td></tr></table></figure>
-<p>在这段查询代码中，我们使用了CASE声明，如果customer的number不变，就给row_number变量+1，否则，重置为1，结果如下：</p>
-<p><img src="/images/mysql-row-number/mysql-row_number-per-group.jpg" alt=""></p>
-<p>与为每一行记录生成row_number一样，也可以使用派生表（derived table）和交叉连接（cross join）生成同样的结果。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span> </div><div class="line">    @row_number:=<span class="keyword">CASE</span></div><div class="line">        <span class="keyword">WHEN</span> @customer_no = customerNumber <span class="keyword">THEN</span> @row_number + <span class="number">1</span></div><div class="line">        <span class="keyword">ELSE</span> <span class="number">1</span></div><div class="line">    <span class="keyword">END</span> <span class="keyword">AS</span> <span class="keyword">num</span>,</div><div class="line">    @customer_no:=customerNumber <span class="keyword">as</span> CustomerNumber,</div><div class="line">    paymentDate,</div><div class="line">    amount</div><div class="line"><span class="keyword">FROM</span></div><div class="line">    payments,(<span class="keyword">SELECT</span> @customer_no:=<span class="number">0</span>,@row_number:=<span class="number">0</span>) <span class="keyword">as</span> t</div><div class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> customerNumber;</div></pre></td></tr></table></figure>
-<p>本教程中，我们展示了如何在MySQL中模仿row_number方法。</p>
-<p>原文地址：<a href="http://www.mysqltutorial.org/mysql-row_number/" target="_blank" rel="external">MySQL row_number, This Is How You Emulate It</a></p>
-]]></content>
-    <summary type="html">
-    <![CDATA[<p>接上篇：<a href="https://www.qichengzx.com/2016/02/03/MySQL%E5%AE%9E%E7%8E%B0row_number%20.html">MySQL实现row_number</a></p>
-<h3 id="为分组增加row_n]]>
-    </summary>
-    
-      <category term="mysql" scheme="https://www.qichengzx.com/tags/mysql/"/>
-    
-      <category term="mysql" scheme="https://www.qichengzx.com/categories/mysql/"/>
     
   </entry>
   
