@@ -6,22 +6,17 @@
   <title>vps 搭建个人git服务器 | 启程</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta http-equiv="Access-Control-Allow-Origin" content="*">
-  <meta name="description" content="以下内容主要来自    How To Set Up a Private Git Server on a VPS
-之前在DigitalOcean买了个5刀的vps，本来是想搞VPN的，但是没成功，后来把个人博客放这了，后来又觉得有点浪费，索性重新启用这个域名来写技术文章。
-本来是用的WP的但是也一直没写，后来又想折腾别的程序试一下，就选了现在的hexo，昨天在自己电脑上安装了，也可以写文章页可以默认">
+  <meta name="description" content="以下内容主要来自    How To Set Up a Private Git Server on a VPS 之前在DigitalOcean买了个5刀的vps，本来是想搞VPN的，但是没成功，后来把个人博客放这了，后来又觉得有点浪费，索性重新启用这个域名来写技术文章。 本来是用的WP的但是也一直没写，后来又想折腾别的程序试一下，就选了现在的hexo，昨天在自己电脑上安装了，也可以写文章页可以默认">
+<meta name="keywords" content="vps,git">
 <meta property="og:type" content="article">
 <meta property="og:title" content="vps 搭建个人git服务器">
 <meta property="og:url" content="https://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html">
 <meta property="og:site_name" content="启程">
-<meta property="og:description" content="以下内容主要来自    How To Set Up a Private Git Server on a VPS
-之前在DigitalOcean买了个5刀的vps，本来是想搞VPN的，但是没成功，后来把个人博客放这了，后来又觉得有点浪费，索性重新启用这个域名来写技术文章。
-本来是用的WP的但是也一直没写，后来又想折腾别的程序试一下，就选了现在的hexo，昨天在自己电脑上安装了，也可以写文章页可以默认">
+<meta property="og:description" content="以下内容主要来自    How To Set Up a Private Git Server on a VPS 之前在DigitalOcean买了个5刀的vps，本来是想搞VPN的，但是没成功，后来把个人博客放这了，后来又觉得有点浪费，索性重新启用这个域名来写技术文章。 本来是用的WP的但是也一直没写，后来又想折腾别的程序试一下，就选了现在的hexo，昨天在自己电脑上安装了，也可以写文章页可以默认">
 <meta property="og:updated_time" content="2015-11-08T02:42:16.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="vps 搭建个人git服务器">
-<meta name="twitter:description" content="以下内容主要来自    How To Set Up a Private Git Server on a VPS
-之前在DigitalOcean买了个5刀的vps，本来是想搞VPN的，但是没成功，后来把个人博客放这了，后来又觉得有点浪费，索性重新启用这个域名来写技术文章。
-本来是用的WP的但是也一直没写，后来又想折腾别的程序试一下，就选了现在的hexo，昨天在自己电脑上安装了，也可以写文章页可以默认">
+<meta name="twitter:description" content="以下内容主要来自    How To Set Up a Private Git Server on a VPS 之前在DigitalOcean买了个5刀的vps，本来是想搞VPN的，但是没成功，后来把个人博客放这了，后来又觉得有点浪费，索性重新启用这个域名来写技术文章。 本来是用的WP的但是也一直没写，后来又想折腾别的程序试一下，就选了现在的hexo，昨天在自己电脑上安装了，也可以写文章页可以默认">
 <meta name="twitter:creator" content="@qichengzx">
   
     <link rel="alternative" href="/atom.xml" title="启程" type="application/atom+xml">
@@ -61,7 +56,7 @@
         <a id="nav-search-btn" class="nav-icon" title="Search"></a>
       </nav>
       <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://www.qichengzx.com"></form>
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://www.qichengzx.com"></form>
       </div>
     </div>
   </div>
@@ -94,21 +89,21 @@
 <p>本来是用的WP的但是也一直没写，后来又想折腾别的程序试一下，就选了现在的<a href="https://hexo.io" target="_blank" rel="external">hexo</a>，昨天在自己电脑上安装了，也可以写文章页可以默认 <code>hexo server</code> 运行，然后，我愉快的把命令行关掉之后，就傻了。</p>
 <p>后来也在官方文档和Google里看有什么办法能让它在后台运行，官方说可以 <code>hexo s &amp;</code>，然并卵，官方和Google都说可以用 <code>forever</code> <code>pm2</code> ，一样然并卵，今天早晨起来继续弄的时候，觉得还是放弃吧，既然有public文件夹，还是用nginx去解析吧。这个都是后话了。</p>
 <p>下边说怎么在vps上安装git服务器，昨天和今天上午也看了一些资料一直也不成功。晚上从DigitalOcean社区里看到这篇文章，然后就成功了。</p>
-<h4 id="0_在本地生成ssh_key">0 在本地生成ssh key</h4><pre><code>ssh-keygen -C <span class="string">"youremail@mailprovider.com"</span>
+<h4 id="0-在本地生成ssh-key"><a href="#0-在本地生成ssh-key" class="headerlink" title="0 在本地生成ssh key"></a>0 在本地生成ssh key</h4><pre><code>ssh-keygen -C &quot;youremail@mailprovider.com&quot;
 
-Generating <span class="keyword">public</span>/<span class="keyword">private</span> rsa <span class="keyword">key</span> pair.
+Generating public/private rsa key pair.
 
-Enter file <span class="keyword">in</span> which <span class="keyword">to</span> save the <span class="keyword">key</span> (/home/flynn/.ssh/id_rsa):
+Enter file in which to save the key (/home/flynn/.ssh/id_rsa):
 
-Enter passphrase (empty <span class="keyword">for</span> no passphrase):
+Enter passphrase (empty for no passphrase):
 
 Enter same passphrase again: 
 
-Your identification has been saved <span class="keyword">in</span> foo_rsa.
+Your identification has been saved in foo_rsa.
 
-Your <span class="keyword">public</span> <span class="keyword">key</span> has been saved <span class="keyword">in</span> foo_rsa.pub.
+Your public key has been saved in foo_rsa.pub.
 </code></pre><p>注意替换成自己的邮箱，可以一路回车，也可以在 Enter passphrase 的时候输入一个密码保护一下。如果已经生成过了可以 <strong>略过这步</strong>。</p>
-<h4 id="1_在服务器添加git用户">1 在服务器添加git用户</h4><p>首先切换到root用户，<code>su -</code> 。<br>然后添加git用户。（用户名不一定是git，但是习惯上用这个名）</p>
+<h4 id="1-在服务器添加git用户"><a href="#1-在服务器添加git用户" class="headerlink" title="1 在服务器添加git用户"></a>1 在服务器添加git用户</h4><p>首先切换到root用户，<code>su -</code> 。<br>然后添加git用户。（用户名不一定是git，但是习惯上用这个名）</p>
 <p><code>useradd git</code></p>
 <p>设置密码</p>
 <p><code>passwd git</code></p>
@@ -118,10 +113,10 @@ Your <span class="keyword">public</span> <span class="keyword">key</span> has be
 <p><code>mkdir git</code></p>
 <p><code>sudo chown -R -v git:git git/</code></p>
 <p>现在可以安装git服务了。</p>
-<pre><code><span class="attribute">CentOS/Fedora</span>: <span class="string">yum install git</span>
-<span class="attribute">Ubuntu/Debian</span>: <span class="string">apt-get install git</span>
+<pre><code>CentOS/Fedora: yum install git
+Ubuntu/Debian: apt-get install git
 </code></pre><p>DO文档说可以这样，但是部分资料里写要 install git-core，但是因为之前安装过git-core，所以不确定是不是DO文档上是正确的，<strong>所以此处DO的文档可能不准确。</strong>（不确定）</p>
-<h4 id="2_把本地的ssh_key添加到服务器的允许访问列表里">2 把本地的ssh key添加到服务器的允许访问列表里</h4><p>登录进服务器，切换到git用户。</p>
+<h4 id="2-把本地的ssh-key添加到服务器的允许访问列表里"><a href="#2-把本地的ssh-key添加到服务器的允许访问列表里" class="headerlink" title="2 把本地的ssh key添加到服务器的允许访问列表里"></a>2 把本地的ssh key添加到服务器的允许访问列表里</h4><p>登录进服务器，切换到git用户。</p>
 <p><code>su git</code></p>
 <p>然后创建git用户的.ssh文件夹及authorized_keys文件，</p>
 <p><code>mkdir ~/.ssh &amp;&amp; touch ~/.ssh/authorized_keys</code></p>
@@ -131,7 +126,7 @@ Your <span class="keyword">public</span> <span class="keyword">key</span> has be
 <p>第一个cat 后的文件地址取决于你电脑上这个文件的路径，后边是说把前边你本地的id_rsa.pub的内容写到远程服务器上git 这个用户的.ssh/authorized_keys文件里，也就是前边创建的那个文件。</p>
 <p>所以，不出意外的话，此时可以在服务器上运行</p>
 <p><code>cat ~/.ssh/authorized_keys</code> 就可以看到你本地电脑生成的key了，不出意外的话结尾应该是你生成key填写的邮箱。</p>
-<h4 id="3_初始化本地仓库">3 初始化本地仓库</h4><p>在服务器上任何一个位置，执行</p>
+<h4 id="3-初始化本地仓库"><a href="#3-初始化本地仓库" class="headerlink" title="3 初始化本地仓库"></a>3 初始化本地仓库</h4><p>在服务器上任何一个位置，执行</p>
 <p><code>git init --bare project.git</code>，这样，在你的开发机和服务器环境是就可以用到这个project.git了。</p>
 <p>（为已存在的git项目）设置远程仓库的URL</p>
 <p><code>git remote set-url origin git@git.droplet.com:project.git</code></p>
@@ -139,15 +134,15 @@ Your <span class="keyword">public</span> <span class="keyword">key</span> has be
 <p>如果是一个新的仓库，是这样</p>
 <p><code>git init &amp;&amp; git remote add origin git@git.droplet.com:project.git</code></p>
 <p>git@git.droplet.com:my-project.gi 只是服务器上</p>
-<h3 id="总结：">总结：</h3><pre><code>所以实际上上边的流程是
+<h3 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h3><pre><code>所以实际上上边的流程是
 
-<span class="number">0</span>. 在服务器上比如home/git 目录里git init --bare project<span class="class">.git</span>
-<span class="number">1</span>. 在自己电脑，某个目录，git init 或者git clone git@git<span class="class">.droplet</span><span class="class">.com</span>:project<span class="class">.git</span>
-<span class="number">2</span>. 在服务器上比如www目录，git init 或git clone git@git<span class="class">.droplet</span><span class="class">.com</span>:project<span class="class">.git</span>
+0. 在服务器上比如home/git 目录里git init --bare project.git
+1. 在自己电脑，某个目录，git init 或者git clone git@git.droplet.com:project.git
+2. 在服务器上比如www目录，git init 或git clone git@git.droplet.com:project.git
 
 不出意外，这样就可以了。
 
-本地添加一个新文件，git add . , git commit -m <span class="string">"test"</span> ,git push origin master，登录服务器，切换到www目录，git pull origin master，就可以了。
+本地添加一个新文件，git add . , git commit -m &quot;test&quot; ,git push origin master，登录服务器，切换到www目录，git pull origin master，就可以了。
 </code></pre><p>参考资料:</p>
 <p><a href="https://www.digitalocean.com/community/tutorials/how-to-set-up-a-private-git-server-on-a-vps" target="_blank" rel="external">How To Set Up a Private Git Server on a VPS</a></p>
 <p><a href="https://git-scm.com/book/it/v2/Git-on-the-Server-Setting-Up-the-Server" target="_blank" rel="external">Git on the Server - Setting Up the Server</a></p>
@@ -155,7 +150,7 @@ Your <span class="keyword">public</span> <span class="keyword">key</span> has be
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html" data-id="cj4fp0g5x0005o60rsg2jgfko" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html" data-id="cj4lhp63y000a2g0raxwiwvnp" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html#comments" class="article-comment-link">Comments</a>
       
@@ -190,7 +185,7 @@ Your <span class="keyword">public</span> <span class="keyword">key</span> has be
 
 
 <section id="comments">
-  <div class="ds-thread" data-thread-key="cj4fp0g5x0005o60rsg2jgfko" data-title="vps 搭建个人git服务器" data-url="https://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html"></div>
+  <div class="ds-thread" data-thread-key="cj4lhp63y000a2g0raxwiwvnp" data-title="vps 搭建个人git服务器" data-url="https://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html"></div>
   <script>
     var duoshuoQuery = {short_name:"qichengzx"};
     (function() {
@@ -241,7 +236,7 @@ Your <span class="keyword">public</span> <span class="keyword">key</span> has be
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">11</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">11</span></li></ul>
     </div>
   </div>
 
@@ -250,7 +245,7 @@ Your <span class="keyword">public</span> <span class="keyword">key</span> has be
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -259,7 +254,7 @@ Your <span class="keyword">public</span> <span class="keyword">key</span> has be
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/dropbox/" style="font-size: 12px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/gin/" style="font-size: 10px;">gin</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/go/" style="font-size: 18px;">go</a> <a href="/tags/goquery/" style="font-size: 12px;">goquery</a> <a href="/tags/hexo/" style="font-size: 14px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 14px;">javascript</a> <a href="/tags/js/" style="font-size: 12px;">js</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 18px;">mysql</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 16px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redis/" style="font-size: 12px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/今日头条/" style="font-size: 10px;">今日头条</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/短网址/" style="font-size: 10px;">短网址</a> <a href="/tags/糗百/" style="font-size: 10px;">糗百</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
+      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/dropbox/" style="font-size: 11.67px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/gin/" style="font-size: 10px;">gin</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/go/" style="font-size: 18.33px;">go</a> <a href="/tags/goquery/" style="font-size: 11.67px;">goquery</a> <a href="/tags/hexo/" style="font-size: 13.33px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 13.33px;">javascript</a> <a href="/tags/js/" style="font-size: 11.67px;">js</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 16.67px;">mysql</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 15px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redis/" style="font-size: 11.67px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/今日头条/" style="font-size: 10px;">今日头条</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/短网址/" style="font-size: 10px;">短网址</a> <a href="/tags/糗百/" style="font-size: 10px;">糗百</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
     </div>
   </div>
 
@@ -268,7 +263,7 @@ Your <span class="keyword">public</span> <span class="keyword">key</span> has be
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
     </div>
   </div>
 
@@ -278,6 +273,10 @@ Your <span class="keyword">public</span> <span class="keyword">key</span> has be
     <h3 class="widget-title">Recents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2017/07/02/HTTP:2-Server-Push.html">在Go中使用 HTTP/2 Server Push</a>
+          </li>
         
           <li>
             <a href="/2017/06/27/order-by-distance-in-mysql.html">MySQL实现按经纬度做距离排序</a>
@@ -293,10 +292,6 @@ Your <span class="keyword">public</span> <span class="keyword">key</span> has be
         
           <li>
             <a href="/2016/12/14/toutiao-images-spider-by-golang.html">Go 福利小爬虫 爬取今日头条美女图</a>
-          </li>
-        
-          <li>
-            <a href="/2016/12/04/go-qiubai.html">Go语言写爬取糗百热门帖子</a>
           </li>
         
       </ul>
