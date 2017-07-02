@@ -62,9 +62,9 @@
       <div class="outer">
         <section id="main">
   
-    <article id="post-HTTP:2-Server-Push" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-HTTP2-Server-Push" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2017/07/02/HTTP:2-Server-Push.html" class="article-date">
+    <a href="/2017/07/02/HTTP2-Server-Push.html" class="article-date">
   <time datetime="2017-07-01T16:09:13.000Z" itemprop="datePublished">2017-07-02</time>
 </a>
     
@@ -80,7 +80,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2017/07/02/HTTP:2-Server-Push.html">在Go中使用 HTTP/2 Server Push</a>
+      <a class="article-title" href="/2017/07/02/HTTP2-Server-Push.html">在Go中使用 HTTP/2 Server Push</a>
     </h1>
   
 
@@ -101,7 +101,7 @@
 <figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">http.HandleFunc(<span class="string">"/"</span>, <span class="function"><span class="keyword">func</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</div><div class="line">  <span class="keyword">if</span> pusher, ok := w.(http.Pusher); ok &#123;</div><div class="line">    <span class="comment">//支持Push</span></div><div class="line">    options := &amp;http.PushOptions&#123;</div><div class="line">      Header: http.Header&#123;</div><div class="line">        <span class="string">"Accept-Encoding"</span>: r.Header[<span class="string">"Accept-Encoding"</span>],</div><div class="line">      &#125;,</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span> err := pusher.Pusher(<span class="string">"/app.js"</span>, options); err != <span class="literal">nil</span> &#123;</div><div class="line">      log.Printf(<span class="string">"Failed to push: %v"</span>, err)</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  <span class="comment">// ...</span></div><div class="line">&#125;)</div></pre></td></tr></table></figure>
 <p>完整示例见：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ go get golang.org/x/blog/content/h2push/server</div></pre></td></tr></table></figure>
-<p>启动服务，然后打开 <a href="https://localhost:8080，浏览器开发工具应该会显示服务器推送了" target="_blank" rel="external">https://localhost:8080，浏览器开发工具应该会显示服务器推送了</a> app.js 和 style.css 。</p>
+<p>启动服务，然后打开 <a href="https://localhost:8080" target="_blank" rel="external">https://localhost:8080</a>，浏览器开发工具应该会显示服务器推送了 app.js 和 style.css 。</p>
 <p><img src="/images/go/networktimeline.png" alt="网络请求耗时"></p>
 <h4 id="在响应前开始Push"><a href="#在响应前开始Push" class="headerlink" title="在响应前开始Push"></a>在响应前开始Push</h4><p>在发送响应之前调用Push是个好主意，否则可能会意外产生重复的响应，例如，假设下边是HTML响应的一部分：</p>
 <figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span> <span class="attr">href</span>=<span class="string">"a.cs"</span>&gt;</span>...</div></pre></td></tr></table></figure>
@@ -133,9 +133,9 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2017/07/02/HTTP:2-Server-Push.html" data-id="cj4lhp63k00002g0r50jcr38d" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2017/07/02/HTTP2-Server-Push.html" data-id="cj4m2mfvh00008e0rssqtxxhl" class="article-share-link">Share</a>
       
-        <a href="https://www.qichengzx.com/2017/07/02/HTTP:2-Server-Push.html#comments" class="article-comment-link">Comments</a>
+        <a href="https://www.qichengzx.com/2017/07/02/HTTP2-Server-Push.html#comments" class="article-comment-link">Comments</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li></ul>
@@ -194,7 +194,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2017/06/27/order-by-distance-in-mysql.html" data-id="cj4lhp652001v2g0r8igs9pag" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2017/06/27/order-by-distance-in-mysql.html" data-id="cj4m2mfxa001z8e0ra4399hwc" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2017/06/27/order-by-distance-in-mysql.html#comments" class="article-comment-link">Comments</a>
       
@@ -252,7 +252,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2017/03/06/insert-filter-in-beego.html" data-id="cj4lhp64v001i2g0rfjapx3dg" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2017/03/06/insert-filter-in-beego.html" data-id="cj4m2mfwv001i8e0r33slndx8" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2017/03/06/insert-filter-in-beego.html#comments" class="article-comment-link">Comments</a>
       
@@ -331,7 +331,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/12/27/shortlen-url-by-go.html" data-id="cj4lhp65m002s2g0rgtvv5zeb" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/12/27/shortlen-url-by-go.html" data-id="cj4m2mfxx002s8e0rh1rq6nbr" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/12/27/shortlen-url-by-go.html#comments" class="article-comment-link">Comments</a>
       
@@ -414,7 +414,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/12/14/toutiao-images-spider-by-golang.html" data-id="cj4lhp65r002y2g0rbamtxy95" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/12/14/toutiao-images-spider-by-golang.html" data-id="cj4m2mfxz002y8e0rl5ldgges" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/12/14/toutiao-images-spider-by-golang.html#comments" class="article-comment-link">Comments</a>
       
@@ -485,7 +485,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/12/04/go-qiubai.html" data-id="cj4lhp64n00182g0rpwkijyw1" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/12/04/go-qiubai.html" data-id="cj4m2mfwu001f8e0rm8cwo0we" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/12/04/go-qiubai.html#comments" class="article-comment-link">Comments</a>
       
@@ -541,7 +541,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/11/02/install-yaf-on-mac.html" data-id="cj4lhp64x001m2g0rzr0avuns" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/11/02/install-yaf-on-mac.html" data-id="cj4m2mfx0001m8e0rd1hr6hkh" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/11/02/install-yaf-on-mac.html#comments" class="article-comment-link">Comments</a>
       
@@ -596,7 +596,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/10/21/beego-in-docker.html" data-id="cj4lhp646000l2g0r28o7kgaw" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/10/21/beego-in-docker.html" data-id="cj4m2mfvy000c8e0ro7025epc" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/10/21/beego-in-docker.html#comments" class="article-comment-link">Comments</a>
       
@@ -658,7 +658,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html" data-id="cj4lhp64g00102g0rvz02qwmj" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html" data-id="cj4m2mfwd000t8e0rinm5whtm" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html#comments" class="article-comment-link">Comments</a>
       
@@ -732,7 +732,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/09/16/convert-xml-to-json-in-golang.html" data-id="cj4lhp64b000s2g0rcg150pwm" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/09/16/convert-xml-to-json-in-golang.html" data-id="cj4m2mfwe000u8e0r8trmuls1" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/09/16/convert-xml-to-json-in-golang.html#comments" class="article-comment-link">Comments</a>
       
@@ -828,7 +828,7 @@
       <ul>
         
           <li>
-            <a href="/2017/07/02/HTTP:2-Server-Push.html">在Go中使用 HTTP/2 Server Push</a>
+            <a href="/2017/07/02/HTTP2-Server-Push.html">在Go中使用 HTTP/2 Server Push</a>
           </li>
         
           <li>

@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://www.qichengzx.com/"/>
-  <updated>2017-07-01T16:11:33.000Z</updated>
+  <updated>2017-07-02T02:00:42.000Z</updated>
   <id>https://www.qichengzx.com/</id>
   
   <author>
@@ -17,10 +17,10 @@
   
   <entry>
     <title>在Go中使用 HTTP/2 Server Push</title>
-    <link href="https://www.qichengzx.com/2017/07/02/HTTP:2-Server-Push.html"/>
-    <id>https://www.qichengzx.com/2017/07/02/HTTP:2-Server-Push.html</id>
+    <link href="https://www.qichengzx.com/2017/07/02/HTTP2-Server-Push.html"/>
+    <id>https://www.qichengzx.com/2017/07/02/HTTP2-Server-Push.html</id>
     <published>2017-07-01T16:09:13.000Z</published>
-    <updated>2017-07-01T16:11:33.000Z</updated>
+    <updated>2017-07-02T02:00:42.000Z</updated>
     
     <content type="html"><![CDATA[<h4 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h4><p>本文来自<a href="https://blog.golang.org/h2push" target="_blank" rel="external">Golang的官方博客</a>，由 Jaana Burcu Dogan, Tom Bergan 发表于2017年3月24日。</p>
 <p>近来看到此篇，觉得不错，非常适合用来学习Go中的 Server Push ，于是决定翻译一下，水平有限，如有不足不恰当的地方还请提出宝贵意见。</p>
@@ -35,7 +35,7 @@
 <figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">http.HandleFunc(<span class="string">"/"</span>, <span class="function"><span class="keyword">func</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</div><div class="line">  <span class="keyword">if</span> pusher, ok := w.(http.Pusher); ok &#123;</div><div class="line">    <span class="comment">//支持Push</span></div><div class="line">    options := &amp;http.PushOptions&#123;</div><div class="line">      Header: http.Header&#123;</div><div class="line">        <span class="string">"Accept-Encoding"</span>: r.Header[<span class="string">"Accept-Encoding"</span>],</div><div class="line">      &#125;,</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span> err := pusher.Pusher(<span class="string">"/app.js"</span>, options); err != <span class="literal">nil</span> &#123;</div><div class="line">      log.Printf(<span class="string">"Failed to push: %v"</span>, err)</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  <span class="comment">// ...</span></div><div class="line">&#125;)</div></pre></td></tr></table></figure>
 <p>完整示例见：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ go get golang.org/x/blog/content/h2push/server</div></pre></td></tr></table></figure>
-<p>启动服务，然后打开 <a href="https://localhost:8080，浏览器开发工具应该会显示服务器推送了" target="_blank" rel="external">https://localhost:8080，浏览器开发工具应该会显示服务器推送了</a> app.js 和 style.css 。</p>
+<p>启动服务，然后打开 <a href="https://localhost:8080" target="_blank" rel="external">https://localhost:8080</a>，浏览器开发工具应该会显示服务器推送了 app.js 和 style.css 。</p>
 <p><img src="/images/go/networktimeline.png" alt="网络请求耗时"></p>
 <h4 id="在响应前开始Push"><a href="#在响应前开始Push" class="headerlink" title="在响应前开始Push"></a>在响应前开始Push</h4><p>在发送响应之前调用Push是个好主意，否则可能会意外产生重复的响应，例如，假设下边是HTML响应的一部分：</p>
 <figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span> <span class="attr">href</span>=<span class="string">"a.cs"</span>&gt;</span>...</div></pre></td></tr></table></figure>

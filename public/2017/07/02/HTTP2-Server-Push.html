@@ -3,23 +3,23 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   
-  <title>利用Dropbox同步hexo的文章源文件并自动生成文章发布 | 启程</title>
+  <title>在Go中使用 HTTP/2 Server Push | 启程</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta http-equiv="Access-Control-Allow-Origin" content="*">
-  <meta name="description" content="阅读之前默认为已在服务器安装hexo，也默认服务器可以访问Dropbox   不建议服务器内存小于512M ，谁卡谁知道  最初的最初先说下我最终完成的结构： 1.本地有一个日志文件夹，用于存放md文件，或HTML文件，作为本地的Dropbox客户端同步的目录 2.服务器home文件夹中init一套hexo程序，用于接收本地的md文件，和generate，minify 流程： 1.本地撰写，本地">
-<meta name="keywords" content="dropbox,hexo">
+  <meta name="description" content="写在前面本文来自Golang的官方博客，由 Jaana Burcu Dogan, Tom Bergan 发表于2017年3月24日。 近来看到此篇，觉得不错，非常适合用来学习Go中的 Server Push ，于是决定翻译一下，水平有限，如有不足不恰当的地方还请提出宝贵意见。 序HTTP/2旨在解决HTTP/1.x的很多问题。现代网页通常包含很多资源：HTML，css，js，图片等等。在 HTTP">
+<meta name="keywords" content="go">
 <meta property="og:type" content="article">
-<meta property="og:title" content="利用Dropbox同步hexo的文章源文件并自动生成文章发布">
-<meta property="og:url" content="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html">
+<meta property="og:title" content="在Go中使用 HTTP&#x2F;2 Server Push">
+<meta property="og:url" content="https://www.qichengzx.com/2017/07/02/HTTP2-Server-Push.html">
 <meta property="og:site_name" content="启程">
-<meta property="og:description" content="阅读之前默认为已在服务器安装hexo，也默认服务器可以访问Dropbox   不建议服务器内存小于512M ，谁卡谁知道  最初的最初先说下我最终完成的结构： 1.本地有一个日志文件夹，用于存放md文件，或HTML文件，作为本地的Dropbox客户端同步的目录 2.服务器home文件夹中init一套hexo程序，用于接收本地的md文件，和generate，minify 流程： 1.本地撰写，本地">
-<meta property="og:image" content="http://7b1hhm.com1.z0.glb.clouddn.com/hexo33B2BAAF-6996-41AA-BFA3-FC177106F62A.png">
-<meta property="og:image" content="http://7b1hhm.com1.z0.glb.clouddn.com/hexoF2A913D3-14C5-4FC9-B177-500AC0434036.png">
-<meta property="og:updated_time" content="2015-12-19T07:50:01.000Z">
+<meta property="og:description" content="写在前面本文来自Golang的官方博客，由 Jaana Burcu Dogan, Tom Bergan 发表于2017年3月24日。 近来看到此篇，觉得不错，非常适合用来学习Go中的 Server Push ，于是决定翻译一下，水平有限，如有不足不恰当的地方还请提出宝贵意见。 序HTTP/2旨在解决HTTP/1.x的很多问题。现代网页通常包含很多资源：HTML，css，js，图片等等。在 HTTP">
+<meta property="og:image" content="https://www.qichengzx.com/images/go/serverpush.svg">
+<meta property="og:image" content="https://www.qichengzx.com/images/go/networktimeline.png">
+<meta property="og:updated_time" content="2017-07-02T02:00:42.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="利用Dropbox同步hexo的文章源文件并自动生成文章发布">
-<meta name="twitter:description" content="阅读之前默认为已在服务器安装hexo，也默认服务器可以访问Dropbox   不建议服务器内存小于512M ，谁卡谁知道  最初的最初先说下我最终完成的结构： 1.本地有一个日志文件夹，用于存放md文件，或HTML文件，作为本地的Dropbox客户端同步的目录 2.服务器home文件夹中init一套hexo程序，用于接收本地的md文件，和generate，minify 流程： 1.本地撰写，本地">
-<meta name="twitter:image" content="http://7b1hhm.com1.z0.glb.clouddn.com/hexo33B2BAAF-6996-41AA-BFA3-FC177106F62A.png">
+<meta name="twitter:title" content="在Go中使用 HTTP&#x2F;2 Server Push">
+<meta name="twitter:description" content="写在前面本文来自Golang的官方博客，由 Jaana Burcu Dogan, Tom Bergan 发表于2017年3月24日。 近来看到此篇，觉得不错，非常适合用来学习Go中的 Server Push ，于是决定翻译一下，水平有限，如有不足不恰当的地方还请提出宝贵意见。 序HTTP/2旨在解决HTTP/1.x的很多问题。现代网页通常包含很多资源：HTML，css，js，图片等等。在 HTTP">
+<meta name="twitter:image" content="https://www.qichengzx.com/images/go/serverpush.svg">
 <meta name="twitter:creator" content="@qichengzx">
   
     <link rel="alternative" href="/atom.xml" title="启程" type="application/atom+xml">
@@ -65,12 +65,16 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="photo-dropbox-sync-hexo-and-autobuild-itself" class="article article-type-photo" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-HTTP2-Server-Push" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html" class="article-date">
-  <time datetime="2015-11-13T06:12:35.000Z" itemprop="datePublished">2015-11-13</time>
+    <a href="/2017/07/02/HTTP2-Server-Push.html" class="article-date">
+  <time datetime="2017-07-01T16:09:13.000Z" itemprop="datePublished">2017-07-02</time>
 </a>
     
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/golang/">golang</a>
+  </div>
+
   </div>
   <div class="article-inner">
     
@@ -79,7 +83,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      利用Dropbox同步hexo的文章源文件并自动生成文章发布
+      在Go中使用 HTTP/2 Server Push
     </h1>
   
 
@@ -87,104 +91,57 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p><strong> 阅读之前默认为已在服务器安装hexo，也默认服务器可以访问Dropbox </strong></p>
-<p><strong> 不建议服务器内存小于512M ，谁卡谁知道 </strong></p>
-<h3 id="最初的最初"><a href="#最初的最初" class="headerlink" title="最初的最初"></a>最初的最初</h3><p>先说下我最终完成的结构：</p>
-<pre><code>1.本地有一个日志文件夹，用于存放md文件，或HTML文件，作为本地的Dropbox客户端同步的目录
-2.服务器home文件夹中init一套hexo程序，用于接收本地的md文件，和generate，minify
-</code></pre><p>流程：</p>
-<pre><code>1.本地撰写，本地客户端自动同步
-2.服务器Dropbox设置的同步目录接收本地的内容并cp到专门用于生成的hexo目录里
-3.服务器用于生成的hexo生成新日志，cp到web目录中
-</code></pre><p>这么做的原因是，如果一共（是整个博客一共）只有一篇文章或几篇文章，那几乎没影响，如果，有几十篇了，据我观察，生成很耗时，可能会导致搜索引擎访问出现404，用户打开一个生成到一半的文件，用户打开一个木有样式的文章。</p>
-<h3 id="STEP-0-安装Dropbox"><a href="#STEP-0-安装Dropbox" class="headerlink" title="STEP 0 安装Dropbox"></a>STEP 0 安装Dropbox</h3><p><a href="https://db.tt/mMNtRA6x" target="_blank" rel="external">注册Dropbox</a>。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">if( ! has_dropbox_account() )&#123;</div><div class="line">	return &quot;请先注册个账户啊亲&quot;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>由于Dropbox默认安装在~，所以建议新建一个专用于同步的账户，如dbox。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">adduser dbox</div><div class="line">passwd dbox</div></pre></td></tr></table></figure>
-<p><strong> 请记住密码。请记住密码。请记住密码。 </strong></p>
-<p>然后，用新建的账户登录进去。</p>
-<p>终于可以安装Dropbox了。</p>
-<p>这里要区分一下你的系统，</p>
-<p><strong> 32位: </strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cd ~ &amp;&amp; wget -O - &quot;https://www.dropbox.com/download?plat=lnx.x86&quot; | tar xzf -</div></pre></td></tr></table></figure>
-<p><strong> 64位: </strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cd ~ &amp;&amp; wget -O - &quot;https://www.dropbox.com/download?plat=lnx.x86_64&quot; | tar xzf -</div></pre></td></tr></table></figure>
-<p>然后就可以运行Dropbox的守护程序了</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">~/.dropbox-dist/dropboxd &amp;</div></pre></td></tr></table></figure>
-<p>第一次在新的电脑上启动，会提示：</p>
-<pre><code>此电脑尚未与任何 Dropbox 帐户关联...
-
-请访问 https://www.dropbox.com/cli_link_nonce?nonce=95cd317d2***** 来关联此设备。
-
-此电脑现在已与 Dropbox 关联。欢迎 yourname username
-</code></pre><p><strong> 注意在出现“此电脑现在已与 Dropbox 关联。欢迎 your username”前不要ctrl+c 退出这个程序。 </strong></p>
-<p>打开授权链接后会出现如下的提示，选择连接即可。</p>
-<p><img src="http://7b1hhm.com1.z0.glb.clouddn.com/hexo33B2BAAF-6996-41AA-BFA3-FC177106F62A.png" alt=""></p>
-<p>一定要注意，不然你都会奇怪为啥再次启动这个进程的时候还会出现“尚未关联的提示”</p>
-<p>验证成功后，会在当前用户的home目录中创建Dropbox目录，即Dropbox同步的目录。</p>
-<p>此时，如果你打开了 top，那应该发现此时服务器的内存有点捉急了，原因是Dropbox这个进程占的很多，所以一般情况下killall dropbox 退出就好了，壕请随意。</p>
-<h3 id="STEP-1-设置文件夹监测"><a href="#STEP-1-设置文件夹监测" class="headerlink" title="STEP 1 设置文件夹监测"></a>STEP 1 设置文件夹监测</h3><p><strong>安装incron服务</strong></p>
-<p>incron是Linux下一个监测文件变化的服务</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">apt-get install incron</div><div class="line">yum install incron</div></pre></td></tr></table></figure>
-<p><strong> 设置开机启动 </strong></p>
-<p>安装sysv-rc-conf，用于管理服务的启动</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">apt-get install sysv-rc-conf</div><div class="line">sysv-rc-conf incron on</div></pre></td></tr></table></figure>
-<p><strong> 创建监测任务 </strong></p>
-<p>先修改下incron的编辑器</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">vi /etc/incron.conf</div></pre></td></tr></table></figure>
-<p>（此时可能需要sudo权限，因为是dbox用户）在文件的最后一行，去掉editor = vi前的#，保存退出。</p>
-<p>输入：incrontab -e</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/home/dbox/Dropbox/yourfolder/ IN_ATTRIB,IN_MOVE /home/dbox/hexo.bash</div></pre></td></tr></table></figure>
-<p>第一个参数：用来接收Dropbox同步的文件夹</p>
-<p>第二个参数：指监测的动作</p>
-<p>第三个参数：处理脚本</p>
-<p>监测的动作可以用：</p>
-<pre><code>IN_ACCESS，即文件被访问
-IN_MODIFY，文件被 write
-IN_ATTRIB，文件属性被修改，如 chmod、chown、touch 等
-IN_CLOSE_WRITE，可写文件被 close
-IN_CLOSE_NOWRITE，不可写文件被 close
-IN_OPEN，文件被 open
-IN_MOVED_FROM，文件被移走,如 mv
-IN_MOVED_TO，文件被移来，如 mv、cp
-IN_CREATE，创建新文件
-IN_DELETE，文件被删除，如 rm
-IN_DELETE_SELF，自删除，即一个可执行文件在执行时删除自己
-IN_MOVE_SELF，自移动，即一个可执行文件在执行时移动自己
-IN_UNMOUNT，宿主文件系统被 umount
-IN_CLOSE，文件被关闭，等同于(IN_CLOSE_WRITE | IN_CLOSE_NOWRITE)
-IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
-#上面所说的文件也包括目录。
-</code></pre><p>可以选自己需要的动作</p>
-<p>接下来写处理脚本<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">vi hexo.bash</div></pre></td></tr></table></figure></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">cp -R /home/dbox/Dropbox/yourfolder/* /home/dbox/dropasync/source/_posts/;</div><div class="line">cd /home/dbox/dropasync/ &amp;&amp; hexo gm</div><div class="line">cd ~ &amp;&amp; ./.dropbox-dist/dropboxd</div></pre></td></tr></table></figure>
-<p>理论上到这里已经可以了。</p>
-<p><del>但是实际上我本人在测试的时候，512内存的服务器会只剩下4M内存，然后再执行任何命令都提示<br><code>-bash: fork: Cannot allocate memory</code>，持续很长时间，一开始以为是同时跑的进程太多导致内存不够，把没用的mongodb，redis都kill之后还是这样，后来干脆在执行这个脚本的时候把Dropbox的后台禁掉，也不行，之后想到了在这段脚本里echo一段数字到log中，执行的时候发现会写入多次，但是还是不清楚为什么会出现这种情况，进程里也是出现了两个或多个hexo，于是干脆就在这段脚本开始时先kill dropbox和hexo，在末尾再kill hexo。实际运行起来，内存还是会降到最低，但是持续时间明显减少到可以接受的程度。</del></p>
-<hr>
-<h2 id="2015-11-21-14-06-07-附截图"><a href="#2015-11-21-14-06-07-附截图" class="headerlink" title="2015-11-21 14:06:07 附截图"></a>2015-11-21 14:06:07 附截图</h2><p><img src="http://7b1hhm.com1.z0.glb.clouddn.com/hexoF2A913D3-14C5-4FC9-B177-500AC0434036.png" alt=""></p>
-<hr>
-<p>2015-11-14 22:38:06 测试发现，上述带删除线的方法依然不行。内存依然会榨干很长时间。</p>
-<hr>
-<p>至于为何出现这个情况，咱不可知。。。总不能完全是因为内存太小吧……</p>
-<p>后续应该还会继续改进这个脚本。</p>
-<p><strong>另外，在安装这个用于生成日志的hexo程序的时候也出现了npm killed的问题，查了资料发现也是因为内存不足，npm install -d 可以查看安装过程，如果出错可以用来定位到底是什么原因引起错误</strong></p>
-<p>一些参考资料：</p>
-<p><a href="http://lucifr.com/2013/06/02/hexo-on-cloud-with-dropbox-and-vps/" target="_blank" rel="external">Hexo 服务器端布署及 Dropbox 同步</a></p>
-<p><a href="http://www.fanicy.com/2014/06/01/0001.hexowithvpsdropbox/" target="_blank" rel="external">用Hexo+Vps搭建博客并用Dropbox同步自动发布</a></p>
-<p><a href="http://linux.die.net/man/5/incrontab" target="_blank" rel="external">incrontab(5) - Linux man page</a></p>
-<p><a href="http://wlx.westgis.ac.cn/tag/incrontab/" target="_blank" rel="external">incron：linux下基于文件的事件触发</a></p>
-<p><a href="http://askubuntu.com/questions/221293/why-is-chkconfig-no-longer-available-in-ubuntu" target="_blank" rel="external">Why is chkconfig no longer available in Ubuntu?</a></p>
-<p><a href="https://www.garron.me/en/linux/use-incron-rsync-dropbox-backup.html" target="_blank" rel="external">Use incron to Trigger Action when File Changes 如果设置incrontab出现问题可以参考这篇</a></p>
+        <h4 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h4><p>本文来自<a href="https://blog.golang.org/h2push" target="_blank" rel="external">Golang的官方博客</a>，由 Jaana Burcu Dogan, Tom Bergan 发表于2017年3月24日。</p>
+<p>近来看到此篇，觉得不错，非常适合用来学习Go中的 Server Push ，于是决定翻译一下，水平有限，如有不足不恰当的地方还请提出宝贵意见。</p>
+<h4 id="序"><a href="#序" class="headerlink" title="序"></a>序</h4><p>HTTP/2旨在解决HTTP/1.x的很多问题。现代网页通常包含很多资源：HTML，css，js，图片等等。在 HTTP/1.x 中，必须明确地请求这些资源。这是一个缓慢的过程。浏览器必须从获取HTML开始，然后在解析页面时获取更多资源。由于服务器必须等待浏览器发起请求，网络通常处于空闲，没有充分利用。</p>
+<p>为了改善延迟，HTTP/2引入了 Server Push ，这允许服务器在明确的请求之前将资源推送到浏览器。服务器通常会知道一个页面所需要的额外的资源，并且可以在响应初始请求时开始推送这些资源。这就允许服务器充分利用空闲的网络来改善加载时间。</p>
+<p><img src="/images/go/serverpush.svg" alt="server push示意"></p>
+<p>在协议层，HTTP/2 Server Push 由 PUSH_PROMISE 帧发起。PUSH_PROMISE 表明了服务器向客户端推送资源的意图。一旦浏览器接收到PUSH_PROMISE，它就会知道服务器会推送资源。如果浏览器后来发现需要这个资源，它会等待推送完成，而不是发起一个新的请求。这减少了浏览器在网络上等待的时间。</p>
+<h4 id="net-http-包中的-Server-Push"><a href="#net-http-包中的-Server-Push" class="headerlink" title="net/http 包中的 Server Push"></a>net/http 包中的 Server Push</h4><p>Go1.8 引入了 http.Server 对 push 响应的支持，如果运行的服务器是 HTTP/2 服务器，并且请求连接使用了 HTTP/2，则可以使用此功能。在任何HTTP处理程序中，可以通过检查 http.ResponseWriter 是否实现了 http.Pusher 接口来判断是否支持 Server Push。</p>
+<p>例如，如果服务器知道一个页面中包含 app.js，处理程序可以初始化一个 http.Pusher。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">http.HandleFunc(<span class="string">"/"</span>, <span class="function"><span class="keyword">func</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</div><div class="line">  <span class="keyword">if</span> push, ok := w.(http.Pusher); ok &#123;</div><div class="line">    <span class="comment">//支持Push</span></div><div class="line">    <span class="keyword">if</span> err := pusher.Push(<span class="string">"/app.js"</span>, <span class="literal">nil</span>); err != <span class="literal">nil</span> &#123;</div><div class="line">      log.Printf(<span class="string">"Failed to push: %v"</span>, err)</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  <span class="comment">// ...</span></div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<p>Push会为 app.js 创建一个 “合成请求”，将该请求合成到 PUSH_PROMISE 帧中，然后将请求转发到服务器的请求处理程序，请求处理程序会生成响应。Push的第二个参数指定了包含在 PUSH_PROMISE 中的附加header头，例如，如果对 app.js 的响应在 Accept-Encoding 上不同，则 PUSH_PROMISE 应包含 Accept-Encoding 的值。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">http.HandleFunc(<span class="string">"/"</span>, <span class="function"><span class="keyword">func</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</div><div class="line">  <span class="keyword">if</span> pusher, ok := w.(http.Pusher); ok &#123;</div><div class="line">    <span class="comment">//支持Push</span></div><div class="line">    options := &amp;http.PushOptions&#123;</div><div class="line">      Header: http.Header&#123;</div><div class="line">        <span class="string">"Accept-Encoding"</span>: r.Header[<span class="string">"Accept-Encoding"</span>],</div><div class="line">      &#125;,</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span> err := pusher.Pusher(<span class="string">"/app.js"</span>, options); err != <span class="literal">nil</span> &#123;</div><div class="line">      log.Printf(<span class="string">"Failed to push: %v"</span>, err)</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  <span class="comment">// ...</span></div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<p>完整示例见：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ go get golang.org/x/blog/content/h2push/server</div></pre></td></tr></table></figure>
+<p>启动服务，然后打开 <a href="https://localhost:8080" target="_blank" rel="external">https://localhost:8080</a>，浏览器开发工具应该会显示服务器推送了 app.js 和 style.css 。</p>
+<p><img src="/images/go/networktimeline.png" alt="网络请求耗时"></p>
+<h4 id="在响应前开始Push"><a href="#在响应前开始Push" class="headerlink" title="在响应前开始Push"></a>在响应前开始Push</h4><p>在发送响应之前调用Push是个好主意，否则可能会意外产生重复的响应，例如，假设下边是HTML响应的一部分：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span> <span class="attr">href</span>=<span class="string">"a.cs"</span>&gt;</span>...</div></pre></td></tr></table></figure>
+<p>然后调用 Push(“a.css”, nil) ，浏览器可能会在接收到 PUSH_PROMISE 之前就开始解析这段 HTM L了，这种情况下，浏览器除了接收到 PUSH_PROMISE 之外，还会发起一个 a.css 的请求，那么服务器就会为 a.css 生成两个请求。而在写入响应之前调用PUSH则避免了这种可能性。</p>
+<h4 id="何时使用Server-Push"><a href="#何时使用Server-Push" class="headerlink" title="何时使用Server Push"></a>何时使用Server Push</h4><p>应该考虑在任何网络连接空闲时使用 Server Push 。刚完成为 web app 发送 HTML ？不要浪费时间等待请求，开始推送客户端需要用到的资源，你有没有过将资源嵌入到 HTML 文件中以减少延迟？替换掉内联，尝试使用推送。重定向是另一个使用推送的好时机，因为客户端在这个过程中几乎把时间全浪费在请求的往返上。有很多情况适合使用 Push ，我们才刚刚开始。</p>
+<p>如果没有提到以下几个注意事项，将是我们的失职。</p>
+<p>​    首先，只能推送当前服务器上的资源-这意味着无法推送托管在第三方服务器或CDN上的资源。</p>
+<p>​    第二，除非能确定客户端确实需要，否则不要推送，这样会浪费带宽。当浏览器已经缓存了某些资源时， 必须要避免推送。</p>
+<p>​    第三，天真的把所有资源推送到页面会使性能更糟糕。</p>
+<p>以下链接可以作为补充阅读：</p>
+<ul>
+<li><a href="https://calendar.perfplanet.com/2016/http2-push-the-details/" target="_blank" rel="external">HTTP/2 Push: The Details</a></li>
+<li><a href="https://www.igvita.com/2013/06/12/innovating-with-http-2.0-server-push/" target="_blank" rel="external">Innovating with HTTP/2 Server Push</a></li>
+<li><a href="https://github.com/h2o/h2o/issues/421" target="_blank" rel="external">Cache-Aware Server Push in H2O</a></li>
+<li><a href="https://developers.google.com/web/fundamentals/performance/prpl-pattern/" target="_blank" rel="external">The PRPL Pattern</a></li>
+<li><a href="https://docs.google.com/document/d/1K0NykTXBbbbTlv60t5MyJvXjqKGsCVNYHyLEXIxYMv0" target="_blank" rel="external">Rules of Thumb for HTTP/2 Push</a></li>
+<li><a href="https://tools.ietf.org/html/rfc7540#section-8.2" target="_blank" rel="external">Server Push in the HTTP/2 spec</a></li>
+</ul>
+<h4 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h4><p>Go1.8 标准库为 HTTP/2 Server Push 提供了开箱即用的支持，为优化 Web 应用程序提供更多灵活性。</p>
+<p>转到<a href="https://http2.golang.org/serverpush" target="_blank" rel="external">HTTP/2 Server Push演示页面</a>查看实际效果。</p>
+<h4 id="一些资料"><a href="#一些资料" class="headerlink" title="一些资料"></a>一些资料</h4><p><a href="https://developers.google.com/web/fundamentals/performance/http2/?hl=zh-cn" target="_blank" rel="external">HTTP/2 简介</a></p>
+<p>HTTP/2 Server Push 详解：</p>
+<p>原文：</p>
+<p><a href="https://www.smashingmagazine.com/2017/04/guide-http2-server-push/" target="_blank" rel="external">A Comprehensive Guide To HTTP/2 Server Push</a></p>
+<p>译文：</p>
+<p><a href="http://www.alloyteam.com/2017/04/guide-http2-server-push-part1/" target="_blank" rel="external">HTTP/2 Server Push 详解（上）</a></p>
+<p><a href="http://www.alloyteam.com/2017/04/guide-http2-server-push-part2/" target="_blank" rel="external">HTTP/2 Server Push 详解（下）</a></p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html" data-id="cj4m2mfwn00108e0r78yifc72" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2017/07/02/HTTP2-Server-Push.html" data-id="cj4m2mfvh00008e0rssqtxxhl" class="article-share-link">Share</a>
       
-        <a href="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html#comments" class="article-comment-link">Comments</a>
+        <a href="https://www.qichengzx.com/2017/07/02/HTTP2-Server-Push.html#comments" class="article-comment-link">Comments</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dropbox/">dropbox</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hexo/">hexo</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li></ul>
 
     </footer>
   </div>
@@ -192,19 +149,10 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
     
 <nav id="article-nav">
   
-    <a href="/2015/11/17/js-names.html" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Newer</strong>
-      <div class="article-nav-title">
-        
-          JS标识符
-        
-      </div>
-    </a>
   
-  
-    <a href="/2015/11/11/time-widget-for-hexo.html" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/2017/06/27/order-by-distance-in-mysql.html" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">为hexo加一个时钟小挂件</div>
+      <div class="article-nav-title">MySQL实现按经纬度做距离排序</div>
     </a>
   
 </nav>
@@ -214,7 +162,7 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
 
 
 <section id="comments">
-  <div class="ds-thread" data-thread-key="cj4m2mfwn00108e0r78yifc72" data-title="利用Dropbox同步hexo的文章源文件并自动生成文章发布" data-url="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html"></div>
+  <div class="ds-thread" data-thread-key="cj4m2mfvh00008e0rssqtxxhl" data-title="在Go中使用 HTTP/2 Server Push" data-url="https://www.qichengzx.com/2017/07/02/HTTP2-Server-Push.html"></div>
   <script>
     var duoshuoQuery = {short_name:"qichengzx"};
     (function() {

@@ -128,14 +128,14 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/tags/hexo/</loc>
+        <loc>https://www.qichengzx.com/tags/dropbox/</loc>
         <lastmod>2016-04-23T12:08:10.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/tags/dropbox/</loc>
+        <loc>https://www.qichengzx.com/tags/hexo/</loc>
         <lastmod>2016-04-23T12:08:10.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
@@ -241,7 +241,7 @@
 
     <url>
         <loc>https://www.qichengzx.com/tags/go/</loc>
-        <lastmod>2017-07-01T16:11:33.000Z</lastmod>
+        <lastmod>2017-07-02T02:00:42.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>

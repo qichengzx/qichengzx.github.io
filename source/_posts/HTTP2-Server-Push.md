@@ -64,7 +64,7 @@ http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 $ go get golang.org/x/blog/content/h2push/server
 ```
 
-启动服务，然后打开 https://localhost:8080，浏览器开发工具应该会显示服务器推送了 app.js 和 style.css 。
+启动服务，然后打开 [https://localhost:8080](https://localhost:8080)，浏览器开发工具应该会显示服务器推送了 app.js 和 style.css 。
 
 ![网络请求耗时](/images/go/networktimeline.png)
 
