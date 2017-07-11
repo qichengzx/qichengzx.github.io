@@ -1,4 +1,4 @@
-title: 使用Go，Angular，WebSockets构建实时聊天应用
+title: 【译】使用Go，Angular，WebSockets构建实时聊天应用
 categories: golang
 date: 2017-07-10 21:59:45
 tags:  [go]
@@ -11,25 +11,21 @@ tags:  [go]
 
 #### 正文
 
-我最近听到很多关于websockets的东西，以及如何在应用程序和服务器之间实现实时通信。WebSocket作为RESTful API的替代和补充，已经存在了很长时间。使用websockets可以做例如聊天，与IoT通信，和其他很多需要在客户端和服务器之间进行即时消息传递的东西。
+我最近听到很多关于WebSocket的东西，以及WebSocket如何在应用程序和服务器之间实现实时通信。WebSocket作为RESTful API的替代和补充，已经存在了很长时间。使用WebSocket可以做例如实时聊天，与IoT通信，游戏，和其他很多需要在客户端和服务器之间进行即时消息传递的东西。
 
-一段时间以来，我使用了一个叫Socket.io的库在Node.js中使用websockets，但是当我真正使用Go以后，我想使用Go语言来探索websockets。
+最近一段时间，我[使用了一个叫Socket.io的库，用来在Node.js中使用websockets](https://www.thepolyglotdeveloper.com/2016/01/create-a-real-time-chat-application-with-the-cean-stack-and-socket-io/)，但是当我真正使用Go以后，我打算研究一下如何在Go中使用WebSocket。
 
-通过本文，我们将 如何创建一个聊天应用，其中客户端使用angular2，服务端使用Go。
-
-
+通过本文，我们将学习如何创建一个聊天应用，其中客户端是一个 Angular 2 应用，服务端使用Go。
 
 #### 要求
 
-在这个应用中有很多操作，所以有一些必要的前提条件，如下：
+在这个应用中有很多操作，所以有一些必要的前提条件，如下所示：
 
-- Go 1.7+
-- Node.js 4.0+
-- Angular2 CLI
+- [Go](https://golang.org/) 1.7+
+- [Node.js](https://nodejs.org/en/) 4.0+
+- [Angular2 CLI](https://cli.angular.io/)
 
-处理所有消息和客户端的服务器端使用Go编写。客户端的前端代码使用 Angular 2编写，它具有
-
-
+处理所有消息和客户端的聊天服务器使用Go编写。客户端前端使用 Angular 2编写，has a dependency of the Node Package Manager (NPM) which ships with Node.js.
 
 #### 创建Go聊天服务器
 
@@ -46,7 +42,7 @@ websocket包的作者同时也是 [Mux](https://github.com/gorilla/mux) 这个�
 
 在 $GOPATH 目录创建一个新的项目，我自己的项目目录是 $GOPATH/src/github.com/nraboy/realtime-chat/main.go。
 
-在进行下一步之前，需要注意的是，我从其他地方获得了很多 Go 代码，为了避免剽窃的嫌疑，我使用了很多原始代码中的一部分，但是我也为这个项目加入了很多自己的独特的东西。
+在进行下一步之前，需要注意的是，我从 [Dinosaurs Code](https://dinosaurscode.xyz/go/2016/07/17/go-websockets-tutorial/) 和 [Gorilla websocket chat example](https://github.com/gorilla/websocket/tree/master/examples/chat)  获取了一部分Go 代码，为了避免剽窃的嫌疑，我使用了很多原始代码中的一部分，但是我也为这个项目加入了很多自己的独特的东西。
 
 应用有3个结构体。
 
