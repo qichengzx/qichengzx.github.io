@@ -42,9 +42,9 @@ websocket包的作者同时也是 [Mux](https://github.com/gorilla/mux) 这个�
 
 在 $GOPATH 目录创建一个新的项目，我自己的项目目录是 $GOPATH/src/github.com/nraboy/realtime-chat/main.go。
 
-在进行下一步之前，需要注意的是，我从 [Dinosaurs Code](https://dinosaurscode.xyz/go/2016/07/17/go-websockets-tutorial/) 和 [Gorilla websocket chat example](https://github.com/gorilla/websocket/tree/master/examples/chat)  获取了一部分Go 代码，为了避免剽窃的嫌疑，我使用了很多原始代码中的一部分，但是我也为这个项目加入了很多自己的独特的东西。
+在进行下一步之前，需要注意的是，我从 [Dinosaurs Code](https://dinosaurscode.xyz/go/2016/07/17/go-websockets-tutorial/) 和 [Gorilla websocket chat example](https://github.com/gorilla/websocket/tree/master/examples/chat)  获取了一部分Go 代码，为了避免剽窃的嫌疑，我使用了很多原始代码中的一部分，但我也为这个项目加入了很多自己的独特的东西。
 
-应用有3个结构体。
+这次我们要做的聊天应用有3个结构体：
 
 ```go
 // $GOPATH/src/github.com/nraboy/realtime-chat/main.go
@@ -68,13 +68,11 @@ type Message struct {
 }
 ```
 
-
-
-ClientManager用于管理所有已连接的客户端，尝试连接的客户端，已经断开连接等待删除的客户端。和所有已连接客户端收发的消息。
+ClientManager用于管理所有已连接的客户端，尝试连接的客户端，已经断开连接等待删除的客户端，和所有已连接客户端收发的消息。
 
 每个客户端有一个唯一的ID，一个socket连接，和等待发送的消息。
 
-为了增加传递的数据的复杂性，将使用JSON格式。而不是传递一串不容易被追踪的数据，我们传递JSON数据。使用JSON我们可以使用元数据和其他有用的东西。每一条消息将包含发送消息的客户端，接收消息的客户端，和消息的实际内容。
+为了增加传递的数据的复杂性，消息将使用 JSON 格式。而不是传递一串不容易被理解，阅读的数据。使用JSON格式，我们可以使用元数据和其他有用的东西。每一条消息将包含发送消息的客户端，接收消息的客户端，和消息的实际内容。
 
 首先定义一个全局的ClientManager。
 
@@ -87,17 +85,17 @@ var manager = ClientManager{
 }
 ```
 
-服务器端将使用3个goroutine，一个用于管理客户端，一个用于读取websocket数据，另一个用于往websocket里写数据。这里指的是读取和写入的goroutine将为每个连接的客户端获取一个新的实例。所有的goroutine将循环运行直至不再需要。
+服务器端将使用3个goroutine，一个用于管理客户端，一个用于读取websocket数据，另一个用于往websocket里写数据。这里指的是读取和写入的goroutine将为每个连接的客户端创建一个新的实例。所有的goroutine将循环运行直至不再需要。
 
-Starting with the server goroutine we have the following: 我们将从启动一个goroutine开始。
+编写如下代码，来开始服务：
 
 ```go
 func (manager *ClientManager) start() {
     for {
         select {
         case conn := <-manager.register:
-            manager.clients[conn] = true
-            jsonMessage, _ := json.Marshal(&Message{Content: "/A new socket has connected."})
+        	manager.clients[conn] = true
+        	jsonMessage, _ := json.Marshal(&Message{Content: "/A new socket has connected."})
             manager.send(jsonMessage, conn)
         case conn := <-manager.unregister:
             if _, ok := manager.clients[conn]; ok {
