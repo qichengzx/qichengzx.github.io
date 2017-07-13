@@ -118,13 +118,13 @@ func (manager *ClientManager) start() {
 }
 ```
 
-每当manager.register通道收到数据，这个客户端将会被添加到manager(前文创建的ClientManager实例)的register客户端中。然后，将向所有其他客户端发送一条JSON消息。
+每当 manager.register 接收到数据，这个正在建立连接的客户端将会被添加到 manager (前文创建的 ClientManager 实例)的 clients 中。然后，将向所有其他客户端发送一条JSON消息。
 
-同时，如果客户端断开连接，manager.unregister通道将会收到消息，断开连接的客户端的通道中的数据将被关闭，客户端也会从manager中删除。然后发送消息给其他的客户端告知某个客户端已断开连接。
+同时，如果客户端断开连接，manager.unregister channel将会收到消息，断开连接的客户端的 channel 中的数据将被关闭，客户端也会从manager中删除。然后发送消息给其他的客户端告知某个客户端已断开连接。
 
-如果 manager.broadcast 通道中有数据，则表示正在尝试发送和接收消息。我们想循环遍历每个连接的客户端，将消息发送给它们。如果由于某些原因，通道被阻塞或消息无法发送，我们会认为这个客户端已断开连接，然后将其删除。
+如果 manager.broadcast channel 中存在数据，则表示正在尝试发送和接收消息。我们打算遍历每个已连接的客户端，将消息发送给它们。如果由于某些原因，channel 被阻塞或消息无法发送，我们会认为这个客户端已断开连接，然后将其删除。
 
-为了使代码简洁，创建一个manager.send方法循环遍历每个客户端。
+为了使代码简洁，创建一个 manager.send 方法遍历每个客户端。
 
 ```go
 func (manager *ClientManager) send(message []byte, ignore *Client) {
@@ -138,7 +138,7 @@ func (manager *ClientManager) send(message []byte, ignore *Client) {
 
 至于conn.send如何发送数据，会在后面探讨。
 
-现在我们可以探索 goroutine 如何读取客户端发送的websocket数据。这个goroutine的关键部分是读取socket数据，并将数据添加到manager.boradcast做进一步处理。
+现在我们可以探索 goroutine 如何读取客户端发送的 websocket 数据。这个 goroutine 的关键是读取 socket 数据，并将数据添加到 manager.boradcast 做进一步处理。
 
 ```go
 func (c *Client) read() {
@@ -160,9 +160,9 @@ func (c *Client) read() {
 }
 ```
 
-如果读取websocket数据时出错，可能意味着客户端已经断开连接。如果是这样，我们需要从服务器中注销这个客户端。
+如果读取 websocket 数据出错，可能意味着客户端已经断开连接。如果是这样，我们需要从服务器中注销这个客户端。
 
-还记得前边的conn.send吗，它用来在第三个goroutine中写数据。
+还记得前边的 conn.send 吗，它用来在第三个 goroutine 中写数据。
 
 ```go
 func (c *Client) write() {
@@ -184,11 +184,11 @@ func (c *Client) write() {
 }
 ```
 
-如果c.send通道具有数据，我们将尝试发送这些信息。如果由于某些原因，channel运行不正常，我们将向客户端发送断开连接的消息。
+如果 c.send channel有数据，我们将尝试发送这些数据。如果由于某些原因，channel 运行不正常，我们将向客户端发送断开连接的消息。
 
-那么，如何启动这些goroutine呢，当我们启动服务器时，服务器goroutine将会启动，当有客户端连接时，其他goroutine将会启动。
+那么，如何启动这些 goroutine 呢，当我们启动服务器时，服务器 goroutine 将会启动，当有客户端连接时，其他 goroutine 将会启动。
 
-例如，main方法中的代码：
+main方法中的代码：
 
 ```go
 //$GOPATH/src/github.com/nraboy/realtime-chat/main.goGo
@@ -200,7 +200,7 @@ func main() {
 }
 ```
 
-我们在12345端口启动服务器，通过websocket连接访问。名为wsPage的方法如下所示：
+我们在12345端口启动服务器，通过 websocket 连接访问。名为 wsPage 的方法如下所示：
 
 ```go
 //$GOPATH/src/github.com/nraboy/realtime-chat/main.goGo
@@ -219,9 +219,9 @@ func wsPage(res http.ResponseWriter, req *http.Request) {
 }
 ```
 
-使用websocket包将HTTP请求升级到websocket请求。通过添加 CheckOrigin ，我们可以接受来自外部域的请求，从而消除跨域资源共享（CORS）的错误。
+通过使用 websocket 包将HTTP请求升级到websocket请求。通过添加 CheckOrigin ，我们可以接受来自外部域的请求，从而消除跨域资源共享（CORS）的错误。
 
-创建连接后，将创建一个客户端，并生成唯一的ID。如前所述，该客户端已经注册到服务器。客户端注册后，读写goroutine将被触发。
+创建连接后，将创建一个客户端，并分配唯一的ID。如前所述，该客户端已经注册到服务器。客户端注册后，读写 goroutine 将被触发。
 
 此时，我们可以通过如下命令启动应用。
 
@@ -229,11 +229,11 @@ func wsPage(res http.ResponseWriter, req *http.Request) {
 go run *.go
 ```
 
-你不能在web浏览器中测试，但是可以建立一个websocket连接到ws://localhost:12345/ws。
+你不能在直接 web 浏览器中测试，但是可以建立一个 websocket 连接到 ws://localhost:12345/ws。
 
 #### 创建Angular2 聊天客户端
 
- 现在我们需要创建一个客户端的应用，我们可以发送和接收消息。假设您已经安装了[Angular 2 CLI](https://cli.angular.io/)，请执行以下操作：
+现在我们需要创建一个客户端的应用，客户端可以发送和接收消息。假设您已经安装了[Angular 2 CLI](https://cli.angular.io/)，请执行以下操作：
 
 ```shell
 ng new SocketExample
@@ -243,13 +243,13 @@ ng new SocketExample
 
 【图片】
 
-JavaScript的websocket在Angular 2提供的一个类中。使用 Angular 2 CLI，通过执行如下操作创建提供程序（provider）。
+JavaScript的 websocket 在Angular 2提供的一个类中。使用 Angular 2 CLI，通过执行如下操作创建provider。
 
 ```shell
 ng g service socket	
 ```
 
-上述命令会在您的项目中创建 src/app/socket.service.ts 和 src/app/socket.service.spec.ts 。spec文件用于单元测试，就不在本例中探索了。打开 src/app/socket.service.ts 文件，编写以下 TypeScript 代码：
+上述命令会在您的项目中创建 src/app/socket.service.ts 和 src/app/socket.service.spec.ts 。spec文件用于单元测试，不在本文讨论范围内。打开 src/app/socket.service.ts 文件，编写以下 TypeScript 代码：
 
 ```typescript
 import { Injectable, EventEmitter } from '@angular/core';
