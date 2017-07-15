@@ -1,13 +1,13 @@
-title: 【译】使用Go，Angular，WebSockets构建实时聊天应用
+title: 【译】使用Go和Angular通过WebSocket构建实时聊天应用
 categories: golang
-date: 2017-07-10 21:59:45
+date: 2017-07-15 12:11:14
 tags:  [go]
 
 ---
 
 ### 写在前面
 
-本文[原文](https://www.thepolyglotdeveloper.com/2016/12/create-real-time-chat-app-golang-angular-2-websockets/)
+本文[原文](https://www.thepolyglotdeveloper.com/2016/12/create-real-time-chat-app-golang-angular-2-websockets/)，详细讲解了如何使用Go和Angular通过WebSocket构建实时聊天应用。
 
 #### 正文
 
@@ -34,6 +34,7 @@ tags:  [go]
 在命令行执行以下命令，下载第三方包：
 
 ```go
+//Install Go Dependencies
 go get github.com/gorilla/websocket
 go get github.com/satori/go.uuid
 ```
@@ -77,6 +78,7 @@ ClientManager用于管理所有已连接的客户端，尝试连接的客户端�
 首先定义一个全局的ClientManager。
 
 ```go
+//$GOPATH/src/github.com/nraboy/realtime-chat/main.go
 var manager = ClientManager{
     broadcast:  make(chan []byte),
     register:   make(chan *Client),
@@ -90,6 +92,7 @@ var manager = ClientManager{
 编写如下代码，来开始服务：
 
 ```go
+//$GOPATH/src/github.com/nraboy/realtime-chat/main.go
 func (manager *ClientManager) start() {
     for {
         select {
@@ -127,6 +130,7 @@ func (manager *ClientManager) start() {
 为了使代码简洁，创建一个 manager.send 方法遍历每个客户端。
 
 ```go
+//$GOPATH/src/github.com/nraboy/realtime-chat/main.go
 func (manager *ClientManager) send(message []byte, ignore *Client) {
     for conn := range manager.clients {
         if conn != ignore {
@@ -141,6 +145,7 @@ func (manager *ClientManager) send(message []byte, ignore *Client) {
 现在我们可以探索 goroutine 如何读取客户端发送的 websocket 数据。这个 goroutine 的关键是读取 socket 数据，并将数据添加到 manager.boradcast 做进一步处理。
 
 ```go
+//$GOPATH/src/github.com/nraboy/realtime-chat/main.go
 func (c *Client) read() {
     defer func() {
         manager.unregister <- c
@@ -165,6 +170,7 @@ func (c *Client) read() {
 还记得前边的 conn.send 吗，它用来在第三个 goroutine 中写数据。
 
 ```go
+//$GOPATH/src/github.com/nraboy/realtime-chat/main.go
 func (c *Client) write() {
     defer func() {
         c.socket.Close()
@@ -226,6 +232,7 @@ func wsPage(res http.ResponseWriter, req *http.Request) {
 此时，我们可以通过如下命令启动应用。
 
 ```shell
+//Run Go Application
 go run *.go
 ```
 
@@ -236,22 +243,27 @@ go run *.go
 现在我们需要创建一个客户端的应用，客户端可以发送和接收消息。假设您已经安装了[Angular 2 CLI](https://cli.angular.io/)，请执行以下操作：
 
 ```shell
+//Create New Angular 2 Project
 ng new SocketExample
 ```
 
 执行完将会生成一个单页应用，而我们想要完成的内容，是下方的动图演示的这样。
 
-【图片】
+![](/images/go/golang-angular2-chat.gif)
+
+补充：此处需cd SocketExmapl && npm install。
 
 JavaScript的 websocket 在Angular 2提供的一个类中。使用 Angular 2 CLI，通过执行如下操作创建provider。
 
 ```shell
-ng g service socket	
+//Create Angular 2 Provider
+ng g service socket
 ```
 
-上述命令会在您的项目中创建 src/app/socket.service.ts 和 src/app/socket.service.spec.ts 。spec文件用于单元测试，不在本文讨论范围内。打开 src/app/socket.service.ts 文件，编写以下 TypeScript 代码：
+上述命令会在您的项目中创建 **src/app/socket.service.ts ** 和 **src/app/socket.service.spec.ts** 。spec文件用于单元测试，不在本文讨论范围内。打开 **src/app/socket.service.ts** 文件，编写以下 TypeScript 代码：
 
 ```typescript
+//src/app/socket.service.ts
 import { Injectable, EventEmitter } from '@angular/core';
  
 @Injectable()
@@ -292,9 +304,10 @@ export class SocketService {
 
 send方法允许我们向Go应用发送消息，close方法用于通知Go应用我们将断开连接。
 
-提供者程序已创建，但是还不能在我们的的应用程序的任何文件中使用。因此，我们需要将其添加到 src/app/app.module.ts 文件的 @NgModule 块中。打开文件并输入：
+提供者程序已创建，但是还不能在我们的的应用程序的任何文件中使用。因此，我们需要将其添加到 **src/app/app.module.ts** 文件的 @NgModule 块中。打开文件并输入：
 
 ```typescript
+//src/app/app.module.ts
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -320,9 +333,10 @@ export class AppModule { }
 
 需要注意的是，此时我们已经将provider导入并且添加到 @NgModule 块的 providers数组中了。
 
-现在我们可以专注处理页面的逻辑了。打开 src/app/app.component.ts 文件，并输入以下代码：
+现在我们可以专注处理页面的逻辑了。打开 **src/app/app.component.ts** 文件，并输入以下代码：
 
 ```typescript
+//src/app/app.component.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { SocketService } from "./socket.service";
  
@@ -377,9 +391,10 @@ export class AppComponent implements OnInit, OnDestroy {
 }
 ```
 
-在上述 AppComponent类的构造方法中，我们注册我们的服务提供者并初始化需要绑定到UI的变量。在构造函数中加载或订阅是个不错的注意，我们使用ngOninit方法来完成。
+在上述 AppComponent类的构造方法中，我们注册服务提供者并初始化需要绑定到UI的变量。在构造函数中加载或订阅不太好，我们使用ngOninit方法来代替。
 
 ```typescript
+//src/app/app.component.ts
 public ngOnInit() {
     this.socket.getEventListener().subscribe(event => {
         if(event.type == "message") {
@@ -405,9 +420,10 @@ public ngOnInit() {
 
 当客户端断开时，关闭事件将会发送到服务器，如果消息已经发送，它也会被发送到服务器。
 
-在查看HTML之前，先添加一些CSS，使其看起来更像一个聊天应用。打开 src/style.css，输入以下内容：
+在查看HTML之前，先添加一些CSS，使其看起来更像一个聊天应用。打开 **src/style.css**，输入以下内容：
 
 ```css
+/*src/styles.css*/
 /* You can add global styles to this file, and also import other style files */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font: 13px Helvetica, Arial; }
@@ -419,9 +435,10 @@ form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 
 #messages li:nth-child(odd) { background: #eee; }
 ```
 
-现在，需要处理下HTML了。打开 src/app/app.component.html文件，并输入以下内容：
+现在，需要处理下HTML了。打开 **src/app/app.component.html** 文件，并输入以下内容：
 
 ```html
+<!--src/app/app.component.html-->
 <ul id="messages">
     <li *ngFor="let message of messages">
         <span [innerHTML]="isSystemMessage(message)"></span>
@@ -437,4 +454,9 @@ form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 
 
 #### 结语
 
-刚刚演示了如何使用Go和Angular 2 创建一个WebSocket实时聊天应用。虽然没有在这个示例中存储聊天记录，但是这套逻辑可言应用于更复杂的项目，比如游戏，IOT，和其他很多场景。
+刚刚演示了如何使用 Go 和 Angular 2 创建一个 WebSocket 实时聊天应用。虽然没有在这个示例中存储聊天记录，但是这套逻辑可以应用于更复杂的项目，比如游戏，IOT，和其他很多场景。
+
+#### 关于原作者
+
+[Nic Raboy](https://www.thepolyglotdeveloper.com/author/nraboy/)是现代网络和移动开发技术的倡导者。 他在Java，JavaScript，Golang以及各种框架（如Angular，NativeScript和Apache Cordova）方面拥有丰富的经验。 Nic写作的内容主要是他在使Web和移动开发更容易理解相关方面的经验。
+

@@ -34,20 +34,3 @@
     <%- partial('post/nav') %>
   <% } %>
 </article>
-
-<% if (!index && post.comments && config.duoshuo_shortname){ %>
-<section id="comments">
-  <div class="ds-thread" data-thread-key="<%= post._id %>" data-title="<%= post.title %>" data-url="<%- post.permalink %>"></div>
-  <script>
-    var duoshuoQuery = {short_name:"qichengzx"};
-    (function() {
-      var ds = document.createElement('script');
-      ds.type = 'text/javascript';ds.async = true;
-      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
-      ds.charset = 'UTF-8';
-      (document.getElementsByTagName('head')[0] 
-       || document.getElementsByTagName('body')[0]).appendChild(ds);
-    })();
-    </script>
-</section>
-<% } %>
