@@ -40,20 +40,20 @@ Explanation: n is 2, and the maximum sum of pairs is 4 = min(1, 2) + min(3, 4).
 package main
 
 import (
-  	"fmt"
+	"fmt"
 	"sort"
 )
 
 func main() {
 	nums := []int{4, 5, 6, 1}
 	n := arrayPairSum(nums)
-    fmt.Println(n)
+	fmt.Println(n)
 }
 
 func arrayPairSum(nums []int) int {
 	sort.Ints(nums)
 	sum := 0
-    length := len(nums)
+	length := len(nums)
 	for i := 0; i < length; i += 2 {
 		sum += nums[i]
 	}
