@@ -61,4 +61,6 @@ func arrayPairSum(nums []int) int {
 }
 ```
 
+在线查看结果:[The Go Playground](https://play.golang.org/p/2tkZyayXUB)
+
 其实这里主要用到了Go的[sort包给int数组排序](https://golang.org/pkg/sort/#Ints)。排序后遍历数组，每次递增2就可以了。
