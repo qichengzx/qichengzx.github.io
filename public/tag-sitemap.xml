@@ -2,21 +2,14 @@
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
     <url>
-        <loc>https://www.qichengzx.com/tags/react-native/</loc>
+        <loc>https://www.qichengzx.com/tags/vps/</loc>
         <lastmod>2016-12-06T02:43:40.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/tags/fetch/</loc>
-        <lastmod>2016-12-06T02:43:40.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>https://www.qichengzx.com/tags/%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/</loc>
+        <loc>https://www.qichengzx.com/tags/git/</loc>
         <lastmod>2016-12-06T02:43:40.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
@@ -58,6 +51,27 @@
     </url>
 
     <url>
+        <loc>https://www.qichengzx.com/tags/react-native/</loc>
+        <lastmod>2016-12-06T02:43:40.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/fetch/</loc>
+        <lastmod>2016-12-06T02:43:40.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/</loc>
+        <lastmod>2016-12-06T02:43:40.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
         <loc>https://www.qichengzx.com/tags/discuz/</loc>
         <lastmod>2016-12-06T02:43:40.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -72,35 +86,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/tags/vps/</loc>
-        <lastmod>2016-12-06T02:43:40.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>https://www.qichengzx.com/tags/git/</loc>
-        <lastmod>2016-12-06T02:43:40.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>https://www.qichengzx.com/tags/laravel/</loc>
-        <lastmod>2016-12-06T02:43:40.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>https://www.qichengzx.com/tags/dropbox/</loc>
-        <lastmod>2016-12-06T02:43:40.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>https://www.qichengzx.com/tags/hexo/</loc>
         <lastmod>2016-12-06T02:43:40.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
@@ -115,6 +101,20 @@
 
     <url>
         <loc>https://www.qichengzx.com/tags/ECharts/</loc>
+        <lastmod>2016-12-06T02:43:40.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/hexo/</loc>
+        <lastmod>2016-12-06T02:43:40.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/dropbox/</loc>
         <lastmod>2016-12-06T02:43:40.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
