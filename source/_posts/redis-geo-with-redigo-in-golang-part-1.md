@@ -1,4 +1,4 @@
-title: Go语言使用redigo操作GEO
+title: Go语言使用redigo操作GEO(1) - 添加和查询
 categories: golang
 date: 2017-09-17 19:45:29
 tags:  [go,redis,redigo,geo]
