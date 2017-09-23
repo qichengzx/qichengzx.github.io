@@ -191,27 +191,6 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/tags/%E7%B3%97%E7%99%BE/</loc>
-        <lastmod>2016-12-07T12:31:33.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>https://www.qichengzx.com/tags/gin/</loc>
-        <lastmod>2016-12-07T12:31:33.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>https://www.qichengzx.com/tags/goquery/</loc>
-        <lastmod>2016-12-16T13:38:03.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>https://www.qichengzx.com/tags/%E4%BB%8A%E6%97%A5%E5%A4%B4%E6%9D%A1/</loc>
         <lastmod>2016-12-16T13:38:03.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -240,13 +219,6 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/tags/go/</loc>
-        <lastmod>2017-09-23T12:19:38.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>https://www.qichengzx.com/tags/redis/</loc>
         <lastmod>2017-09-23T12:19:38.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -263,6 +235,34 @@
     <url>
         <loc>https://www.qichengzx.com/tags/geo/</loc>
         <lastmod>2017-09-23T12:19:38.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/go/</loc>
+        <lastmod>2017-09-23T12:27:08.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/%E7%B3%97%E7%99%BE/</loc>
+        <lastmod>2017-09-23T12:27:08.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/goquery/</loc>
+        <lastmod>2017-09-23T12:27:08.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/gin/</loc>
+        <lastmod>2017-09-23T12:27:08.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
