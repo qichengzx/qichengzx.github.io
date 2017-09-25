@@ -15,9 +15,9 @@ tags:  [go,redis,redigo,geo]
 先添加几条测试用的数据。
 
 ```Go
-push("citylist", "tianjin", "39.1252291", "117.0153461")
-push("citylist", "tangshan", "39.0507819", "116.9421939")
-push("citylist", "baoding", "38.8712164", "115.3353061")
+push("citylist", "tianjin", 39.1252291, 117.0153461)
+push("citylist", "tangshan", 39.0507819, 116.9421939)
+push("citylist", "baoding", 38.8712164, 115.3353061)
 ```
 
 添加了三个城市。

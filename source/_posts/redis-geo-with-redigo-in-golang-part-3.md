@@ -63,9 +63,19 @@ GEORADIUS 的返回值是一个数组:
 
 那么，使用redigo如何实现呢？
 
+#### 有WITHCOORD，WITHDIST，WITHHASH参数
+
+
+
+#### 无WITHCOORD，WITHDIST，WITHHASH参数
+
 ```Go
-func radius() {
-	
+func radius(key string, lng, lat float64, radius int, unit string) []string {
+	rc := RedisClient.Get()
+	defer rc.Close()
+
+	pos, _ := redis.Strings(rc.Do("GEORADIUS", key, lng, lat, radius, unit))
+	return pos
 }
 
 ```
