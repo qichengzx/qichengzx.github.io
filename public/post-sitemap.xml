@@ -7,8 +7,8 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/12/04/go-qiubai.html</loc>
-        <lastmod>2017-09-23T12:27:08.000Z</lastmod>
+        <loc>https://www.qichengzx.com/2017/09/24/redis-geo-with-redigo-in-golang-part-3.html</loc>
+        <lastmod>2017-09-27T12:34:31.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -16,7 +16,15 @@
 
     <url>
         <loc>https://www.qichengzx.com/2017/09/23/redis-geo-with-redigo-in-golang-part-2.html</loc>
-        <lastmod>2017-09-23T12:19:38.000Z</lastmod>
+        <lastmod>2017-09-24T09:49:02.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2016/12/04/go-qiubai.html</loc>
+        <lastmod>2017-09-23T12:27:08.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 

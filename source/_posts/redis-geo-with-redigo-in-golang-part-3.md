@@ -65,7 +65,7 @@ GEORADIUS 的返回值是一个数组:
 
 #### 有WITHCOORD，WITHDIST，WITHHASH参数
 
-
+暂时还没想到怎么解决这个比较好。
 
 #### 无WITHCOORD，WITHDIST，WITHHASH参数
 
@@ -79,3 +79,9 @@ func radius(key string, lng, lat float64, radius int, unit string) []string {
 }
 
 ```
+
+该方法则会返回符合条件的元素的名称，如：
+```shell
+[beijing baoding tangshan tianjin]
+```
+

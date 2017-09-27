@@ -62,6 +62,82 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-redis-geo-with-redigo-in-golang-part-3" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/09/24/redis-geo-with-redigo-in-golang-part-3.html" class="article-date">
+  <time datetime="2017-09-24T10:09:18.000Z" itemprop="datePublished">2017-09-24</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/golang/">golang</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/09/24/redis-geo-with-redigo-in-golang-part-3.html">Go语言使用redigo操作GEO(3) - 获取范围集合</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><a href="/2017/09/17/redis-geo-with-redigo-in-golang-part-2.html">上一篇</a>记录了使用redigo操作Redis的获取两点距离的功能。</p>
+<p>今天继续来写一下，获取一个坐标点指定距离范围内地理位置的集合。</p>
+<p>完成此功能，需要使用Redis的 GEORADIUS 命令。</p>
+<p>语法：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GEORADIUS key longitude latitude radius [m|km|ft|mi] [WITHCOORD] [WITHDIST] [ASC|DESC] [WITHHASH] [COUNT count]</div></pre></td></tr></table></figure>
+<p>其中，longitude latitude 表示地理位置的坐标，radius表示范围的距离，单位可以是m，km，ft，mi，依次为米，千米，英里，英尺。</p>
+<p>后边的可选参数中：</p>
+<ul>
+<li>WITHCOORD：传入WITHCOORD参数，返回结果会带上匹配位置的经纬度。</li>
+<li>WITHDIST：传入WITHDIST参数，返回结果会带上匹配位置与给定地理位置的距离，距离的单位与 GEORADIUS 命令传入的单位一致。</li>
+<li>ASC|DESC：默认结果是未排序的，ASC表示从近到远排序，DESC表示从远到近排序。</li>
+<li>WITHHASH：传入WITHHASH参数，返回结果会带上匹配位置的hash值。hash为52位有符号整数。</li>
+<li>COUNT count：传入COUNT参数，返回指定数量的结果。</li>
+</ul>
+<p>参照文档，可以发现，默认情况下 GEORADIUS 会返回全部匹配的元素，而传入 COUNT 参数会截取指定的部分元素返回，但是由于此命令还需要对返回结果进行排序，所以如果元素较多的情况下，即使使用了 COUNT 参数，查找速度也会很慢。所以此参数仅适用于减小带宽占用，一次性返回少数数据，多次查询。</p>
+<p>GEORADIUS 的返回值是一个数组:</p>
+<ul>
+<li>如果传入了WITHCOORD，WITHDIST，WITHHASH参数，会返回二维的数组，其中每个子数组表示一个元素</li>
+<li>如果没有传入上述参数，会返回一个一维的数组，值为元素名，如[“tianjin”,”baoding”]</li>
+</ul>
+<p>如果返回的是二维数组，子数组的第一个元素是对应位置的名字，其他的会根据传入的参数当做数组的元素返回，其中：</p>
+<ul>
+<li>距离依然是一个双精度浮点数，单位与传入的单位参数一致。</li>
+<li>GEOHASH 是一个整数。</li>
+<li>坐标分别为经度，纬度，其中经度在前。</li>
+</ul>
+<p>如：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GEORADIUS citylist 116.280316 39.9329 200 km WITHCOORD</div></pre></td></tr></table></figure>
+<p>会返回</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">1) 1) "beijing"</div><div class="line">   2) 1) "116.40528291463851929"</div><div class="line">      2) "39.9049884229125027"</div><div class="line">2) 1) "baoding"</div><div class="line">   2) 1) "115.33530682325363159"</div><div class="line">      2) "38.87121760640306434"</div><div class="line">3) 1) "tangshan"</div><div class="line">   2) 1) "116.94219142198562622"</div><div class="line">      2) "39.05078232277295314"</div><div class="line">4) 1) "tianjin"</div><div class="line">   2) 1) "117.0153459906578064"</div><div class="line">      2) "39.12522961794389431"</div></pre></td></tr></table></figure>
+<p>那么，使用redigo如何实现呢？</p>
+<h4 id="有WITHCOORD，WITHDIST，WITHHASH参数"><a href="#有WITHCOORD，WITHDIST，WITHHASH参数" class="headerlink" title="有WITHCOORD，WITHDIST，WITHHASH参数"></a>有WITHCOORD，WITHDIST，WITHHASH参数</h4><p>暂时还没想到怎么解决这个比较好。</p>
+<h4 id="无WITHCOORD，WITHDIST，WITHHASH参数"><a href="#无WITHCOORD，WITHDIST，WITHHASH参数" class="headerlink" title="无WITHCOORD，WITHDIST，WITHHASH参数"></a>无WITHCOORD，WITHDIST，WITHHASH参数</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">radius</span><span class="params">(key <span class="keyword">string</span>, lng, lat <span class="keyword">float64</span>, radius <span class="keyword">int</span>, unit <span class="keyword">string</span>)</span> []<span class="title">string</span></span> &#123;</div><div class="line">	rc := RedisClient.Get()</div><div class="line">	<span class="keyword">defer</span> rc.Close()</div><div class="line"></div><div class="line">	pos, _ := redis.Strings(rc.Do(<span class="string">"GEORADIUS"</span>, key, lng, lat, radius, unit))</div><div class="line">	<span class="keyword">return</span> pos</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>该方法则会返回符合条件的元素的名称，如：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[beijing baoding tangshan tianjin]</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://www.qichengzx.com/2017/09/24/redis-geo-with-redigo-in-golang-part-3.html" data-id="cj830jkdw0031lu0r8kjbdeo2" class="article-share-link">Share</a>
+      
+        <a href="https://www.qichengzx.com/2017/09/24/redis-geo-with-redigo-in-golang-part-3.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/geo/">geo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redigo/">redigo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis/">redis</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+  
     <article id="post-redis-geo-with-redigo-in-golang-part-2" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/09/23/redis-geo-with-redigo-in-golang-part-2.html" class="article-date">
@@ -92,7 +168,7 @@
 <p>今天来试一下计算距离。之前也写到过在<a href="/2017/06/27/order-by-distance-in-mysql.html">MySQL中计算坐标的距离，及排序</a>。</p>
 <p>在上一篇中疏忽了一个问题，使用的几个坐标点是用高德地图获取到的，但是Redis中GEO是使用了 WGS84 坐标系的。实际使用中需要注意一下，这里有一篇文章详细介绍了不同坐标系的区别。</p>
 <h4 id="添加测试数据"><a href="#添加测试数据" class="headerlink" title="添加测试数据"></a>添加测试数据</h4><p>先添加几条测试用的数据。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">push(<span class="string">"citylist"</span>, <span class="string">"tianjin"</span>, <span class="string">"39.1252291"</span>, <span class="string">"117.0153461"</span>)</div><div class="line">push(<span class="string">"citylist"</span>, <span class="string">"tangshan"</span>, <span class="string">"39.0507819"</span>, <span class="string">"116.9421939"</span>)</div><div class="line">push(<span class="string">"citylist"</span>, <span class="string">"baoding"</span>, <span class="string">"38.8712164"</span>, <span class="string">"115.3353061"</span>)</div></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">push(<span class="string">"citylist"</span>, <span class="string">"tianjin"</span>, <span class="number">39.1252291</span>, <span class="number">117.0153461</span>)</div><div class="line">push(<span class="string">"citylist"</span>, <span class="string">"tangshan"</span>, <span class="number">39.0507819</span>, <span class="number">116.9421939</span>)</div><div class="line">push(<span class="string">"citylist"</span>, <span class="string">"baoding"</span>, <span class="number">38.8712164</span>, <span class="number">115.3353061</span>)</div></pre></td></tr></table></figure>
 <p>添加了三个城市。</p>
 <h4 id="查询距离"><a href="#查询距离" class="headerlink" title="查询距离"></a>查询距离</h4><p>使用GEODIST方法查询两点的距离。手册<a href="http://redisdoc.com/geo/geodist.html" target="_blank" rel="external">见此</a>。</p>
 <p>语法： GEODIST key member1 member2 [unit]</p>
@@ -111,7 +187,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2017/09/23/redis-geo-with-redigo-in-golang-part-2.html" data-id="cj7xaires002ywl0r7vjxcbn8" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2017/09/23/redis-geo-with-redigo-in-golang-part-2.html" data-id="cj830jkdw002ylu0rfd9zp5vc" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2017/09/23/redis-geo-with-redigo-in-golang-part-2.html#comments" class="article-comment-link">Comments</a>
       
@@ -169,7 +245,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2017/09/17/redis-geo-with-redigo-in-golang-part-1.html" data-id="cj7xairen002swl0rd34ctgww" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2017/09/17/redis-geo-with-redigo-in-golang-part-1.html" data-id="cj830jkdt002ulu0rd6wxbzck" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2017/09/17/redis-geo-with-redigo-in-golang-part-1.html#comments" class="article-comment-link">Comments</a>
       
@@ -223,7 +299,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2017/08/13/leetcode-array-partition-i.html" data-id="cj7xaire8001vwl0rwh8u0i7h" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2017/08/13/leetcode-array-partition-i.html" data-id="cj830jkd6001mlu0r3tnjb4da" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2017/08/13/leetcode-array-partition-i.html#comments" class="article-comment-link">Comments</a>
       
@@ -342,7 +418,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2017/07/15/create-real-time-chat-app-golang-angular-2-websockets.html" data-id="cj7xairdo000uwl0rdfa1q5i6" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2017/07/15/create-real-time-chat-app-golang-angular-2-websockets.html" data-id="cj830jkcr000ulu0r83cius4o" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2017/07/15/create-real-time-chat-app-golang-angular-2-websockets.html#comments" class="article-comment-link">Comments</a>
       
@@ -425,7 +501,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2017/07/02/HTTP2-Server-Push.html" data-id="cj7xaircz0001wl0r4rjr87tm" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2017/07/02/HTTP2-Server-Push.html" data-id="cj830jkby0000lu0rtv4fpuxe" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2017/07/02/HTTP2-Server-Push.html#comments" class="article-comment-link">Comments</a>
       
@@ -484,7 +560,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2017/06/27/order-by-distance-in-mysql.html" data-id="cj7xairea0021wl0rspvsis1w" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2017/06/27/order-by-distance-in-mysql.html" data-id="cj830jkdd0021lu0rei0vngno" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2017/06/27/order-by-distance-in-mysql.html#comments" class="article-comment-link">Comments</a>
       
@@ -540,7 +616,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2017/03/06/insert-filter-in-beego.html" data-id="cj7xaire3001mwl0rkiolch4n" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2017/03/06/insert-filter-in-beego.html" data-id="cj830jkd9001rlu0ramanni04" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2017/03/06/insert-filter-in-beego.html#comments" class="article-comment-link">Comments</a>
       
@@ -617,7 +693,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/12/27/shortlen-url-by-go.html" data-id="cj7xaireu0035wl0r5vcs4lmw" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/12/27/shortlen-url-by-go.html" data-id="cj830jkdy0037lu0r7tcjdml4" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/12/27/shortlen-url-by-go.html#comments" class="article-comment-link">Comments</a>
       
@@ -698,81 +774,12 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/12/14/toutiao-images-spider-by-golang.html" data-id="cj7xaireu0037wl0rb29epxqn" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/12/14/toutiao-images-spider-by-golang.html" data-id="cj830jke0003clu0rbejr0wjb" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/12/14/toutiao-images-spider-by-golang.html#comments" class="article-comment-link">Comments</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/goquery/">goquery</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/今日头条/">今日头条</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-  
-    <article id="post-go-qiubai" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2016/12/04/go-qiubai.html" class="article-date">
-  <time datetime="2016-12-04T07:49:04.000Z" itemprop="datePublished">2016-12-04</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/golang/">golang</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/12/04/go-qiubai.html">Go语言写爬取糗百热门帖子</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>闲来无事，想着也用Go来写个爬虫之类的东西，我并不知道这算不算严格意义上的爬虫。</p>
-<p>思前想后，觉得写个爬糗百热门的脚本吧，一来足够简单，二来大概熟悉下流程。</p>
-<p>首先，选了<a href="https://github.com/PuerkitoBio/goquery" target="_blank" rel="external">goquery</a>这个包来解析HTML，声称与jquery相似的用法，事实上也确实是这样，非常方便。</p>
-<p>定个目标，只爬取列表页的帖子内容，作者和回帖都不管。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">package main</div><div class="line"></div><div class="line">import (</div><div class="line">	&quot;github.com/PuerkitoBio/goquery&quot;</div><div class="line">	&quot;log&quot;</div><div class="line">)</div><div class="line"></div><div class="line">//定义结构体</div><div class="line">type Qb struct &#123;</div><div class="line">	Id int `json:&quot;id&quot;`</div><div class="line">	Content string `json:&quot;content&quot;`</div><div class="line">&#125;</div><div class="line"></div><div class="line">func main() &#123;</div><div class="line">	var url = &quot;http://www.qiushibaike.com/hot&quot;</div><div class="line"></div><div class="line">	doc, err := goquery.NewDocument(url)</div><div class="line">	if err != nil &#123;</div><div class="line">		log.Fatal(err)</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	var qb []Qb</div><div class="line">	doc.Find(&quot;#content-left .article&quot;).Each(func(i int, s *goquery.Selection) &#123;</div><div class="line">		//s即为当前的 .article 元素，查找下级中的span元素的内容。</div><div class="line">		content := s.Find(&quot;.content span&quot;).Text()</div><div class="line">		qb = append(qb, Qb&#123;Id: i, Content: content&#125;)</div><div class="line">	&#125;)</div><div class="line"></div><div class="line">	log.Println(qb)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>“#content-left .article” 即每一条帖子作为元素的class。</p>
-<p>将会输出：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[</div><div class="line">	&#123;0 结婚十三周年那天，老婆望着一大桌子菜不禁泪流满面。我帮她拭去泪水:瞧你，都激动的哭了!老婆却说:我激动个屁!想想这十三年跟着你受的罪，我实在忍不住啊!&#125; </div><div class="line">	&#123;1 前几天天冷，就给妹妹买了条围巾，然后她说谢谢哥，本人本着组织精神说你应该谢谢你嫂子，她惊讶的对我说:哥，你谈女朋友了。我说:没有，你应该感谢她一直到现在都没出现，哥才有钱给你买东西&#125; </div><div class="line">	&#123;2 跟哥们去理发，剪头的是个妹纸。。妹纸:“你有女朋友么？”哥们一听，突然兴奋的说:“没有！”妹纸:“我是个实习生，本来想给你换大工的，看你没有女朋友，我就随意剪了！”哥们你别看我，我就是一口水没忍住，喷你脸上了而已！&#125; </div><div class="line">	&#123;3 老妈比较胖，小时候每次打我我都是撒腿就跑，老妈没一次抓到我的。直到老妈学会骑自行车以后，那鞭子挥得………真像套马杆的汉子，威武雄壮……&#125;</div><div class="line">]</div></pre></td></tr></table></figure></p>
-<p>那么如何展示到页面中呢。</p>
-<p>我选择了 <a href="https://github.com/gin-gonic/gin" target="_blank" rel="external">gin</a> 框架。</p>
-<p>修改一下代码。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">func main() &#123;</div><div class="line">	r := gin.Default()</div><div class="line">	r.LoadHTMLGlob(&quot;public/*&quot;)</div><div class="line">	r.GET(&quot;/&quot;, Index)</div><div class="line">	r.Run()</div><div class="line">&#125;</div><div class="line"></div><div class="line">func Index(c *gin.Context) &#123;</div><div class="line">	var url = &quot;http://www.qiushibaike.com/hot&quot;</div><div class="line"></div><div class="line">	doc, err := goquery.NewDocument(url)</div><div class="line">	if err != nil &#123;</div><div class="line">		log.Fatal(err)</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	var result []Qb</div><div class="line">	doc.Find(&quot;#content-left .article&quot;).Each(func(i int, s *goquery.Selection) &#123;</div><div class="line">		content := s.Find(&quot;.content span&quot;).Text()</div><div class="line">		result = append(result, Qb&#123;Id: i, Content: content&#125;)</div><div class="line">	&#125;)</div><div class="line"></div><div class="line">	c.HTML(http.StatusOK, &quot;index.html&quot;, gin.H&#123;</div><div class="line">		&quot;items&quot;: result,</div><div class="line">		&quot;title&quot;: &quot;糗百热门&quot;</div><div class="line">	&#125;)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>可以看到，<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">r := gin.Default()</div><div class="line">r.LoadHTMLGlob(&quot;public/*&quot;)</div><div class="line">r.GET(&quot;/&quot;, Index)</div></pre></td></tr></table></figure></p>
-<p>这里加载了public目录中的模板，然后下一行，表示，接收到 “/“ 的请求时，调用Index方法去处理。</p>
-<p>到这里，文档的抓取，解析，构造数据就已经完成，下一步，看一下怎么显示到页面中。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">&#123;% raw %&#125;</div><div class="line">&lt;div class=&quot;col-md-12&quot;&gt;</div><div class="line">    &lt;h2&gt;&#123;&#123; .title &#125;&#125;&lt;/h2&gt;</div><div class="line">    &lt;table class=&quot;table table-striped table-bordered table-hover&quot;&gt;</div><div class="line">        &#123;&#123; range $item := .items &#125;&#125;</div><div class="line">        &lt;tr&gt;</div><div class="line">            &lt;td&gt;&#123;&#123; $item.Content &#125;&#125;&lt;/td&gt;</div><div class="line">        &lt;/tr&gt;</div><div class="line">        &#123;&#123; end &#125;&#125;</div><div class="line">    &lt;/table&gt;</div><div class="line">&lt;/div&gt;</div><div class="line">&#123;% endraw %&#125;</div></pre></td></tr></table></figure>
-<p>使用 “{{ }}“ 输出后端发送过来的数据。使用 range 迭代数据。与</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">for pos, char := range str &#123;</div><div class="line">...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>一样。</p>
-<p>完整的模板代码：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">&#123;% raw %&#125;</div><div class="line">&lt;!-- public/index.html --&gt;</div><div class="line"></div><div class="line">&lt;html&gt;</div><div class="line">    &lt;head&gt;</div><div class="line">        &lt;meta http-equiv=&quot;content-type&quot; content=&quot;text/html; charset=utf-8&quot;&gt;</div><div class="line">        &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no&quot;&gt;</div><div class="line">        &lt;title&gt;糗百&lt;/title&gt;</div><div class="line"></div><div class="line">        &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.min.css&quot;&gt;</div><div class="line">        &lt;link rel=&quot;stylesheet&quot;  href=&quot;https://cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css&quot;&gt;</div><div class="line"></div><div class="line">    &lt;/head&gt;</div><div class="line">    &lt;body&gt;</div><div class="line">        &lt;div class=&quot;container&quot;&gt;</div><div class="line">            &lt;div class=&quot;row&quot;&gt;</div><div class="line">                &lt;div class=&quot;col-md-12&quot;&gt;</div><div class="line">                    &lt;h2&gt;&#123;&#123; .title &#125;&#125;&lt;/h2&gt;</div><div class="line">                    &lt;table class=&quot;table table-striped table-bordered table-hover&quot;&gt;</div><div class="line">                        &#123;&#123; range $item := .items &#125;&#125;</div><div class="line">                        &lt;tr&gt;</div><div class="line">                            &lt;td&gt;&#123;&#123; $item.Content &#125;&#125;&lt;/td&gt;</div><div class="line">                        &lt;/tr&gt;</div><div class="line">                        &#123;&#123; end &#125;&#125;</div><div class="line">                    &lt;/table&gt;</div><div class="line">                &lt;/div&gt;</div><div class="line">            &lt;/div&gt;</div><div class="line">        &lt;/div&gt;</div><div class="line">    &lt;/body&gt;</div><div class="line">&lt;/html&gt;</div><div class="line">&#123;% endraw %&#125;</div></pre></td></tr></table></figure>
-<p>这样，运行一下，就可以了。</p>
-<p>gin框架默认使用8080端口，打开 <a href="http://localhost:8080" target="_blank" rel="external">http://localhost:8080</a> 就可以看到一个极简版的糗百热门了。</p>
-<p>问题来了，怎么增加一个分页呢？</p>
-<p>完整代码见:</p>
-<p><a href="https://github.com/qichengzx/goqiubai" target="_blank" rel="external">Github地址</a></p>
-<h4 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h4><p>其实早就写完了这篇，但是hexo生成的时候由于 <a href="https://hexo.io/docs/troubleshooting.html#Escape-Contents" target="_blank" rel="external">“{{“的问题</a>，生成一直失败，一直拖到现在。</p>
-<p>实际代码中需要去掉 “{ % raw % }” 相关部分。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/12/04/go-qiubai.html" data-id="cj7xaire0001fwl0rv8gmvy4b" class="article-share-link">Share</a>
-      
-        <a href="https://www.qichengzx.com/2016/12/04/go-qiubai.html#comments" class="article-comment-link">Comments</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gin/">gin</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/goquery/">goquery</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/糗百/">糗百</a></li></ul>
 
     </footer>
   </div>
@@ -822,7 +829,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">12</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">11</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">11</span></li></ul>
     </div>
   </div>
 
@@ -831,7 +838,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geo/">geo</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redigo/">redigo</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geo/">geo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redigo/">redigo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -840,7 +847,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/dropbox/" style="font-size: 11.67px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/geo/" style="font-size: 11.67px;">geo</a> <a href="/tags/gin/" style="font-size: 10px;">gin</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/go/" style="font-size: 20px;">go</a> <a href="/tags/goquery/" style="font-size: 11.67px;">goquery</a> <a href="/tags/hexo/" style="font-size: 13.33px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 13.33px;">javascript</a> <a href="/tags/js/" style="font-size: 11.67px;">js</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/leetcode/" style="font-size: 10px;">leetcode</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 18.33px;">mysql</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 20px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 16.67px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redigo/" style="font-size: 11.67px;">redigo</a> <a href="/tags/redis/" style="font-size: 15px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/今日头条/" style="font-size: 10px;">今日头条</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/短网址/" style="font-size: 10px;">短网址</a> <a href="/tags/糗百/" style="font-size: 10px;">糗百</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
+      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/dropbox/" style="font-size: 11.43px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/geo/" style="font-size: 12.86px;">geo</a> <a href="/tags/gin/" style="font-size: 10px;">gin</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/go/" style="font-size: 20px;">go</a> <a href="/tags/goquery/" style="font-size: 11.43px;">goquery</a> <a href="/tags/hexo/" style="font-size: 12.86px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 12.86px;">javascript</a> <a href="/tags/js/" style="font-size: 11.43px;">js</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/leetcode/" style="font-size: 10px;">leetcode</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 17.14px;">mysql</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 18.57px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 15.71px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redigo/" style="font-size: 12.86px;">redigo</a> <a href="/tags/redis/" style="font-size: 14.29px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/今日头条/" style="font-size: 10px;">今日头条</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/短网址/" style="font-size: 10px;">短网址</a> <a href="/tags/糗百/" style="font-size: 10px;">糗百</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
     </div>
   </div>
 
@@ -849,7 +856,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
     </div>
   </div>
 
@@ -859,6 +866,10 @@
     <h3 class="widget-title">Recents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2017/09/24/redis-geo-with-redigo-in-golang-part-3.html">Go语言使用redigo操作GEO(3) - 获取范围集合</a>
+          </li>
         
           <li>
             <a href="/2017/09/23/redis-geo-with-redigo-in-golang-part-2.html">Go语言使用redigo操作GEO(2) - 获取两点距离</a>
@@ -874,10 +885,6 @@
         
           <li>
             <a href="/2017/07/15/create-real-time-chat-app-golang-angular-2-websockets.html">【译】使用Go和Angular通过WebSocket构建实时聊天应用</a>
-          </li>
-        
-          <li>
-            <a href="/2017/07/02/HTTP2-Server-Push.html">在Go中使用 HTTP/2 Server Push</a>
           </li>
         
       </ul>

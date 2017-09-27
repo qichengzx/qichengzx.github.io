@@ -3,18 +3,20 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   
-  <title>Tag: ECharts | 启程</title>
+  <title>Go语言使用redigo操作GEO(3) - 获取范围集合 | 启程</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta http-equiv="Access-Control-Allow-Origin" content="*">
-  <meta name="description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
-<meta property="og:type" content="website">
-<meta property="og:title" content="启程">
-<meta property="og:url" content="https://www.qichengzx.com/tags/ECharts/index.html">
+  <meta name="description" content="上一篇记录了使用redigo操作Redis的获取两点距离的功能。 今天继续来写一下，获取一个坐标点指定距离范围内地理位置的集合。 完成此功能，需要使用Redis的 GEORADIUS 命令。 语法： 1GEORADIUS key longitude latitude radius [m|km|ft|mi] [WITHCOORD] [WITHDIST] [ASC|DESC] [WITHHASH] [">
+<meta name="keywords" content="go,redis,redigo,geo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go语言使用redigo操作GEO(3) - 获取范围集合">
+<meta property="og:url" content="https://www.qichengzx.com/2017/09/24/redis-geo-with-redigo-in-golang-part-3.html">
 <meta property="og:site_name" content="启程">
-<meta property="og:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
+<meta property="og:description" content="上一篇记录了使用redigo操作Redis的获取两点距离的功能。 今天继续来写一下，获取一个坐标点指定距离范围内地理位置的集合。 完成此功能，需要使用Redis的 GEORADIUS 命令。 语法： 1GEORADIUS key longitude latitude radius [m|km|ft|mi] [WITHCOORD] [WITHDIST] [ASC|DESC] [WITHHASH] [">
+<meta property="og:updated_time" content="2017-09-27T12:34:31.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="启程">
-<meta name="twitter:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
+<meta name="twitter:title" content="Go语言使用redigo操作GEO(3) - 获取范围集合">
+<meta name="twitter:description" content="上一篇记录了使用redigo操作Redis的获取两点距离的功能。 今天继续来写一下，获取一个坐标点指定距离范围内地理位置的集合。 完成此功能，需要使用Redis的 GEORADIUS 命令。 语法： 1GEORADIUS key longitude latitude radius [m|km|ft|mi] [WITHCOORD] [WITHDIST] [ASC|DESC] [WITHHASH] [">
 <meta name="twitter:creator" content="@qichengzx">
   
     <link rel="alternative" href="/atom.xml" title="启程" type="application/atom+xml">
@@ -60,40 +62,93 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2016" class="archive-year">2016</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2016/01/19/echarts-pie.html" class="archive-article-date">
-  <time datetime="2016-01-19T13:27:00.000Z" itemprop="datePublished">Jan 19</time>
+        <section id="main"><article id="post-redis-geo-with-redigo-in-golang-part-3" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/09/24/redis-geo-with-redigo-in-golang-part-3.html" class="article-date">
+  <time datetime="2017-09-24T10:09:18.000Z" itemprop="datePublished">2017-09-24</time>
 </a>
-      
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/golang/">golang</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/01/19/echarts-pie.html">ECharts饼图示例</a>
+    <h1 class="article-title" itemprop="name">
+      Go语言使用redigo操作GEO(3) - 获取范围集合
     </h1>
   
 
-    </header>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><a href="/2017/09/17/redis-geo-with-redigo-in-golang-part-2.html">上一篇</a>记录了使用redigo操作Redis的获取两点距离的功能。</p>
+<p>今天继续来写一下，获取一个坐标点指定距离范围内地理位置的集合。</p>
+<p>完成此功能，需要使用Redis的 GEORADIUS 命令。</p>
+<p>语法：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GEORADIUS key longitude latitude radius [m|km|ft|mi] [WITHCOORD] [WITHDIST] [ASC|DESC] [WITHHASH] [COUNT count]</div></pre></td></tr></table></figure>
+<p>其中，longitude latitude 表示地理位置的坐标，radius表示范围的距离，单位可以是m，km，ft，mi，依次为米，千米，英里，英尺。</p>
+<p>后边的可选参数中：</p>
+<ul>
+<li>WITHCOORD：传入WITHCOORD参数，返回结果会带上匹配位置的经纬度。</li>
+<li>WITHDIST：传入WITHDIST参数，返回结果会带上匹配位置与给定地理位置的距离，距离的单位与 GEORADIUS 命令传入的单位一致。</li>
+<li>ASC|DESC：默认结果是未排序的，ASC表示从近到远排序，DESC表示从远到近排序。</li>
+<li>WITHHASH：传入WITHHASH参数，返回结果会带上匹配位置的hash值。hash为52位有符号整数。</li>
+<li>COUNT count：传入COUNT参数，返回指定数量的结果。</li>
+</ul>
+<p>参照文档，可以发现，默认情况下 GEORADIUS 会返回全部匹配的元素，而传入 COUNT 参数会截取指定的部分元素返回，但是由于此命令还需要对返回结果进行排序，所以如果元素较多的情况下，即使使用了 COUNT 参数，查找速度也会很慢。所以此参数仅适用于减小带宽占用，一次性返回少数数据，多次查询。</p>
+<p>GEORADIUS 的返回值是一个数组:</p>
+<ul>
+<li>如果传入了WITHCOORD，WITHDIST，WITHHASH参数，会返回二维的数组，其中每个子数组表示一个元素</li>
+<li>如果没有传入上述参数，会返回一个一维的数组，值为元素名，如[“tianjin”,”baoding”]</li>
+</ul>
+<p>如果返回的是二维数组，子数组的第一个元素是对应位置的名字，其他的会根据传入的参数当做数组的元素返回，其中：</p>
+<ul>
+<li>距离依然是一个双精度浮点数，单位与传入的单位参数一致。</li>
+<li>GEOHASH 是一个整数。</li>
+<li>坐标分别为经度，纬度，其中经度在前。</li>
+</ul>
+<p>如：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GEORADIUS citylist 116.280316 39.9329 200 km WITHCOORD</div></pre></td></tr></table></figure>
+<p>会返回</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">1) 1) "beijing"</div><div class="line">   2) 1) "116.40528291463851929"</div><div class="line">      2) "39.9049884229125027"</div><div class="line">2) 1) "baoding"</div><div class="line">   2) 1) "115.33530682325363159"</div><div class="line">      2) "38.87121760640306434"</div><div class="line">3) 1) "tangshan"</div><div class="line">   2) 1) "116.94219142198562622"</div><div class="line">      2) "39.05078232277295314"</div><div class="line">4) 1) "tianjin"</div><div class="line">   2) 1) "117.0153459906578064"</div><div class="line">      2) "39.12522961794389431"</div></pre></td></tr></table></figure>
+<p>那么，使用redigo如何实现呢？</p>
+<h4 id="有WITHCOORD，WITHDIST，WITHHASH参数"><a href="#有WITHCOORD，WITHDIST，WITHHASH参数" class="headerlink" title="有WITHCOORD，WITHDIST，WITHHASH参数"></a>有WITHCOORD，WITHDIST，WITHHASH参数</h4><p>暂时还没想到怎么解决这个比较好。</p>
+<h4 id="无WITHCOORD，WITHDIST，WITHHASH参数"><a href="#无WITHCOORD，WITHDIST，WITHHASH参数" class="headerlink" title="无WITHCOORD，WITHDIST，WITHHASH参数"></a>无WITHCOORD，WITHDIST，WITHHASH参数</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">radius</span><span class="params">(key <span class="keyword">string</span>, lng, lat <span class="keyword">float64</span>, radius <span class="keyword">int</span>, unit <span class="keyword">string</span>)</span> []<span class="title">string</span></span> &#123;</div><div class="line">	rc := RedisClient.Get()</div><div class="line">	<span class="keyword">defer</span> rc.Close()</div><div class="line"></div><div class="line">	pos, _ := redis.Strings(rc.Do(<span class="string">"GEORADIUS"</span>, key, lng, lat, radius, unit))</div><div class="line">	<span class="keyword">return</span> pos</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>该方法则会返回符合条件的元素的名称，如：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[beijing baoding tangshan tianjin]</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://www.qichengzx.com/2017/09/24/redis-geo-with-redigo-in-golang-part-3.html" data-id="cj830jkdw0031lu0r8kjbdeo2" class="article-share-link">Share</a>
+      
+        <a href="https://www.qichengzx.com/2017/09/24/redis-geo-with-redigo-in-golang-part-3.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/geo/">geo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redigo/">redigo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis/">redis</a></li></ul>
+
+    </footer>
   </div>
-</article>
+  
+    
+<nav id="article-nav">
   
   
-    </div></section>
+    <a href="/2017/09/23/redis-geo-with-redigo-in-golang-part-2.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Go语言使用redigo操作GEO(2) - 获取两点距离</div>
+    </a>
   
-</section>
+</nav>
+
+  
+</article></section>
         
           <aside id="sidebar">
   
