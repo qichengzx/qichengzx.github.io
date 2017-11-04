@@ -1,1 +1,160 @@
-!function(e){var t=e("#search-form-wrap"),o=!1,n=200,i=function(){o=!0},a=function(e){setTimeout(function(){o=!1,e&&e()},n)};e("#nav-search-btn").on("click",function(){o||(i(),t.addClass("on"),a(function(){e(".search-form-input").focus()}))}),e(".search-form-input").on("blur",function(){i(),t.removeClass("on"),a()}),e("body").on("click",function(){e(".article-share-box.on").removeClass("on")}).on("click",".article-share-link",function(t){t.stopPropagation();var o=e(this),n=o.attr("data-url"),i=encodeURIComponent(n),a="article-share-box-"+o.attr("data-id"),r=o.offset();if(e("#"+a).length){var s=e("#"+a);if(s.hasClass("on"))return s.removeClass("on"),void 0}else{var l=['<div id="'+a+'" class="article-share-box">','<input class="article-share-input" value="'+n+'">','<div class="article-share-links">','<a href="https://twitter.com/intent/tweet?url='+i+'" class="article-share-twitter" target="_blank" title="Twitter"></a>','<a href="https://www.facebook.com/sharer.php?u='+i+'" class="article-share-facebook" target="_blank" title="Facebook"></a>','<a href="http://pinterest.com/pin/create/button/?url='+i+'" class="article-share-pinterest" target="_blank" title="Pinterest"></a>','<a href="https://plus.google.com/share?url='+i+'" class="article-share-google" target="_blank" title="Google+"></a>',"</div>","</div>"].join(""),s=e(l);e("body").append(s)}e(".article-share-box.on").hide(),s.css({top:r.top+25,left:r.left}).addClass("on")}).on("click",".article-share-box",function(e){e.stopPropagation()}).on("click",".article-share-box-input",function(){e(this).select()}).on("click",".article-share-box-link",function(e){e.preventDefault(),e.stopPropagation(),window.open(this.href,"article-share-box-window-"+Date.now(),"width=500,height=450")}),e(".article-entry").each(function(t){e(this).find("img").each(function(){if(!e(this).parent().hasClass("fancybox")){var t=this.alt;t&&e(this).after('<span class="caption">'+t+"</span>"),e(this).wrap('<a href="'+this.src+'" title="'+t+'" class="fancybox"></a>')}}),e(this).find(".fancybox").each(function(){e(this).attr("rel","article"+t)})}),e.fancybox&&e(".fancybox").fancybox();var r=e("#container"),s=!1,l=200,c=function(){s=!0},d=function(){setTimeout(function(){s=!1},l)};e("#main-nav-toggle").on("click",function(){s||(c(),r.toggleClass("mobile-nav-on"),d())}),e("#wrap").on("click",function(){!s&&r.hasClass("mobile-nav-on")&&r.removeClass("mobile-nav-on")});var p=new Date;p.getSeconds(),p.getMinutes();var h=p.getHours();h>12&&(h-=12),hourDeg=30*h+30*(p.getMinutes()/60),minuteDeg=6*p.getMinutes(),secondDeg=6*p.getSeconds(),stylesDeg=["@keyframes rotate-hour{ from{transform:rotate("+hourDeg+"deg);}to{transform:rotate("+(hourDeg+360)+"deg);}}","@keyframes rotate-minute{from{transform:rotate("+minuteDeg+"deg);}to{transform:rotate("+(minuteDeg+360)+"deg);}}","@keyframes rotate-second{from{transform:rotate("+secondDeg+"deg);}to{transform:rotate("+(secondDeg+360)+"deg);}}","@-moz-keyframes rotate-hour{ from{transform:rotate("+hourDeg+"deg);}to{transform:rotate("+(hourDeg+360)+"deg);}}","@-moz-keyframes rotate-minute{from{transform:rotate("+minuteDeg+"deg);}to{transform:rotate("+(minuteDeg+360)+"deg);}}","@-moz-keyframes rotate-second{from{transform:rotate("+secondDeg+"deg);}to{transform:rotate("+(secondDeg+360)+"deg);}}","@-webkit-keyframes rotate-hour{from{transform:rotate("+hourDeg+"deg);}to{transform:rotate("+(hourDeg+360)+"deg);}}","@-webkit-keyframes rotate-minute{from{transform:rotate("+minuteDeg+"deg);}to{transform:rotate("+(minuteDeg+360)+"deg);}}","@-webkit-keyframes rotate-second{from{transform:rotate("+secondDeg+"deg);}to{transform:rotate("+(secondDeg+360)+"deg);}}"].join(""),e("#clock-animations").html(stylesDeg)}(jQuery);
+(function($){
+  // Search
+  var $searchWrap = $('#search-form-wrap'),
+    isSearchAnim = false,
+    searchAnimDuration = 200;
+
+  var startSearchAnim = function(){
+    isSearchAnim = true;
+  };
+
+  var stopSearchAnim = function(callback){
+    setTimeout(function(){
+      isSearchAnim = false;
+      callback && callback();
+    }, searchAnimDuration);
+  };
+
+  $('#nav-search-btn').on('click', function(){
+    if (isSearchAnim) return;
+
+    startSearchAnim();
+    $searchWrap.addClass('on');
+    stopSearchAnim(function(){
+      $('.search-form-input').focus();
+    });
+  });
+
+  $('.search-form-input').on('blur', function(){
+    startSearchAnim();
+    $searchWrap.removeClass('on');
+    stopSearchAnim();
+  });
+
+  // Share
+  $('body').on('click', function(){
+    $('.article-share-box.on').removeClass('on');
+  }).on('click', '.article-share-link', function(e){
+    e.stopPropagation();
+
+    var $this = $(this),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      id = 'article-share-box-' + $this.attr('data-id'),
+      offset = $this.offset();
+
+    if ($('#' + id).length){
+      var box = $('#' + id);
+
+      if (box.hasClass('on')){
+        box.removeClass('on');
+        return;
+      }
+    } else {
+      var html = [
+        '<div id="' + id + '" class="article-share-box">',
+          '<input class="article-share-input" value="' + url + '">',
+          '<div class="article-share-links">',
+            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="article-share-pinterest" target="_blank" title="Pinterest"></a>',
+            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="article-share-google" target="_blank" title="Google+"></a>',
+          '</div>',
+        '</div>'
+      ].join('');
+
+      var box = $(html);
+
+      $('body').append(box);
+    }
+
+    $('.article-share-box.on').hide();
+
+    box.css({
+      top: offset.top + 25,
+      left: offset.left
+    }).addClass('on');
+  }).on('click', '.article-share-box', function(e){
+    e.stopPropagation();
+  }).on('click', '.article-share-box-input', function(){
+    $(this).select();
+  }).on('click', '.article-share-box-link', function(e){
+    e.preventDefault();
+    e.stopPropagation();
+
+    window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+  });
+
+  // Caption
+  $('.article-entry').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+
+      var alt = this.alt;
+
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+
+  if ($.fancybox){
+    $('.fancybox').fancybox();
+  }
+
+  // Mobile nav
+  var $container = $('#container'),
+    isMobileNavAnim = false,
+    mobileNavAnimDuration = 200;
+
+  var startMobileNavAnim = function(){
+    isMobileNavAnim = true;
+  };
+
+  var stopMobileNavAnim = function(){
+    setTimeout(function(){
+      isMobileNavAnim = false;
+    }, mobileNavAnimDuration);
+  }
+
+  $('#main-nav-toggle').on('click', function(){
+    if (isMobileNavAnim) return;
+
+    startMobileNavAnim();
+    $container.toggleClass('mobile-nav-on');
+    stopMobileNavAnim();
+  });
+
+  $('#wrap').on('click', function(){
+    if (isMobileNavAnim || !$container.hasClass('mobile-nav-on')) return;
+
+    $container.removeClass('mobile-nav-on');
+  });
+
+  var now = new Date();
+  var second = now.getSeconds();
+  var minute = now.getMinutes();
+  var hour = now.getHours();
+  if (hour > 12) {
+      hour = hour - 12;
+  }
+  hourDeg   = hour * 30 + now.getMinutes() / 60 * 30;
+  minuteDeg = now.getMinutes() * 6;
+  secondDeg = now.getSeconds() * 6;
+  stylesDeg = [
+      "@keyframes rotate-hour{ from{transform:rotate(" + hourDeg + "deg);}to{transform:rotate(" + (hourDeg + 360) + "deg);}}",
+      "@keyframes rotate-minute{from{transform:rotate(" + minuteDeg + "deg);}to{transform:rotate(" + (minuteDeg + 360) + "deg);}}",
+      "@keyframes rotate-second{from{transform:rotate(" + secondDeg + "deg);}to{transform:rotate(" + (secondDeg + 360) + "deg);}}",
+      "@-moz-keyframes rotate-hour{ from{transform:rotate(" + hourDeg + "deg);}to{transform:rotate(" + (hourDeg + 360) + "deg);}}",
+      "@-moz-keyframes rotate-minute{from{transform:rotate(" + minuteDeg + "deg);}to{transform:rotate(" + (minuteDeg + 360) + "deg);}}",
+      "@-moz-keyframes rotate-second{from{transform:rotate(" + secondDeg + "deg);}to{transform:rotate(" + (secondDeg + 360) + "deg);}}",
+      "@-webkit-keyframes rotate-hour{from{transform:rotate(" + hourDeg + "deg);}to{transform:rotate(" + (hourDeg + 360) + "deg);}}",
+      "@-webkit-keyframes rotate-minute{from{transform:rotate(" + minuteDeg + "deg);}to{transform:rotate(" + (minuteDeg + 360) + "deg);}}",
+      "@-webkit-keyframes rotate-second{from{transform:rotate(" + secondDeg + "deg);}to{transform:rotate(" + (secondDeg + 360) + "deg);}}"
+  ].join("");
+  $('#clock-animations').html(stylesDeg);
+})(jQuery);
