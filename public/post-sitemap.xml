@@ -7,6 +7,14 @@
     </url>
 
     <url>
+        <loc>https://www.qichengzx.com/2017/11/27/multi-stage-builds-in-docker.html</loc>
+        <lastmod>2017-11-27T13:12:41.352Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>https://www.qichengzx.com/2017/09/24/redis-geo-with-redigo-in-golang-part-3.html</loc>
         <lastmod>2017-09-27T12:34:31.000Z</lastmod>
         <changefreq>weekly</changefreq>

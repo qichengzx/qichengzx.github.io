@@ -62,6 +62,102 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-php-rabbitmq-tutorial-six" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/05/03/php-rabbitmq-tutorial-six.html" class="article-date">
+  <time datetime="2016-05-03T06:35:20.000Z" itemprop="datePublished">2016-05-03</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/php/">php</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/05/03/php-rabbitmq-tutorial-six.html">PHP RabbitMQ 教程（六） - 远程调用</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="远程调用"><a href="#远程调用" class="headerlink" title="远程调用"></a>远程调用</h3><p>在<a href="/2016/04/17/php-rabbitmq-tutorial-two.html">第二节</a>中，我们学习了如何使用工作队列在多个worker中分发耗时任务。</p>
+<p>但是如果我们需要在远程运行一个函数并等待返回结果怎么办？这是两码事，这个模式通常被称为远程过程调用（Remote Procedure Call，RPC）。</p>
+<p>在本节中我们准备使用RabbitMQ构建一个RPC系统：一个客户端和一个可扩展的RPC服务端。由于我们没有值得分发的耗时任务，我们准备创建一个假的返回<a href="https://en.wikipedia.org/wiki/Fibonacci_number" target="_blank" rel="external">斐波那契数列</a>的RPC服务。</p>
+<h3 id="客户端接口"><a href="#客户端接口" class="headerlink" title="客户端接口"></a>客户端接口</h3><p>我们创建一个简单的客户端类来说明RPC服务如何使用。这个类会展示call方法如何发送一个RPC请求并且阻塞，直到接收到返回值。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$fibonacci_rpc = <span class="keyword">new</span> FibonacciRpcClient();</div><div class="line">$response = $fibonacci_rpc-&gt;call(<span class="number">30</span>);</div><div class="line"><span class="keyword">echo</span> <span class="string">"[.] Got "</span>, $response, <span class="string">"\n"</span>;</div></pre></td></tr></table></figure>
+<h4 id="RPC注意事项"><a href="#RPC注意事项" class="headerlink" title="RPC注意事项"></a>RPC注意事项</h4><p>尽管RPC在计算机学中很常见，但它十分挑剔。当程序员不知道是否是调用一个本地的方法还是一个很慢的RPC会出现这个问题。这样的困惑便导致不可预测的系统并增加不必要的调试复杂性。比起简化的软件，误用RPC会导致不可维护的无头绪代码。</p>
+<p>记住刚才的内容，考虑下面的建议：</p>
+<p>​    确保可以明显的看出哪个方法调用的是本地的哪个是远程的。</p>
+<p>​    系统文档化。让组件之间的依赖变得清晰可见。</p>
+<p>​    错误处理。当RPC服务长时间关闭客户端该作何反应？</p>
+<p>如果有疑问，则尽量避免使用RPC。如果可以话，你应该使用异步管道——而不是RPC——像阻塞，结果被异步推送到下个计算阶段。</p>
+<h3 id="回调队列"><a href="#回调队列" class="headerlink" title="回调队列"></a>回调队列</h3><p>通常在RabbitMQ上做RPC很简单。客户端发送请求消息，服务端回复消息。为了接收响应消息，我们需要在请求中附带一个”callback”队列地址，我们可以使用默认的队列。来试一试：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">list</span>($queue_name, ,) = $channel-&gt;queue_declare(<span class="string">""</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">true</span>, <span class="keyword">false</span>);</div><div class="line"></div><div class="line">$msg = <span class="keyword">new</span> AMQPMessage(</div><div class="line">	$payload,</div><div class="line">	<span class="keyword">array</span>(<span class="string">'reply_to'</span> =&gt; $queue_name));</div><div class="line"></div><div class="line">$channel-&gt;basic_publish($msg, <span class="string">''</span>, <span class="string">'rpc_queue'</span>);</div><div class="line"></div><div class="line"><span class="comment"># ... then code to read a response message from the callback_queue</span></div></pre></td></tr></table></figure>
+<h4 id="消息属性"><a href="#消息属性" class="headerlink" title="消息属性"></a>消息属性</h4><p>AMQP协议定义了14个消息属性。大部分不常用，下面的除外：</p>
+<p>​    delivery_mode：值为2时表示持久化，1为临时的。也许你还记得这个属性来自第二节。</p>
+<p>​    content_type：编码格式，比如经常用的JSON格式，良好的做法是设置为：application/json。</p>
+<p>​    reply_to：通常用来定义回调队列名称。</p>
+<p>​    correlation_id：用来关联RPC的响应和请求。</p>
+<h3 id="Correlation-Id"><a href="#Correlation-Id" class="headerlink" title="Correlation Id"></a>Correlation Id</h3><p>在上面的方法中我们建议为每一个RPC请求创建一个回调队列。这样非常低效，但是幸运的是有更好的办法 - 我们可以为每一个客户端创建一个单独的回调队列。</p>
+<p>这样又带来一个新的问题，在队列接收到响应时，并不知道属于哪个请求。这也正是correlation_id属性要发挥的作用。我们为每一个请求的设定一个唯一的correlation_id值，然后，当在回调队列接收到消息时会查看它的属性，基于此，我们就可以把响应和请求进行匹配。如果发现一个未知的correlation_id值，可以安全的忽略掉这条消息 - 因为它不属于任何请求。</p>
+<p>也许你会问，为什么应该忽略回调队列里的未知消息，而不是返回一个错误？因为服务可能会出现紊乱的情况，虽然不太可能，但是如果发生这种情况，RPC服务会在发送完响应后挂掉，但是还没有进行消息确认。如果发生了，重启RPC服务后会再次处理这个请求。这就是为什么在客户端我们必须适当的处理重复请求，而RPC服务最好的幂等的。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p><img src="/images/rabbitmq/python-six.png" alt=""></p>
+<p>RPC工作流程：</p>
+<p>​    当客户端开始运行时会创建一个匿名独有回调队列。</p>
+<p>​    RPC请求中，客户端消息带有两个属性：reply_to用来设置回调队列，correlation_id用来唯一标识每一个请求。</p>
+<p>​    请求被发送到rpc_queue队列。</p>
+<p>​    RPC worker（又称worker）在队列中守护，等待新请求。当请求到达，它会进行处理，然后把结果以消息的形式发送回客户端的队列，队列名便是客户端消息带有的reply_to的值。</p>
+<p>​    客户端等待回调队列中的数据。当消息到达，检查它的correlation_id的值。如果符合客户端发送给RPC服务器中请求的值，客户端会返回响应内容到应用中。</p>
+<h3 id="整合"><a href="#整合" class="headerlink" title="整合"></a>整合</h3><p>斐波那契方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">function fib($n)&#123;</div><div class="line">  if($n == 0)</div><div class="line">  	return 0;</div><div class="line">  if($n == 1)</div><div class="line">  	return 1;</div><div class="line">  return fib($n-1) + fib($n-2);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>定义完斐波那契方法。假定它仅接受数字类型的输入。（别期望它能处理大的数字，它很可能非常慢的处理完。）</p>
+<p>RPC服务处理程序rpc_server.php：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&lt;?php</span></div><div class="line"></div><div class="line"><span class="keyword">require_once</span> <span class="keyword">__DIR__</span> . <span class="string">'/vendor/autoload.php'</span>;</div><div class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Connection</span>\<span class="title">AMQPStreamConnection</span>;</div><div class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Message</span>\<span class="title">AMQPMessage</span>;</div><div class="line"></div><div class="line">$connection = <span class="keyword">new</span> AMQPStreamConnection(<span class="string">'localhost'</span>, <span class="number">5672</span>, <span class="string">'guest'</span>, <span class="string">'guest'</span>);</div><div class="line">$channel = $connection-&gt;channel();</div><div class="line"></div><div class="line">$channel-&gt;queue_declare(<span class="string">'rpc_queue'</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>);</div><div class="line"></div><div class="line">fuction fib($n)&#123;</div><div class="line">  <span class="keyword">if</span>($n == <span class="number">0</span>)</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">  <span class="keyword">if</span>($n == <span class="number">1</span>)</div><div class="line">    <span class="keyword">return</span> <span class="number">1</span>;</div><div class="line">  </div><div class="line">  <span class="keyword">return</span> fib($n<span class="number">-1</span>) + fib($n<span class="number">-2</span>);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">echo</span> <span class="string">" [x] Awaiting RPC requests\n"</span>;</div><div class="line"></div><div class="line">$callback = <span class="function"><span class="keyword">function</span><span class="params">($req)</span></span>&#123;</div><div class="line">  $n = intval($req-&gt;body);</div><div class="line">  <span class="keyword">echo</span> <span class="string">" [.] fib("</span>,$n,<span class="string">")\n"</span>;</div><div class="line">  </div><div class="line">  $msg = <span class="keyword">new</span> AMQPMessage(</div><div class="line">  	(string)fib($n),</div><div class="line">    <span class="keyword">array</span>(<span class="string">'correlation_id'</span> =&gt; $req-&gt;get(<span class="string">'correlation_id'</span>))</div><div class="line">  );</div><div class="line">  </div><div class="line">  $req-&gt;delivery_info[<span class="string">'channel'</span>]-&gt;basic_publish($msg, <span class="string">''</span>, $req-&gt;get(<span class="string">'reply_to'</span>));</div><div class="line">  $req-&gt;delivery_info[<span class="string">'channel'</span>]-&gt;basic_ack($req-&gt;delivery_info[<span class="string">'delivery_tag'</span>]);</div><div class="line">&#125;;</div><div class="line"></div><div class="line">$channel-&gt;basic_qos(<span class="keyword">null</span>, <span class="number">1</span>, <span class="keyword">null</span>);</div><div class="line">$channel-&gt;basic_consume(<span class="string">'rpc_queue'</span>, <span class="string">''</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, $callback);</div><div class="line"></div><div class="line"><span class="keyword">while</span>(count($channel-&gt;callbacks))&#123;</div><div class="line">  $channel-&gt;wait();</div><div class="line">&#125;</div><div class="line"></div><div class="line">$channel-&gt;close();</div><div class="line">$connection-&gt;close();</div><div class="line"></div><div class="line"><span class="meta">?&gt;</span></div></pre></td></tr></table></figure>
+<p>服务端代码相当简单：</p>
+<p>​    和以往一样我们会从创建连接，频道，和声明队列开始</p>
+<p>​    也许我们想要运行更多的进程。为了在多个服务器之间负载均衡，需要在$channel.basic_qos中设置prefech_count；</p>
+<p>​    我们使用basic_consume访问队列。然后进入while循环等待请求消息，处理，然后返回响应消息。</p>
+<p>RPC客户端 rpc_client.php：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&lt;?php</span></div><div class="line"></div><div class="line"><span class="keyword">require_once</span> <span class="keyword">__DIR__</span> . <span class="string">'/vendor/autoload.php'</span>;</div><div class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Connection</span>\<span class="title">AMQPStreamConnection</span>;</div><div class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Message</span>\<span class="title">AMQPMessage</span>;</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">FibonacciRpcClient</span></span>&#123;</div><div class="line">	<span class="keyword">private</span> $connection;</div><div class="line">	<span class="keyword">private</span> $channel;</div><div class="line">	<span class="keyword">private</span> $callback_queue;</div><div class="line">	<span class="keyword">private</span> $response;</div><div class="line">	<span class="keyword">private</span> $corr_id;</div><div class="line">  </div><div class="line">	<span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">()</span></span>&#123;</div><div class="line">		<span class="keyword">$this</span>-&gt;connection = <span class="keyword">new</span> AMQPStreamConnection(</div><div class="line">		  <span class="string">'localhost'</span>, <span class="number">5672</span>, <span class="string">'guest'</span>, <span class="string">'guest'</span></div><div class="line">		);</div><div class="line">		<span class="keyword">$this</span>-&gt;channel = <span class="keyword">$this</span>-&gt;connection-&gt;channel();</div><div class="line">		<span class="keyword">list</span>(<span class="keyword">$this</span>-&gt;callback_queue, ,) = <span class="keyword">$this</span>-&gt;channel-&gt;queue_declare(<span class="string">""</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">true</span>, <span class="keyword">false</span>);</div><div class="line">		<span class="keyword">$this</span>-&gt;channel-&gt;basic_consume(</div><div class="line">			<span class="keyword">$this</span>-&gt;callback_queue, <span class="string">''</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>,</div><div class="line">			<span class="keyword">array</span>(<span class="keyword">$this</span>, <span class="string">'on_response'</span>));</div><div class="line">	&#125;</div><div class="line">  </div><div class="line"> 	<span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">on_response</span><span class="params">($req)</span></span>&#123;</div><div class="line"> 		<span class="keyword">if</span>($req-&gt;get(<span class="string">'correlation_id'</span>) == <span class="keyword">$this</span>-&gt;corr_id)&#123;</div><div class="line"> 			<span class="keyword">$this</span>-&gt;response = $req-&gt;body;</div><div class="line"> 		&#125;</div><div class="line"> 	&#125;</div><div class="line">  	</div><div class="line">	<span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">call</span><span class="params">($n)</span></span>&#123;</div><div class="line">		<span class="keyword">$this</span>-&gt;response = <span class="keyword">null</span>;</div><div class="line">		<span class="keyword">$this</span>-&gt;corr_id = uniqid();</div><div class="line"></div><div class="line">		$msg = <span class="keyword">new</span> AMQPMessage(</div><div class="line">  		(string) $n,</div><div class="line">  		<span class="keyword">array</span>(</div><div class="line">  			<span class="string">'correlation_id'</span> =&gt; <span class="keyword">$this</span>-&gt;corr_id,</div><div class="line">  			<span class="string">'reply_to'</span> =&gt; <span class="keyword">$this</span>-&gt;callback_queue)</div><div class="line">  		);</div><div class="line">    )</div><div class="line">      </div><div class="line">    <span class="keyword">$this</span>-&gt;channel-&gt;basic_publish($msg, <span class="string">''</span>, <span class="string">'rpc_queue'</span>);</div><div class="line">    <span class="keyword">while</span>(!<span class="keyword">$this</span>-&gt;response)&#123;</div><div class="line">    	<span class="keyword">$this</span>-&gt;channel-&gt;wait();</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> intval(<span class="keyword">$this</span>-&gt;response);</div><div class="line">  &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">$fibonacci_rpc = <span class="keyword">new</span> FibonacciRpcClient();</div><div class="line">$response = $fibonacci_rpc-&gt;call(<span class="number">30</span>);</div><div class="line"><span class="keyword">echo</span> <span class="string">" [.] Got "</span>, $response, <span class="string">"\n"</span>;</div><div class="line"></div><div class="line"><span class="meta">?&gt;</span></div></pre></td></tr></table></figure>
+<p>现在可以查看示例的完整代码了。<a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/rpc_client.php" target="_blank" rel="external">rpc_client.php</a> 和 <a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/rpc_server.php" target="_blank" rel="external">rpc_server.php</a>。</p>
+<p>现在RPC服务端可以运行了：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">php rpc_server.php</div><div class="line">[x] Awiting RPC resquests</div></pre></td></tr></table></figure>
+<p>接收斐波那契数列运行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">php rpc_client.php</div><div class="line">[x] Requesting fib(30)</div></pre></td></tr></table></figure>
+<p>这里展现的并不是RPC服务的唯一可能实现，但它有一些重要的优势：</p>
+<p>​    如果RPC服务太慢，可以按比例增加运行数量。试试在新控制台裕兴第二个rpc_server.php服务。</p>
+<p>​    在客户端，RPC要求只发送和接收一条消息。不能有像队列声明一样的异步调用。结果就是，对于单一的RPC请求，客户端仅需要一个网络往返。</p>
+<p>现在的代码还是过于简单，并没有想解决更复杂（更重要）的问题，比如：</p>
+<p>​    要是没有服务端守护运行，客户端作何反应？</p>
+<p>​    RPC客户端是否需要设置超时？</p>
+<p>​    如果服务端引发异常，是否该把它发送到客户端？</p>
+<p>​    处理前阻止无效消息（如检查范围，类型）进入？</p>
+<p>如果想尝试，可以在<a href="https://www.rabbitmq.com/plugins.html" target="_blank" rel="external">rabbitmq-management</a> 里找到一些有用的查看队列的插件。</p>
+<p>原文地址：<a href="https://www.rabbitmq.com/tutorials/tutorial-six-php.html" target="_blank" rel="external">Remote procedure call (RPC)</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html" data-id="cjai7rbvc002kfc0reiw739sj" class="article-share-link">Share</a>
+      
+        <a href="https://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/php/">php</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/rabbitmq/">rabbitmq</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+  
     <article id="post-php-rabbitmq-tutorial-five" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2016/04/27/php-rabbitmq-tutorial-five.html" class="article-date">
@@ -139,7 +235,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html" data-id="cj9l76e6600288h0rucbzyvx6" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html" data-id="cjai7rbv8002afc0raozxa7xi" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html#comments" class="article-comment-link">Comments</a>
       
@@ -220,7 +316,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html" data-id="cj9l76e67002a8h0r7fxdhqx1" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html" data-id="cjai7rbv9002dfc0rnx3hpwpd" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html#comments" class="article-comment-link">Comments</a>
       
@@ -321,7 +417,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html" data-id="cj9l76e6f002i8h0rke727ivt" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html" data-id="cjai7rbvc002nfc0r18mv7iwq" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html#comments" class="article-comment-link">Comments</a>
       
@@ -427,7 +523,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html" data-id="cj9l76e6h002p8h0rnu06uhai" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html" data-id="cjai7rbve002rfc0rlzfrr4dr" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html#comments" class="article-comment-link">Comments</a>
       
@@ -526,7 +622,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html" data-id="cj9l76e68002d8h0rejoc5ovp" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html" data-id="cjai7rbva002gfc0rlml62dd1" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html#comments" class="article-comment-link">Comments</a>
       
@@ -572,7 +668,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html" data-id="cj9l76e5c000b8h0rar75jni6" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html" data-id="cjai7rbu9000ffc0r5pdmuws4" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html#comments" class="article-comment-link">Comments</a>
       
@@ -628,7 +724,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html" data-id="cj9l76e5700058h0rcdd6ij69" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html" data-id="cjai7rbu40006fc0rzfyyi6ei" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html#comments" class="article-comment-link">Comments</a>
       
@@ -685,7 +781,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/02/03/MySQL实现row_number .html" data-id="cj9l76e5700048h0rgqryj4o7" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/02/03/MySQL实现row_number .html" data-id="cjai7rbty0001fc0rfvf62lc0" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/02/03/MySQL实现row_number .html#comments" class="article-comment-link">Comments</a>
       
@@ -740,62 +836,12 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/01/19/echarts-pie.html" data-id="cj9l76e5s00188h0rjmmf6gx0" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/01/19/echarts-pie.html" data-id="cjai7rbum0018fc0rscufi3tf" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/01/19/echarts-pie.html#comments" class="article-comment-link">Comments</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ECharts/">ECharts</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/javascript/">javascript</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/php/">php</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-  
-    <article id="post-placeholder-animate" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2016/01/11/placeholder-animate.html" class="article-date">
-  <time datetime="2016-01-11T13:42:58.000Z" itemprop="datePublished">2016-01-11</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/javascript/">javascript</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/01/11/placeholder-animate.html">一个简单的input获得焦点时的小动画效果</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>以前经常见到的一种页面表单效果，但是并没有在项目中用过，前几天在sf上看到相关问题，顺手写了一个，还挺简单，没什么含量。</p>
-<p>此处省略HTML头信息等内容。</p>
-<h3 id="HTML"><a href="#HTML" class="headerlink" title="HTML"></a>HTML</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;div&gt;</div><div class="line">  &lt;input type=&quot;text&quot; id=&quot;uname&quot;/&gt;</div><div class="line">  &lt;label&gt;Name&lt;/label&gt;</div><div class="line">&lt;/div&gt;</div></pre></td></tr></table></figure>
-<h3 id="CSS"><a href="#CSS" class="headerlink" title="CSS"></a>CSS</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">div&#123;</div><div class="line">  position:relative;</div><div class="line">  top:20px;</div><div class="line">&#125;</div><div class="line">input&#123;</div><div class="line">  width:200px;</div><div class="line">  height:30px;</div><div class="line">  line-height:30px;</div><div class="line">  padding:0 3px;</div><div class="line">  border:none;</div><div class="line">  border-bottom:1px solod #666;</div><div class="line"></div><div class="line">&#125;</div><div class="line">label&#123;</div><div class="line">  position:absolute;</div><div class="line">  top:0;</div><div class="line">  left:5px;</div><div class="line">  color:#ccc;</div><div class="line">  height:30px;</div><div class="line">  line-height:30px;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="JS"><a href="#JS" class="headerlink" title="JS"></a>JS</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">$(document).on(&apos;focus&apos;,&apos;input&apos;,function()&#123;</div><div class="line">  $(this).siblings(&apos;label&apos;).animate(&#123;top:&apos;-20px&apos;&#125;);</div><div class="line">&#125;)</div><div class="line">.on(&apos;focusout&apos;,&apos;input&apos;,function()&#123;</div><div class="line">  $(this).siblings(&apos;label&apos;).animate(&#123;top:&apos;0&apos;&#125;);</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
-<h3 id="RESULT"><a href="#RESULT" class="headerlink" title="RESULT"></a>RESULT</h3><iframe width="100%" height="300" src="//jsfiddle.net/qichengzx/zc91Lyx7/8/embedded/" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
-
-<h3 id="不足"><a href="#不足" class="headerlink" title="不足"></a>不足</h3><p>没有考虑label的鼠标点击事件。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/01/11/placeholder-animate.html" data-id="cj9l76e6i002s8h0r0qd9uoam" class="article-share-link">Share</a>
-      
-        <a href="https://www.qichengzx.com/2016/01/11/placeholder-animate.html#comments" class="article-comment-link">Comments</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/input/">input</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/javascript/">javascript</a></li></ul>
 
     </footer>
   </div>
@@ -845,7 +891,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">11</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">11</span></li></ul>
     </div>
   </div>
 
@@ -854,7 +900,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geo/">geo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redigo/">redigo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geo/">geo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redigo/">redigo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -863,7 +909,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/dropbox/" style="font-size: 11.43px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/geo/" style="font-size: 12.86px;">geo</a> <a href="/tags/gin/" style="font-size: 10px;">gin</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/go/" style="font-size: 20px;">go</a> <a href="/tags/goquery/" style="font-size: 11.43px;">goquery</a> <a href="/tags/hexo/" style="font-size: 12.86px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 12.86px;">javascript</a> <a href="/tags/js/" style="font-size: 11.43px;">js</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/leetcode/" style="font-size: 10px;">leetcode</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 17.14px;">mysql</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 18.57px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 15.71px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redigo/" style="font-size: 12.86px;">redigo</a> <a href="/tags/redis/" style="font-size: 14.29px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/今日头条/" style="font-size: 10px;">今日头条</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/短网址/" style="font-size: 10px;">短网址</a> <a href="/tags/糗百/" style="font-size: 10px;">糗百</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
+      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/docker/" style="font-size: 10px;">docker</a> <a href="/tags/dropbox/" style="font-size: 11.43px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/geo/" style="font-size: 12.86px;">geo</a> <a href="/tags/gin/" style="font-size: 10px;">gin</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/go/" style="font-size: 20px;">go</a> <a href="/tags/goquery/" style="font-size: 11.43px;">goquery</a> <a href="/tags/hexo/" style="font-size: 12.86px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 12.86px;">javascript</a> <a href="/tags/js/" style="font-size: 11.43px;">js</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/leetcode/" style="font-size: 10px;">leetcode</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 17.14px;">mysql</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 18.57px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 15.71px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redigo/" style="font-size: 12.86px;">redigo</a> <a href="/tags/redis/" style="font-size: 14.29px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/今日头条/" style="font-size: 10px;">今日头条</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/短网址/" style="font-size: 10px;">短网址</a> <a href="/tags/糗百/" style="font-size: 10px;">糗百</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
     </div>
   </div>
 
@@ -872,7 +918,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
     </div>
   </div>
 
@@ -882,6 +928,10 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
     <h3 class="widget-title">Recents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2017/11/27/multi-stage-builds-in-docker.html">Docker多阶段构建</a>
+          </li>
         
           <li>
             <a href="/2017/09/24/redis-geo-with-redigo-in-golang-part-3.html">Go语言使用redigo操作GEO(3) - 获取范围集合</a>
@@ -897,10 +947,6 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
         
           <li>
             <a href="/2017/08/13/leetcode-array-partition-i.html">LeetCode 561.Array Partition I(数组分区 1) - Go实现</a>
-          </li>
-        
-          <li>
-            <a href="/2017/07/15/create-real-time-chat-app-golang-angular-2-websockets.html">【译】使用Go和Angular通过WebSocket构建实时聊天应用</a>
           </li>
         
       </ul>
