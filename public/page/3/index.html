@@ -62,6 +62,62 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-cant-post-iqiyi-video-to-discuz" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/05/08/cant-post-iqiyi-video-to-discuz.html" class="article-date">
+  <time datetime="2016-05-08T10:57:24.000Z" itemprop="datePublished">2016-05-08</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/javascript/">javascript</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/05/08/cant-post-iqiyi-video-to-discuz.html">解决Discuz无法发布爱奇艺视频的问题</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="/images/discuz/201510148054_136.jpg" alt=""></p>
+<p>最近碰到需要在Discuz论坛中插入爱奇艺视频的问题，之前没关注过，搜索后有些答案说DZ不支持爱奇艺，有些说爱奇艺不支持DZ，并没有真正能解决问题的。</p>
+<p>下午突然想到也许是DZ根据粘贴进来的flash地址生成的标签代码不对，试验后发现果然是这个原因。</p>
+<p>打卡/static/js/editor.js 文件第1299行查看这段代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">case</span> <span class="string">'vid'</span>:</div><div class="line">	<span class="keyword">var</span> mediaUrl = $(ctrlid + <span class="string">'_param_1'</span>).value;</div><div class="line">	<span class="keyword">var</span> auto = <span class="string">''</span>;</div><div class="line">	<span class="keyword">var</span> posque = mediaUrl.lastIndexOf(<span class="string">'?'</span>);</div><div class="line">	posque = posque === <span class="number">-1</span> ? mb_strlen(mediaUrl) : posque;</div><div class="line">	<span class="keyword">var</span> ext = mediaUrl.lastIndexOf(<span class="string">'.'</span>) === <span class="number">-1</span> ? <span class="string">''</span> : mediaUrl.substring(mediaUrl.lastIndexOf(<span class="string">'.'</span>) + <span class="number">1</span>, posque).toLowerCase();</div><div class="line">	ext = in_array(ext, [<span class="string">'mp3'</span>, <span class="string">'wma'</span>, <span class="string">'ra'</span>, <span class="string">'rm'</span>, <span class="string">'ram'</span>, <span class="string">'mid'</span>, <span class="string">'asx'</span>, <span class="string">'wmv'</span>, <span class="string">'avi'</span>, <span class="string">'mpg'</span>, <span class="string">'mpeg'</span>, <span class="string">'rmvb'</span>, <span class="string">'asf'</span>, <span class="string">'mov'</span>, <span class="string">'flv'</span>, <span class="string">'swf'</span>]) ? ext : <span class="string">'x'</span>;</div><div class="line">	<span class="keyword">if</span>(ext == <span class="string">'x'</span>) &#123;</div><div class="line">		<span class="keyword">if</span>(<span class="regexp">/^mms:\/\//</span>.test(mediaUrl)) &#123;</div><div class="line">			ext = <span class="string">'mms'</span>;</div><div class="line">		&#125; <span class="keyword">else</span> <span class="keyword">if</span>(<span class="regexp">/^(rtsp|pnm):\/\//</span>.test(mediaUrl)) &#123;</div><div class="line">			ext = <span class="string">'rtsp'</span>;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">var</span> str = <span class="string">'[media='</span> + ext + <span class="string">','</span> + $(ctrlid + <span class="string">'_param_2'</span>).value + <span class="string">','</span> + $(ctrlid + <span class="string">'_param_3'</span>).value + <span class="string">']'</span> + squarestrip(mediaUrl) + <span class="string">'[/media]'</span>;</div><div class="line">	insertText(str, str.length, <span class="number">0</span>, <span class="literal">false</span>, sel);</div><div class="line">	<span class="keyword">break</span>;</div></pre></td></tr></table></figure>
+<p>Discuz根据主流的视频网站的视频地址格式写的规则，生成discuz专用的[media]标签，在前台输出的时候再解析成embed这样的HTML代码。</p>
+<p>解析之后的差不多就是这样：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">embed</span> <span class="attr">src</span>=<span class="string">"http://player.video.qiyi.com/7b42a1a27ff121c201ee5e6c6d757817/0/0/v_19rrklq2bs.swf-albumId=406283300-tvId=406283300-isPurchase=2-cnId=1"</span> <span class="attr">allowFullScreen</span>=<span class="string">"true"</span> <span class="attr">quality</span>=<span class="string">"high"</span> <span class="attr">width</span>=<span class="string">"480"</span> <span class="attr">height</span>=<span class="string">"350"</span> <span class="attr">align</span>=<span class="string">"middle"</span> <span class="attr">allowScriptAccess</span>=<span class="string">"always"</span> <span class="attr">type</span>=<span class="string">"application/x-shockwave-flash"</span>&gt;</span><span class="tag">&lt;/<span class="name">embed</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>而不那么主流的爱奇艺的flash地址则是：”<a href="http://player.video.qiyi.com/7b42a1a27ff121c201ee5e6c6d757817/0/0/v_19rrklq2bs.swf-albumId=406283300-tvId=406283300-isPurchase=2-cnId=1”，查看上一段代码可以看到，discuz会用正则去看粘贴的地址最后一个&quot;.&quot;后的后缀，如果这个后缀不在自己的已知flash格式数组中，就把类型设为&quot;x&quot;，也就是生成的标签成了[media=x,500,350]。" target="_blank" rel="external">http://player.video.qiyi.com/7b42a1a27ff121c201ee5e6c6d757817/0/0/v_19rrklq2bs.swf-albumId=406283300-tvId=406283300-isPurchase=2-cnId=1”，查看上一段代码可以看到，discuz会用正则去看粘贴的地址最后一个&quot;.&quot;后的后缀，如果这个后缀不在自己的已知flash格式数组中，就把类型设为&quot;x&quot;，也就是生成的标签成了[media=x,500,350]。</a></p>
+<p>再到了前台解析，不认识，直接生成一个a标签。</p>
+<p>所以，我的解决办法是：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span>(ext == <span class="string">'x'</span>) &#123;</div><div class="line">	<span class="keyword">if</span>(<span class="regexp">/^mms:\/\//</span>.test(mediaUrl)) &#123;</div><div class="line">		ext = <span class="string">'mms'</span>;</div><div class="line">	&#125; <span class="keyword">else</span> <span class="keyword">if</span>(<span class="regexp">/^(rtsp|pnm):\/\//</span>.test(mediaUrl)) &#123;</div><div class="line">		ext = <span class="string">'rtsp'</span>;</div><div class="line">	&#125; <span class="keyword">else</span> <span class="keyword">if</span> (mediaUrl.indexOf(<span class="string">'player.video.qiyi.com'</span>)) &#123;</div><div class="line">  		ext = <span class="string">'swf'</span>;	</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>增加一个else if 判断是否包含爱奇艺播放器的域名，当用户粘贴的flash地址包含这个字符串时，就认为是粘贴了一个爱奇艺的视频，存储的格式也就成了[media=swf]。</p>
+<p>但是这里其实不是十分严谨，如果一个非法的flash地址很巧合的包含了这个字符串，也会认为是flash了，那这种情况下就会出错了。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html" data-id="cjdhco0ve000l5p0r086vnmo4" class="article-share-link">Share</a>
+      
+        <a href="https://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/discuz/">discuz</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/爱奇艺/">爱奇艺</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+  
     <article id="post-php-rabbitmq-tutorial-six" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2016/05/03/php-rabbitmq-tutorial-six.html" class="article-date">
@@ -146,7 +202,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html" data-id="cjai7rbvc002kfc0reiw739sj" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html" data-id="cjdhco0w9002k5p0r3u5unnpr" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html#comments" class="article-comment-link">Comments</a>
       
@@ -235,7 +291,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html" data-id="cjai7rbv8002afc0raozxa7xi" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html" data-id="cjdhco0w6002e5p0rtvr2mek4" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html#comments" class="article-comment-link">Comments</a>
       
@@ -316,7 +372,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html" data-id="cjai7rbv9002dfc0rnx3hpwpd" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html" data-id="cjdhco0w8002h5p0ra82ga51i" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html#comments" class="article-comment-link">Comments</a>
       
@@ -417,7 +473,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html" data-id="cjai7rbvc002nfc0r18mv7iwq" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html" data-id="cjdhco0wb002r5p0ra519iim3" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html#comments" class="article-comment-link">Comments</a>
       
@@ -523,7 +579,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html" data-id="cjai7rbve002rfc0rlzfrr4dr" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html" data-id="cjdhco0wf00305p0rox9k8jxm" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html#comments" class="article-comment-link">Comments</a>
       
@@ -622,7 +678,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html" data-id="cjai7rbva002gfc0rlml62dd1" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html" data-id="cjdhco0wa002n5p0rrzwgtmeh" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html#comments" class="article-comment-link">Comments</a>
       
@@ -668,7 +724,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html" data-id="cjai7rbu9000ffc0r5pdmuws4" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html" data-id="cjdhco0va000b5p0rm5ht0mei" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html#comments" class="article-comment-link">Comments</a>
       
@@ -724,7 +780,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html" data-id="cjai7rbu40006fc0rzfyyi6ei" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html" data-id="cjdhco0v600065p0rn5pjsw6d" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html#comments" class="article-comment-link">Comments</a>
       
@@ -781,67 +837,12 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/02/03/MySQL实现row_number .html" data-id="cjai7rbty0001fc0rfvf62lc0" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/02/03/MySQL实现row_number .html" data-id="cjdhco0v400045p0rlqudywym" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/02/03/MySQL实现row_number .html#comments" class="article-comment-link">Comments</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-  
-    <article id="post-echarts-pie" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2016/01/19/echarts-pie.html" class="article-date">
-  <time datetime="2016-01-19T13:27:00.000Z" itemprop="datePublished">2016-01-19</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/javascript/">javascript</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/01/19/echarts-pie.html">ECharts饼图示例</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><img src="/images/BEEC6560-EC03-4027-969D-DBB584A47E69.png" alt=""></p>
-<p>今天写一个做地区分布的饼图的东西。</p>
-<p>由于数据库里本身没有存储地区数据，只有IP，所以也用到了<a href="http://www.ipip.net/" target="_blank" rel="external">高春辉老师目前的项目</a>里提供的IP地址数据库。可以在数据库下载页面下载到免费的数据库文件和一个PHP处理类。</p>
-<p>还用到了百度团队开源的<a href="http://echarts.baidu.com/index.html" target="_blank" rel="external">ECharts</a>，很简单很好用。</p>
-<p>其实事情本身并没有难度。</p>
-<h3 id="约定"><a href="#约定" class="headerlink" title="约定"></a>约定</h3><p>默认为：此时已有一个静态页面，并且已引入echarts的js文件。</p>
-<h3 id="先读取数据"><a href="#先读取数据" class="headerlink" title="先读取数据"></a>先读取数据</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">$sql = &quot;SELECT id,ips FROM table order by id desc limit 100000&quot;;</div><div class="line"></div><div class="line">$pdo = new PDO(&apos;mysql:host=127.0.0.1;dbname=db1&apos;,&apos;root&apos;,&apos;root&apos;);</div><div class="line"></div><div class="line">$query = $pdo -&gt; query($sql);</div><div class="line">$query-&gt;setFetchMode(PDO::FETCH_ASSOC);</div><div class="line">$rs = $query-&gt;fetchAll();</div></pre></td></tr></table></figure>
-<h3 id="根据IP得出所在地信息"><a href="#根据IP得出所在地信息" class="headerlink" title="根据IP得出所在地信息"></a>根据IP得出所在地信息</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">include &apos;./IP.class.php&apos;;//ipip.net提供的IP处理类</div><div class="line">$IP = new IP();</div><div class="line">foreach ($rs as $key =&gt; $value) &#123;</div><div class="line">	$a = $IP-&gt;find($value[&quot;ips&quot;]);</div><div class="line">	$arr[$key] = $a[1].$a[2]; //正确的IP返回的数据为:Array ( [0] =&gt; 中国 [1] =&gt; 黑龙江 [2] =&gt; 鹤岗 [3] =&gt; ) ,这里根据实际情况取对应字段即可。</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="生成echarts所需的数据"><a href="#生成echarts所需的数据" class="headerlink" title="生成echarts所需的数据"></a>生成echarts所需的数据</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$data = array_count_values($arr);</div></pre></td></tr></table></figure>
-<p>嗯，一个非常简单粗暴的把同名地区数量算出来的方法。这样就生成了如array(‘北京’=&gt;2,’天津’=&gt;3)这样的数据。正是echarts所需的。</p>
-<h3 id="饼图区域"><a href="#饼图区域" class="headerlink" title="饼图区域"></a>饼图区域</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;div id=&quot;main&quot; style=&quot;width: 1400px;height:1400px;&quot;&gt;&lt;/div&gt;</div></pre></td></tr></table></figure>
-<h3 id="正经的JS来了"><a href="#正经的JS来了" class="headerlink" title="正经的JS来了"></a>正经的JS来了</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line">var myChart = echarts.init(document.getElementById(&apos;main&apos;));</div><div class="line"></div><div class="line">var option = &#123;</div><div class="line">      </div><div class="line">       title : &#123;</div><div class="line">        text: &apos;IP分布地区&apos;,</div><div class="line">        x:&apos;center&apos;</div><div class="line">    &#125;,</div><div class="line">    tooltip : &#123;</div><div class="line">        trigger: &apos;item&apos;,</div><div class="line">        formatter: &quot;&#123;a&#125; &lt;br/&gt;&#123;b&#125; : &#123;c&#125; (&#123;d&#125;%)&quot;</div><div class="line">    &#125;,</div><div class="line">    legend: &#123;</div><div class="line">        orient: &apos;vertical&apos;,</div><div class="line">        left: &apos;left&apos;,</div><div class="line">        //简单起见此处直接foreach了</div><div class="line">        data: [&lt;?php foreach ($keys as $key =&gt; $value) &#123; echo &apos;&quot;&apos;.$value.&apos;&quot;,&apos;; &#125;?&gt;]</div><div class="line">    &#125;,</div><div class="line">    series : [</div><div class="line">        &#123;</div><div class="line">            name: &apos;IP所在地区&apos;,</div><div class="line">            type: &apos;pie&apos;,</div><div class="line">            radius : &apos;40%&apos;,</div><div class="line">            center: [&apos;50%&apos;, &apos;60%&apos;],</div><div class="line">            data:[</div><div class="line">            	//同上，</div><div class="line">            	&lt;?php </div><div class="line">            		//reset($data);</div><div class="line">					while (list($key, $val) = each($data))&#123;</div><div class="line">						echo &apos;&#123;value:&apos;.$val.&apos;,name:&quot;&apos;.$key.&apos;&quot;&#125;,&apos;;</div><div class="line">					&#125;</div><div class="line">            	?&gt;</div><div class="line">            ],</div><div class="line">            itemStyle: &#123;</div><div class="line">                emphasis: &#123;</div><div class="line">                    shadowBlur: 10,</div><div class="line">                    shadowOffsetX: 0,</div><div class="line">                    shadowColor: &apos;rgba(0, 0, 0, 0.5)&apos;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    ]</div><div class="line">   &#125;;</div><div class="line">   </div><div class="line">   // 使用刚指定的配置项和数据显示图表。</div><div class="line">   myChart.setOption(option);</div></pre></td></tr></table></figure>
-<p>打开页面看一下吧。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/01/19/echarts-pie.html" data-id="cjai7rbum0018fc0rscufi3tf" class="article-share-link">Share</a>
-      
-        <a href="https://www.qichengzx.com/2016/01/19/echarts-pie.html#comments" class="article-comment-link">Comments</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ECharts/">ECharts</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/javascript/">javascript</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/php/">php</a></li></ul>
 
     </footer>
   </div>
@@ -891,7 +892,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">11</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">15</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">11</span></li></ul>
     </div>
   </div>
 
@@ -900,7 +901,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geo/">geo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redigo/">redigo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geo/">geo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redigo/">redigo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -918,7 +919,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
     </div>
   </div>
 
@@ -928,6 +929,10 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
     <h3 class="widget-title">Recents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2018/02/10/get-the-content-type-of-file.html">Go 检测文件内容类型</a>
+          </li>
         
           <li>
             <a href="/2017/11/27/multi-stage-builds-in-docker.html">Docker多阶段构建</a>
@@ -945,10 +950,6 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
             <a href="/2017/09/17/redis-geo-with-redigo-in-golang-part-1.html">Go语言使用redigo操作GEO(1) - 添加和查询</a>
           </li>
         
-          <li>
-            <a href="/2017/08/13/leetcode-array-partition-i.html">LeetCode 561.Array Partition I(数组分区 1) - Go实现</a>
-          </li>
-        
       </ul>
     </div>
   </div>
@@ -961,7 +962,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2017 qichengzx<br>
+      &copy; 2018 qichengzx<br>
       Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
       Hosted by <a href="https://www.vultr.com/?ref=7241986" target="_blank">Vultr</a>
     </div>

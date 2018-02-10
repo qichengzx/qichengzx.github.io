@@ -62,6 +62,61 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-echarts-pie" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/01/19/echarts-pie.html" class="article-date">
+  <time datetime="2016-01-19T13:27:00.000Z" itemprop="datePublished">2016-01-19</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/javascript/">javascript</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/01/19/echarts-pie.html">ECharts饼图示例</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="/images/BEEC6560-EC03-4027-969D-DBB584A47E69.png" alt=""></p>
+<p>今天写一个做地区分布的饼图的东西。</p>
+<p>由于数据库里本身没有存储地区数据，只有IP，所以也用到了<a href="http://www.ipip.net/" target="_blank" rel="external">高春辉老师目前的项目</a>里提供的IP地址数据库。可以在数据库下载页面下载到免费的数据库文件和一个PHP处理类。</p>
+<p>还用到了百度团队开源的<a href="http://echarts.baidu.com/index.html" target="_blank" rel="external">ECharts</a>，很简单很好用。</p>
+<p>其实事情本身并没有难度。</p>
+<h3 id="约定"><a href="#约定" class="headerlink" title="约定"></a>约定</h3><p>默认为：此时已有一个静态页面，并且已引入echarts的js文件。</p>
+<h3 id="先读取数据"><a href="#先读取数据" class="headerlink" title="先读取数据"></a>先读取数据</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">$sql = &quot;SELECT id,ips FROM table order by id desc limit 100000&quot;;</div><div class="line"></div><div class="line">$pdo = new PDO(&apos;mysql:host=127.0.0.1;dbname=db1&apos;,&apos;root&apos;,&apos;root&apos;);</div><div class="line"></div><div class="line">$query = $pdo -&gt; query($sql);</div><div class="line">$query-&gt;setFetchMode(PDO::FETCH_ASSOC);</div><div class="line">$rs = $query-&gt;fetchAll();</div></pre></td></tr></table></figure>
+<h3 id="根据IP得出所在地信息"><a href="#根据IP得出所在地信息" class="headerlink" title="根据IP得出所在地信息"></a>根据IP得出所在地信息</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">include &apos;./IP.class.php&apos;;//ipip.net提供的IP处理类</div><div class="line">$IP = new IP();</div><div class="line">foreach ($rs as $key =&gt; $value) &#123;</div><div class="line">	$a = $IP-&gt;find($value[&quot;ips&quot;]);</div><div class="line">	$arr[$key] = $a[1].$a[2]; //正确的IP返回的数据为:Array ( [0] =&gt; 中国 [1] =&gt; 黑龙江 [2] =&gt; 鹤岗 [3] =&gt; ) ,这里根据实际情况取对应字段即可。</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="生成echarts所需的数据"><a href="#生成echarts所需的数据" class="headerlink" title="生成echarts所需的数据"></a>生成echarts所需的数据</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$data = array_count_values($arr);</div></pre></td></tr></table></figure>
+<p>嗯，一个非常简单粗暴的把同名地区数量算出来的方法。这样就生成了如array(‘北京’=&gt;2,’天津’=&gt;3)这样的数据。正是echarts所需的。</p>
+<h3 id="饼图区域"><a href="#饼图区域" class="headerlink" title="饼图区域"></a>饼图区域</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;div id=&quot;main&quot; style=&quot;width: 1400px;height:1400px;&quot;&gt;&lt;/div&gt;</div></pre></td></tr></table></figure>
+<h3 id="正经的JS来了"><a href="#正经的JS来了" class="headerlink" title="正经的JS来了"></a>正经的JS来了</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line">var myChart = echarts.init(document.getElementById(&apos;main&apos;));</div><div class="line"></div><div class="line">var option = &#123;</div><div class="line">      </div><div class="line">       title : &#123;</div><div class="line">        text: &apos;IP分布地区&apos;,</div><div class="line">        x:&apos;center&apos;</div><div class="line">    &#125;,</div><div class="line">    tooltip : &#123;</div><div class="line">        trigger: &apos;item&apos;,</div><div class="line">        formatter: &quot;&#123;a&#125; &lt;br/&gt;&#123;b&#125; : &#123;c&#125; (&#123;d&#125;%)&quot;</div><div class="line">    &#125;,</div><div class="line">    legend: &#123;</div><div class="line">        orient: &apos;vertical&apos;,</div><div class="line">        left: &apos;left&apos;,</div><div class="line">        //简单起见此处直接foreach了</div><div class="line">        data: [&lt;?php foreach ($keys as $key =&gt; $value) &#123; echo &apos;&quot;&apos;.$value.&apos;&quot;,&apos;; &#125;?&gt;]</div><div class="line">    &#125;,</div><div class="line">    series : [</div><div class="line">        &#123;</div><div class="line">            name: &apos;IP所在地区&apos;,</div><div class="line">            type: &apos;pie&apos;,</div><div class="line">            radius : &apos;40%&apos;,</div><div class="line">            center: [&apos;50%&apos;, &apos;60%&apos;],</div><div class="line">            data:[</div><div class="line">            	//同上，</div><div class="line">            	&lt;?php </div><div class="line">            		//reset($data);</div><div class="line">					while (list($key, $val) = each($data))&#123;</div><div class="line">						echo &apos;&#123;value:&apos;.$val.&apos;,name:&quot;&apos;.$key.&apos;&quot;&#125;,&apos;;</div><div class="line">					&#125;</div><div class="line">            	?&gt;</div><div class="line">            ],</div><div class="line">            itemStyle: &#123;</div><div class="line">                emphasis: &#123;</div><div class="line">                    shadowBlur: 10,</div><div class="line">                    shadowOffsetX: 0,</div><div class="line">                    shadowColor: &apos;rgba(0, 0, 0, 0.5)&apos;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    ]</div><div class="line">   &#125;;</div><div class="line">   </div><div class="line">   // 使用刚指定的配置项和数据显示图表。</div><div class="line">   myChart.setOption(option);</div></pre></td></tr></table></figure>
+<p>打开页面看一下吧。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://www.qichengzx.com/2016/01/19/echarts-pie.html" data-id="cjdhco0vq001c5p0rtqxsz8ls" class="article-share-link">Share</a>
+      
+        <a href="https://www.qichengzx.com/2016/01/19/echarts-pie.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ECharts/">ECharts</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/javascript/">javascript</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/php/">php</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+  
     <article id="post-placeholder-animate" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2016/01/11/placeholder-animate.html" class="article-date">
@@ -100,7 +155,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/01/11/placeholder-animate.html" data-id="cjai7rbvf002tfc0re086uwk7" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/01/11/placeholder-animate.html" data-id="cjdhco0wc002u5p0rado7bf6w" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/01/11/placeholder-animate.html#comments" class="article-comment-link">Comments</a>
       
@@ -178,7 +233,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html" data-id="cjai7rbua000hfc0rs056q46i" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html" data-id="cjdhco0vd000h5p0rkinj5eoq" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html#comments" class="article-comment-link">Comments</a>
       
@@ -248,7 +303,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html" data-id="cjai7rbuk0014fc0r42byp0ff" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html" data-id="cjdhco0vp00195p0r7gpvjw16" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html#comments" class="article-comment-link">Comments</a>
       
@@ -332,7 +387,7 @@ privkey.pem: 证书私钥
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html" data-id="cjai7rbvk0038fc0ru5sk80yn" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html" data-id="cjdhco0wj003c5p0rhe2db6wc" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html#comments" class="article-comment-link">Comments</a>
       
@@ -388,7 +443,7 @@ privkey.pem: 证书私钥
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html" data-id="cjai7rbvg002vfc0rb25jadlp" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html" data-id="cjdhco0wd002w5p0rl9484r7r" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html#comments" class="article-comment-link">Comments</a>
       
@@ -452,7 +507,7 @@ privkey.pem: 证书私钥
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/03/nodejs-mysql.html" data-id="cjai7rbv70027fc0rxkortu7b" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/12/03/nodejs-mysql.html" data-id="cjdhco0w100215p0rsnxjxrcu" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/12/03/nodejs-mysql.html#comments" class="article-comment-link">Comments</a>
       
@@ -505,7 +560,7 @@ privkey.pem: 证书私钥
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html" data-id="cjai7rbun001bfc0r3s4ebat3" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html" data-id="cjdhco0vs001h5p0r6a3ugrcw" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html#comments" class="article-comment-link">Comments</a>
       
@@ -553,7 +608,7 @@ privkey.pem: 证书私钥
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/17/js-names.html" data-id="cjai7rbut001sfc0r9w7wwa4p" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/17/js-names.html" data-id="cjdhco0vz001y5p0roo0pyhh5" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/17/js-names.html#comments" class="article-comment-link">Comments</a>
       
@@ -679,336 +734,12 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html" data-id="cjai7rbuj0011fc0rpn2m6p84" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html" data-id="cjdhco0vi000t5p0rd1r2qoe3" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html#comments" class="article-comment-link">Comments</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dropbox/">dropbox</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hexo/">hexo</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-  
-    <article id="post-time-widget-for-hexo" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2015/11/11/time-widget-for-hexo.html" class="article-date">
-  <time datetime="2015-11-11T06:16:29.000Z" itemprop="datePublished">2015-11-11</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2015/11/11/time-widget-for-hexo.html">为hexo加一个时钟小挂件</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>之前在 <a href="http://segmentfault.com/a/1190000003055672" target="_blank" rel="external">HTML+CSS3再加一点点JS做的一个小时钟</a> 看到的这个问题，觉得很好把代码存下来了，今天突发奇想把它放到hexo的新博客上。</p>
-<h3 id="STEP-0"><a href="#STEP-0" class="headerlink" title="STEP 0"></a>STEP 0</h3><p>把HTML内容放到新建的模板里，我命名为time.ejs。</p>
-<pre><code>    &lt;div class=&quot;widget-wrap&quot;&gt;
-    &lt;h3 class=&quot;widget-title&quot;&gt;Time&lt;/h3&gt;
-    &lt;div class=&quot;widget time&quot;&gt;
-        &lt;style id=&quot;clock-animations&quot;&gt;&lt;/style&gt;
-        &lt;div class=&quot;clock-wrapper&quot;&gt;
-            &lt;div class=&quot;clock-base&quot;&gt;
-                    &lt;div class=&quot;clock-indicator&quot;&gt;
-                        &lt;div&gt;&lt;/div&gt;
-                        &lt;div&gt;&lt;/div&gt;
-                        &lt;div&gt;&lt;/div&gt;
-                        &lt;div&gt;&lt;/div&gt;
-                        &lt;div&gt;&lt;/div&gt;
-                        &lt;div&gt;&lt;/div&gt;
-                        &lt;div&gt;&lt;/div&gt;
-                        &lt;div&gt;&lt;/div&gt;
-                        &lt;div&gt;&lt;/div&gt;
-                        &lt;div&gt;&lt;/div&gt;
-                        &lt;div&gt;&lt;/div&gt;
-                        &lt;div&gt;&lt;/div&gt;
-                    &lt;/div&gt;
-                    &lt;div class=&quot;clock-hour&quot;&gt;&lt;/div&gt;
-                    &lt;div class=&quot;clock-minute&quot;&gt;&lt;/div&gt;
-                    &lt;div class=&quot;clock-second&quot;&gt;&lt;/div&gt;
-                    &lt;div class=&quot;clock-center&quot;&gt;&lt;/div&gt;
-            &lt;/div&gt;
-        &lt;/div&gt;
-    &lt;/div&gt;
-&lt;/div&gt;
-</code></pre><p>原文中<code>&lt;style id=&quot;clock-animations&quot;&gt;&lt;/style&gt;</code>是放在head区域的，为了减小对全局的影响，我拿到这个挂件中了，实际上并没有影响。</p>
-<p>这里要注意挂件的代码结构要尽量与主题自带的结构一致。（仅仅是为了好看，和好整理）</p>
-<p>当然了，这个文件要放在<code>layout/_widget</code>下。</p>
-<h3 id="STEP-1"><a href="#STEP-1" class="headerlink" title="STEP 1"></a>STEP 1</h3><p>js脚本</p>
-<p>由于脚本内容较少，我就直接放在了script.js中，文件位置再source/js。</p>
-<pre><code>var now = new Date();
-  var second = now.getSeconds();
-  var minute = now.getMinutes();
-  var hour = now.getHours();
-  if (hour &gt; 12) {
-      hour = hour - 12;
-  }
-  hourDeg   = hour * 30 + now.getMinutes() / 60 * 30;
-  minuteDeg = now.getMinutes() * 6;
-  secondDeg = now.getSeconds() * 6;
-  stylesDeg = [
-      &quot;@keyframes rotate-hour{ from{transform:rotate(&quot; + hourDeg + &quot;deg);}to{transform:rotate(&quot; + (hourDeg + 360) + &quot;deg);}}&quot;,
-      &quot;@keyframes rotate-minute{from{transform:rotate(&quot; + minuteDeg + &quot;deg);}to{transform:rotate(&quot; + (minuteDeg + 360) + &quot;deg);}}&quot;,
-      &quot;@keyframes rotate-second{from{transform:rotate(&quot; + secondDeg + &quot;deg);}to{transform:rotate(&quot; + (secondDeg + 360) + &quot;deg);}}&quot;,
-      &quot;@-moz-keyframes rotate-hour{ from{transform:rotate(&quot; + hourDeg + &quot;deg);}to{transform:rotate(&quot; + (hourDeg + 360) + &quot;deg);}}&quot;,
-      &quot;@-moz-keyframes rotate-minute{from{transform:rotate(&quot; + minuteDeg + &quot;deg);}to{transform:rotate(&quot; + (minuteDeg + 360) + &quot;deg);}}&quot;,
-      &quot;@-moz-keyframes rotate-second{from{transform:rotate(&quot; + secondDeg + &quot;deg);}to{transform:rotate(&quot; + (secondDeg + 360) + &quot;deg);}}&quot;,
-      &quot;@-webkit-keyframes rotate-hour{from{transform:rotate(&quot; + hourDeg + &quot;deg);}to{transform:rotate(&quot; + (hourDeg + 360) + &quot;deg);}}&quot;,
-      &quot;@-webkit-keyframes rotate-minute{from{transform:rotate(&quot; + minuteDeg + &quot;deg);}to{transform:rotate(&quot; + (minuteDeg + 360) + &quot;deg);}}&quot;,
-      &quot;@-webkit-keyframes rotate-second{from{transform:rotate(&quot; + secondDeg + &quot;deg);}to{transform:rotate(&quot; + (secondDeg + 360) + &quot;deg);}}&quot;
-  ].join(&quot;&quot;);
-  $(&apos;#clock-animations&apos;).html(stylesDeg);
-</code></pre><h3 id="STEP-2"><a href="#STEP-2" class="headerlink" title="STEP 2"></a>STEP 2</h3><p>CSS样式</p>
-<p>新建文件time.styl，路径为<code>/source/css/_partial/time.styl</code></p>
-<p>内容略多，主要是给多浏览器写前缀。</p>
-<pre><code>.clock-wrapper {
-    position: relative;
-    height: 250px;
-    width: 250px;
-    background-image: linear-gradient(#f7f7f7,#e0e0e0);
-    border-radius: 50%;
-    box-shadow: 0 10px 15px rgba(0,0,0,.15),0 2px 2px rgba(0,0,0,.2);
-}
-.clock-base {
-    width: 250px;
-    height: 250px;
-    background-color: #eee;
-    border-radius: 50%;
-    box-shadow: 0 0 5px #eee;
-}
-.clock-indicator {
-    z-index: 1;
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    width: 230px;
-    height: 230px;
-}
-.clock-indicator div {
-    position: absolute;
-    width: 2px;
-    height: 4px;
-    margin: 113px 114px;
-    background-color: #a4a4a4;
-}
-.clock-indicator div:nth-child(1) {
-    transform:rotate(30deg) translateY(-113px);
-    -ms-transform:rotate(30deg) translateY(-113px);     /* IE 9 */
-    -moz-transform:rotate(30deg) translateY(-113px);    /* Firefox */
-    -webkit-transform:rotate(30deg) translateY(-113px); /* Safari 和 Chrome */
-    -o-transform:rotate(30deg) translateY(-113px);  /* Opera */        }
-    .clock-indicator div:nth-child(2) {
-    transform:rotate(60deg) translateY(-113px);
-    -ms-transform:rotate(60deg) translateY(-113px);     /* IE 9 */
-    -moz-transform:rotate(60deg) translateY(-113px);    /* Firefox */
-    -webkit-transform:rotate(60deg) translateY(-113px); /* Safari 和 Chrome */
-    -o-transform:rotate(60deg) translateY(-113px);  /* Opera */
-}
-.clock-indicator div:nth-child(3) {
-    transform:rotate(90deg) translateY(-113px);
-    -ms-transform:rotate(90deg) translateY(-113px);     /* IE 9 */
-    -moz-transform:rotate(90deg) translateY(-113px);    /* Firefox */
-    -webkit-transform:rotate(90deg) translateY(-113px); /* Safari 和 Chrome */
-    -o-transform:rotate(90deg) translateY(-113px);  /* Opera */
-    background-color: #5a5a5a;
-}
-.clock-indicator div:nth-child(4) {
-    transform:rotate(120deg) translateY(-113px);
-    -ms-transform:rotate(120deg) translateY(-113px);    /* IE 9 */
-    -moz-transform:rotate(120deg) translateY(-113px);   /* Firefox */
-    -webkit-transform:rotate(120deg) translateY(-113px); /* Safari 和 Chrome */
-    -o-transform:rotate(120deg) translateY(-113px);     /* Opera */
-}
-.clock-indicator div:nth-child(5) {
-    transform:rotate(150deg) translateY(-113px);
-    -ms-transform:rotate(150deg) translateY(-113px);    /* IE 9 */
-    -moz-transform:rotate(150deg) translateY(-113px);   /* Firefox */
-    -webkit-transform:rotate(150deg) translateY(-113px); /* Safari 和 Chrome */
-    -o-transform:rotate(150deg) translateY(-113px);     /* Opera */
-}
-.clock-indicator div:nth-child(6) {
-    transform:rotate(180deg) translateY(-113px);
-    -ms-transform:rotate(180deg) translateY(-113px);    /* IE 9 */
-    -moz-transform:rotate(180deg) translateY(-113px);   /* Firefox */
-    -webkit-transform:rotate(180deg) translateY(-113px); /* Safari 和 Chrome */
-    -o-transform:rotate(180deg) translateY(-113px);     /* Opera */
-    background-color: #5a5a5a;
-}
-.clock-indicator div:nth-child(7) {
-    transform:rotate(210deg) translateY(-113px);
-    -ms-transform:rotate(210deg) translateY(-113px);    /* IE 9 */
-    -moz-transform:rotate(210deg) translateY(-113px);   /* Firefox */
-    -webkit-transform:rotate(210deg) translateY(-113px); /* Safari 和 Chrome */
-    -o-transform:rotate(210deg) translateY(-113px);     /* Opera */
-}
-.clock-indicator div:nth-child(8) {
-    transform:rotate(240deg) translateY(-113px);
-    -ms-transform:rotate(240deg) translateY(-113px);    /* IE 9 */
-    -moz-transform:rotate(240deg) translateY(-113px);   /* Firefox */
-    -webkit-transform:rotate(240deg) translateY(-113px); /* Safari 和 Chrome */
-    -o-transform:rotate(240deg) translateY(-113px);     /* Opera */
-}
-.clock-indicator div:nth-child(9) {
-    transform:rotate(270deg) translateY(-113px);
-    -ms-transform:rotate(270deg) translateY(-113px);    /* IE 9 */
-    -moz-transform:rotate(270deg) translateY(-113px);   /* Firefox */
-    -webkit-transform:rotate(270deg) translateY(-113px); /* Safari 和 Chrome */
-    -o-transform:rotate(270deg) translateY(-113px);     /* Opera */
-    background-color: #5a5a5a;
-}
-.clock-indicator div:nth-child(10) {
-    transform:rotate(300deg) translateY(-113px);
-    -ms-transform:rotate(300deg) translateY(-113px);    /* IE 9 */
-    -moz-transform:rotate(300deg) translateY(-113px);   /* Firefox */
-    -webkit-transform:rotate(300deg) translateY(-113px); /* Safari 和 Chrome */
-    -o-transform:rotate(300deg) translateY(-113px);     /* Opera */
-}
-.clock-indicator div:nth-child(11) {
-    transform:rotate(330deg) translateY(-113px);
-    -ms-transform:rotate(330deg) translateY(-113px);    /* IE 9 */
-    -moz-transform:rotate(330deg) translateY(-113px);   /* Firefox */
-    -webkit-transform:rotate(330deg) translateY(-113px); /* Safari 和 Chrome */
-    -o-transform:rotate(330deg) translateY(-113px);     /* Opera */
-}
-.clock-indicator div:nth-child(12) {
-    transform:rotate(360deg) translateY(-113px);
-    -ms-transform:rotate(360deg) translateY(-113px);    /* IE 9 */
-    -moz-transform:rotate(360deg) translateY(-113px);   /* Firefox */
-    -webkit-transform:rotate(360deg) translateY(-113px); /* Safari 和 Chrome */
-    -o-transform:rotate(360deg) translateY(-113px);     /* Opera */
-    background-color: #5a5a5a;
-}
-.clock-hour {
-    z-index: 2;
-    position: absolute;
-    left: 128px;
-    top: 80px;
-    width: 4px;
-    height: 65px;
-    border-radius: 2px;
-    background-color: #555;
-    box-shadow: 0 0 2px rgba(0,0,0,0.2); 
-    transform-origin: 2px 50px;
-    -moz-transform-origin: 2px 50px;
-    -ms-transform-origin: 2px 50px;
-    -o-transform-origin: 2px 50px;
-    -webkit-transform-origin: 2px 50px;
-    transition: 1s;
-    -moz-transition: 1s; /* Firefox 4 */
-    -webkit-transition: 1s; /* Safari 和 Chrome */
-    -o-transition: 1s; /* Opera */
-    animation:rotate-hour 43200s linear infinite;
-    -webkit-animation: rotate-hour 43200s linear infinite; /* Safari 和 Chrome */
-}
-.clock-minute {
-    z-index: 3;
-    position: absolute;
-    left: 128px;
-    top: 60px;
-    width: 4px;
-    height: 85px;
-    border-radius: 2px;
-    background-color: #555;
-    box-shadow: 0 0 2px rgba(0,0,0,0.2); 
-    transition: 1s;
-    -moz-transition: 1s; /* Firefox 4 */
-    -webkit-transition: 1s; /* Safari 和 Chrome */
-    -o-transition: 1s; /* Opera */
-    transform-origin: 2px 70px;
-    -moz-transform-origin: 2px 70px;
-    -ms-transform-origin: 2px 70px;
-    -o-transform-origin: 2px 70px;
-    -webkit-transform-origin: 2px 70px;
-    animation:rotate-minute 3600s linear infinite;
-    -webkit-animation: rotate-minute 3600s linear infinite; /* Safari 和 Chrome */
-}
-.clock-second {
-    z-index: 4;
-    position: absolute;
-    left: 129px;
-    top: 15px;
-    width: 2px;
-    height: 140px;
-    border-radius: 2px;
-    background-color: #a00;
-    box-shadow: 0 0 1px rgba(0,0,0,0.2); 
-    transform-origin: 1px 115px;
-    -moz-transform-origin: 1px 115px;
-    -ms-transform-origin: 1px 115px;
-    -o-transform-origin: 1px 115px;
-    -webkit-transform-origin: 1px 115px;
-    transition: 1s;
-    -moz-transition: 1s; /* Firefox 4 */
-    -webkit-transition: 1s; /* Safari 和 Chrome */
-    -o-transition: 1s; /* Opera */
-    animation:rotate-hour 60s linear infinite;
-     -webkit-animation: rotate-second 60s linear infinite;  /* Safari 和 Chrome */
-}
-.clock-second:after {
-    content: &quot;&quot;;
-    display: block;
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    left: -3px;
-    top:110px;
-    background-color: #a00;
-    box-shadow: 0 0 3px rgba(0,0,0,0.2);
-}
-.clock-center {
-    z-index: 1;
-    position: absolute;
-    left: 55px;
-    top: 55px;
-    background-image: linear-gradient(#e3e3e3,#f7f7f7); 
-    border-radius: 50%;
-    width: 150px;
-    height: 150px;
-    box-shadow: inset 0 -1px 0 #fafafa, inset 0 1px 0 #e3e3e3;
-}
-.clock-center:after{
-    content: &quot;&quot;;
-    display: block;
-    width: 20px;
-    height: 20px;
-    margin: 65px;
-    background-color: #ddd;
-    border-radius: 50%;
-}
-</code></pre><p> 之后，在sidebar.styl 末尾加入 <code>@import &quot;time&quot;</code>,这是styl的语法，表示引入一个文件，因为两个文件是同级，所以可以直接这么写，加<code>./</code>也可以。</p>
-<h3 id="STEP-3"><a href="#STEP-3" class="headerlink" title="STEP 3"></a>STEP 3</h3><p>最后，在themes的config文件中注册这个挂件。</p>
-<p>在_config.yml中，找到<code>widgets</code>，在你想要加的位置中加入 <code>- time</code>，即模板文件名。<br>比如我的widgets变成了这样：</p>
-<pre><code>widgets:
-- clock
-- category
-- tag
-- tagcloud
-- archive
-- recent_posts
-</code></pre><h3 id="LAST"><a href="#LAST" class="headerlink" title="LAST"></a>LAST</h3><p>至此，就全部完事，可以去<code>hexo generate</code>或<code>hexo server</code>了。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html" data-id="cjai7rbvm003dfc0rw4o10ta8" class="article-share-link">Share</a>
-      
-        <a href="https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html#comments" class="article-comment-link">Comments</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hexo/">hexo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/time/">time</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/widget/">widget</a></li></ul>
 
     </footer>
   </div>
@@ -1058,7 +789,7 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">11</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">15</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">11</span></li></ul>
     </div>
   </div>
 
@@ -1067,7 +798,7 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geo/">geo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redigo/">redigo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geo/">geo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redigo/">redigo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -1085,7 +816,7 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
     </div>
   </div>
 
@@ -1095,6 +826,10 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
     <h3 class="widget-title">Recents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2018/02/10/get-the-content-type-of-file.html">Go 检测文件内容类型</a>
+          </li>
         
           <li>
             <a href="/2017/11/27/multi-stage-builds-in-docker.html">Docker多阶段构建</a>
@@ -1112,10 +847,6 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
             <a href="/2017/09/17/redis-geo-with-redigo-in-golang-part-1.html">Go语言使用redigo操作GEO(1) - 添加和查询</a>
           </li>
         
-          <li>
-            <a href="/2017/08/13/leetcode-array-partition-i.html">LeetCode 561.Array Partition I(数组分区 1) - Go实现</a>
-          </li>
-        
       </ul>
     </div>
   </div>
@@ -1128,7 +859,7 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2017 qichengzx<br>
+      &copy; 2018 qichengzx<br>
       Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
       Hosted by <a href="https://www.vultr.com/?ref=7241986" target="_blank">Vultr</a>
     </div>
