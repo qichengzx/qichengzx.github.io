@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://www.qichengzx.com/"/>
-  <updated>2018-02-11T13:26:00.595Z</updated>
+  <updated>2018-02-25T13:50:11.304Z</updated>
   <id>https://www.qichengzx.com/</id>
   
   <author>
@@ -17,13 +17,39 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Go slice，struct排序</title>
+    <link href="https://www.qichengzx.com/2018/02/25/how-to-sort-in-go.html"/>
+    <id>https://www.qichengzx.com/2018/02/25/how-to-sort-in-go.html</id>
+    <published>2018-02-25T13:40:16.000Z</published>
+    <updated>2018-02-25T13:50:11.304Z</updated>
+    
+    <content type="html"><![CDATA[<p>Go中有时会需要对slice，或多个struct进行排序，其实很简单。</p><h2 id="slice"><a href="#slice" class="headerlink" title="slice"></a>slice</h2><p>对于 slice 的排序，可以直接使用 sort 包提供的方法，</p><h4 id="int"><a href="#int" class="headerlink" title="int"></a>int</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">s := []<span class="keyword">int</span>&#123;<span class="number">3</span>,<span class="number">2</span>,<span class="number">4</span>,<span class="number">1</span>&#125;</div><div class="line">sort.Ints(s)</div><div class="line">fmt.Println(s) <span class="comment">// [1,2,3,4]</span></div></pre></td></tr></table></figure><h4 id="string"><a href="#string" class="headerlink" title="string"></a>string</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">s := []<span class="keyword">string</span>&#123;<span class="string">"Go"</span>, <span class="string">"Bravo"</span>, <span class="string">"Gopher"</span>, <span class="string">"Alpha"</span>, <span class="string">"Grin"</span>, <span class="string">"Delta"</span>&#125;</div><div class="line">sort.Strings(s)</div><div class="line">fmt.Println(s) <span class="comment">// [Alpha Bravo Delta Go Gopher Grin]</span></div></pre></td></tr></table></figure><h4 id="float"><a href="#float" class="headerlink" title="float"></a>float</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">s := []<span class="keyword">float64</span>&#123;<span class="number">5.2</span>, <span class="number">-1.3</span>, <span class="number">0.7</span>, <span class="number">-3.8</span>, <span class="number">2.6</span>&#125; </div><div class="line">sort.Float64s(s)</div><div class="line">fmt.Println(s) <span class="comment">// [-3.8,-1.3,0.7,2.6,5.2]</span></div></pre></td></tr></table></figure><h2 id="struct"><a href="#struct" class="headerlink" title="struct"></a>struct</h2><p>以上都是 sort 默认提供的方法，但是对于 struct ，就需要自己实现 sort.Interface。</p><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">type</span> Person <span class="keyword">struct</span> &#123;</div><div class="line">Name <span class="keyword">string</span></div><div class="line">Age <span class="keyword">int</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">type</span> byAge []Person</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(a ByAge)</span> <span class="title">Len</span><span class="params">()</span> <span class="title">int</span></span>           &#123; <span class="keyword">return</span> <span class="built_in">len</span>(a) &#125;</div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(a ByAge)</span> <span class="title">Less</span><span class="params">(i, j <span class="keyword">int</span>)</span> <span class="title">bool</span></span> &#123; <span class="keyword">return</span> a[i].Age &lt; a[j].Age &#125;</div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(a ByAge)</span> <span class="title">Swap</span><span class="params">(i, j <span class="keyword">int</span>)</span></span>      &#123; a[i], a[j] = a[j], a[i] &#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</div><div class="line">    family := []Person&#123;</div><div class="line">        &#123;<span class="string">"Alice"</span>, <span class="number">23</span>&#125;,</div><div class="line">        &#123;<span class="string">"Eve"</span>, <span class="number">2</span>&#125;,</div><div class="line">        &#123;<span class="string">"Bob"</span>, <span class="number">25</span>&#125;,</div><div class="line">    &#125;</div><div class="line">    sort.Sort(ByAge(family))</div><div class="line">    fmt.Println(family) <span class="comment">// [&#123;Eve 2&#125; &#123;Alice 23&#125; &#123;Bob 25&#125;]</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;Go中有时会需要对slice，或多个struct进行排序，其实很简单。&lt;/p&gt;
+&lt;h2 id=&quot;slice&quot;&gt;&lt;a href=&quot;#slice&quot; class=&quot;headerlink&quot; title=&quot;slice&quot;&gt;&lt;/a&gt;slice&lt;/h2&gt;&lt;p&gt;对于 slice 的排序，可以
+      
+    
+    </summary>
+    
+      <category term="golang" scheme="https://www.qichengzx.com/categories/golang/"/>
+    
+    
+      <category term="go" scheme="https://www.qichengzx.com/tags/go/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Go struct 转 map 使用自定义标签</title>
     <link href="https://www.qichengzx.com/2018/02/11/go-struct-tag.html"/>
     <id>https://www.qichengzx.com/2018/02/11/go-struct-tag.html</id>
     <published>2018-02-11T13:06:00.000Z</published>
-    <updated>2018-02-11T13:26:00.595Z</updated>
+    <updated>2018-02-11T13:38:25.186Z</updated>
     
-    <content type="html"><![CDATA[<p>今天工作遇到一个问题，之前将 struct 转 map 的时候，没有注意 field 大小写的问题，具体的说，是没有注意 field name 与实际需要的 name 的区别，其实就是需要自定义转为 map 之后的name，今天发现问题后，看了下引用包的源码，发现是可以<a href="https://godoc.org/github.com/fatih/structs#Struct.Map" target="_blank" rel="external">自定义标签</a>的，就跟 struct 转 JSON 一样。</p><p>代码也很简单，加上 <code>structs:&quot;name&quot;</code>  即可。</p><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> main</div><div class="line"></div><div class="line"><span class="keyword">import</span> (</div><div class="line"><span class="string">"fmt"</span></div><div class="line"><span class="string">"github.com/fatih/structs"</span></div><div class="line">)</div><div class="line"></div><div class="line"><span class="keyword">type</span> Server <span class="keyword">struct</span> &#123;</div><div class="line">Name <span class="keyword">string</span> <span class="string">`structs:"server_name"`</span></div><div class="line">ID <span class="keyword">int</span> <span class="string">`structs:"server_id"`</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span>&#123;</div><div class="line">server := &amp;Server&#123;</div><div class="line">Name:    <span class="string">"gopher"</span>,</div><div class="line">ID:      <span class="number">123456</span>,</div><div class="line">&#125;</div><div class="line"></div><div class="line">fmt.Printf(<span class="string">"struct : %v\n"</span>,server)</div><div class="line"></div><div class="line">serverMap := structs.Map(server)</div><div class="line">fmt.Printf(<span class="string">"map : %v\n"</span>,serverMap)</div><div class="line">&#125;</div></pre></td></tr></table></figure><p>这样就可以拿到自定义key的map了。</p>]]></content>
+    <content type="html"><![CDATA[<p>今天工作遇到一个问题，之前将 struct 转 map 的时候，没有注意 field 大小写的问题，具体的说，是没有注意 field name 与实际需要的 name 的区别，其实就是需要自定义转为 map 之后的name，今天发现问题后，看了下引用包的源码，发现是可以<a href="https://godoc.org/github.com/fatih/structs#Struct.Map" target="_blank" rel="external">自定义标签</a>的，就跟 struct 转 JSON 一样。</p><p>代码也很简单，加上 `<code>structs:&quot;name&quot;</code>`  即可。</p><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> main</div><div class="line"></div><div class="line"><span class="keyword">import</span> (</div><div class="line"><span class="string">"fmt"</span></div><div class="line"><span class="string">"github.com/fatih/structs"</span></div><div class="line">)</div><div class="line"></div><div class="line"><span class="keyword">type</span> Server <span class="keyword">struct</span> &#123;</div><div class="line">Name <span class="keyword">string</span> <span class="string">`structs:"server_name"`</span></div><div class="line">ID   <span class="keyword">int</span>    <span class="string">`structs:"server_id"`</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</div><div class="line">server := &amp;Server&#123;</div><div class="line">Name: <span class="string">"gopher"</span>,</div><div class="line">ID:   <span class="number">123456</span>,</div><div class="line">&#125;</div><div class="line"></div><div class="line">fmt.Printf(<span class="string">"struct : %v\n"</span>, server) <span class="comment">//struct : &amp;&#123;gopher 123456&#125;</span></div><div class="line"></div><div class="line">serverMap := structs.Map(server)</div><div class="line"></div><div class="line">fmt.Printf(<span class="string">"map : %v\n"</span>, serverMap) <span class="comment">//map : map[server_name:gopher server_id:123456]</span></div></pre></td></tr></table></figure><p>这样就可以拿到自定义key的map了。</p>]]></content>
     
     <summary type="html">
     
@@ -539,34 +565,6 @@
     
     
       <category term="go" scheme="https://www.qichengzx.com/tags/go/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>PHP Curl 上传文件</title>
-    <link href="https://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html"/>
-    <id>https://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html</id>
-    <published>2016-07-02T15:11:30.000Z</published>
-    <updated>2016-07-03T01:14:00.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>有时候会遇到上传文件给第三方服务的情况，比如本身程序并不需要存储附件，而是把附件发送给一个公共的服务。</p><p>最近正好碰到这个问题，记录一下。</p><p>上代码。</p><h4 id="发送端："><a href="#发送端：" class="headerlink" title="发送端："></a>发送端：</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&lt;?php</span></div><div class="line"></div><div class="line"><span class="comment">// 接口地址</span></div><div class="line">$api = <span class="string">'http://api.example.com/uploadfile'</span>;</div><div class="line">$file = $_FILES[<span class="string">'file'</span>];<span class="comment">//保存$_FILES到变量中。</span></div><div class="line"></div><div class="line"><span class="comment">// 此处可能存在上传失败等问题，需验证$_FILES["file"]["error"]。</span></div><div class="line"><span class="comment">// 做业务对应的规则验证，如文件格式，文件大小等。</span></div><div class="line"></div><div class="line"><span class="comment">// 创建一个 cURL 句柄</span></div><div class="line">$ch = curl_init($api);</div><div class="line"></div><div class="line"><span class="comment">// 创建一个 CURLFile 对象</span></div><div class="line"><span class="comment">// 上传文件的路径，文件的Mimetype，文件名</span></div><div class="line">$cfile = curl_file_create($file[<span class="string">'tmp_name'</span>],$file[<span class="string">'type'</span>],$file[<span class="string">'name'</span>]);</div><div class="line"></div><div class="line">$data = [</div><div class="line"><span class="string">'type'</span>=&gt;<span class="string">'image'</span>,</div><div class="line"><span class="string">'data'</span>=&gt;$cfile</div><div class="line">];</div><div class="line"></div><div class="line"><span class="comment">// 设置 POST 数据</span></div><div class="line">curl_setopt($ch, CURLOPT_POST,<span class="number">1</span>);</div><div class="line">curl_setopt($ch, CURLOPT_POSTFIELDS, $data);</div><div class="line"></div><div class="line">$resp = curl_exec($ch);</div><div class="line"></div><div class="line"><span class="keyword">if</span>(!$resp) &#123;</div><div class="line">  <span class="keyword">die</span>(<span class="string">'Error: "'</span> . curl_error($ch) . <span class="string">'" - Code: '</span> . curl_errno($ch));</div><div class="line">&#125; <span class="keyword">else</span> &#123;</div><div class="line">  <span class="keyword">echo</span> <span class="string">"Response HTTP Status Code : "</span> . curl_getinfo($ch, CURLINFO_HTTP_CODE);</div><div class="line">  <span class="keyword">echo</span> <span class="string">"\nResponse HTTP Body : "</span> . $resp;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// Close request to clear up some resources</span></div><div class="line">curl_close($ch);</div></pre></td></tr></table></figure><h4 id="接收端："><a href="#接收端：" class="headerlink" title="接收端："></a>接收端：</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&lt;?php</span> </div><div class="line">var_dump($_FILES);<span class="comment">// 接收文件内容</span></div><div class="line">va_dump($_POST);<span class="comment">// 接收type</span></div></pre></td></tr></table></figure><h4 id="前端："><a href="#前端：" class="headerlink" title="前端："></a>前端：</h4><p>前端可使用Form或其他Ajax方式上传。</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;有时候会遇到上传文件给第三方服务的情况，比如本身程序并不需要存储附件，而是把附件发送给一个公共的服务。&lt;/p&gt;
-&lt;p&gt;最近正好碰到这个问题，记录一下。&lt;/p&gt;
-&lt;p&gt;上代码。&lt;/p&gt;
-&lt;h4 id=&quot;发送端：&quot;&gt;&lt;a href=&quot;#发送端：&quot; class=&quot;headerli
-      
-    
-    </summary>
-    
-      <category term="php" scheme="https://www.qichengzx.com/categories/php/"/>
-    
-    
-      <category term="php" scheme="https://www.qichengzx.com/tags/php/"/>
     
   </entry>
   

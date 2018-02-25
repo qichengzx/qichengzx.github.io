@@ -7,7 +7,7 @@ tags:  [go]
 
 今天工作遇到一个问题，之前将 struct 转 map 的时候，没有注意 field 大小写的问题，具体的说，是没有注意 field name 与实际需要的 name 的区别，其实就是需要自定义转为 map 之后的name，今天发现问题后，看了下引用包的源码，发现是可以[自定义标签](https://godoc.org/github.com/fatih/structs#Struct.Map)的，就跟 struct 转 JSON 一样。
 
-代码也很简单，加上 `structs:"name"`  即可。
+代码也很简单，加上 \``structs:"name"`\`  即可。
 
 ```go
 package main

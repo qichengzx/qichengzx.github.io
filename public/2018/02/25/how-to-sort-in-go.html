@@ -3,18 +3,20 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   
-  <title>Tag: discuz | 启程</title>
+  <title>Go slice，struct排序 | 启程</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta http-equiv="Access-Control-Allow-Origin" content="*">
-  <meta name="description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
-<meta property="og:type" content="website">
-<meta property="og:title" content="启程">
-<meta property="og:url" content="https://www.qichengzx.com/tags/discuz/index.html">
+  <meta name="description" content="Go中有时会需要对slice，或多个struct进行排序，其实很简单。 slice对于 slice 的排序，可以直接使用 sort 包提供的方法， int123s := []int&amp;#123;3,2,4,1&amp;#125;sort.Ints(s)fmt.Println(s) // [1,2,3,4] string123s := []string&amp;#123;&quot;Go&quot;, &quot;Bravo&quot;, &quot;Gopher&quot;">
+<meta name="keywords" content="go">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go slice，struct排序">
+<meta property="og:url" content="https://www.qichengzx.com/2018/02/25/how-to-sort-in-go.html">
 <meta property="og:site_name" content="启程">
-<meta property="og:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
+<meta property="og:description" content="Go中有时会需要对slice，或多个struct进行排序，其实很简单。 slice对于 slice 的排序，可以直接使用 sort 包提供的方法， int123s := []int&amp;#123;3,2,4,1&amp;#125;sort.Ints(s)fmt.Println(s) // [1,2,3,4] string123s := []string&amp;#123;&quot;Go&quot;, &quot;Bravo&quot;, &quot;Gopher&quot;">
+<meta property="og:updated_time" content="2018-02-25T13:50:11.304Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="启程">
-<meta name="twitter:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
+<meta name="twitter:title" content="Go slice，struct排序">
+<meta name="twitter:description" content="Go中有时会需要对slice，或多个struct进行排序，其实很简单。 slice对于 slice 的排序，可以直接使用 sort 包提供的方法， int123s := []int&amp;#123;3,2,4,1&amp;#125;sort.Ints(s)fmt.Println(s) // [1,2,3,4] string123s := []string&amp;#123;&quot;Go&quot;, &quot;Bravo&quot;, &quot;Gopher&quot;">
 <meta name="twitter:creator" content="@qichengzx">
   
     <link rel="alternative" href="/atom.xml" title="启程" type="application/atom+xml">
@@ -60,40 +62,65 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2016" class="archive-year">2016</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2016/05/08/cant-post-iqiyi-video-to-discuz.html" class="archive-article-date">
-  <time datetime="2016-05-08T10:57:24.000Z" itemprop="datePublished">May 8</time>
+        <section id="main"><article id="post-how-to-sort-in-go" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/02/25/how-to-sort-in-go.html" class="article-date">
+  <time datetime="2018-02-25T13:40:16.000Z" itemprop="datePublished">2018-02-25</time>
 </a>
-      
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/golang/">golang</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/05/08/cant-post-iqiyi-video-to-discuz.html">解决Discuz无法发布爱奇艺视频的问题</a>
+    <h1 class="article-title" itemprop="name">
+      Go slice，struct排序
     </h1>
   
 
-    </header>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Go中有时会需要对slice，或多个struct进行排序，其实很简单。</p>
+<h2 id="slice"><a href="#slice" class="headerlink" title="slice"></a>slice</h2><p>对于 slice 的排序，可以直接使用 sort 包提供的方法，</p>
+<h4 id="int"><a href="#int" class="headerlink" title="int"></a>int</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">s := []<span class="keyword">int</span>&#123;<span class="number">3</span>,<span class="number">2</span>,<span class="number">4</span>,<span class="number">1</span>&#125;</div><div class="line">sort.Ints(s)</div><div class="line">fmt.Println(s) <span class="comment">// [1,2,3,4]</span></div></pre></td></tr></table></figure>
+<h4 id="string"><a href="#string" class="headerlink" title="string"></a>string</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">s := []<span class="keyword">string</span>&#123;<span class="string">"Go"</span>, <span class="string">"Bravo"</span>, <span class="string">"Gopher"</span>, <span class="string">"Alpha"</span>, <span class="string">"Grin"</span>, <span class="string">"Delta"</span>&#125;</div><div class="line">sort.Strings(s)</div><div class="line">fmt.Println(s) <span class="comment">// [Alpha Bravo Delta Go Gopher Grin]</span></div></pre></td></tr></table></figure>
+<h4 id="float"><a href="#float" class="headerlink" title="float"></a>float</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">s := []<span class="keyword">float64</span>&#123;<span class="number">5.2</span>, <span class="number">-1.3</span>, <span class="number">0.7</span>, <span class="number">-3.8</span>, <span class="number">2.6</span>&#125; </div><div class="line">sort.Float64s(s)</div><div class="line">fmt.Println(s) <span class="comment">// [-3.8,-1.3,0.7,2.6,5.2]</span></div></pre></td></tr></table></figure>
+<h2 id="struct"><a href="#struct" class="headerlink" title="struct"></a>struct</h2><p>以上都是 sort 默认提供的方法，但是对于 struct ，就需要自己实现 sort.Interface。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">type</span> Person <span class="keyword">struct</span> &#123;</div><div class="line">	Name <span class="keyword">string</span></div><div class="line">	Age <span class="keyword">int</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">type</span> byAge []Person</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(a ByAge)</span> <span class="title">Len</span><span class="params">()</span> <span class="title">int</span></span>           &#123; <span class="keyword">return</span> <span class="built_in">len</span>(a) &#125;</div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(a ByAge)</span> <span class="title">Less</span><span class="params">(i, j <span class="keyword">int</span>)</span> <span class="title">bool</span></span> &#123; <span class="keyword">return</span> a[i].Age &lt; a[j].Age &#125;</div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(a ByAge)</span> <span class="title">Swap</span><span class="params">(i, j <span class="keyword">int</span>)</span></span>      &#123; a[i], a[j] = a[j], a[i] &#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</div><div class="line">    family := []Person&#123;</div><div class="line">        &#123;<span class="string">"Alice"</span>, <span class="number">23</span>&#125;,</div><div class="line">        &#123;<span class="string">"Eve"</span>, <span class="number">2</span>&#125;,</div><div class="line">        &#123;<span class="string">"Bob"</span>, <span class="number">25</span>&#125;,</div><div class="line">    &#125;</div><div class="line">    sort.Sort(ByAge(family))</div><div class="line">    fmt.Println(family) <span class="comment">// [&#123;Eve 2&#125; &#123;Alice 23&#125; &#123;Bob 25&#125;]</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://www.qichengzx.com/2018/02/25/how-to-sort-in-go.html" data-id="cje2uq7tz001tqf0ro02e37gn" class="article-share-link">Share</a>
+      
+        <a href="https://www.qichengzx.com/2018/02/25/how-to-sort-in-go.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li></ul>
+
+    </footer>
   </div>
-</article>
+  
+    
+<nav id="article-nav">
   
   
-    </div></section>
+    <a href="/2018/02/11/go-struct-tag.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Go struct 转 map 使用自定义标签</div>
+    </a>
   
-</section>
+</nav>
+
+  
+</article></section>
         
           <aside id="sidebar">
   

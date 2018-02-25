@@ -7,8 +7,16 @@
     </url>
 
     <url>
+        <loc>https://www.qichengzx.com/2018/02/25/how-to-sort-in-go.html</loc>
+        <lastmod>2018-02-25T13:50:11.304Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>https://www.qichengzx.com/2018/02/11/go-struct-tag.html</loc>
-        <lastmod>2018-02-11T13:26:00.595Z</lastmod>
+        <lastmod>2018-02-11T13:38:25.186Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -215,7 +223,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html</loc>
+        <loc>https://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html</loc>
         <lastmod>2016-05-07T14:06:15.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -223,7 +231,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html</loc>
+        <loc>https://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html</loc>
         <lastmod>2016-05-07T14:06:15.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
