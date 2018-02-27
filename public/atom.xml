@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://www.qichengzx.com/"/>
-  <updated>2018-02-25T13:50:11.304Z</updated>
+  <updated>2018-02-27T13:13:36.653Z</updated>
   <id>https://www.qichengzx.com/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Nginx HTTP/2 Server Push</title>
+    <link href="https://www.qichengzx.com/2018/02/27/nginx-1-13-9-http2-server-push.html"/>
+    <id>https://www.qichengzx.com/2018/02/27/nginx-1-13-9-http2-server-push.html</id>
+    <published>2018-02-27T11:41:32.000Z</published>
+    <updated>2018-02-27T13:13:36.653Z</updated>
+    
+    <content type="html"><![CDATA[<p>Nginx 在最新的 <a href="http://nginx.org/en/download.html" target="_blank" rel="external">1.13.9</a> 版本中，增加了对 HTTP/2 Server Push 的支持，以下就简单介绍下如何使用。</p><p>以下内容主要来自 <a href="https://www.nginx.com/blog/nginx-1-13-9-http2-server-push/" target="_blank" rel="external">Introducing HTTP/2 Server Push with NGINX 1.13.9</a>，进行了简单的整理。</p><h3 id="推送指定资源"><a href="#推送指定资源" class="headerlink" title="推送指定资源"></a>推送指定资源</h3><p>首先，在 Nginx 中进行配置：</p><figure class="highlight nginx"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="section">server</span> &#123;</div><div class="line">    <span class="comment">#开启HTTP/2</span></div><div class="line">    <span class="attribute">listen</span> <span class="number">443</span> ssl http2;</div><div class="line"></div><div class="line">    <span class="attribute">ssl_certificate</span> ssl/certificate.pem;</div><div class="line">    <span class="attribute">ssl_certificate_key</span> ssl/key.pem;</div><div class="line"></div><div class="line">    <span class="attribute">root</span> /var/www/html;</div><div class="line"></div><div class="line">    <span class="comment"># 当请求 demo.html 时，推送 /style.css, /image1.jpg, /image2.jpg</span></div><div class="line">    <span class="attribute">location</span> = /demo.html &#123;</div><div class="line">        <span class="attribute">http2_push</span> /style.css;</div><div class="line">        <span class="attribute">http2_push</span> /image1.jpg;</div><div class="line">        <span class="attribute">http2_push</span> /image2.jpg;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure><p>可以通过 Chrome Developer Tools 查看效果。在 Network 中，可以看到 demo.html 的请求和推送到客户端的内容。</p><p>如下图所示，可以看到 style.css，image1.jpg，image2.jpg。它们都是 demo.html 请求的一部分。</p><p><img src="/images/http2-server-push-chrome-dev-tools.png" alt=""></p><h3 id="自动推送"><a href="#自动推送" class="headerlink" title="自动推送"></a>自动推送</h3><p>以上是在页面加载时推送指定资源的例子，但是很多情况下，并不能指定要推送哪些资源，因此，Nginx 还支持通过 http2_push_preload 指令，自动分析响应头中的 Link header，来自动推送这些资源。</p><figure class="highlight nginx"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="section">server</span> &#123;</div><div class="line">    <span class="comment">#开启HTTP/2</span></div><div class="line">    <span class="attribute">listen</span> <span class="number">443</span> ssl http2;</div><div class="line"></div><div class="line">    <span class="attribute">ssl_certificate</span> ssl/certificate.pem;</div><div class="line">    <span class="attribute">ssl_certificate_key</span> ssl/key.pem;</div><div class="line"></div><div class="line">    <span class="attribute">root</span> /var/www/html;</div><div class="line"></div><div class="line">    <span class="attribute">location</span> = /myapp &#123;</div><div class="line">        <span class="attribute">proxy_pass</span> http://upstream;</div><div class="line">        <span class="attribute">http2_push_preload</span> <span class="literal">on</span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure><p>通过如上的配置，当 upstream 返回的响应头中包含 Link header 时，</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Link: &lt;/style.css&gt;; as=style; rel=preload</div></pre></td></tr></table></figure><p>Nginx 即会开启一个推送， 内容则是 /style.css ，Link header 的路径必须是绝对路径。</p><p>如果想要推送多个资源，可以添加多个 Link header ， 或更直接一些，把所有资源添加到一个 Link header 中。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Link: &lt;/style.css&gt;; as=style; rel=preload, &lt;/favicon.ico&gt;; as=image; rel=preload</div></pre></td></tr></table></figure><p>如果不想让 Nginx 推送某个资源，为该 header 添加一个 nopush 参数即可。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Link: &lt;/nginx.png&gt;; as=image; rel=preload; nopush</div></pre></td></tr></table></figure><h3 id="有选择的推送"><a href="#有选择的推送" class="headerlink" title="有选择的推送"></a>有选择的推送</h3><p>由于 HTTP/2 规范并没有解决是否要推送哪些资源的问题，但是比较合理的方式是知道需要推送哪些资源，并且客户端没有缓存过这些资源，才进行推送。</p><p>所以 Nginx 支持了添加条件，只在符合条件时才进行推送</p><p>当客户端请求时包含了 cookie ，Nginx 将只会推送一次资源。</p><figure class="highlight nginx"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="section">server</span> &#123;</div><div class="line">    <span class="attribute">listen</span> <span class="number">443</span> ssl http2 default_server;</div><div class="line"></div><div class="line">    <span class="attribute">ssl_certificate</span> ssl/certificate.pem;</div><div class="line">    <span class="attribute">ssl_certificate_key</span> ssl/key.pem;</div><div class="line"></div><div class="line"></div><div class="line">    <span class="attribute">root</span> /var/www/html;</div><div class="line">    <span class="attribute">http2_push_preload</span> <span class="literal">on</span>;</div><div class="line"></div><div class="line">    <span class="attribute">location</span> = /demo.html &#123;</div><div class="line">        <span class="attribute">add_header</span> Set-Cookie <span class="string">"session=1"</span>;</div><div class="line">        <span class="attribute">add_header</span> Link <span class="variable">$resources</span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line"><span class="attribute">map</span> <span class="variable">$http_cookie</span> <span class="variable">$resources</span> &#123;</div><div class="line">    "~*session=1" "";</div><div class="line">    <span class="attribute">default</span> <span class="string">"&lt;/style.css&gt;; as=style; rel=preload, &lt;/image1.jpg&gt;; as=image; rel=preload,</span></div><div class="line"><span class="string">             &lt;/image2.jpg&gt;; as=style; rel=preload"</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure><p>相关链接:</p><p><a href="https://www.qichengzx.com/2017/07/02/HTTP2-Server-Push.html">在Go中使用 HTTP/2 Server Push</a></p><p>参考资料:</p><p><a href="https://w3c.github.io/preload/#server-push-http-2" target="_blank" rel="external">Server Push (HTTP/2)</a></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;Nginx 在最新的 &lt;a href=&quot;http://nginx.org/en/download.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;1.13.9&lt;/a&gt; 版本中，增加了对 HTTP/2 Server Push 的支持，以下就简单介绍下
+      
+    
+    </summary>
+    
+      <category term="nginx" scheme="https://www.qichengzx.com/categories/nginx/"/>
+    
+    
+      <category term="nginx" scheme="https://www.qichengzx.com/tags/nginx/"/>
+    
+  </entry>
   
   <entry>
     <title>Go slice，struct排序</title>
@@ -531,32 +556,6 @@
       
         &lt;p&gt;&lt;img src=&quot;/images/golang.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;h4 id=&quot;起因&quot;&gt;&lt;a href=&quot;#起因&quot; class=&quot;headerlink&quot; title=&quot;起因&quot;&gt;&lt;/a&gt;起因&lt;/h4&gt;&lt;p&gt;某个上古时代的API，依然在返回XML格式的数据，
-      
-    
-    </summary>
-    
-      <category term="golang" scheme="https://www.qichengzx.com/categories/golang/"/>
-    
-    
-      <category term="go" scheme="https://www.qichengzx.com/tags/go/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Hello Go</title>
-    <link href="https://www.qichengzx.com/2016/09/11/Hello-Go.html"/>
-    <id>https://www.qichengzx.com/2016/09/11/Hello-Go.html</id>
-    <published>2016-09-11T09:21:03.000Z</published>
-    <updated>2016-09-11T09:21:09.000Z</updated>
-    
-    <content type="html"><![CDATA[<h5 id="Mac-安装-GO"><a href="#Mac-安装-GO" class="headerlink" title="Mac 安装 GO"></a>Mac 安装 GO</h5><p>本人使用了Brew来安装。</p><h5 id="安装前首先更新Brew。"><a href="#安装前首先更新Brew。" class="headerlink" title="安装前首先更新Brew。"></a>安装前首先更新Brew。</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">brew update &amp;&amp; brew upgrade</div></pre></td></tr></table></figure><h5 id="安装Go"><a href="#安装Go" class="headerlink" title="安装Go"></a>安装Go</h5><p>使用brew安装go</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">brew install go</div></pre></td></tr></table></figure><h5 id="设置-GOPATH"><a href="#设置-GOPATH" class="headerlink" title="设置$GOPATH"></a>设置$GOPATH</h5><p>Go从1.1版本开始必须设置这个变量，也就是说通过以上方式安装后就必须要设置$GOPATH了。</p><p>这个目录用来存放Go源码，可运行文件，和编译之后的包文件。</p><p>Mac系统设置</p><p>在bash中加入：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">export GOPATH=/your/path</div></pre></td></tr></table></figure><p>以上目录需要存在，不存在就自己手动创建一个。</p><p>然后运行</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">source ~/.zshrc</div></pre></td></tr></table></figure><p>替换成你自己使用的shell，如.bashrc等。</p><p>然后，需要在/your/path目录下，新建 pkg，bin，src目录。</p><p>​    src目录存放源代码，如hello.go</p><p>​    pkg目录存放编译后的文件，如hello.a</p><p>​    bin目录存放生成后的可执行文件</p><p>src目录就是主要开发目录。如hello项目，则在src下新建hello目录。</p><p>到这里，就可以开始Go之旅了。</p><h5 id="Hello-Go"><a href="#Hello-Go" class="headerlink" title="Hello Go"></a>Hello Go</h5><p>需要注意的是，在Go中，包名和文件名是可以不同的，包名为main的时候即为可以独立运行的包。</p><p>在src目录新建hello目录，创建hello.go文件。</p><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> main <span class="comment">//包名</span></div><div class="line"></div><div class="line"><span class="keyword">import</span> <span class="string">"fmt"</span> <span class="comment">//导入一个系统级别的fmt包</span></div><div class="line"></div><div class="line"><span class="comment">//使用func定义函数</span></div><div class="line"><span class="comment">//main函数没有参数，没有返回值</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</div><div class="line">  fmt.Println(<span class="string">"Hello Go"</span>) <span class="comment">//调用包函数的方法为 pkgName.funcName</span></div><div class="line">&#125;</div></pre></td></tr></table></figure><p>一个hello.go就写好了，在命令行输入</p><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">go</span> run hello.<span class="keyword">go</span></div></pre></td></tr></table></figure><p>就可以看到输出Hello Go了。</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h5 id=&quot;Mac-安装-GO&quot;&gt;&lt;a href=&quot;#Mac-安装-GO&quot; class=&quot;headerlink&quot; title=&quot;Mac 安装 GO&quot;&gt;&lt;/a&gt;Mac 安装 GO&lt;/h5&gt;&lt;p&gt;本人使用了Brew来安装。&lt;/p&gt;
-&lt;h5 id=&quot;安装前首先更新Brew。&quot;&gt;&lt;a
       
     
     </summary>
