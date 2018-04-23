@@ -31,7 +31,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/02/03/MySQL%E5%AE%9E%E7%8E%B0row_number%20.html</loc>
+        <loc>https://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -39,7 +39,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html</loc>
+        <loc>https://www.qichengzx.com/2016/02/03/MySQL%E5%AE%9E%E7%8E%B0row_number%20.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -63,14 +63,6 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2015/11/07/Set%20Up%20a%20Private%20Git%20Server%20on%20a%20VPS.html</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
         <loc>https://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -79,7 +71,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/10/21/beego-in-docker.html</loc>
+        <loc>https://www.qichengzx.com/2015/11/07/Set%20Up%20a%20Private%20Git%20Server%20on%20a%20VPS.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -88,6 +80,14 @@
 
     <url>
         <loc>https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html</loc>
+        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2016/10/21/beego-in-docker.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -119,23 +119,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2017/07/15/create-real-time-chat-app-golang-angular-2-websockets.html</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
         <loc>https://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -151,6 +135,22 @@
     </url>
 
     <url>
+        <loc>https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html</loc>
+        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2017/07/15/create-real-time-chat-app-golang-angular-2-websockets.html</loc>
+        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -159,7 +159,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2018/02/10/get-the-content-type-of-file.html</loc>
+        <loc>https://www.qichengzx.com/2016/12/04/go-qiubai.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -167,7 +167,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/12/04/go-qiubai.html</loc>
+        <loc>https://www.qichengzx.com/2018/02/10/get-the-content-type-of-file.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -191,23 +191,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2017/03/06/insert-filter-in-beego.html</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
         <loc>https://www.qichengzx.com/2018/02/25/how-to-sort-in-go.html</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://www.qichengzx.com/2015/11/17/js-names.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -223,7 +207,31 @@
     </url>
 
     <url>
+        <loc>https://www.qichengzx.com/2015/11/17/js-names.html</loc>
+        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2017/03/06/insert-filter-in-beego.html</loc>
+        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>https://www.qichengzx.com/2017/08/13/leetcode-array-partition-i.html</loc>
+        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2017/11/27/multi-stage-builds-in-docker.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -255,7 +263,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2017/11/27/multi-stage-builds-in-docker.html</loc>
+        <loc>https://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -264,14 +272,6 @@
 
     <url>
         <loc>https://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -295,7 +295,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html</loc>
+        <loc>https://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -303,7 +303,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html</loc>
+        <loc>https://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -328,6 +328,14 @@
 
     <url>
         <loc>https://www.qichengzx.com/2016/01/11/placeholder-animate.html</loc>
+        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2017/09/17/redis-geo-with-redigo-in-golang-part-1.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -368,14 +376,6 @@
 
     <url>
         <loc>https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://www.qichengzx.com/2017/09/17/redis-geo-with-redigo-in-golang-part-1.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
