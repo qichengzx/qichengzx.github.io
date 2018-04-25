@@ -107,14 +107,14 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/tags/hexo/</loc>
+        <loc>https://www.qichengzx.com/tags/dropbox/</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/tags/dropbox/</loc>
+        <loc>https://www.qichengzx.com/tags/hexo/</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
@@ -247,6 +247,13 @@
     </url>
 
     <url>
+        <loc>https://www.qichengzx.com/tags/%E4%BB%8A%E6%97%A5%E5%A4%B4%E6%9D%A1/</loc>
+        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
         <loc>https://www.qichengzx.com/tags/time/</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -261,13 +268,6 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/tags/%E4%BB%8A%E6%97%A5%E5%A4%B4%E6%9D%A1/</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>https://www.qichengzx.com/tags/github/</loc>
         <lastmod>2018-04-22T14:12:19.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -276,14 +276,14 @@
 
     <url>
         <loc>https://www.qichengzx.com/tags/go/</loc>
-        <lastmod>2018-04-25T09:09:02.000Z</lastmod>
+        <lastmod>2018-04-25T09:20:42.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
         <loc>https://www.qichengzx.com/tags/docker/</loc>
-        <lastmod>2018-04-25T09:09:02.000Z</lastmod>
+        <lastmod>2018-04-25T09:20:42.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>

@@ -8,7 +8,7 @@
 
     <url>
         <loc>https://www.qichengzx.com/2018/04/25/dockerfile-build-arg.html</loc>
-        <lastmod>2018-04-25T09:09:02.000Z</lastmod>
+        <lastmod>2018-04-25T09:20:42.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -23,7 +23,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/02/03/MySQL%E5%AE%9E%E7%8E%B0row_number%20.html</loc>
+        <loc>https://www.qichengzx.com/2017/07/02/HTTP2-Server-Push.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -31,7 +31,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2017/07/02/HTTP2-Server-Push.html</loc>
+        <loc>https://www.qichengzx.com/2016/09/11/Hello-Go.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -47,7 +47,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/09/11/Hello-Go.html</loc>
+        <loc>https://www.qichengzx.com/2016/02/03/MySQL%E5%AE%9E%E7%8E%B0row_number%20.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -119,14 +119,6 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
         <loc>https://www.qichengzx.com/2017/07/15/create-real-time-chat-app-golang-angular-2-websockets.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -135,7 +127,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html</loc>
+        <loc>https://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -144,6 +136,14 @@
 
     <url>
         <loc>https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html</loc>
+        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -287,14 +287,6 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
         <loc>https://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -303,7 +295,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html</loc>
+        <loc>https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -311,7 +303,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html</loc>
+        <loc>https://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -343,7 +335,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2017/09/23/redis-geo-with-redigo-in-golang-part-2.html</loc>
+        <loc>https://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -352,6 +344,14 @@
 
     <url>
         <loc>https://www.qichengzx.com/2017/09/17/redis-geo-with-redigo-in-golang-part-1.html</loc>
+        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2017/09/23/redis-geo-with-redigo-in-golang-part-2.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -383,7 +383,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html</loc>
+        <loc>https://www.qichengzx.com/2016/12/14/toutiao-images-spider-by-golang.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -391,7 +391,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/12/14/toutiao-images-spider-by-golang.html</loc>
+        <loc>https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>

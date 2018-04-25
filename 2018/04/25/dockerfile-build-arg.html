@@ -14,7 +14,7 @@
 <meta property="og:site_name" content="启程">
 <meta property="og:description" content="使用 Docker 做服务部署的时候，经常需要在构建的时候区分环境，让程序能够拿到环境变量，或者让程序能够针对不同环境做出不同的处理。 之前的写法比较原始，在本地打包 Docker 镜像后 push 到服务器，所以就可以在打包的时候修改环境变量的值。虽然只用到了一个区分开发，生产的变量，但是每次都这么做还是比较烦。 最近重新整理 Dockerfile ， 又看了下文档，发现可以在 docker b">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2018-04-25T09:09:02.000Z">
+<meta property="og:updated_time" content="2018-04-25T09:20:42.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Dockerfile 构建参数小计">
 <meta name="twitter:description" content="使用 Docker 做服务部署的时候，经常需要在构建的时候区分环境，让程序能够拿到环境变量，或者让程序能够针对不同环境做出不同的处理。 之前的写法比较原始，在本地打包 Docker 镜像后 push 到服务器，所以就可以在打包的时候修改环境变量的值。虽然只用到了一个区分开发，生产的变量，但是每次都这么做还是比较烦。 最近重新整理 Dockerfile ， 又看了下文档，发现可以在 docker b">
@@ -99,11 +99,13 @@
 <p>build 时，可以这样写</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker build -t app -f Dockerfile . --build-arg app_env=dev</span><br></pre></td></tr></table></figure>
 <p>这样就可以在 go 程序里 通过 os.Getenv(“APP_ENV”) 拿到环境变量信息，进行不同处理了。</p>
+<p>参考资料:</p>
+<p><a href="https://yeasy.gitbooks.io/docker_practice/content/image/dockerfile/arg.html" target="_blank" rel="noopener">ARG 构建参数</a><br><a href="https://medium.com/statuscode/golang-docker-for-development-and-production-ce3ad4e69673" target="_blank" rel="noopener">Golang and Docker for development and production</a></p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/04/25/dockerfile-build-arg.html" data-id="cjgevsirw0011uts634csgmu8" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/04/25/dockerfile-build-arg.html" data-id="cjgew358x000unws6y26v6snn" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/04/25/dockerfile-build-arg.html#comments" class="article-comment-link">Comments</a>
       
