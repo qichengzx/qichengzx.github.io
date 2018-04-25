@@ -2,13 +2,6 @@
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
     <url>
-        <loc>https://www.qichengzx.com/tags/go/</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>https://www.qichengzx.com/tags/mysql/</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -31,6 +24,20 @@
 
     <url>
         <loc>https://www.qichengzx.com/tags/%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/</loc>
+        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/vps/</loc>
+        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/git/</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
@@ -65,20 +72,6 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/tags/vps/</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>https://www.qichengzx.com/tags/git/</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>https://www.qichengzx.com/tags/crontab/</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -107,7 +100,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/tags/dropbox/</loc>
+        <loc>https://www.qichengzx.com/tags/laravel/</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
@@ -121,7 +114,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/tags/laravel/</loc>
+        <loc>https://www.qichengzx.com/tags/dropbox/</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
@@ -178,13 +171,6 @@
 
     <url>
         <loc>https://www.qichengzx.com/tags/leetcode/</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>https://www.qichengzx.com/tags/docker/</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
@@ -284,6 +270,20 @@
     <url>
         <loc>https://www.qichengzx.com/tags/github/</loc>
         <lastmod>2018-04-22T14:12:19.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/go/</loc>
+        <lastmod>2018-04-25T09:09:02.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/docker/</loc>
+        <lastmod>2018-04-25T09:09:02.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
