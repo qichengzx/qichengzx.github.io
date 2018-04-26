@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://www.qichengzx.com/"/>
-  <updated>2018-04-25T09:20:42.000Z</updated>
+  <updated>2018-04-26T02:16:03.000Z</updated>
   <id>https://www.qichengzx.com/</id>
   
   <author>
@@ -17,11 +17,11 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>Dockerfile 构建参数小计</title>
+    <title>Dockerfile 构建参数</title>
     <link href="https://www.qichengzx.com/2018/04/25/dockerfile-build-arg.html"/>
     <id>https://www.qichengzx.com/2018/04/25/dockerfile-build-arg.html</id>
     <published>2018-04-25T07:29:29.000Z</published>
-    <updated>2018-04-25T09:20:42.000Z</updated>
+    <updated>2018-04-26T02:16:03.000Z</updated>
     
     <content type="html"><![CDATA[<p>使用 Docker 做服务部署的时候，经常需要在构建的时候区分环境，让程序能够拿到环境变量，或者让程序能够针对不同环境做出不同的处理。</p><p>之前的写法比较原始，在本地打包 Docker 镜像后 push 到服务器，所以就可以在打包的时候修改环境变量的值。虽然只用到了一个区分开发，生产的变量，但是每次都这么做还是比较烦。</p><p>最近重新整理 Dockerfile ， 又看了下文档，发现可以在 docker build 阶段传入参数的。</p><p>如下所示：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">FROM golang</span><br><span class="line"></span><br><span class="line">ARG app_env</span><br><span class="line"></span><br><span class="line">ENV APP_ENV $app_env</span><br><span class="line"></span><br><span class="line">...</span><br></pre></td></tr></table></figure><p>build 时，可以这样写</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker build -t app -f Dockerfile . --build-arg app_env=dev</span><br></pre></td></tr></table></figure><p>这样就可以在 go 程序里 通过 os.Getenv(“APP_ENV”) 拿到环境变量信息，进行不同处理了。</p><p>参考资料:</p><p><a href="https://yeasy.gitbooks.io/docker_practice/content/image/dockerfile/arg.html" target="_blank" rel="noopener">ARG 构建参数</a><br><a href="https://medium.com/statuscode/golang-docker-for-development-and-production-ce3ad4e69673" target="_blank" rel="noopener">Golang and Docker for development and production</a></p>]]></content>
     
@@ -45,11 +45,11 @@
   </entry>
   
   <entry>
-    <title>迁移到 GitHub pages 小计</title>
+    <title>迁移到 GitHub pages 小记</title>
     <link href="https://www.qichengzx.com/2018/04/22/github-pages.html"/>
     <id>https://www.qichengzx.com/2018/04/22/github-pages.html</id>
     <published>2018-04-22T10:58:49.000Z</published>
-    <updated>2018-04-22T14:12:19.000Z</updated>
+    <updated>2018-04-26T02:15:46.000Z</updated>
     
     <content type="html"><![CDATA[<p><img src="/images/github-pages.jpeg" alt=""></p><p>在 Vultr vps 挂了N个月之后，无奈只能选择把这堆东西迁到 GitHub pages 了，看起来是唯一能选的比较不错的选择。虽然很早以前也看过一些迁到 GitHub pages 的教程，但是实施起来还是有些新的收获。</p><p>开始前没注意看文档，其实创建 repo 的时候对于 usrename 的项目，repo 名必须是 username.github.io。</p><p>如果不想使用 username.github.io 作为域名的话，要在 repo-&gt;settings-&gt;GitHub Pages 中，设置一个 Custom domain，然后 Save。</p><p>GitHub 默认是提供了使用 jekyll 作为 GitHub pages 的内容处理程序。而如果并不想使用 jekyll 的话，也可以。比如我就是使用 hexo ，把 generate 的内容作为 git 内容提交了的。</p><p>但是还有一个要注意的是，把静态内容提交到 repo 后，需要过一会才会生效。所以刚提交完时，会返回 404 ，不要着急，过一会就好了。</p><p>另外目前 GitHub 还提供了使用自定义域名时启用 HTTPS 的选项，启用后就会强制使用 HTTPS 打开网站了。</p>]]></content>
     
