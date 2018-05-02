@@ -65,6 +65,58 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-go-closure" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/02/go-closure.html" class="article-date">
+  <time datetime="2018-05-02T02:32:04.000Z" itemprop="datePublished">2018-05-02</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/golang/">golang</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/05/02/go-closure.html">Go 闭包</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在 Go 中可以在一个函数里创建另一个函数。如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	add := <span class="function"><span class="keyword">func</span><span class="params">(x, y <span class="keyword">int</span>)</span> <span class="title">int</span></span> &#123;</span><br><span class="line">		<span class="keyword">return</span> x + y</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	fmt.Println(add(<span class="number">1</span>,<span class="number">1</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>add 是一个属性为 func(int, int) int (两个 int 类型参数，返回值类型为 int 的函数)的局部变量。这样的局部函数还可以访问其他局部变量。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	x := <span class="number">0</span></span><br><span class="line">	increment := <span class="function"><span class="keyword">func</span><span class="params">()</span> <span class="title">int</span></span> &#123;</span><br><span class="line">		x++</span><br><span class="line">		<span class="keyword">return</span> x</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	fmt.Println(increment())</span><br><span class="line">	fmt.Println(increment())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>increment 函数为在 main 函数作用域中定义的变量 x 加1。 变量 x 可以被 increment 函数访问和修改。所以以上程序第一行将会输出：1，第二行将会输出：2。</p>
+<p>这样的函数以及它引用的非本地变量称为闭包。 在本示例中，increment 函数和变量 x 形成闭包。</p>
+<p>使用闭包的一种方法是编写一个函数，该函数返回另一个函数 - 当被调用时 - 可以生成一个数字序列。 例如，我们可以生成所有的偶数：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">makeEvenGenerator</span><span class="params">()</span> <span class="title">func</span><span class="params">()</span> <span class="title">uint</span></span> &#123;</span><br><span class="line">	i := <span class="keyword">uint</span>(<span class="number">0</span>)</span><br><span class="line">	<span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">()</span> <span class="params">(ret <span class="keyword">uint</span>)</span></span> &#123;</span><br><span class="line">		ret = i</span><br><span class="line">		i += <span class="number">2</span></span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	nextEven := makeEvenGenerator()</span><br><span class="line">	fmt.Println(nextEven()) <span class="comment">// 0</span></span><br><span class="line">	fmt.Println(nextEven()) <span class="comment">// 2</span></span><br><span class="line">	fmt.Println(nextEven()) <span class="comment">// 4</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>makeEvenGenerator 返回一个生成偶数的函数。 每次调用它时，它会将2添加到本地i变量中 - 与正常的局部变量不同，它会在调用之间保持不变。</p>
+<p>原文：<a href="https://www.golang-book.com/books/intro/7#section4" target="_blank" rel="noopener">Closure</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://www.qichengzx.com/2018/05/02/go-closure.html" data-id="cjgoog5el001pkis6k5qbe1a4" class="article-share-link">Share</a>
+      
+        <a href="https://www.qichengzx.com/2018/05/02/go-closure.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+  
     <article id="post-dockerfile-build-arg" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/04/25/dockerfile-build-arg.html" class="article-date">
@@ -105,7 +157,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/04/25/dockerfile-build-arg.html" data-id="cjgfwdlex0012sfs6v8xbxl9t" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/04/25/dockerfile-build-arg.html" data-id="cjgoog5ea0012kis62s9kmae8" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/04/25/dockerfile-build-arg.html#comments" class="article-comment-link">Comments</a>
       
@@ -154,7 +206,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/04/22/github-pages.html" data-id="cjgfwdlf7001nsfs6tkli86ug" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/04/22/github-pages.html" data-id="cjgoog5ej001mkis6f55ea0dl" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/04/22/github-pages.html#comments" class="article-comment-link">Comments</a>
       
@@ -220,7 +272,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/02/27/nginx-1-13-9-http2-server-push.html" data-id="cjgfwdlfl002ksfs6jhmxwtla" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/02/27/nginx-1-13-9-http2-server-push.html" data-id="cjgoog5f3002qkis6yxstnsz3" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/02/27/nginx-1-13-9-http2-server-push.html#comments" class="article-comment-link">Comments</a>
       
@@ -268,7 +320,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/02/25/how-to-sort-in-go.html" data-id="cjgfwdlfd0021sfs61frqlpsd" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/02/25/how-to-sort-in-go.html" data-id="cjgoog5er0023kis6k05dzola" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/02/25/how-to-sort-in-go.html#comments" class="article-comment-link">Comments</a>
       
@@ -314,7 +366,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/02/11/go-struct-tag.html" data-id="cjgfwdlfb001vsfs68ot473cx" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/02/11/go-struct-tag.html" data-id="cjgoog5en001wkis63fbjci2g" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/02/11/go-struct-tag.html#comments" class="article-comment-link">Comments</a>
       
@@ -357,7 +409,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/02/10/get-the-content-type-of-file.html" data-id="cjgfwdlf5001isfs6zhobrv98" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/02/10/get-the-content-type-of-file.html" data-id="cjgoog5eh001ikis69pj9j20d" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/02/10/get-the-content-type-of-file.html#comments" class="article-comment-link">Comments</a>
       
@@ -407,7 +459,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2017/11/27/multi-stage-builds-in-docker.html" data-id="cjgfwdlfk002hsfs6v2uzpydp" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2017/11/27/multi-stage-builds-in-docker.html" data-id="cjgoog5ez002kkis6xc0um8k4" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2017/11/27/multi-stage-builds-in-docker.html#comments" class="article-comment-link">Comments</a>
       
@@ -483,7 +535,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2017/09/24/redis-geo-with-redigo-in-golang-part-3.html" data-id="cjgfwdlg6003tsfs64fwotfdz" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2017/09/24/redis-geo-with-redigo-in-golang-part-3.html" data-id="cjgoog5fo003xkis695ixpkw8" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2017/09/24/redis-geo-with-redigo-in-golang-part-3.html#comments" class="article-comment-link">Comments</a>
       
@@ -544,67 +596,9 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2017/09/23/redis-geo-with-redigo-in-golang-part-2.html" data-id="cjgfwdlg4003psfs6jdfvgvns" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2017/09/23/redis-geo-with-redigo-in-golang-part-2.html" data-id="cjgoog5fn003ukis6wj0jd97t" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2017/09/23/redis-geo-with-redigo-in-golang-part-2.html#comments" class="article-comment-link">Comments</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/geo/">geo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redigo/">redigo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis/">redis</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-  
-    <article id="post-redis-geo-with-redigo-in-golang-part-1" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/09/17/redis-geo-with-redigo-in-golang-part-1.html" class="article-date">
-  <time datetime="2017-09-17T11:45:29.000Z" itemprop="datePublished">2017-09-17</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/golang/">golang</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/09/17/redis-geo-with-redigo-in-golang-part-1.html">Go语言使用redigo操作GEO(1) - 添加和查询</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>周五的时候群里有人遇到在Go中使用Redis GEO的问题，顺手搜了下解决办法。发现还挺简单的，周末无事，写下来记一下。</p>
-<p>GEO是在Redis 3.2加入的功能，手册<a href="http://redisdoc.com/geo/index.html" target="_blank" rel="noopener">见此</a></p>
-<p>本示例中只演示GEOADD和GEOPOS功能。</p>
-<p><a href="https://github.com/garyburd/redigo/tree/master/redis" target="_blank" rel="noopener">redigo</a>这个客户端还挺好用的，但是个人觉得略有不足的是文档不全（指的是中文的文档），但是好在可以看源码解决一些不太清楚的问题。</p>
-<h4 id="0-连接Redis"><a href="#0-连接Redis" class="headerlink" title="0.连接Redis"></a>0.连接Redis</h4><p>首先习惯性的创建了连接池，嗯，连接池。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> &#123;</span><br><span class="line">	RedisClient = &amp;redis.Pool&#123;</span><br><span class="line">		MaxIdle:   MaxIdle,</span><br><span class="line">		MaxActive: MaxActive,</span><br><span class="line"></span><br><span class="line">		IdleTimeout: <span class="number">60</span> * time.Second,</span><br><span class="line"></span><br><span class="line">		Dial: <span class="function"><span class="keyword">func</span><span class="params">()</span> <span class="params">(redis.Conn, error)</span></span> &#123;</span><br><span class="line">			c, err := redis.Dial(<span class="string">"tcp"</span>, RedisHost)</span><br><span class="line"></span><br><span class="line">			<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">				<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			<span class="comment">/*if _, err := c.Do("AUTH", RedisPwd); err != nil &#123;</span></span><br><span class="line"><span class="comment">				c.Close()</span></span><br><span class="line"><span class="comment">				return nil, err</span></span><br><span class="line"><span class="comment">			&#125;*/</span></span><br><span class="line">			c.Do(<span class="string">"SELECT"</span>, RedisDb)</span><br><span class="line"></span><br><span class="line">			<span class="keyword">return</span> c, <span class="literal">nil</span></span><br><span class="line">		&#125;,</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="1-添加值"><a href="#1-添加值" class="headerlink" title="1.添加值"></a>1.添加值</h4><p>为了简单起见，创建了一个方法用于向传入的key中写入name的坐标点。</p>
-<p>直接返回错误。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">push</span><span class="params">(key, name <span class="keyword">string</span>, lat, lng <span class="keyword">float64</span>)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	rc := RedisClient.Get()</span><br><span class="line">	<span class="keyword">defer</span> rc.Close()</span><br><span class="line"></span><br><span class="line">	_, err := rc.Do(<span class="string">"GEOADD"</span>, key, lng, lat, name)</span><br><span class="line">	<span class="keyword">return</span> err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="2-取回值"><a href="#2-取回值" class="headerlink" title="2.取回值"></a>2.取回值</h4><p>同样，创建一个方法，在Redis中取回key中name的坐标点的值。</p>
-<p>但是注意，这里在执行完 <code>GEOPOS</code> 后，调用 redigo 包中的 <code>Positions</code> 方法把返回结果转成 <code>float64</code> 的数组。</p>
-<p>然后返回这个数组和错误</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">get</span><span class="params">(key, name <span class="keyword">string</span>)</span> <span class="params">([]*[2]<span class="keyword">float64</span>, error)</span></span> &#123;</span><br><span class="line">	rc := RedisClient.Get()</span><br><span class="line">	<span class="keyword">defer</span> rc.Close()</span><br><span class="line"></span><br><span class="line">	res, err := redis.Positions(rc.Do(<span class="string">"GEOPOS"</span>, key, name))</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> res, err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="3-main方法中的简单代码"><a href="#3-main方法中的简单代码" class="headerlink" title="3.main方法中的简单代码"></a>3.main方法中的简单代码</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	key := <span class="string">"citylist"</span></span><br><span class="line">	name := <span class="string">"beijing"</span></span><br><span class="line">	lat := <span class="number">39.9329</span></span><br><span class="line">	lng := <span class="number">116.280316</span></span><br><span class="line">	err := push(key, name, lat, lng)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Println(<span class="string">"坐标写入完成"</span>)</span><br><span class="line">	fmt.Println(<span class="string">"获取刚刚写入的值"</span>)</span><br><span class="line"></span><br><span class="line">	res, err := get(key, name)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Println(res[<span class="number">0</span>][<span class="number">0</span>], res[<span class="number">0</span>][<span class="number">1</span>])</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>就这么简单。</p>
-<p>import部分和定义的几个全局变量就不用写了，</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2017/09/17/redis-geo-with-redigo-in-golang-part-1.html" data-id="cjgfwdlg3003msfs665hsro8x" class="article-share-link">Share</a>
-      
-        <a href="https://www.qichengzx.com/2017/09/17/redis-geo-with-redigo-in-golang-part-1.html#comments" class="article-comment-link">Comments</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/geo/">geo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redigo/">redigo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis/">redis</a></li></ul>
@@ -657,7 +651,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/git/">git</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/nginx/">nginx</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">11</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/git/">git</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">19</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/nginx/">nginx</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">11</span></li></ul>
     </div>
   </div>
 
@@ -666,7 +660,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geo/">geo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">17</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redigo/">redigo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geo/">geo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">18</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redigo/">redigo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -684,7 +678,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
     </div>
   </div>
 
@@ -694,6 +688,10 @@
     <h3 class="widget-title">Recents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2018/05/02/go-closure.html">Go 闭包</a>
+          </li>
         
           <li>
             <a href="/2018/04/25/dockerfile-build-arg.html">Dockerfile 构建参数</a>
@@ -709,10 +707,6 @@
         
           <li>
             <a href="/2018/02/25/how-to-sort-in-go.html">Go slice，struct排序</a>
-          </li>
-        
-          <li>
-            <a href="/2018/02/11/go-struct-tag.html">Go struct 转 map 使用自定义标签</a>
           </li>
         
       </ul>

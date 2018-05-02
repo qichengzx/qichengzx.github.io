@@ -65,6 +65,107 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-php-rabbitmq-tutorial-three" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/04/23/php-rabbitmq-tutorial-three.html" class="article-date">
+  <time datetime="2016-04-23T11:58:17.000Z" itemprop="datePublished">2016-04-23</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/php/">php</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/04/23/php-rabbitmq-tutorial-three.html">PHP RabbitMQ 教程（三） - 发布/订阅</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="发布-订阅"><a href="#发布-订阅" class="headerlink" title="发布/订阅"></a>发布/订阅</h3><p>我们在<a href="/2016/04/17/php-rabbitmq-tutorial-two.html">上一节</a>创建了一个工作队列，并假定队列对应的任务传送给了某个客户端。在这一章节我们会做一些完全不一样的东西–我们会发送一条消息到多个消费者，也称之为“发布/订阅”模式。</p>
+<p>为了说明这个模式，我们会创建一个简单的日志系统（logging system，以下简称日志系统），它由两个程序组成–第一个是发送日志信息，第二个是接收日志并打印。</p>
+<p>日志系统的每一个运行的接收端程序都会接收信息，这样就可以运行一个接收端就把日志保存到硬盘里，同时运行另一个接收端去实时显示日志到屏幕。</p>
+<p>本质上，日志内容是广播给所有的接收端的。</p>
+<h3 id="交换器"><a href="#交换器" class="headerlink" title="交换器"></a>交换器</h3><p>在之前的章节中我们从一个队列里发送和接收消息，现在该把完整的RabbitMQ消息模型介绍给大家了。</p>
+<p>让我们快速的回看一遍在之前的章节中的内容：</p>
+<pre><code>&gt;生产者是一个用来发送消息的程序
+
+&gt;队列是一个存储消息的缓冲区
+
+&gt;消费者是一个接收消息的程序
+</code></pre><p>RabbitMQ消息模型的核心思想是，生产者永远不会直接发送给任何消息队列，实际上，生产者一般情况下甚至不知道消息应该发送给哪个队列。</p>
+<p>生产者只能发送消息到交换器中，交换器非常简单。一方面从生产者接收消息，另一方面把消息推送到队列中。交换器必须知道如何处理接收到的消息，是推送到某个队列？推送到多个队列？还是丢弃这条消息。这个规则通过交换器类型(exchange type)来指定。</p>
+<p><img src="/images/rabbitmq/exchanges.png" alt=""></p>
+<p>这里是交换器的几个类型：direct,topic,headers,fanout。这里我们主要关注最后一个–fanout，创建一个类型为 fanout 的交换器，命名为 logs。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$channel-&gt;exchange_declare(&apos;logs&apos;,&apos;fanout&apos;,false,false,false);</span><br></pre></td></tr></table></figure>
+<p>fanout交换器非常简单，你可以从名称中猜出它的功能，它把所有接收到的消息广播给所有它知道的队列，这也正是我们的日志系统需要的功能。</p>
+<h4 id="列出交换器"><a href="#列出交换器" class="headerlink" title="列出交换器"></a>列出交换器</h4><p>可以使用rabbitmqctl 命令列出服务器上的所有交换器：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">sudo rabbitmqctl list_exchanges</span><br><span class="line"></span><br><span class="line">Listing exchanges ...</span><br><span class="line">        direct</span><br><span class="line">amq.direct      direct</span><br><span class="line">amq.fanout      fanout</span><br><span class="line">amq.headers     headers</span><br><span class="line">amq.match       headers</span><br><span class="line">amq.rabbitmq.log        topic</span><br><span class="line">amq.rabbitmq.trace      topic</span><br><span class="line">amq.topic       topic</span><br><span class="line">logs    fanout</span><br><span class="line">...done.</span><br></pre></td></tr></table></figure>
+<p>结果中有一些amq.*和一些未命名的交换器，这是一些默认创建的交换器，它们不太可能是现在需要用到的。</p>
+<h4 id="未命名交换器"><a href="#未命名交换器" class="headerlink" title="未命名交换器"></a>未命名交换器</h4><p>在之前的章节中我们对交换器一无所知，直到可以发送消息给队列。大概是因为我们当时正在使用一个以空字符串“”定义的默认的交换器。</p>
+<p>回想一下之前怎么发布消息：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$channel-&gt;basic_publish($msg,&apos;&apos;,&apos;hello&apos;);</span><br></pre></td></tr></table></figure>
+<p>这里就是使用默认或者说未命名的交换器：消息被routing_key的值<br>Here we use the default or nameless exchange: messages are routed to the queue with the name specified by routing_key, if it exists. The routing key is the second argument to basic_publish</p>
+<p>现在，可以发布消息到这个队列。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$channel-&gt;exchange_declare(&apos;logs&apos;,&apos;fanout&apos;,false,false,false);</span><br><span class="line">$channel-&gt;basic_publish($msg,&apos;logs&apos;);</span><br></pre></td></tr></table></figure>
+<h3 id="临时队列"><a href="#临时队列" class="headerlink" title="临时队列"></a>临时队列</h3><p>也许你还记得在之前我们使用了一个指定的队列（还记得 hello 队列 和 task_queue 队列吗？）。可以命名一个队列是至关重要的–我们需要指定一个worker到同一个队列。当想让生产者和消费者使用同一个队列时给队列命名是非常重要的。</p>
+<p>但是在我们的日志系统中情况不同了，我们想要接收所有的消息，不仅仅是其中的一部分，我们关心的是最新的消息而不是旧的，因此需要做两件事。</p>
+<p>首先，当连接到RabbitMQ时，需要一个空的队列，可以手动创建一个名字随机的队列，或者，更好的办法是，让服务器为我们随机选一个队列名字。</p>
+<p>其次，一旦与消费者失去连接，队列需要自动删除。</p>
+<p>在<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="noopener">php-amqplib</a>中，当我们创建了一个名字为空的队列时，实际上是创建了一个被生成了名字的非持久化的队列。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">list($queue_name, ,) = $channel-&gt;queue_declare(&quot;&quot;);</span><br></pre></td></tr></table></figure>
+<p>方法执行后，$queue_name变量包含了一个RabbitMQ生成的字符串。比如也许是这样的：amq.gen-JzTY20BRgKO-HjmUJj0wLg。</p>
+<p>当连接被关闭的时候，队列也会被删掉，因为队列是独有的。</p>
+<h3 id="绑定-Bindlings"><a href="#绑定-Bindlings" class="headerlink" title="绑定(Bindlings)"></a>绑定(Bindlings)</h3><p><img src="/images/rabbitmq/bindings.png" alt=""></p>
+<p>我们已经创建了一个fanout类型的交换器和一个队列。现在需要让交换器发送消息给队列。交换器和队列之间的关系称之为绑定(binding)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$channel-&gt;queue_bind($queue_name,&apos;logs&apos;);</span><br></pre></td></tr></table></figure>
+<p>现在开始，logs 交换器会把消息附加到队列中。</p>
+<h4 id="列出绑定（Listing-bindings）"><a href="#列出绑定（Listing-bindings）" class="headerlink" title="列出绑定（Listing bindings）"></a>列出绑定（Listing bindings）</h4><p>可以使用 rabbitmqctl list_bindings列出所有存在的正在使用的绑定。</p>
+<h3 id="整合"><a href="#整合" class="headerlink" title="整合"></a>整合</h3><p><img src="/images/rabbitmq/python-three-overall.png" alt=""></p>
+<p>发送日志消息的生产者，与之前的代码看起来没什么不同，最重要的变化是现在想要发送消息到我们的 logs 交换器中，需要在发送时提供一个routing_key，但是在 fanout类型的交换器中这个值是可以忽略的。下边是emit_log.php的代码。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">require_once</span> <span class="keyword">__DIR__</span> .<span class="string">'/verdor/autoload.php'</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Connection</span>\<span class="title">AMQPStreamConnection</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Message</span>\<span class="title">AMQPMessage</span>;</span><br><span class="line"></span><br><span class="line">$connection = <span class="keyword">new</span> AMQPStreamConnection(<span class="string">'localhost'</span>,<span class="number">5672</span>,<span class="string">'guest'</span>,<span class="string">'guest'</span>);</span><br><span class="line">$channel = $channel-&gt;channel();</span><br><span class="line"></span><br><span class="line">$channel-&gt;exchange_declare(<span class="string">'logs'</span>,<span class="string">'fanout'</span>,<span class="keyword">false</span>,<span class="keyword">false</span>,<span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line">$data = implode(<span class="string">' '</span>,array_slice($argv,<span class="number">1</span>));</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">empty</span>($data)) $data = <span class="string">"info:Hello World"</span>;</span><br><span class="line">$msg = <span class="keyword">new</span> AMQPMessage($data);</span><br><span class="line"></span><br><span class="line">$channel-&gt;basic_publish($msg,<span class="string">'logs'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> <span class="string">"[x]Sent "</span>,$data,<span class="string">"\n"</span>;</span><br><span class="line"></span><br><span class="line">$channel-&gt;close();</span><br><span class="line">$connection-&gt;close();</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>(<a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/emit_log.php" target="_blank" rel="noopener">emit_log.php</a>)</p>
+<p>如你所见，建立连接后声明了交换器，这一步是必须的，因为发送消息到一个不存在的交换器是被禁止的。</p>
+<p>如果还没有队列绑定到交换器，信息会丢失，但是这对于我们是可以的，如果没有消费者监听，我们可以安全的丢弃消息。</p>
+<p>receive_logs.php：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">require_once</span> <span class="keyword">__DIR__</span> .<span class="string">'/vendor/autoload.php'</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Connection</span>\<span class="title">QMAPStreamConnection</span>;</span><br><span class="line"></span><br><span class="line">$connection = <span class="keyword">new</span> AMQPStreamConnection(<span class="string">'localhost'</span>,<span class="number">5672</span>,<span class="string">'guest'</span>,<span class="string">'guest'</span>);</span><br><span class="line">$channel = $connection-&gt;channel();</span><br><span class="line"></span><br><span class="line">$channel-&gt;queue_bind($queue_name,<span class="string">'logs'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> <span class="string">'[*] Waiting for logs. To exit press CTRL+C'</span>,<span class="string">"\n"</span>;</span><br><span class="line"></span><br><span class="line">$callback = <span class="function"><span class="keyword">function</span><span class="params">($msg)</span></span>&#123;</span><br><span class="line">	<span class="keyword">echo</span> <span class="string">'[x]'</span>,$msg-&gt;body,<span class="string">"\n"</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">$channel-&gt;basic_consume($queue_name,<span class="string">''</span>,<span class="keyword">false</span>,<span class="keyword">true</span>,<span class="keyword">false</span>,<span class="keyword">false</span>,$callback);</span><br><span class="line"></span><br><span class="line">whild(count($channel-&gt;callbacks))&#123;</span><br><span class="line">	$channel-&gt;wait();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$channel-&gt;close();</span><br><span class="line">$connection-&gt;close();</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>(<a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/receive_logs.php" target="_blank" rel="noopener">receive_logs.php</a>)</p>
+<p>如果想保存日志到文件中，可以在命令中输入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php receive_logs.php &gt; logs_from_rabbit.log</span><br></pre></td></tr></table></figure>
+<p>如果想在屏幕上查看日志，新打开一个终端并运行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php receive_logs.php</span><br></pre></td></tr></table></figure>
+<p>发送日志：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php emit_log.php</span><br></pre></td></tr></table></figure>
+<p>使用 rabbitmqctl list_bindings 可以确认代码确实创建了绑定和队列，当两个receive_logs.php在运行的时候会看到类似这样的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo rabbitmqctl list_bindings</span><br><span class="line">Listing bindings ...</span><br><span class="line">logs    exchange        amq.gen-JzTY20BRgKO-HjmUJj0wLg  queue           []</span><br><span class="line">logs    exchange        amq.gen-vso0PVvyiRIL2WoV3i48Yg  queue           []</span><br><span class="line">...done.</span><br></pre></td></tr></table></figure>
+<p>对于结果的解释很简单，logs交换器中的数据发送到两个服务器指定的队列，而这正是我们要实现的。</p>
+<p>想要弄明白怎样去监听部分消息，转到第四部分。</p>
+<p>原文地址：<a href="https://www.rabbitmq.com/tutorials/tutorial-three-php.html" target="_blank" rel="noopener">Publish/Subscribe</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html" data-id="cjgoog5fi003kkis6w2j4gxy1" class="article-share-link">Share</a>
+      
+        <a href="https://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/php/">php</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/rabbitmq/">rabbitmq</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+  
     <article id="post-php-rabbitmq-tutorial-two" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2016/04/17/php-rabbitmq-tutorial-two.html" class="article-date">
@@ -159,7 +260,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html" data-id="cjgfwdlfz003esfs6upbv56pw" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html" data-id="cjgoog5fd003fkis6iqhqa9jh" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html#comments" class="article-comment-link">Comments</a>
       
@@ -258,7 +359,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html" data-id="cjgfwdlfv0035sfs6gvthayb6" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html" data-id="cjgoog5fa0038kis6icjkaai3" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html#comments" class="article-comment-link">Comments</a>
       
@@ -304,7 +405,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html" data-id="cjgfwdleh000asfs6r1s4jxbx" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html" data-id="cjgoog5dv000bkis6a8125am0" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html#comments" class="article-comment-link">Comments</a>
       
@@ -360,7 +461,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html" data-id="cjgfwdled0005sfs6cann6sgg" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html" data-id="cjgoog5dp0005kis6wlt2jovw" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html#comments" class="article-comment-link">Comments</a>
       
@@ -417,7 +518,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/02/03/MySQL实现row_number .html" data-id="cjgfwdlec0004sfs609gxmlbg" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/02/03/MySQL实现row_number .html" data-id="cjgoog5do0004kis6kl3f2xte" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/02/03/MySQL实现row_number .html#comments" class="article-comment-link">Comments</a>
       
@@ -472,7 +573,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/01/19/echarts-pie.html" data-id="cjgfwdlf00018sfs69h5a48hc" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/01/19/echarts-pie.html" data-id="cjgoog5ee001akis6j5jkvkwu" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/01/19/echarts-pie.html#comments" class="article-comment-link">Comments</a>
       
@@ -522,7 +623,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/01/11/placeholder-animate.html" data-id="cjgfwdlg0003hsfs62dwuhdqe" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/01/11/placeholder-animate.html" data-id="cjgoog5fl003nkis6c5v1rcmw" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/01/11/placeholder-animate.html#comments" class="article-comment-link">Comments</a>
       
@@ -600,7 +701,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html" data-id="cjgfwdlel000gsfs6ynijj0wf" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html" data-id="cjgoog5dz000hkis6m1vbsg02" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html#comments" class="article-comment-link">Comments</a>
       
@@ -670,96 +771,12 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html" data-id="cjgfwdlf2001asfs6kcr9d6a4" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html" data-id="cjgoog5ec0018kis67nzpj0pn" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html#comments" class="article-comment-link">Comments</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dropbox/">dropbox</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hexo/">hexo</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-  
-    <article id="post-secure-your-website-with-lets-encrypt" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2015/12/19/secure-your-website-with-lets-encrypt.html" class="article-date">
-  <time datetime="2015-12-19T08:38:37.000Z" itemprop="datePublished">2015-12-19</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2015/12/19/secure-your-website-with-lets-encrypt.html">使用Let&#39;s Encrypt制作数字证书</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><img src="https://s.qichengzx.com/img/201512/https.png" alt=""></p>
-<p>Let’s Encrypt是一个新的CA机构，提供非常简单并且免费的TLS／SSL证书服务。</p>
-<p>可谓万众期待。</p>
-<p>说下我的环境：</p>
-<pre><code>Ubuntu 14.04.3
-Nginx 1.4.6
-</code></pre><p>首先你要有个域名，其次要有个服务器。</p>
-<h3 id="STEP-0-－-安装Let’s-Encrypt-客户端"><a href="#STEP-0-－-安装Let’s-Encrypt-客户端" class="headerlink" title="STEP 0 － 安装Let’s Encrypt 客户端"></a>STEP 0 － 安装Let’s Encrypt 客户端</h3><h5 id="安装git"><a href="#安装git" class="headerlink" title="安装git"></a>安装git</h5><p>先更新下系统</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get -y install git</span><br></pre></td></tr></table></figure>
-<h5 id="Clone-Let’s-Encrypt"><a href="#Clone-Let’s-Encrypt" class="headerlink" title="Clone Let’s Encrypt"></a>Clone Let’s Encrypt</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo git clone https://github.com/letsencrypt/letsencrypt /opt/letsencrypt</span><br></pre></td></tr></table></figure>
-<p>这里把下载的文件放到了/opt/letsencrypt文件夹</p>
-<h3 id="STEP-1－生成证书"><a href="#STEP-1－生成证书" class="headerlink" title="STEP 1－生成证书"></a>STEP 1－生成证书</h3><p>首先需要关闭80端口</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo nginx -s stop</span><br></pre></td></tr></table></figure>
-<p>接下来运行Let’s Encrypt</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd /opt/letsencrypt</span><br><span class="line">./letsencrypt-auto certonly --standalone</span><br></pre></td></tr></table></figure>
-<p>注意：需要超级用户权限，所以需要输入密码</p>
-<p>之后会出现提示框，需要输入邮箱，用于接收提醒和，如果不幸丢失了Key，找回的时候也需要邮箱。</p>
-<p>根据提示进行操作即可，接下来啥同意用户协议。</p>
-<p>下一步则是输入你需要生成证书的域名了，如果需要一个证书给多个域名使用，这些域名则要全部输入，（example.com和<a href="http://www.example.com是不同的域名），域名之间用空格，逗号，左斜杠" target="_blank" rel="noopener">www.example.com是不同的域名），域名之间用空格，逗号，左斜杠</a> 分隔。</p>
-<p>成功后会有如下提示：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">IMPORTANT NOTES:</span><br><span class="line"></span><br><span class="line"> - If you lose your account credentials, you can recover through</span><br><span class="line">   e-mails sent to sammy@digitalocean.com</span><br><span class="line"> - Congratulations! Your certificate and chain have been saved at</span><br><span class="line">    /etc/letsencrypt/live/example.com/fullchain.pem. Your</span><br><span class="line">   cert will expire on 2016-03-15. To obtain a new version of the</span><br><span class="line">   certificate in the future, simply run Let&apos;s Encrypt again.</span><br><span class="line"> - Your account credentials have been saved in your Let&apos;s Encrypt</span><br><span class="line">   configuration directory at /etc/letsencrypt. You should make a</span><br><span class="line">   secure backup of this folder now. This configuration directory will</span><br><span class="line">   also contain certificates and private keys obtained by Let&apos;s</span><br><span class="line">   Encrypt so making regular backups of this folder is ideal.</span><br><span class="line"> - If like Let&apos;s Encrypt, please consider supporting our work by:</span><br><span class="line"></span><br><span class="line">   Donating to ISRG / Let&apos;s Encrypt:   https://letsencrypt.org/donate</span><br><span class="line">   Donating to EFF:                    https://eff.org/donate-le</span><br></pre></td></tr></table></figure>
-<p>证书位置：/etc/letsencrypt/live/example.com/fullchain.pem</p>
-<p>过期时间：2016-03-15</p>
-<p>至于过期时间为什么这么短则是出于安全考虑。不宜使用同一个证书太长时间。</p>
-<h5 id="证书文件："><a href="#证书文件：" class="headerlink" title="证书文件："></a>证书文件：</h5><p>上一步成功后，会有如下4个文件生成。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ls /etc/letsencrypt/live/your_domain_name</span><br></pre></td></tr></table></figure>
-<pre><code>cert.pem: 证书
-chain.pem: The Let&apos;s Encrypt chain certificate（不知道什么鬼）
-fullchain.pem: cert.pem and chain.pem combined
-privkey.pem: 证书私钥
-</code></pre><h3 id="STEP-2－配置Web服务器-Nginx"><a href="#STEP-2－配置Web服务器-Nginx" class="headerlink" title="STEP 2－配置Web服务器(Nginx)"></a>STEP 2－配置Web服务器(Nginx)</h3><p>证书生成完毕，现在可以配置Web服务器了。</p>
-<p>编辑配置文件：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vi /etc/nginx/sites-available/default</span><br></pre></td></tr></table></figure>
-<p>在server区块中，增加如下代码：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">listen 443 ssl;</span><br><span class="line">server_name example.com;</span><br><span class="line">ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;</span><br><span class="line">ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;</span><br></pre></td></tr></table></figure>
-<p>如果之前是绑定的80端口，直接改为443即可，后边增加 ssl 。</p>
-<p>如果想使用最安全的SSL协议，增加如下代码：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ssl_protocols TLSv1 TLSv1.1 TLSv1.2;</span><br><span class="line">ssl_prefer_server_ciphers on;</span><br><span class="line">ssl_ciphers AES256+EECDH:AES256+EDH:!aNULL;</span><br></pre></td></tr></table></figure>
-<p>最后，在server区块后再增加一段，用于从HTTP跳转到HTTPS。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen 80;</span><br><span class="line">    server_name example.com;</span><br><span class="line">    rewrite ^/(.*) https://example.com/$1 permanent;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>保存，退出。</p>
-<p>重启Nginx服务器。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo nginx -s reopen</span><br></pre></td></tr></table></figure>
-<p>现在已经可以通过HTTPS访问网站了。</p>
-<p>原文中还有设置自动生成证书的部分，出于懒的原因此处不再写。</p>
-<p>参考资料：<br><a href="https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-14-04" target="_blank" rel="noopener">How To Secure Nginx with Let’s Encrypt on Ubuntu 14.04</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html" data-id="cjgfwdlg7003wsfs6dl94mm9o" class="article-share-link">Share</a>
-      
-        <a href="https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html#comments" class="article-comment-link">Comments</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/https/">https</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ssl/">ssl</a></li></ul>
 
     </footer>
   </div>
@@ -809,7 +826,7 @@ privkey.pem: 证书私钥
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/git/">git</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/nginx/">nginx</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">11</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/git/">git</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">19</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/nginx/">nginx</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">11</span></li></ul>
     </div>
   </div>
 
@@ -818,7 +835,7 @@ privkey.pem: 证书私钥
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geo/">geo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">17</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redigo/">redigo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geo/">geo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">18</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redigo/">redigo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -836,7 +853,7 @@ privkey.pem: 证书私钥
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
     </div>
   </div>
 
@@ -846,6 +863,10 @@ privkey.pem: 证书私钥
     <h3 class="widget-title">Recents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2018/05/02/go-closure.html">Go 闭包</a>
+          </li>
         
           <li>
             <a href="/2018/04/25/dockerfile-build-arg.html">Dockerfile 构建参数</a>
@@ -861,10 +882,6 @@ privkey.pem: 证书私钥
         
           <li>
             <a href="/2018/02/25/how-to-sort-in-go.html">Go slice，struct排序</a>
-          </li>
-        
-          <li>
-            <a href="/2018/02/11/go-struct-tag.html">Go struct 转 map 使用自定义标签</a>
           </li>
         
       </ul>

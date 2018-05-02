@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://www.qichengzx.com/"/>
-  <updated>2018-04-26T02:16:03.000Z</updated>
+  <updated>2018-05-02T05:44:44.000Z</updated>
   <id>https://www.qichengzx.com/</id>
   
   <author>
@@ -15,6 +15,32 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Go 闭包</title>
+    <link href="https://www.qichengzx.com/2018/05/02/go-closure.html"/>
+    <id>https://www.qichengzx.com/2018/05/02/go-closure.html</id>
+    <published>2018-05-02T02:32:04.000Z</published>
+    <updated>2018-05-02T05:44:44.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>在 Go 中可以在一个函数里创建另一个函数。如下：</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">add := <span class="function"><span class="keyword">func</span><span class="params">(x, y <span class="keyword">int</span>)</span> <span class="title">int</span></span> &#123;</span><br><span class="line"><span class="keyword">return</span> x + y</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fmt.Println(add(<span class="number">1</span>,<span class="number">1</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>add 是一个属性为 func(int, int) int (两个 int 类型参数，返回值类型为 int 的函数)的局部变量。这样的局部函数还可以访问其他局部变量。</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">x := <span class="number">0</span></span><br><span class="line">increment := <span class="function"><span class="keyword">func</span><span class="params">()</span> <span class="title">int</span></span> &#123;</span><br><span class="line">x++</span><br><span class="line"><span class="keyword">return</span> x</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fmt.Println(increment())</span><br><span class="line">fmt.Println(increment())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>increment 函数为在 main 函数作用域中定义的变量 x 加1。 变量 x 可以被 increment 函数访问和修改。所以以上程序第一行将会输出：1，第二行将会输出：2。</p><p>这样的函数以及它引用的非本地变量称为闭包。 在本示例中，increment 函数和变量 x 形成闭包。</p><p>使用闭包的一种方法是编写一个函数，该函数返回另一个函数 - 当被调用时 - 可以生成一个数字序列。 例如，我们可以生成所有的偶数：</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">makeEvenGenerator</span><span class="params">()</span> <span class="title">func</span><span class="params">()</span> <span class="title">uint</span></span> &#123;</span><br><span class="line">i := <span class="keyword">uint</span>(<span class="number">0</span>)</span><br><span class="line"><span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">()</span> <span class="params">(ret <span class="keyword">uint</span>)</span></span> &#123;</span><br><span class="line">ret = i</span><br><span class="line">i += <span class="number">2</span></span><br><span class="line"><span class="keyword">return</span></span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">nextEven := makeEvenGenerator()</span><br><span class="line">fmt.Println(nextEven()) <span class="comment">// 0</span></span><br><span class="line">fmt.Println(nextEven()) <span class="comment">// 2</span></span><br><span class="line">fmt.Println(nextEven()) <span class="comment">// 4</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>makeEvenGenerator 返回一个生成偶数的函数。 每次调用它时，它会将2添加到本地i变量中 - 与正常的局部变量不同，它会在调用之间保持不变。</p><p>原文：<a href="https://www.golang-book.com/books/intro/7#section4" target="_blank" rel="noopener">Closure</a></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;在 Go 中可以在一个函数里创建另一个函数。如下：&lt;/p&gt;
+&lt;figure class=&quot;highlight go&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=
+      
+    
+    </summary>
+    
+      <category term="golang" scheme="https://www.qichengzx.com/categories/golang/"/>
+    
+    
+      <category term="go" scheme="https://www.qichengzx.com/tags/go/"/>
+    
+  </entry>
   
   <entry>
     <title>Dockerfile 构建参数</title>
@@ -537,33 +563,6 @@
     
     
       <category term="php" scheme="https://www.qichengzx.com/tags/php/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>用Docker部署Golang Beego框架应用</title>
-    <link href="https://www.qichengzx.com/2016/10/21/beego-in-docker.html"/>
-    <id>https://www.qichengzx.com/2016/10/21/beego-in-docker.html</id>
-    <published>2016-10-21T02:02:02.000Z</published>
-    <updated>2018-02-27T13:14:16.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>Docker是什么就不说了。<br>Golang是什么也不说了。<br>Beego是什么就更不用说了。</p><p>最近Beego项目完成，研究怎么部署。因为Docker部署起来更简单更快速，所以就说下怎么在docker里部署beego应用。</p><h4 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h4><p>假设你的应用路径为 /go/app；<br>假设已配置好docker的相关东西。<br>假设使用 <a href="https://github.com/tools/godep" target="_blank" rel="noopener">godep</a> 作为依赖管理工具<br>示例中开放端口为80，需要与app.conf中的端口一致，可以自行修改。</p><h4 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h4><p>在 /go/app 目录新建Dockerfile。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">FROM golang:1.7.1-alpine</span><br><span class="line"></span><br><span class="line">MAINTAINER youremail &lt;youremail@xxx.com&gt;</span><br><span class="line"></span><br><span class="line">RUN apk add --update go git</span><br><span class="line"></span><br><span class="line">ADD ./ /go/src/app</span><br><span class="line"></span><br><span class="line">RUN cd /go/src/app \</span><br><span class="line">&amp;&amp; go get github.com/astaxie/beego \</span><br><span class="line">&amp;&amp; go get github.com/tools/godep \</span><br><span class="line">&amp;&amp; godep update -goversion \</span><br><span class="line">&amp;&amp; godep get \</span><br><span class="line">&amp;&amp; godep save \</span><br><span class="line">&amp;&amp; go build</span><br><span class="line"></span><br><span class="line">EXPOSE 80</span><br><span class="line"></span><br><span class="line">EXTRYPOINT /go/src/app/app</span><br></pre></td></tr></table></figure><p>本例使用 golang:1.7.1-alpine 作为基础镜像。golang的所有镜像见<a href="https://hub.docker.com/_/golang/" target="_blank" rel="noopener">这里</a>。</p><h4 id="构建"><a href="#构建" class="headerlink" title="构建"></a>构建</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker build -t app .</span><br></pre></td></tr></table></figure><h4 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d -p 8080:80 app</span><br></pre></td></tr></table></figure><h4 id="访问"><a href="#访问" class="headerlink" title="访问"></a>访问</h4><p>使用nginx反向代理访问docker中的go应用。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen       80;</span><br><span class="line">    server_name  app.com;</span><br><span class="line"></span><br><span class="line">    charset utf-8;</span><br><span class="line">    access_log  logs/app.access.log;</span><br><span class="line"></span><br><span class="line">    location / &#123;</span><br><span class="line">        try_files /_not_exists_ @backend;</span><br><span class="line">    &#125;</span><br><span class="line">    if (!-e $request_filename) &#123;</span><br><span class="line">        return 404;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    location @backend &#123;</span><br><span class="line">        proxy_set_header X-Forwarded-For $remote_addr;</span><br><span class="line">        proxy_set_header Host            $http_host;</span><br><span class="line"></span><br><span class="line">        proxy_pass http://192.168.99.100:8080; // 192.168.99.100为docker machine的ip,8080为 docker run 时指定的本地端口。</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h4 id="相关资料"><a href="#相关资料" class="headerlink" title="相关资料"></a>相关资料</h4><p><a href="https://yq.aliyun.com/articles/57247" target="_blank" rel="noopener">如何使用Docker快速部署go-web应用程序</a><br><a href="https://blog.golang.org/docker" target="_blank" rel="noopener">Deploying Go servers with Docker</a><br><a href="http://www.infoq.com/cn/articles/how-to-deploy-a-go-web-application-with-docker?utm_source=infoq&amp;utm_medium=related_content_link&amp;utm_campaign=relatedContent_articles_clk" target="_blank" rel="noopener">如何使用Docker部署Go Web应用程序</a><br><a href="https://www.iron.io/the-easiest-way-to-develop-with-go%E2%80%8A-%E2%80%8Aintroducing-a-docker-based-go-tool/" target="_blank" rel="noopener">The Easiest Way to Develop with Go — Introducing a Docker Based Go Tool</a><br><a href="https://semaphoreci.com/community/tutorials/how-to-deploy-a-go-web-application-with-docker" target="_blank" rel="noopener">How To Deploy a Go Web Application with Docker</a><br><a href="https://beego.me/docs/deploy/nginx.md" target="_blank" rel="noopener">nginx 部署</a></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;Docker是什么就不说了。&lt;br&gt;Golang是什么也不说了。&lt;br&gt;Beego是什么就更不用说了。&lt;/p&gt;
-&lt;p&gt;最近Beego项目完成，研究怎么部署。因为Docker部署起来更简单更快速，所以就说下怎么在docker里部署beego应用。&lt;/p&gt;
-&lt;h4 id=&quot;写在
-      
-    
-    </summary>
-    
-      <category term="golang" scheme="https://www.qichengzx.com/categories/golang/"/>
-    
-    
-      <category term="go" scheme="https://www.qichengzx.com/tags/go/"/>
     
   </entry>
   
