@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://www.qichengzx.com/"/>
-  <updated>2018-05-02T05:44:44.000Z</updated>
+  <updated>2018-05-03T08:57:44.000Z</updated>
   <id>https://www.qichengzx.com/</id>
   
   <author>
@@ -15,6 +15,33 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Go 递归</title>
+    <link href="https://www.qichengzx.com/2018/05/03/go-recursion.html"/>
+    <id>https://www.qichengzx.com/2018/05/03/go-recursion.html</id>
+    <published>2018-05-03T07:15:41.000Z</published>
+    <updated>2018-05-03T08:57:44.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>递归，就是在运行的过程中调用自己。</p><p>通过以下阶乘函数来看下递归的写法：</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">factorial</span><span class="params">(x <span class="keyword">uint</span>)</span> <span class="title">uint</span></span> &#123;</span><br><span class="line">  <span class="keyword">if</span> x == <span class="number">0</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> x * factorial(x<span class="number">-1</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>factorial 函数调用自己，形成函数递归，为了更好地理解这个函数是如何工作的，可以通过 factorial(2) 来理解。</p><ul><li><p>x == 0 ？ 不等于, x = 2</p></li><li><p>计算 x - 1 的阶乘</p><ul><li><p>x == 0 ? 不等于, x = 1</p></li><li><p>计算 x - 1 的阶乘</p><ul><li>x == 0 ? 等于, 返回 1</li></ul></li><li><p>返回 1 * 1</p></li></ul></li><li><p>返回 2 * 1</p></li></ul><p>递归函数通过不断的调用自身完成需求，需要注意的是需要设置退出条件，否则就死循环了。</p><p>递归函数可以非常方便的解决数学上的问题，如阶乘，斐波那契数列等。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;递归，就是在运行的过程中调用自己。&lt;/p&gt;
+&lt;p&gt;通过以下阶乘函数来看下递归的写法：&lt;/p&gt;
+&lt;figure class=&quot;highlight go&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span
+      
+    
+    </summary>
+    
+      <category term="golang" scheme="https://www.qichengzx.com/categories/golang/"/>
+    
+    
+      <category term="go" scheme="https://www.qichengzx.com/tags/go/"/>
+    
+  </entry>
   
   <entry>
     <title>Go 闭包</title>
@@ -537,32 +564,6 @@
       <category term="goquery" scheme="https://www.qichengzx.com/tags/goquery/"/>
     
       <category term="gin" scheme="https://www.qichengzx.com/tags/gin/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Mac brew php7.1环境下安装Yaf</title>
-    <link href="https://www.qichengzx.com/2016/11/02/install-yaf-on-mac.html"/>
-    <id>https://www.qichengzx.com/2016/11/02/install-yaf-on-mac.html</id>
-    <published>2016-11-02T09:57:38.000Z</published>
-    <updated>2018-02-27T13:14:16.000Z</updated>
-    
-    <content type="html"><![CDATA[<p><img src="/images/php/think201-emergence-of-php7.jpg" alt=""></p><p>开发机一直使用brew来安装PHP及其他的环境，今天把PHP升到7.1，由于7.1版本下还没有<a href="http://www.laruence.com/manual/" target="_blank" rel="noopener">yaf</a>的源，所以无法使用brew安装，只能编译安装了。</p><p>首先下载yaf，解压，进入目录。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">git clone git@github.com:laruence/yaf.git</span><br><span class="line"></span><br><span class="line">$(brew --prefix homebrew/php/php71)/bin/phpize</span><br><span class="line"></span><br><span class="line">./configure --with-php-config=$(brew --prefix homebrew/php/php71)/bin/php-config</span><br><span class="line"></span><br><span class="line">make &amp;&amp; make install</span><br><span class="line"></span><br><span class="line">make test</span><br></pre></td></tr></table></figure><p>$(brew –prefix homebrew/php/php71) 即 brew info php71结果中的path值。</p><p>由于brew安装PHP会在php.ini同级目录创建conf.d目录，并把扩展的配置文件写在这里，一目了然知道都安装了哪些扩展，所以也以同样方式在此目录创建ext-yaf.ini。</p><p>make install 后会显示，具体路径可能会不一样。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Installing shared extensions:     /usr/local/Cellar/php71/7.1.0-rc.5_9/lib/php/extensions/no-debug-non-zts-20160303/</span><br></pre></td></tr></table></figure><p>这个目录即扩展.so的存放目录。下边会用到。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[yaf]</span><br><span class="line">extension=&quot;/usr/local/opt/php71/lib/php/extensions/no-debug-non-zts-20160303/yaf.so&quot;</span><br><span class="line">yaf.environ=&quot;dev&quot;</span><br><span class="line">;yaf.use_namespace = 1</span><br></pre></td></tr></table></figure><p>至此，重启php-fpm就可以了。</p><p>####<br>图片来自：<a href="https://think201.com/blog/2016/emergence-of-php7/" target="_blank" rel="noopener">Emergence of PHP7</a></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;&lt;img src=&quot;/images/php/think201-emergence-of-php7.jpg&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
-&lt;p&gt;开发机一直使用brew来安装PHP及其他的环境，今天把PHP升到7.1，由于7.1版本下还没有&lt;a href=&quot;http://www.l
-      
-    
-    </summary>
-    
-      <category term="php" scheme="https://www.qichengzx.com/categories/php/"/>
-    
-    
-      <category term="php" scheme="https://www.qichengzx.com/tags/php/"/>
     
   </entry>
   

@@ -3,19 +3,21 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   
-  <title>Tag: mysql | 启程</title>
+  <title>Go 递归 | 启程</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta http-equiv="Access-Control-Allow-Origin" content="*">
-  <meta name="description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
-<meta property="og:type" content="website">
-<meta property="og:title" content="启程">
-<meta property="og:url" content="https://www.qichengzx.com/tags/mysql/index.html">
+  <meta name="description" content="递归，就是在运行的过程中调用自己。 通过以下阶乘函数来看下递归的写法： 123456func factorial(x uint) uint &amp;#123;  if x == 0 &amp;#123;    return 1  &amp;#125;  return x * factorial(x-1)&amp;#125; factorial 函数调用自己，形成函数递归，为了更好地理解这个函数是如何工作的，可以通过 facto">
+<meta name="keywords" content="go">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go 递归">
+<meta property="og:url" content="https://www.qichengzx.com/2018/05/03/go-recursion.html">
 <meta property="og:site_name" content="启程">
-<meta property="og:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
+<meta property="og:description" content="递归，就是在运行的过程中调用自己。 通过以下阶乘函数来看下递归的写法： 123456func factorial(x uint) uint &amp;#123;  if x == 0 &amp;#123;    return 1  &amp;#125;  return x * factorial(x-1)&amp;#125; factorial 函数调用自己，形成函数递归，为了更好地理解这个函数是如何工作的，可以通过 facto">
 <meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-05-03T08:57:44.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="启程">
-<meta name="twitter:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
+<meta name="twitter:title" content="Go 递归">
+<meta name="twitter:description" content="递归，就是在运行的过程中调用自己。 通过以下阶乘函数来看下递归的写法： 123456func factorial(x uint) uint &amp;#123;  if x == 0 &amp;#123;    return 1  &amp;#125;  return x * factorial(x-1)&amp;#125; factorial 函数调用自己，形成函数递归，为了更好地理解这个函数是如何工作的，可以通过 facto">
 <meta name="twitter:creator" content="@qichengzx">
   
     <link rel="alternative" href="/atom.xml" title="启程" type="application/atom+xml">
@@ -63,174 +65,84 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2017" class="archive-year">2017</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2017/06/27/order-by-distance-in-mysql.html" class="archive-article-date">
-  <time datetime="2017-06-27T14:18:19.000Z" itemprop="datePublished">Jun 27</time>
+        <section id="main"><article id="post-go-recursion" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/03/go-recursion.html" class="article-date">
+  <time datetime="2018-05-03T07:15:41.000Z" itemprop="datePublished">2018-05-03</time>
 </a>
-      
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/golang/">golang</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/06/27/order-by-distance-in-mysql.html">MySQL实现按经纬度做距离排序</a>
+    <h1 class="article-title" itemprop="name">
+      Go 递归
     </h1>
   
 
-    </header>
-  </div>
-</article>
-  
+      </header>
     
-    
+    <div class="article-entry" itemprop="articleBody">
       
-        </div></section>
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2016" class="archive-year">2016</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2016/02/24/MySql-row_number-part-2.html" class="archive-article-date">
-  <time datetime="2016-02-24T09:58:24.000Z" itemprop="datePublished">Feb 24</time>
-</a>
-      
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/02/24/MySql-row_number-part-2.html">MySQL实现row_number第二部分</a>
-    </h1>
-  
+        <p>递归，就是在运行的过程中调用自己。</p>
+<p>通过以下阶乘函数来看下递归的写法：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">factorial</span><span class="params">(x <span class="keyword">uint</span>)</span> <span class="title">uint</span></span> &#123;</span><br><span class="line">  <span class="keyword">if</span> x == <span class="number">0</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> x * factorial(x<span class="number">-1</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>factorial 函数调用自己，形成函数递归，为了更好地理解这个函数是如何工作的，可以通过 factorial(2) 来理解。</p>
+<ul>
+<li><p>x == 0 ？ 不等于, x = 2</p>
+</li>
+<li><p>计算 x - 1 的阶乘</p>
+<ul>
+<li><p>x == 0 ? 不等于, x = 1</p>
+</li>
+<li><p>计算 x - 1 的阶乘</p>
+<ul>
+<li>x == 0 ? 等于, 返回 1</li>
+</ul>
+</li>
+<li><p>返回 1 * 1</p>
+</li>
+</ul>
+</li>
+<li><p>返回 2 * 1</p>
+</li>
+</ul>
+<p>递归函数通过不断的调用自身完成需求，需要注意的是需要设置退出条件，否则就死循环了。</p>
+<p>递归函数可以非常方便的解决数学上的问题，如阶乘，斐波那契数列等。</p>
 
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2016/02/03/MySQL实现row_number .html" class="archive-article-date">
-  <time datetime="2016-02-03T10:25:26.000Z" itemprop="datePublished">Feb 3</time>
-</a>
       
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/02/03/MySQL实现row_number .html">MySQL实现row_number</a>
-    </h1>
-  
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://www.qichengzx.com/2018/05/03/go-recursion.html" data-id="cjgqascq0001ws0s6mivdfp5c" class="article-share-link">Share</a>
+      
+        <a href="https://www.qichengzx.com/2018/05/03/go-recursion.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li></ul>
 
-    </header>
+    </footer>
   </div>
-</article>
   
     
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2016/01/10/backup-database-with-crontab.html" class="archive-article-date">
-  <time datetime="2016-01-10T10:52:55.000Z" itemprop="datePublished">Jan 10</time>
-</a>
-      
+<nav id="article-nav">
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/01/10/backup-database-with-crontab.html">crontab实现定时备份数据库</a>
-    </h1>
   
+    <a href="/2018/05/02/go-closure.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Go 闭包</div>
+    </a>
+  
+</nav>
 
-    </header>
-  </div>
-</article>
   
-    
-    
-      
-        </div></section>
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2015" class="archive-year">2015</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2015/12/05/php-use-pdo-cache-query-result-with-redis.html" class="archive-article-date">
-  <time datetime="2015-12-05T14:37:09.000Z" itemprop="datePublished">Dec 5</time>
-</a>
-      
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2015/12/05/php-use-pdo-cache-query-result-with-redis.html">PHP使用Redis作为缓存使用PDO读取MySQL数据</a>
-    </h1>
-  
-
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2015/12/03/nodejs-mysql.html" class="archive-article-date">
-  <time datetime="2015-12-03T13:38:37.000Z" itemprop="datePublished">Dec 3</time>
-</a>
-      
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2015/12/03/nodejs-mysql.html">Node.js连接MySQL并读取数据</a>
-    </h1>
-  
-
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2015/11/21/export-results-of-mysql-to-excel.html" class="archive-article-date">
-  <time datetime="2015-11-21T13:24:35.000Z" itemprop="datePublished">Nov 21</time>
-</a>
-      
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2015/11/21/export-results-of-mysql-to-excel.html">MySQL命令行导出结果集到Excel</a>
-    </h1>
-  
-
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
-</section>
+</article></section>
         
           <aside id="sidebar">
   
