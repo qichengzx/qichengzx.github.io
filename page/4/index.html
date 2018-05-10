@@ -65,6 +65,95 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-php-rabbitmq-tutorial-five" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/04/27/php-rabbitmq-tutorial-five.html" class="article-date">
+  <time datetime="2016-04-27T10:27:03.000Z" itemprop="datePublished">2016-04-27</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/php/">php</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/04/27/php-rabbitmq-tutorial-five.html">PHP RabbitMQ 教程（五） - 主题</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="主题"><a href="#主题" class="headerlink" title="主题"></a>主题</h3><p>(<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="noopener">使用php-amqplib</a>)</p>
+<p>在<a href="/2016/04/24/php-rabbitmq-tutorial-four.html">上一节</a>我们改善了日志系统(logging system，以下简称日志系统)，为了替代fanout类型的交换器，我们使用了一个direct类型的交换器，带来的好处是可以有选择的接收日志。</p>
+<p>虽然使用direct交换器改善了系统，但是仍然有局限性 - 它不能根据多个条件进行路由。</p>
+<p>在日志系统中，我们也许不仅仅想订阅严重等级的日志，也想订阅基于消息发布源的内容。也许你已经知道这个概念来自于UNIX的<a href="http://en.wikipedia.org/wiki/Syslog" target="_blank" rel="noopener">syslog</a>工具，基于严重性(info/warn/crit…)和设备路由日志(auth/cron/kern…)的工具。</p>
+<p>这可以提高灵活性 - 我们也许只想要监听来自’cron’的关键错误而不是来自’kern’的全部日志。</p>
+<p>为了在我们的日志系统上实现这个功能，需要学习一个更复杂的 topic 交换器。</p>
+<h3 id="Topic-交换器"><a href="#Topic-交换器" class="headerlink" title="Topic 交换器"></a>Topic 交换器</h3><p>发送到 topic 交换器的消息不能随意设置 routing_key - 它必须是一个单词列表，以’.’分隔。单词可以是任何内容，但是通常会具体说明消息的功能。一些有效的routing key示例：样：”stock.usd.nyse”，”nyse.vmw”，”quick.orange.rabbit”。routing key 可以是任何长度的你喜欢的单词，最大255个字节。</p>
+<p>binding key 也必须是同样的格式，topic交换器的逻辑和direct交换器类似 - 带有特定routing key的消息会被派发到所有绑定了binding key的队列，然而对于binding key依然有两个重要的特殊情况：</p>
+<pre><code>*可以代替一个单词
+
+#可以代替0个或多个单词
+</code></pre><p>下图比较好的解释了这个情况：</p>
+<p><img src="/images/rabbitmq/python-five.png" alt="">    </p>
+<p>在这个例子中，我们准备全部发送描述动物的消息。这些消息带有由三个单词(两个点号分隔)组成的routing key，其中第一个单词表示速度，第二个表示颜色，第三个表示种类：”<speed>.<colour>.<species>“。</species></colour></speed></p>
+<p>我们创建三个绑定：Q1的binding key为”*.orange”，Q2的binding key为”*.*.rabbit”和”lazy.#“。</p>
+<p>这些绑定可以概括为：</p>
+<pre><code>Q1 关注所有orange的动物
+
+Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的消息。
+</code></pre><p>routing key为”quick.orange.rabbit”的消息会被发送到两个队列，”lazy.orange.elephant”也会被发送到这两个队列。而”quick.orange.fox”则只会发送到第一个队列，”lazy.brown.fox”会被只发送到第二个队列。”lazy.pink.rabbit”会只被发送到第二个队列一次，即使它匹配两个绑定。”quick.brown.fox”不匹配任何绑定，所以会被丢弃。</p>
+<p>如果打破规则，发送一条带有一个或四个单词，如”orange”或”quick.orange.male.rabbit”会怎么样？好吧，消息会丢失，因为它不匹配任何一个绑定。</p>
+<p>但是，”lazy.orange.male.rabbit”这种消息，即使它有4个单词，依然会匹配最后一个绑定，然后被发送到第二个队列。</p>
+<h4 id="topic-交换器"><a href="#topic-交换器" class="headerlink" title="topic 交换器"></a>topic 交换器</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">topic 交换器非常强大，可以表现得跟其他交换器一样。</span><br><span class="line"></span><br><span class="line">当一个队列的binding key为&quot;#&quot;时，它会接收所有消息，忽略routing key，像fanout交换器一样。</span><br><span class="line"></span><br><span class="line">当绑定中不存在&quot;*&quot;和&quot;#&quot;时，topic交换器会表现的跟direct交换器一样。</span><br></pre></td></tr></table></figure>
+<h3 id="整合"><a href="#整合" class="headerlink" title="整合"></a>整合</h3><p>我们准备在日志系统中使用topic交换器。假定日志的routing key由两个单词：”<facility>.<severity>“组成。</severity></facility></p>
+<p>代码与上一节的几乎一致。</p>
+<p>emit_log_topic.php：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">require_once</span> <span class="keyword">__DIR__</span> . <span class="string">'/vendor/autoload.php'</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Connection</span>\<span class="title">AMQPStreamConnection</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Message</span>\<span class="title">AMQPMessage</span>;</span><br><span class="line"></span><br><span class="line">$connection = <span class="keyword">new</span> AMQPStreamConnection(<span class="string">'localhost'</span>, <span class="number">5672</span>, <span class="string">'guest'</span>, <span class="string">'guest'</span>);</span><br><span class="line">$channel = $connection-&gt;channel();</span><br><span class="line"></span><br><span class="line">$channel-&gt;exchange_declare(<span class="string">'topic_logs'</span>, <span class="string">'topic'</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line">$routing_key = <span class="keyword">isset</span>($argv[<span class="number">1</span>]) &amp;&amp; !<span class="keyword">empty</span>($argv[<span class="number">1</span>]) ? $argv[<span class="number">1</span>] : <span class="string">'anonymous.info'</span>;</span><br><span class="line">$data = implode(<span class="string">' '</span>, array_slice($agrv, <span class="number">2</span>));</span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">empty</span>($data)) $data = <span class="string">"Hello Wrold!"</span>;</span><br><span class="line"></span><br><span class="line">$msg = <span class="keyword">new</span> AMQPMessage($data);</span><br><span class="line"></span><br><span class="line">$channel-&gt;basic_publish($msg, <span class="string">'topic_logs'</span>, $routing_key);</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> <span class="string">" [x] Sent "</span>,$routing_key,<span class="string">':'</span>,$data,<span class="string">" \n"</span>;</span><br><span class="line"></span><br><span class="line">$channel-&gt;close();</span><br><span class="line">$connection-&gt;close();</span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>receive_logs_topic.php：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">require_once</span> <span class="keyword">__DIR__</span> . <span class="string">'/vendor/autoload.php'</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Connection</span>\<span class="title">AMQPStreamConnection</span>;</span><br><span class="line"></span><br><span class="line">$connection = <span class="keyword">new</span> AMQPStreamConnection(<span class="string">'localhost'</span>, <span class="number">5672</span>, <span class="string">'guest'</span>, <span class="string">'guest'</span>);</span><br><span class="line">$channel = $connection-&gt;channel();</span><br><span class="line"></span><br><span class="line">$channel-&gt;exchange_declare(<span class="string">'topic_logs'</span>, <span class="string">'topic'</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">list</span>($queue_name, ,) = $channel-&gt;queue_declare(<span class="string">""</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, <span class="keyword">true</span>, <span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line">$binding_keys = array_slice($argv, <span class="number">1</span>);</span><br><span class="line"><span class="keyword">if</span>( <span class="keyword">empty</span>($binding_keys) )&#123;</span><br><span class="line">  file_put_contents(<span class="string">'php://stderr'</span>, <span class="string">"Usage: $argv[0] [binding_key]\n"</span>);</span><br><span class="line">  <span class="keyword">exit</span>(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">foreach</span>($binding_keys <span class="keyword">as</span> $binding_key)&#123;</span><br><span class="line">  $channel-&gt;queue_bind($queue_name, <span class="string">'topic_logs'</span>, $binding_key);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> <span class="string">' [*] Waiting for logs. To exit press CTRL+C'</span>, <span class="string">"\n"</span>;</span><br><span class="line"></span><br><span class="line">$callback = <span class="function"><span class="keyword">function</span><span class="params">($msg)</span></span>&#123;</span><br><span class="line">  <span class="keyword">echo</span> <span class="string">' [*] '</span>,$msg-&gt;delivery_info[<span class="string">'routing_key'</span>], <span class="string">':'</span>, $msg-&gt;body, <span class="string">"\n"</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$channel-&gt;basic_consume($queue_name, <span class="string">''</span>, <span class="keyword">false</span>, <span class="keyword">true</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, $callback);</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span>(count($channel-&gt;callbacks))&#123;</span><br><span class="line">  $channel-&gt;wait();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$channel-&gt;close();</span><br><span class="line">$connection-&gt;close();</span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>接收所有日志：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php receive_logs_topic.php &apos;#&apos;</span><br></pre></td></tr></table></figure>
+<p>接收所有来自”kern”的日志：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php receive_logs_topic.php &quot;kern.*&quot;</span><br></pre></td></tr></table></figure>
+<p>只接收”致命(critical)”日志：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php receive_logs_topic.php "*.critical"</span><br></pre></td></tr></table></figure>
+<p>创建多个绑定：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php receive_logs_topic.php "kern.*" "*.critical"</span><br></pre></td></tr></table></figure>
+<p>发布routing key为”kern.critical”的日志就输入：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php emit_log_topic.php "kern.critical" "A critical kernel error"</span><br></pre></td></tr></table></figure>
+<p>注意此代码并没有做路由或捆绑的例子，也许你想试一下两个以上的routing key参数。</p>
+<p>一些问题：</p>
+<p>​    <a href="http://www.rabbitmq.com/tutorials/tutorial-five-php.html#teaser_answer_1" target="_blank" rel="noopener">“*”会匹配routing key为空的消息吗？</a></p>
+<p>​    <a href="http://www.rabbitmq.com/tutorials/tutorial-five-php.html#teaser_answer_2" target="_blank" rel="noopener">“#.*”会匹配内容为”..”的消息吗？会匹配一个单词的消息吗？</a></p>
+<p>​    <a href="http://www.rabbitmq.com/tutorials/tutorial-five-php.html#teaser_answer_3" target="_blank" rel="noopener">“a.*.#”和”a.#”的区别是什么？</a></p>
+<p><a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/emit_log_topic.php" target="_blank" rel="noopener">emit_log_topic.php完整代码</a> <a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/receive_logs_topic.php" target="_blank" rel="noopener">receive_logs_topic.php完整代码</a></p>
+<p>下一步，在第六节中学习像远程过程调用一样完成消息往返。</p>
+<p>原文地址：<a href="https://www.rabbitmq.com/tutorials/tutorial-five-php.html" target="_blank" rel="noopener">Topics</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html" data-id="cjh07rwnb00377ns6vassmtjr" class="article-share-link">Share</a>
+      
+        <a href="https://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/php/">php</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/rabbitmq/">rabbitmq</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+  
     <article id="post-php-rabbitmq-tutorial-four" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2016/04/24/php-rabbitmq-tutorial-four.html" class="article-date">
@@ -134,7 +223,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html" data-id="cjgqascqm0038s0s6e00a4wd7" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html" data-id="cjh07rwne003e7ns6aefos5pl" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html#comments" class="article-comment-link">Comments</a>
       
@@ -235,7 +324,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html" data-id="cjgqascqr003js0s6pcw5rp8l" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html" data-id="cjh07rwnk003l7ns6pai8pxc9" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html#comments" class="article-comment-link">Comments</a>
       
@@ -341,7 +430,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html" data-id="cjgqascqs003ls0s6vpy9r05l" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html" data-id="cjh07rwno003u7ns61yaqpicr" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html#comments" class="article-comment-link">Comments</a>
       
@@ -440,7 +529,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html" data-id="cjgqascqn003cs0s62p183t9c" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html" data-id="cjh07rwnd003b7ns6fe701rqe" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html#comments" class="article-comment-link">Comments</a>
       
@@ -486,7 +575,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html" data-id="cjgqascp7000bs0s6u5gbpxu6" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html" data-id="cjh07rwlw000a7ns6896yvw5h" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html#comments" class="article-comment-link">Comments</a>
       
@@ -542,7 +631,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html" data-id="cjgqascp00005s0s6tsq5vlgo" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html" data-id="cjh07rwls00047ns6j6dm0ff8" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html#comments" class="article-comment-link">Comments</a>
       
@@ -599,7 +688,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/02/03/MySQL实现row_number .html" data-id="cjgqascoz0004s0s6e7x75wx4" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/02/03/MySQL实现row_number .html" data-id="cjh07rwlo00017ns6in1y7hq4" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/02/03/MySQL实现row_number .html#comments" class="article-comment-link">Comments</a>
       
@@ -654,7 +743,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/01/19/echarts-pie.html" data-id="cjgqascpr001as0s6i554d5nw" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/01/19/echarts-pie.html" data-id="cjh07rwmk001g7ns6ti8nhxvl" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/01/19/echarts-pie.html#comments" class="article-comment-link">Comments</a>
       
@@ -704,90 +793,12 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/01/11/placeholder-animate.html" data-id="cjgqascqw003rs0s6w5hhmzzc" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/01/11/placeholder-animate.html" data-id="cjh07rwnn003s7ns6tphpd4c7" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/01/11/placeholder-animate.html#comments" class="article-comment-link">Comments</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/input/">input</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/javascript/">javascript</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-  
-    <article id="post-backup-database-with-crontab" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2016/01/10/backup-database-with-crontab.html" class="article-date">
-  <time datetime="2016-01-10T10:52:55.000Z" itemprop="datePublished">2016-01-10</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/linux/">linux</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/01/10/backup-database-with-crontab.html">crontab实现定时备份数据库</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><img src="/images/backup-database-with-crontab/crontab.jpg" alt=""></p>
-<p>crontab命令之前写过了，在<a href="http://segmentfault.com/a/1190000003953826" target="_blank" rel="noopener">Linux crontab 访问PHP URL完成定时任务</a>，今天写了一个用来备份数据库的脚本。</p>
-<p>主要会用到以下几个命令：</p>
-<h4 id="mysqldump"><a href="#mysqldump" class="headerlink" title="mysqldump"></a>mysqldump</h4><p>参考文章：<a href="http://blog.csdn.net/shellching/article/details/8129687" target="_blank" rel="noopener">mysqldump导入导出数据库总结 </a></p>
-<h4 id="创建-sh文件："><a href="#创建-sh文件：" class="headerlink" title="创建.sh文件："></a>创建.sh文件：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd ~</span><br><span class="line">vi backup.sh</span><br></pre></td></tr></table></figure>
-<p>backup.sh内主要内容如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -hlocalhost -uroot -p&apos;root&apos; --databases database1 | gzip &gt; /var/backups/databases-database1`date +&apos;%Y%m%d_%H%M%S&apos;`.sql.gz</span><br></pre></td></tr></table></figure>
-<p>首先用mysqldump命令</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1.连接数据库</span><br><span class="line">2.选择要备份数据库</span><br><span class="line">3.选择存储备份文件的方式，这里使用了gzip了生成一个压缩包</span><br></pre></td></tr></table></figure>
-<p>根据文档，如果想备份所有数据库，可以使用</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqldump -hlocalhost -uroot -p&apos;root&apos; --all-databases | gzip &gt; /var/backups/databases-all-database`date +&apos;%Y%m%d_%H%M%S&apos;`.sql.gz</span><br></pre></td></tr></table></figure>
-<p>保存。</p>
-<p>有备份，就会有备份后的处理，显而易见的问题是备份多了会比较占空间，并且也用不到那么多备份。所以备份完成删除掉一段时间以前的就可以了。这步也可以在备份前做，无所谓。</p>
-<p>这里又用到了find命令</p>
-<p>参考文章：<a href="http://www.cnblogs.com/wanqieddy/archive/2011/06/09/2076785.html" target="_blank" rel="noopener">Linux中find常见用法示例</a></p>
-<h4 id="删除之前的备份文件"><a href="#删除之前的备份文件" class="headerlink" title="删除之前的备份文件"></a>删除之前的备份文件</h4><p>在刚才的backup.sh中继续输入：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd /var/backups/</span><br><span class="line">rm -rf `find . -name &apos;*.sql.gz&apos; -mtime +10`</span><br></pre></td></tr></table></figure>
-<p>这句命令有两部分，</p>
-<p>第一部分是删除命令：’rm -rf’。就是那句一定要慎用的命令了.</p>
-<p>第二部分是找到：当前目录，名字以’.sql.gz’结尾的，更改时间在10天以前的文件。</p>
-<p>‘.’表示当前目录，由于上一句是’cd /var/backups/‘，所以这里使用当前目录即可。</p>
-<p>‘-name ‘和’-mtime’参数是find命令的条件。</p>
-<p>具体的说明，和其他条件可以参考前边说到的文章。</p>
-<p>到这里基本上备份脚本就完成了。</p>
-<p>但是为了什么时候突然想看一下日志，或者备份出错的时候查问题，还可以在脚本里加上记录日志的命令：</p>
-<h4 id="日志"><a href="#日志" class="headerlink" title="日志"></a>日志</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo &apos;Begin Backup Database At :&apos; `date +&apos;%Y-%m-%d %H:%M:%S&apos;`</span><br></pre></td></tr></table></figure>
-<p>这里又用到了date。</p>
-<p>参考文章：<a href="http://blog.csdn.net/jk110333/article/details/8590746/" target="_blank" rel="noopener">Linux下date命令，格式化输出，时间设置 </a></p>
-<p>脚本保存之后，记得添加执行权限；</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo chmod +x backup.sh</span><br></pre></td></tr></table></figure>
-<p>接下来就是在系统里添加crontab任务了。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd /etc/</span><br><span class="line">vi crontab</span><br></pre></td></tr></table></figure>
-<p>在文件末尾，加上</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">m  h dom mon dow user	command</span><br><span class="line">00 5 * * * root /home/yourname/backup.sh &gt;&gt; /var/log/backup.log</span><br></pre></td></tr></table></figure>
-<p>这样，backup.sh里的echo就会输出到/var/log/backup.log中了。</p>
-<p>Over。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html" data-id="cjgqascpb000hs0s6ersdmj32" class="article-share-link">Share</a>
-      
-        <a href="https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html#comments" class="article-comment-link">Comments</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/crontab/">crontab</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li></ul>
 
     </footer>
   </div>
@@ -837,7 +848,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/git/">git</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">20</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/nginx/">nginx</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">11</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/git/">git</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">20</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/nginx/">nginx</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">11</span></li></ul>
     </div>
   </div>
 
@@ -846,7 +857,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geo/">geo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">19</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redigo/">redigo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geo/">geo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">19</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redigo/">redigo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -855,7 +866,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/docker/" style="font-size: 11.43px;">docker</a> <a href="/tags/dropbox/" style="font-size: 11.43px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/geo/" style="font-size: 12.86px;">geo</a> <a href="/tags/gin/" style="font-size: 10px;">gin</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/go/" style="font-size: 20px;">go</a> <a href="/tags/goquery/" style="font-size: 11.43px;">goquery</a> <a href="/tags/hexo/" style="font-size: 12.86px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 12.86px;">javascript</a> <a href="/tags/js/" style="font-size: 11.43px;">js</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/leetcode/" style="font-size: 10px;">leetcode</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 17.14px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 18.57px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 15.71px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redigo/" style="font-size: 12.86px;">redigo</a> <a href="/tags/redis/" style="font-size: 14.29px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/今日头条/" style="font-size: 10px;">今日头条</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/短网址/" style="font-size: 10px;">短网址</a> <a href="/tags/糗百/" style="font-size: 10px;">糗百</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
+      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/docker/" style="font-size: 11.43px;">docker</a> <a href="/tags/dropbox/" style="font-size: 11.43px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/geo/" style="font-size: 12.86px;">geo</a> <a href="/tags/gin/" style="font-size: 10px;">gin</a> <a href="/tags/git/" style="font-size: 11.43px;">git</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/go/" style="font-size: 20px;">go</a> <a href="/tags/goquery/" style="font-size: 11.43px;">goquery</a> <a href="/tags/hexo/" style="font-size: 12.86px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 12.86px;">javascript</a> <a href="/tags/js/" style="font-size: 11.43px;">js</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/leetcode/" style="font-size: 10px;">leetcode</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 17.14px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 18.57px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 15.71px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redigo/" style="font-size: 12.86px;">redigo</a> <a href="/tags/redis/" style="font-size: 14.29px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/今日头条/" style="font-size: 10px;">今日头条</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/短网址/" style="font-size: 10px;">短网址</a> <a href="/tags/糗百/" style="font-size: 10px;">糗百</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
     </div>
   </div>
 
@@ -864,7 +875,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
     </div>
   </div>
 
@@ -874,6 +885,10 @@
     <h3 class="widget-title">Recents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2018/05/10/git-rebase.html">Git rebase 笔记</a>
+          </li>
         
           <li>
             <a href="/2018/05/03/go-recursion.html">Go 递归</a>
@@ -889,10 +904,6 @@
         
           <li>
             <a href="/2018/04/22/github-pages.html">迁移到 GitHub pages 小记</a>
-          </li>
-        
-          <li>
-            <a href="/2018/02/27/nginx-1-13-9-http2-server-push.html">Nginx HTTP/2 Server Push</a>
           </li>
         
       </ul>

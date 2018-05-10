@@ -65,6 +65,63 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-git-rebase" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/10/git-rebase.html" class="article-date">
+  <time datetime="2018-05-10T07:18:29.000Z" itemprop="datePublished">2018-05-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/git/">git</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/05/10/git-rebase.html">Git rebase 笔记</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Git 合并代码有 merge和 rebase 两种选择，个人观点是，merge 一般用来合并两个分支，而 rebase 一般用来合并 commit。</p>
+<p>最近在给 mattermost 项目提交 PR 的时候被要求 rebase ，操作了几次都不成功，后来仔细看了文档才正确合并，所以又了以下记录。</p>
+<p>如果有4次提交，hash分别是</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">commit1 ---&gt; be8ad5c</span><br><span class="line">commit2 ---&gt; 57939ce</span><br><span class="line">commit3 ---&gt; 64be23a</span><br><span class="line">commit4 ---&gt; e0788e4</span><br></pre></td></tr></table></figure>
+<p>如果想把commit4合并到commit3，</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">git rebase -i 57939ce</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">pick 64be23a commit 3</span><br><span class="line">pick e0788e4 commit 4</span><br></pre></td></tr></table></figure>
+<p>下方会有操作的注释</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># s, squash = use commit, but meld into previous commit</span><br></pre></td></tr></table></figure>
+<p>对于想要合并的commit，使用s操作，<br>即</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pick 64be23a commit 3</span><br><span class="line">s e0788e4 commit 4</span><br></pre></td></tr></table></figure>
+<p>保存后，会进入交互编辑模式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># This is a combination of 2 commits.</span><br><span class="line"># This is the 1st commit message:</span><br><span class="line"></span><br><span class="line">commit 3</span><br><span class="line"></span><br><span class="line"># This is the commit message #2:</span><br><span class="line"></span><br><span class="line">commit 4</span><br></pre></td></tr></table></figure>
+<p>表示将要合并两个commit，可以修改或不修改commit内容，保存后，两次commit即合并成一个commit了。</p>
+<p>这样，在 git 的提交历史里便没有了 commit 4 这次提交。</p>
+<h5 id="参考资料："><a href="#参考资料：" class="headerlink" title="参考资料："></a>参考资料：</h5><p><a href="https://git-scm.com/book/zh/v2/Git-%E5%88%86%E6%94%AF-%E5%8F%98%E5%9F%BA" target="_blank" rel="noopener">Git 分支 - 变基</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://www.qichengzx.com/2018/05/10/git-rebase.html" data-id="cjh07rwmo001p7ns65dip35hx" class="article-share-link">Share</a>
+      
+        <a href="https://www.qichengzx.com/2018/05/10/git-rebase.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/git/">git</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+  
     <article id="post-go-recursion" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/05/03/go-recursion.html" class="article-date">
@@ -120,7 +177,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/05/03/go-recursion.html" data-id="cjgqascq0001ws0s6mivdfp5c" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/05/03/go-recursion.html" data-id="cjh07rwmv00247ns62fn4f4zu" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/05/03/go-recursion.html#comments" class="article-comment-link">Comments</a>
       
@@ -172,7 +229,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/05/02/go-closure.html" data-id="cjgqascpx001ps0s6smzgxd39" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/05/02/go-closure.html" data-id="cjh07rwmq001v7ns6texm0cs3" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/05/02/go-closure.html#comments" class="article-comment-link">Comments</a>
       
@@ -224,7 +281,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/04/25/dockerfile-build-arg.html" data-id="cjgqascpn0011s0s6o6fqte47" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/04/25/dockerfile-build-arg.html" data-id="cjh07rwmg00157ns6moqglv6z" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/04/25/dockerfile-build-arg.html#comments" class="article-comment-link">Comments</a>
       
@@ -273,7 +330,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/04/22/github-pages.html" data-id="cjgqascpv001ms0s6uui7jtcy" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/04/22/github-pages.html" data-id="cjh07rwmp001s7ns6njusqunz" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/04/22/github-pages.html#comments" class="article-comment-link">Comments</a>
       
@@ -339,7 +396,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/02/27/nginx-1-13-9-http2-server-push.html" data-id="cjgqascqe002rs0s61c1dopyh" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/02/27/nginx-1-13-9-http2-server-push.html" data-id="cjh07rwn6002w7ns6yc5ab4s5" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/02/27/nginx-1-13-9-http2-server-push.html#comments" class="article-comment-link">Comments</a>
       
@@ -387,7 +444,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/02/25/how-to-sort-in-go.html" data-id="cjgqascq50026s0s6jr7jpyky" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/02/25/how-to-sort-in-go.html" data-id="cjh07rwmt00217ns6o3pzmzo1" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/02/25/how-to-sort-in-go.html#comments" class="article-comment-link">Comments</a>
       
@@ -433,7 +490,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/02/11/go-struct-tag.html" data-id="cjgqascq20020s0s6s5lux4wy" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/02/11/go-struct-tag.html" data-id="cjh07rwms001x7ns68gnie4hk" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/02/11/go-struct-tag.html#comments" class="article-comment-link">Comments</a>
       
@@ -476,7 +533,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/02/10/get-the-content-type-of-file.html" data-id="cjgqascpu001is0s628hrtihy" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/02/10/get-the-content-type-of-file.html" data-id="cjh07rwml001j7ns68arv9m4q" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/02/10/get-the-content-type-of-file.html#comments" class="article-comment-link">Comments</a>
       
@@ -526,88 +583,12 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2017/11/27/multi-stage-builds-in-docker.html" data-id="cjgqascqc002os0s6qjpnoc4m" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2017/11/27/multi-stage-builds-in-docker.html" data-id="cjh07rwn3002p7ns6jqztwko1" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2017/11/27/multi-stage-builds-in-docker.html#comments" class="article-comment-link">Comments</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker/">docker</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-  
-    <article id="post-redis-geo-with-redigo-in-golang-part-3" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/09/24/redis-geo-with-redigo-in-golang-part-3.html" class="article-date">
-  <time datetime="2017-09-24T10:09:18.000Z" itemprop="datePublished">2017-09-24</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/golang/">golang</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/09/24/redis-geo-with-redigo-in-golang-part-3.html">Go语言使用redigo操作GEO(3) - 获取范围集合</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><a href="/2017/09/17/redis-geo-with-redigo-in-golang-part-2.html">上一篇</a>记录了使用redigo操作Redis的获取两点距离的功能。</p>
-<p>今天继续来写一下，获取一个坐标点指定距离范围内地理位置的集合。</p>
-<p>完成此功能，需要使用Redis的 GEORADIUS 命令。</p>
-<p>语法：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GEORADIUS key longitude latitude radius [m|km|ft|mi] [WITHCOORD] [WITHDIST] [ASC|DESC] [WITHHASH] [COUNT count]</span><br></pre></td></tr></table></figure>
-<p>其中，longitude latitude 表示地理位置的坐标，radius表示范围的距离，单位可以是m，km，ft，mi，依次为米，千米，英里，英尺。</p>
-<p>后边的可选参数中：</p>
-<ul>
-<li>WITHCOORD：传入WITHCOORD参数，返回结果会带上匹配位置的经纬度。</li>
-<li>WITHDIST：传入WITHDIST参数，返回结果会带上匹配位置与给定地理位置的距离，距离的单位与 GEORADIUS 命令传入的单位一致。</li>
-<li>ASC|DESC：默认结果是未排序的，ASC表示从近到远排序，DESC表示从远到近排序。</li>
-<li>WITHHASH：传入WITHHASH参数，返回结果会带上匹配位置的hash值。hash为52位有符号整数。</li>
-<li>COUNT count：传入COUNT参数，返回指定数量的结果。</li>
-</ul>
-<p>参照文档，可以发现，默认情况下 GEORADIUS 会返回全部匹配的元素，而传入 COUNT 参数会截取指定的部分元素返回，但是由于此命令还需要对返回结果进行排序，所以如果元素较多的情况下，即使使用了 COUNT 参数，查找速度也会很慢。所以此参数仅适用于减小带宽占用，一次性返回少数数据，多次查询。</p>
-<p>GEORADIUS 的返回值是一个数组:</p>
-<ul>
-<li>如果传入了WITHCOORD，WITHDIST，WITHHASH参数，会返回二维的数组，其中每个子数组表示一个元素</li>
-<li>如果没有传入上述参数，会返回一个一维的数组，值为元素名，如[“tianjin”,”baoding”]</li>
-</ul>
-<p>如果返回的是二维数组，子数组的第一个元素是对应位置的名字，其他的会根据传入的参数当做数组的元素返回，其中：</p>
-<ul>
-<li>距离依然是一个双精度浮点数，单位与传入的单位参数一致。</li>
-<li>GEOHASH 是一个整数。</li>
-<li>坐标分别为经度，纬度，其中经度在前。</li>
-</ul>
-<p>如：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GEORADIUS citylist 116.280316 39.9329 200 km WITHCOORD</span><br></pre></td></tr></table></figure>
-<p>会返回</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">1) 1) "beijing"</span><br><span class="line">   2) 1) "116.40528291463851929"</span><br><span class="line">      2) "39.9049884229125027"</span><br><span class="line">2) 1) "baoding"</span><br><span class="line">   2) 1) "115.33530682325363159"</span><br><span class="line">      2) "38.87121760640306434"</span><br><span class="line">3) 1) "tangshan"</span><br><span class="line">   2) 1) "116.94219142198562622"</span><br><span class="line">      2) "39.05078232277295314"</span><br><span class="line">4) 1) "tianjin"</span><br><span class="line">   2) 1) "117.0153459906578064"</span><br><span class="line">      2) "39.12522961794389431"</span><br></pre></td></tr></table></figure>
-<p>那么，使用redigo如何实现呢？</p>
-<h4 id="有WITHCOORD，WITHDIST，WITHHASH参数"><a href="#有WITHCOORD，WITHDIST，WITHHASH参数" class="headerlink" title="有WITHCOORD，WITHDIST，WITHHASH参数"></a>有WITHCOORD，WITHDIST，WITHHASH参数</h4><p>暂时还没想到怎么解决这个比较好。</p>
-<h4 id="无WITHCOORD，WITHDIST，WITHHASH参数"><a href="#无WITHCOORD，WITHDIST，WITHHASH参数" class="headerlink" title="无WITHCOORD，WITHDIST，WITHHASH参数"></a>无WITHCOORD，WITHDIST，WITHHASH参数</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">radius</span><span class="params">(key <span class="keyword">string</span>, lng, lat <span class="keyword">float64</span>, radius <span class="keyword">int</span>, unit <span class="keyword">string</span>)</span> []<span class="title">string</span></span> &#123;</span><br><span class="line">	rc := RedisClient.Get()</span><br><span class="line">	<span class="keyword">defer</span> rc.Close()</span><br><span class="line"></span><br><span class="line">	pos, _ := redis.Strings(rc.Do(<span class="string">"GEORADIUS"</span>, key, lng, lat, radius, unit))</span><br><span class="line">	<span class="keyword">return</span> pos</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>该方法则会返回符合条件的元素的名称，如：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[beijing baoding tangshan tianjin]</span><br></pre></td></tr></table></figure></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2017/09/24/redis-geo-with-redigo-in-golang-part-3.html" data-id="cjgqascr20041s0s6kb056j51" class="article-share-link">Share</a>
-      
-        <a href="https://www.qichengzx.com/2017/09/24/redis-geo-with-redigo-in-golang-part-3.html#comments" class="article-comment-link">Comments</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/geo/">geo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redigo/">redigo</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis/">redis</a></li></ul>
 
     </footer>
   </div>
@@ -657,7 +638,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/git/">git</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">20</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/nginx/">nginx</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">11</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/git/">git</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">20</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/nginx/">nginx</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">11</span></li></ul>
     </div>
   </div>
 
@@ -666,7 +647,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geo/">geo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">19</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redigo/">redigo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geo/">geo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">19</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redigo/">redigo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -675,7 +656,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/docker/" style="font-size: 11.43px;">docker</a> <a href="/tags/dropbox/" style="font-size: 11.43px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/geo/" style="font-size: 12.86px;">geo</a> <a href="/tags/gin/" style="font-size: 10px;">gin</a> <a href="/tags/git/" style="font-size: 10px;">git</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/go/" style="font-size: 20px;">go</a> <a href="/tags/goquery/" style="font-size: 11.43px;">goquery</a> <a href="/tags/hexo/" style="font-size: 12.86px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 12.86px;">javascript</a> <a href="/tags/js/" style="font-size: 11.43px;">js</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/leetcode/" style="font-size: 10px;">leetcode</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 17.14px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 18.57px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 15.71px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redigo/" style="font-size: 12.86px;">redigo</a> <a href="/tags/redis/" style="font-size: 14.29px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/今日头条/" style="font-size: 10px;">今日头条</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/短网址/" style="font-size: 10px;">短网址</a> <a href="/tags/糗百/" style="font-size: 10px;">糗百</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
+      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/docker/" style="font-size: 11.43px;">docker</a> <a href="/tags/dropbox/" style="font-size: 11.43px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/geo/" style="font-size: 12.86px;">geo</a> <a href="/tags/gin/" style="font-size: 10px;">gin</a> <a href="/tags/git/" style="font-size: 11.43px;">git</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/go/" style="font-size: 20px;">go</a> <a href="/tags/goquery/" style="font-size: 11.43px;">goquery</a> <a href="/tags/hexo/" style="font-size: 12.86px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 12.86px;">javascript</a> <a href="/tags/js/" style="font-size: 11.43px;">js</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/leetcode/" style="font-size: 10px;">leetcode</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 17.14px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 18.57px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 15.71px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redigo/" style="font-size: 12.86px;">redigo</a> <a href="/tags/redis/" style="font-size: 14.29px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/今日头条/" style="font-size: 10px;">今日头条</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/短网址/" style="font-size: 10px;">短网址</a> <a href="/tags/糗百/" style="font-size: 10px;">糗百</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
     </div>
   </div>
 
@@ -684,7 +665,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
     </div>
   </div>
 
@@ -694,6 +675,10 @@
     <h3 class="widget-title">Recents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2018/05/10/git-rebase.html">Git rebase 笔记</a>
+          </li>
         
           <li>
             <a href="/2018/05/03/go-recursion.html">Go 递归</a>
@@ -709,10 +694,6 @@
         
           <li>
             <a href="/2018/04/22/github-pages.html">迁移到 GitHub pages 小记</a>
-          </li>
-        
-          <li>
-            <a href="/2018/02/27/nginx-1-13-9-http2-server-push.html">Nginx HTTP/2 Server Push</a>
           </li>
         
       </ul>

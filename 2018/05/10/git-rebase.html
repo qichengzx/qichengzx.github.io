@@ -3,19 +3,21 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   
-  <title>Archives: 2016 | 启程</title>
+  <title>Git rebase 笔记 | 启程</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta http-equiv="Access-Control-Allow-Origin" content="*">
-  <meta name="description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
-<meta property="og:type" content="website">
-<meta property="og:title" content="启程">
-<meta property="og:url" content="https://www.qichengzx.com/archives/2016/index.html">
+  <meta name="description" content="Git 合并代码有 merge和 rebase 两种选择，个人观点是，merge 一般用来合并两个分支，而 rebase 一般用来合并 commit。 最近在给 mattermost 项目提交 PR 的时候被要求 rebase ，操作了几次都不成功，后来仔细看了文档才正确合并，所以又了以下记录。 如果有4次提交，hash分别是 1234commit1 ---&amp;gt; be8ad5ccommit2">
+<meta name="keywords" content="git">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Git rebase 笔记">
+<meta property="og:url" content="https://www.qichengzx.com/2018/05/10/git-rebase.html">
 <meta property="og:site_name" content="启程">
-<meta property="og:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
+<meta property="og:description" content="Git 合并代码有 merge和 rebase 两种选择，个人观点是，merge 一般用来合并两个分支，而 rebase 一般用来合并 commit。 最近在给 mattermost 项目提交 PR 的时候被要求 rebase ，操作了几次都不成功，后来仔细看了文档才正确合并，所以又了以下记录。 如果有4次提交，hash分别是 1234commit1 ---&amp;gt; be8ad5ccommit2">
 <meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-05-10T07:27:43.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="启程">
-<meta name="twitter:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
+<meta name="twitter:title" content="Git rebase 笔记">
+<meta name="twitter:description" content="Git 合并代码有 merge和 rebase 两种选择，个人观点是，merge 一般用来合并两个分支，而 rebase 一般用来合并 commit。 最近在给 mattermost 项目提交 PR 的时候被要求 rebase ，操作了几次都不成功，后来仔细看了文档才正确合并，所以又了以下记录。 如果有4次提交，hash分别是 1234commit1 ---&amp;gt; be8ad5ccommit2">
 <meta name="twitter:creator" content="@qichengzx">
   
     <link rel="alternative" href="/atom.xml" title="启程" type="application/atom+xml">
@@ -63,211 +65,74 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2016" class="archive-year">2016</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2016/12/27/shortlen-url-by-go.html" class="archive-article-date">
-  <time datetime="2016-12-27T13:27:34.000Z" itemprop="datePublished">Dec 27</time>
+        <section id="main"><article id="post-git-rebase" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/10/git-rebase.html" class="article-date">
+  <time datetime="2018-05-10T07:18:29.000Z" itemprop="datePublished">2018-05-10</time>
 </a>
-      
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/git/">git</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/12/27/shortlen-url-by-go.html">Go语言写的一个短网址服务</a>
+    <h1 class="article-title" itemprop="name">
+      Git rebase 笔记
     </h1>
   
 
-    </header>
-  </div>
-</article>
-  
+      </header>
     
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2016/12/14/toutiao-images-spider-by-golang.html" class="archive-article-date">
-  <time datetime="2016-12-14T08:28:36.000Z" itemprop="datePublished">Dec 14</time>
-</a>
+    <div class="article-entry" itemprop="articleBody">
       
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/12/14/toutiao-images-spider-by-golang.html">Go 福利小爬虫 爬取今日头条美女图</a>
-    </h1>
-  
+        <p>Git 合并代码有 merge和 rebase 两种选择，个人观点是，merge 一般用来合并两个分支，而 rebase 一般用来合并 commit。</p>
+<p>最近在给 mattermost 项目提交 PR 的时候被要求 rebase ，操作了几次都不成功，后来仔细看了文档才正确合并，所以又了以下记录。</p>
+<p>如果有4次提交，hash分别是</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">commit1 ---&gt; be8ad5c</span><br><span class="line">commit2 ---&gt; 57939ce</span><br><span class="line">commit3 ---&gt; 64be23a</span><br><span class="line">commit4 ---&gt; e0788e4</span><br></pre></td></tr></table></figure>
+<p>如果想把commit4合并到commit3，</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">git rebase -i 57939ce</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">pick 64be23a commit 3</span><br><span class="line">pick e0788e4 commit 4</span><br></pre></td></tr></table></figure>
+<p>下方会有操作的注释</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># s, squash = use commit, but meld into previous commit</span><br></pre></td></tr></table></figure>
+<p>对于想要合并的commit，使用s操作，<br>即</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pick 64be23a commit 3</span><br><span class="line">s e0788e4 commit 4</span><br></pre></td></tr></table></figure>
+<p>保存后，会进入交互编辑模式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># This is a combination of 2 commits.</span><br><span class="line"># This is the 1st commit message:</span><br><span class="line"></span><br><span class="line">commit 3</span><br><span class="line"></span><br><span class="line"># This is the commit message #2:</span><br><span class="line"></span><br><span class="line">commit 4</span><br></pre></td></tr></table></figure>
+<p>表示将要合并两个commit，可以修改或不修改commit内容，保存后，两次commit即合并成一个commit了。</p>
+<p>这样，在 git 的提交历史里便没有了 commit 4 这次提交。</p>
+<h5 id="参考资料："><a href="#参考资料：" class="headerlink" title="参考资料："></a>参考资料：</h5><p><a href="https://git-scm.com/book/zh/v2/Git-%E5%88%86%E6%94%AF-%E5%8F%98%E5%9F%BA" target="_blank" rel="noopener">Git 分支 - 变基</a></p>
 
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2016/12/04/go-qiubai.html" class="archive-article-date">
-  <time datetime="2016-12-04T07:49:04.000Z" itemprop="datePublished">Dec 4</time>
-</a>
       
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/12/04/go-qiubai.html">Go语言写爬取糗百热门帖子</a>
-    </h1>
-  
-
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2016/11/02/install-yaf-on-mac.html" class="archive-article-date">
-  <time datetime="2016-11-02T09:57:38.000Z" itemprop="datePublished">Nov 2</time>
-</a>
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://www.qichengzx.com/2018/05/10/git-rebase.html" data-id="cjh07rwmo001p7ns65dip35hx" class="article-share-link">Share</a>
       
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/11/02/install-yaf-on-mac.html">Mac brew php7.1环境下安装Yaf</a>
-    </h1>
-  
-
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2016/10/21/beego-in-docker.html" class="archive-article-date">
-  <time datetime="2016-10-21T02:02:02.000Z" itemprop="datePublished">Oct 21</time>
-</a>
+        <a href="https://www.qichengzx.com/2018/05/10/git-rebase.html#comments" class="article-comment-link">Comments</a>
       
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/10/21/beego-in-docker.html">用Docker部署Golang Beego框架应用</a>
-    </h1>
-  
-
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html" class="archive-article-date">
-  <time datetime="2016-09-28T07:43:13.000Z" itemprop="datePublished">Sep 28</time>
-</a>
       
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html">Laravel 手动创建分页</a>
-    </h1>
-  
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/git/">git</a></li></ul>
 
-    </header>
+    </footer>
   </div>
-</article>
   
     
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2016/09/16/convert-xml-to-json-in-golang.html" class="archive-article-date">
-  <time datetime="2016-09-16T03:28:20.000Z" itemprop="datePublished">Sep 16</time>
-</a>
-      
+<nav id="article-nav">
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/09/16/convert-xml-to-json-in-golang.html">Golang XMl 转 JSON</a>
-    </h1>
   
+    <a href="/2018/05/03/go-recursion.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Go 递归</div>
+    </a>
+  
+</nav>
 
-    </header>
-  </div>
-</article>
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2016/09/11/Hello-Go.html" class="archive-article-date">
-  <time datetime="2016-09-11T09:21:03.000Z" itemprop="datePublished">Sep 11</time>
-</a>
-      
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/09/11/Hello-Go.html">Hello Go</a>
-    </h1>
-  
-
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2016/07/02/php-post-file-with-curl.html" class="archive-article-date">
-  <time datetime="2016-07-02T15:11:30.000Z" itemprop="datePublished">Jul 2</time>
-</a>
-      
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/07/02/php-post-file-with-curl.html">PHP Curl 上传文件</a>
-    </h1>
-  
-
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2016/05/15/a-sample-redis-queue.html" class="archive-article-date">
-  <time datetime="2016-05-15T06:19:52.000Z" itemprop="datePublished">May 15</time>
-</a>
-      
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/05/15/a-sample-redis-queue.html">一个简单的php+redis队列示例</a>
-    </h1>
-  
-
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
-</section>
+</article></section>
         
           <aside id="sidebar">
   

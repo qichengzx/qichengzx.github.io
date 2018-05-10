@@ -7,6 +7,14 @@
     </url>
 
     <url>
+        <loc>https://www.qichengzx.com/2018/05/10/git-rebase.html</loc>
+        <lastmod>2018-05-10T07:27:43.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>https://www.qichengzx.com/2018/05/03/go-recursion.html</loc>
         <lastmod>2018-05-03T08:57:44.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -47,14 +55,6 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/09/11/Hello-Go.html</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
         <loc>https://www.qichengzx.com/2016/02/03/MySQL%E5%AE%9E%E7%8E%B0row_number%20.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -79,7 +79,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2015/11/07/Set%20Up%20a%20Private%20Git%20Server%20on%20a%20VPS.html</loc>
+        <loc>https://www.qichengzx.com/2016/09/11/Hello-Go.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -103,6 +103,14 @@
     </url>
 
     <url>
+        <loc>https://www.qichengzx.com/2015/11/07/Set%20Up%20a%20Private%20Git%20Server%20on%20a%20VPS.html</loc>
+        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>https://www.qichengzx.com/2016/01/10/backup-database-with-crontab.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -111,7 +119,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html</loc>
+        <loc>https://www.qichengzx.com/2016/10/21/beego-in-docker.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -119,7 +127,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/10/21/beego-in-docker.html</loc>
+        <loc>https://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -143,7 +151,23 @@
     </url>
 
     <url>
+        <loc>https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html</loc>
+        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>https://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html</loc>
+        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -159,23 +183,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
         <loc>https://www.qichengzx.com/2016/01/19/echarts-pie.html</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -207,7 +215,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2015/11/06/hello-world.html</loc>
+        <loc>https://www.qichengzx.com/2018/02/25/how-to-sort-in-go.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -215,7 +223,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2018/02/25/how-to-sort-in-go.html</loc>
+        <loc>https://www.qichengzx.com/2015/11/06/hello-world.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -263,14 +271,6 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2018/02/27/nginx-1-13-9-http2-server-push.html</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
         <loc>https://www.qichengzx.com/2015/12/03/nodejs-mysql.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -279,7 +279,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html</loc>
+        <loc>https://www.qichengzx.com/2018/02/27/nginx-1-13-9-http2-server-push.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -295,6 +295,14 @@
     </url>
 
     <url>
+        <loc>https://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html</loc>
+        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>https://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -303,7 +311,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html</loc>
+        <loc>https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -311,7 +319,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html</loc>
+        <loc>https://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -335,14 +343,6 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
         <loc>https://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -352,6 +352,14 @@
 
     <url>
         <loc>https://www.qichengzx.com/2016/01/11/placeholder-animate.html</loc>
+        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -399,7 +407,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html</loc>
+        <loc>https://www.qichengzx.com/2016/12/14/toutiao-images-spider-by-golang.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -407,7 +415,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/12/14/toutiao-images-spider-by-golang.html</loc>
+        <loc>https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
