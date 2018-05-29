@@ -7,6 +7,22 @@
     </url>
 
     <url>
+        <loc>https://www.qichengzx.com/2018/05/29/git-pull-upstream.html</loc>
+        <lastmod>2018-05-29T11:02:43.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2018/05/10/gp-database-sql-prepare.html</loc>
+        <lastmod>2018-05-16T07:30:46.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>https://www.qichengzx.com/2018/05/13/create-a-single-page-app-with-go-echo-and-vue.html</loc>
         <lastmod>2018-05-13T07:29:53.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -63,14 +79,6 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/09/11/Hello-Go.html</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
         <loc>https://www.qichengzx.com/2017/07/02/HTTP2-Server-Push.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -79,7 +87,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/02/03/MySQL%E5%AE%9E%E7%8E%B0row_number%20.html</loc>
+        <loc>https://www.qichengzx.com/2016/09/11/Hello-Go.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -88,6 +96,14 @@
 
     <url>
         <loc>https://www.qichengzx.com/2016/02/24/MySql-row_number-part-2.html</loc>
+        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2016/02/03/MySQL%E5%AE%9E%E7%8E%B0row_number%20.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -111,7 +127,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html</loc>
+        <loc>https://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -119,7 +135,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html</loc>
+        <loc>https://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -159,14 +175,6 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
         <loc>https://www.qichengzx.com/2017/07/15/create-real-time-chat-app-golang-angular-2-websockets.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -175,7 +183,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html</loc>
+        <loc>https://www.qichengzx.com/2015/12/27/dropbox-sync-hexo-article.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -192,6 +200,14 @@
 
     <url>
         <loc>https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html</loc>
+        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -279,7 +295,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2018/02/27/nginx-1-13-9-http2-server-push.html</loc>
+        <loc>https://www.qichengzx.com/2017/11/27/multi-stage-builds-in-docker.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -287,7 +303,23 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2017/11/27/multi-stage-builds-in-docker.html</loc>
+        <loc>https://www.qichengzx.com/2017/06/27/order-by-distance-in-mysql.html</loc>
+        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html</loc>
+        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2018/02/27/nginx-1-13-9-http2-server-push.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -311,31 +343,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
         <loc>https://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://www.qichengzx.com/2017/06/27/order-by-distance-in-mysql.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -351,7 +359,31 @@
     </url>
 
     <url>
+        <loc>https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html</loc>
+        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>https://www.qichengzx.com/2015/12/05/php-use-pdo-cache-query-result-with-redis.html</loc>
+        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html</loc>
+        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -383,7 +415,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html</loc>
+        <loc>https://www.qichengzx.com/2016/12/27/shortlen-url-by-go.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -399,7 +431,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html</loc>
+        <loc>https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -415,23 +447,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://www.qichengzx.com/2016/12/27/shortlen-url-by-go.html</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html</loc>
+        <loc>https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html</loc>
         <lastmod>2018-02-27T13:14:16.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>

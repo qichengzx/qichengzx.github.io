@@ -3,19 +3,21 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   
-  <title>Tag: leetcode | 启程</title>
+  <title>Git 同步上游源更改 | 启程</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta http-equiv="Access-Control-Allow-Origin" content="*">
-  <meta name="description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
-<meta property="og:type" content="website">
-<meta property="og:title" content="启程">
-<meta property="og:url" content="https://www.qichengzx.com/tags/leetcode/index.html">
+  <meta name="description" content="在 Git 上 fork 了一个项目后，如果没有经常合并上游的更改，或者 fork 后的项目提交代码后没有提交到上游，就会出现 1This branch is X commits ahead, Y commits behind” 可以通过如下的方式同步上游项目。 在本地添加上游项目: 1git remote add upstream git@github:upstream/repo.git 当需要">
+<meta name="keywords" content="git">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Git 同步上游源更改">
+<meta property="og:url" content="https://www.qichengzx.com/2018/05/29/git-pull-upstream.html">
 <meta property="og:site_name" content="启程">
-<meta property="og:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
+<meta property="og:description" content="在 Git 上 fork 了一个项目后，如果没有经常合并上游的更改，或者 fork 后的项目提交代码后没有提交到上游，就会出现 1This branch is X commits ahead, Y commits behind” 可以通过如下的方式同步上游项目。 在本地添加上游项目: 1git remote add upstream git@github:upstream/repo.git 当需要">
 <meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-05-29T11:02:43.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="启程">
-<meta name="twitter:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
+<meta name="twitter:title" content="Git 同步上游源更改">
+<meta name="twitter:description" content="在 Git 上 fork 了一个项目后，如果没有经常合并上游的更改，或者 fork 后的项目提交代码后没有提交到上游，就会出现 1This branch is X commits ahead, Y commits behind” 可以通过如下的方式同步上游项目。 在本地添加上游项目: 1git remote add upstream git@github:upstream/repo.git 当需要">
 <meta name="twitter:creator" content="@qichengzx">
   
     <link rel="alternative" href="/atom.xml" title="启程" type="application/atom+xml">
@@ -63,40 +65,74 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2017" class="archive-year">2017</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2017/08/13/leetcode-array-partition-i.html" class="archive-article-date">
-  <time datetime="2017-08-13T02:14:49.000Z" itemprop="datePublished">Aug 13</time>
+        <section id="main"><article id="post-git-pull-upstream" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/29/git-pull-upstream.html" class="article-date">
+  <time datetime="2018-05-29T09:45:12.000Z" itemprop="datePublished">2018-05-29</time>
 </a>
-      
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/git/">git</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/08/13/leetcode-array-partition-i.html">LeetCode 561.Array Partition I(数组分区 1) - Go实现</a>
+    <h1 class="article-title" itemprop="name">
+      Git 同步上游源更改
     </h1>
   
 
-    </header>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在 Git 上 fork 了一个项目后，如果没有经常合并上游的更改，或者 fork 后的项目提交代码后没有提交到上游，就会出现</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">This branch is X commits ahead, Y commits behind”</span><br></pre></td></tr></table></figure>
+<p>可以通过如下的方式同步上游项目。</p>
+<p>在本地添加上游项目:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git remote add upstream git@github:upstream/repo.git</span><br></pre></td></tr></table></figure>
+<p>当需要同步时，执行:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git pull --rebase upstream master</span><br><span class="line">git push --force-with-lease origin master</span><br></pre></td></tr></table></figure>
+<p>–rebase 和 –force-with-lease 选项在没有合并到上游提交时才有必要。</p>
+<p>以下还有几个可以用到的命令:</p>
+<p>重置本地的更改到上游的状态:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git reset --hard upstream/master</span><br></pre></td></tr></table></figure>
+<p>其实通常使用中，建议为 功能/错误修复 创建一个新的分支。这样可以在等待 PR 被合并时，开始另一个 功能/错误修复 的开发。如果从不直接提交给 master，那么可以不用使用 –rebase 或 –force-with-lease 进行同步:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git checkout master</span><br><span class="line">git pull upstream master</span><br><span class="line">git push origin master</span><br></pre></td></tr></table></figure>
+<p>在更新主分支后更新功能分支:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git checkout myfeature</span><br><span class="line">git rebase master</span><br><span class="line">git push --force-with-lease origin myfeature</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://www.qichengzx.com/2018/05/29/git-pull-upstream.html" data-id="cjhrkq2qy001rzb2j2tswf91z" class="article-share-link">Share</a>
+      
+        <a href="https://www.qichengzx.com/2018/05/29/git-pull-upstream.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/git/">git</a></li></ul>
+
+    </footer>
   </div>
-</article>
+  
+    
+<nav id="article-nav">
   
   
-    </div></section>
+    <a href="/2018/05/13/create-a-single-page-app-with-go-echo-and-vue.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">【译】使用 Go，Echo 和 Vue 创建单页 TODO 应用</div>
+    </a>
   
-</section>
+</nav>
+
+  
+</article></section>
         
           <aside id="sidebar">
   

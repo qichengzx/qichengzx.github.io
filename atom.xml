@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://www.qichengzx.com/"/>
-  <updated>2018-05-13T07:29:53.000Z</updated>
+  <updated>2018-05-29T11:02:43.000Z</updated>
   <id>https://www.qichengzx.com/</id>
   
   <author>
@@ -15,6 +15,32 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Git 同步上游源更改</title>
+    <link href="https://www.qichengzx.com/2018/05/29/git-pull-upstream.html"/>
+    <id>https://www.qichengzx.com/2018/05/29/git-pull-upstream.html</id>
+    <published>2018-05-29T09:45:12.000Z</published>
+    <updated>2018-05-29T11:02:43.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>在 Git 上 fork 了一个项目后，如果没有经常合并上游的更改，或者 fork 后的项目提交代码后没有提交到上游，就会出现</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">This branch is X commits ahead, Y commits behind”</span><br></pre></td></tr></table></figure><p>可以通过如下的方式同步上游项目。</p><p>在本地添加上游项目:</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git remote add upstream git@github:upstream/repo.git</span><br></pre></td></tr></table></figure><p>当需要同步时，执行:</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git pull --rebase upstream master</span><br><span class="line">git push --force-with-lease origin master</span><br></pre></td></tr></table></figure><p>–rebase 和 –force-with-lease 选项在没有合并到上游提交时才有必要。</p><p>以下还有几个可以用到的命令:</p><p>重置本地的更改到上游的状态:</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git reset --hard upstream/master</span><br></pre></td></tr></table></figure><p>其实通常使用中，建议为 功能/错误修复 创建一个新的分支。这样可以在等待 PR 被合并时，开始另一个 功能/错误修复 的开发。如果从不直接提交给 master，那么可以不用使用 –rebase 或 –force-with-lease 进行同步:</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git checkout master</span><br><span class="line">git pull upstream master</span><br><span class="line">git push origin master</span><br></pre></td></tr></table></figure><p>在更新主分支后更新功能分支:</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git checkout myfeature</span><br><span class="line">git rebase master</span><br><span class="line">git push --force-with-lease origin myfeature</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;在 Git 上 fork 了一个项目后，如果没有经常合并上游的更改，或者 fork 后的项目提交代码后没有提交到上游，就会出现&lt;/p&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;s
+      
+    
+    </summary>
+    
+      <category term="git" scheme="https://www.qichengzx.com/categories/git/"/>
+    
+    
+      <category term="git" scheme="https://www.qichengzx.com/tags/git/"/>
+    
+  </entry>
   
   <entry>
     <title>【译】使用 Go，Echo 和 Vue 创建单页 TODO 应用</title>
@@ -88,6 +114,32 @@
       
         &lt;p&gt;Git 合并代码有 merge和 rebase 两种选择，个人观点是，merge 一般用来合并两个分支，而 rebase 一般用来合并 commit。&lt;/p&gt;
 &lt;p&gt;最近在给 mattermost 项目提交 PR 的时候被要求 rebase ，操作了几次都不成功，后来仔细看
+      
+    
+    </summary>
+    
+      <category term="git" scheme="https://www.qichengzx.com/categories/git/"/>
+    
+    
+      <category term="git" scheme="https://www.qichengzx.com/tags/git/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Git rebase 笔记</title>
+    <link href="https://www.qichengzx.com/2018/05/10/gp-database-sql-prepare.html"/>
+    <id>https://www.qichengzx.com/2018/05/10/gp-database-sql-prepare.html</id>
+    <published>2018-05-10T07:18:29.000Z</published>
+    <updated>2018-05-16T07:30:46.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>Prepare 语句在Go中具有所有常见好处：安全性，效率和便利性。但是它们的实现方式与你习惯的方式有些不同，特别是关于它们如何与 database/sql 包的某些内部进行交互。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;Prepare 语句在Go中具有所有常见好处：安全性，效率和便利性。但是它们的实现方式与你习惯的方式有些不同，特别是关于它们如何与 database/sql 包的某些内部进行交互。&lt;/p&gt;
+
       
     
     </summary>
@@ -495,59 +547,6 @@
       
       
         &lt;h4 id=&quot;写在前面&quot;&gt;&lt;a href=&quot;#写在前面&quot; class=&quot;headerlink&quot; title=&quot;写在前面&quot;&gt;&lt;/a&gt;写在前面&lt;/h4&gt;&lt;p&gt;本文来自&lt;a href=&quot;https://blog.golang.org/h2push&quot; target=&quot;_blank&quot; r
-      
-    
-    </summary>
-    
-      <category term="golang" scheme="https://www.qichengzx.com/categories/golang/"/>
-    
-    
-      <category term="go" scheme="https://www.qichengzx.com/tags/go/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>MySQL实现按经纬度做距离排序</title>
-    <link href="https://www.qichengzx.com/2017/06/27/order-by-distance-in-mysql.html"/>
-    <id>https://www.qichengzx.com/2017/06/27/order-by-distance-in-mysql.html</id>
-    <published>2017-06-27T14:18:19.000Z</published>
-    <updated>2018-02-27T13:14:16.000Z</updated>
-    
-    <content type="html"><![CDATA[<p><img src="/images/geolocation.png" alt=""><br>题图来自网络</p><p>工作中某些业务需要用到按距离排序返回结果，之前的方式是根据前端传过来来的经纬度，和指定范围的距离，算出一个坐标区间，再用这个区间的值去MySQL中查找，类似“where lat between (lat1, lat2) and lng between (lng1,lng2)”，查出数据后，再遍历数据计算每一条数据到这个经纬度的距离，然后根据得出的距离排序返回。低效，麻烦，不方便分页。</p><p>于是决定直接从MySQL中算出距离后返回，省事，方便，还可以直接分页了。</p><p>查资料后发现还挺简单的，下方的示例是从<a href="https://developers.google.com/maps/articles/phpsqlsearch_v3" target="_blank" rel="noopener">Google官方的文档</a>中摘取出来。</p><p>创建如下数据表：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE `markers` (</span><br><span class="line">  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,</span><br><span class="line">  `name` VARCHAR( 60 ) NOT NULL ,</span><br><span class="line">  `address` VARCHAR( 80 ) NOT NULL ,</span><br><span class="line">  `lat` FLOAT( 10, 6 ) NOT NULL ,</span><br><span class="line">  `lng` FLOAT( 10, 6 ) NOT NULL</span><br><span class="line">) ENGINE = MYISAM ;</span><br></pre></td></tr></table></figure><p>填充数据：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">INSERT INTO `markers` (`name`, `address`, `lat`, `lng`) VALUES (&apos;Frankie Johnnie &amp; Luigo Too&apos;,&apos;939 W El Camino Real, Mountain View, CA&apos;,&apos;37.386339&apos;,&apos;-122.085823&apos;);</span><br><span class="line">INSERT INTO `markers` (`name`, `address`, `lat`, `lng`) VALUES (&apos;Amici\&apos;s East Coast Pizzeria&apos;,&apos;790 Castro St, Mountain View, CA&apos;,&apos;37.38714&apos;,&apos;-122.083235&apos;);</span><br><span class="line">INSERT INTO `markers` (`name`, `address`, `lat`, `lng`) VALUES (&apos;Kapp\&apos;s Pizza Bar &amp; Grill&apos;,&apos;191 Castro St, Mountain View, CA&apos;,&apos;37.393885&apos;,&apos;-122.078916&apos;);</span><br><span class="line">INSERT INTO `markers` (`name`, `address`, `lat`, `lng`) VALUES (&apos;Round Table Pizza: Mountain View&apos;,&apos;570 N Shoreline Blvd, Mountain View, CA&apos;,&apos;37.402653&apos;,&apos;-122.079354&apos;);</span><br><span class="line">INSERT INTO `markers` (`name`, `address`, `lat`, `lng`) VALUES (&apos;Tony &amp; Alba\&apos;s Pizza &amp; Pasta&apos;,&apos;619 Escuela Ave, Mountain View, CA&apos;,&apos;37.394011&apos;,&apos;-122.095528&apos;);</span><br><span class="line">INSERT INTO `markers` (`name`, `address`, `lat`, `lng`) VALUES (&apos;Oregano\&apos;s Wood-Fired Pizza&apos;,&apos;4546 El Camino Real, Los Altos, CA&apos;,&apos;37.401724&apos;,&apos;-122.114646&apos;);</span><br></pre></td></tr></table></figure><p>下面，开始从表中查询数据。</p><p>根据latitude，longitude值，基于<a href="http://en.wikipedia.org/wiki/Haversine_formula" target="_blank" rel="noopener">Haversine公式</a>从表中查询数据。</p><p>假设我们要查询latitude=37.38714,longitude=-122.083235，范围在25英里内的前20条数据，可以这样：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT id, ( 3959 * acos( cos( radians(&apos;37.38714&apos;) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians(&apos;-122.083235&apos;) ) + sin( radians(&apos;37.38714&apos;) ) * sin( radians( lat ) ) ) ) AS distance FROM markers HAVING distance &lt; 25 ORDER BY distance LIMIT 0, 20;</span><br></pre></td></tr></table></figure><p>如果想使用“公里”代替“英里”，将3959换成6371即可。</p><p>特别简单。</p><p>参考资料：</p><p><a href="https://developers.google.com/maps/articles/phpsqlsearch_v3" target="_blank" rel="noopener">Creating a Store Locator with PHP, MySQL &amp; Google Maps</a></p><p><a href="https://zh.scribd.com/presentation/2569355/Geo-Distance-Search-with-MySQL" target="_blank" rel="noopener">Geo/Spatial Search with MySQL</a></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;&lt;img src=&quot;/images/geolocation.png&quot; alt=&quot;&quot;&gt;&lt;br&gt;题图来自网络&lt;/p&gt;
-&lt;p&gt;工作中某些业务需要用到按距离排序返回结果，之前的方式是根据前端传过来来的经纬度，和指定范围的距离，算出一个坐标区间，再用这个区间的值去MySQL中查找，类
-      
-    
-    </summary>
-    
-      <category term="mysql" scheme="https://www.qichengzx.com/categories/mysql/"/>
-    
-    
-      <category term="mysql" scheme="https://www.qichengzx.com/tags/mysql/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Beego中使用过滤器</title>
-    <link href="https://www.qichengzx.com/2017/03/06/insert-filter-in-beego.html"/>
-    <id>https://www.qichengzx.com/2017/03/06/insert-filter-in-beego.html</id>
-    <published>2017-03-06T00:23:47.000Z</published>
-    <updated>2018-02-27T13:14:16.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>为了方便调试和排错，决定在现有的beego程序里加上requestID。</p><p>查了些资料发现写的并不是特别清楚和详细，在此总结一下，也算是加深下印象。</p><p>astaxie说可以用过滤器实现，就是在Beego运行时在特定的步骤前加入。而由于我的需求比较简单，就选在了BeforeRouter。</p><p>在main.go中:</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">"github.com/astaxie/beego/context"</span></span><br><span class="line"><span class="keyword">import</span> <span class="string">"github.com/satori/go.uuid"</span></span><br></pre></td></tr></table></figure><p>在main函数中加入:</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> FilterRequestID = <span class="function"><span class="keyword">func</span><span class="params">(ctx *context.Context)</span></span> &#123;</span><br><span class="line">requestId := uuid.NewV4().String()</span><br><span class="line">ctx.Input.SetData(<span class="string">"requestId"</span>, requestId)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">beego.InsertFilter(<span class="string">"/*"</span>, beego.BeforeRouter, FilterRequestID)</span><br></pre></td></tr></table></figure><p>在需要使用的地方，如</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @router /requestid [get]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *MyController)</span> <span class="title">Requestid</span><span class="params">()</span></span> &#123;</span><br><span class="line"><span class="comment">//读取requestId</span></span><br><span class="line">rid := this.Ctx.Input.GetData(<span class="string">"requestId"</span>).(<span class="keyword">string</span>)</span><br><span class="line"></span><br><span class="line">fmt.Println(<span class="string">"requestId:"</span>,rid)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>或者</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(m *MyController)</span> <span class="title">Requestid</span><span class="params">()</span></span> &#123;</span><br><span class="line">rid := m.Ctx.Input.GetData(<span class="string">"requestId"</span>).(<span class="keyword">string</span>)</span><br><span class="line"></span><br><span class="line">fmt.Println(<span class="string">"requestId:"</span>,rid)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>其实很简单，但是文档和查到的资料中都没有明确的说需要引用 “github.com/astaxie/beego/context”，导致写的时候浪费了一些时间。</p><p>参考资料:</p><p><a href="https://beego.me/docs/mvc/controller/filter.md" target="_blank" rel="noopener">过滤器</a><br><a href="https://gocn.io/article/95" target="_blank" rel="noopener">beego log中增加request id的一种方式</a></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;为了方便调试和排错，决定在现有的beego程序里加上requestID。&lt;/p&gt;
-&lt;p&gt;查了些资料发现写的并不是特别清楚和详细，在此总结一下，也算是加深下印象。&lt;/p&gt;
-&lt;p&gt;astaxie说可以用过滤器实现，就是在Beego运行时在特定的步骤前加入。而由于我的需求比较简单
       
     
     </summary>

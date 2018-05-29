@@ -65,6 +65,121 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-order-by-distance-in-mysql" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/06/27/order-by-distance-in-mysql.html" class="article-date">
+  <time datetime="2017-06-27T14:18:19.000Z" itemprop="datePublished">2017-06-27</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mysql/">mysql</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/06/27/order-by-distance-in-mysql.html">MySQL实现按经纬度做距离排序</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="/images/geolocation.png" alt=""><br>题图来自网络</p>
+<p>工作中某些业务需要用到按距离排序返回结果，之前的方式是根据前端传过来来的经纬度，和指定范围的距离，算出一个坐标区间，再用这个区间的值去MySQL中查找，类似“where lat between (lat1, lat2) and lng between (lng1,lng2)”，查出数据后，再遍历数据计算每一条数据到这个经纬度的距离，然后根据得出的距离排序返回。低效，麻烦，不方便分页。</p>
+<p>于是决定直接从MySQL中算出距离后返回，省事，方便，还可以直接分页了。</p>
+<p>查资料后发现还挺简单的，下方的示例是从<a href="https://developers.google.com/maps/articles/phpsqlsearch_v3" target="_blank" rel="noopener">Google官方的文档</a>中摘取出来。</p>
+<p>创建如下数据表：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE `markers` (</span><br><span class="line">  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,</span><br><span class="line">  `name` VARCHAR( 60 ) NOT NULL ,</span><br><span class="line">  `address` VARCHAR( 80 ) NOT NULL ,</span><br><span class="line">  `lat` FLOAT( 10, 6 ) NOT NULL ,</span><br><span class="line">  `lng` FLOAT( 10, 6 ) NOT NULL</span><br><span class="line">) ENGINE = MYISAM ;</span><br></pre></td></tr></table></figure>
+<p>填充数据：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">INSERT INTO `markers` (`name`, `address`, `lat`, `lng`) VALUES (&apos;Frankie Johnnie &amp; Luigo Too&apos;,&apos;939 W El Camino Real, Mountain View, CA&apos;,&apos;37.386339&apos;,&apos;-122.085823&apos;);</span><br><span class="line">INSERT INTO `markers` (`name`, `address`, `lat`, `lng`) VALUES (&apos;Amici\&apos;s East Coast Pizzeria&apos;,&apos;790 Castro St, Mountain View, CA&apos;,&apos;37.38714&apos;,&apos;-122.083235&apos;);</span><br><span class="line">INSERT INTO `markers` (`name`, `address`, `lat`, `lng`) VALUES (&apos;Kapp\&apos;s Pizza Bar &amp; Grill&apos;,&apos;191 Castro St, Mountain View, CA&apos;,&apos;37.393885&apos;,&apos;-122.078916&apos;);</span><br><span class="line">INSERT INTO `markers` (`name`, `address`, `lat`, `lng`) VALUES (&apos;Round Table Pizza: Mountain View&apos;,&apos;570 N Shoreline Blvd, Mountain View, CA&apos;,&apos;37.402653&apos;,&apos;-122.079354&apos;);</span><br><span class="line">INSERT INTO `markers` (`name`, `address`, `lat`, `lng`) VALUES (&apos;Tony &amp; Alba\&apos;s Pizza &amp; Pasta&apos;,&apos;619 Escuela Ave, Mountain View, CA&apos;,&apos;37.394011&apos;,&apos;-122.095528&apos;);</span><br><span class="line">INSERT INTO `markers` (`name`, `address`, `lat`, `lng`) VALUES (&apos;Oregano\&apos;s Wood-Fired Pizza&apos;,&apos;4546 El Camino Real, Los Altos, CA&apos;,&apos;37.401724&apos;,&apos;-122.114646&apos;);</span><br></pre></td></tr></table></figure>
+<p>下面，开始从表中查询数据。</p>
+<p>根据latitude，longitude值，基于<a href="http://en.wikipedia.org/wiki/Haversine_formula" target="_blank" rel="noopener">Haversine公式</a>从表中查询数据。</p>
+<p>假设我们要查询latitude=37.38714,longitude=-122.083235，范围在25英里内的前20条数据，可以这样：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT id, ( 3959 * acos( cos( radians(&apos;37.38714&apos;) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians(&apos;-122.083235&apos;) ) + sin( radians(&apos;37.38714&apos;) ) * sin( radians( lat ) ) ) ) AS distance FROM markers HAVING distance &lt; 25 ORDER BY distance LIMIT 0, 20;</span><br></pre></td></tr></table></figure>
+<p>如果想使用“公里”代替“英里”，将3959换成6371即可。</p>
+<p>特别简单。</p>
+<p>参考资料：</p>
+<p><a href="https://developers.google.com/maps/articles/phpsqlsearch_v3" target="_blank" rel="noopener">Creating a Store Locator with PHP, MySQL &amp; Google Maps</a></p>
+<p><a href="https://zh.scribd.com/presentation/2569355/Geo-Distance-Search-with-MySQL" target="_blank" rel="noopener">Geo/Spatial Search with MySQL</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://www.qichengzx.com/2017/06/27/order-by-distance-in-mysql.html" data-id="cjhrkq2rl0038zb2jd3z1jzd1" class="article-share-link">Share</a>
+      
+        <a href="https://www.qichengzx.com/2017/06/27/order-by-distance-in-mysql.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+  
+    <article id="post-insert-filter-in-beego" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/03/06/insert-filter-in-beego.html" class="article-date">
+  <time datetime="2017-03-06T00:23:47.000Z" itemprop="datePublished">2017-03-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/golang/">golang</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/03/06/insert-filter-in-beego.html">Beego中使用过滤器</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>为了方便调试和排错，决定在现有的beego程序里加上requestID。</p>
+<p>查了些资料发现写的并不是特别清楚和详细，在此总结一下，也算是加深下印象。</p>
+<p>astaxie说可以用过滤器实现，就是在Beego运行时在特定的步骤前加入。而由于我的需求比较简单，就选在了BeforeRouter。</p>
+<p>在main.go中:</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">"github.com/astaxie/beego/context"</span></span><br><span class="line"><span class="keyword">import</span> <span class="string">"github.com/satori/go.uuid"</span></span><br></pre></td></tr></table></figure>
+<p>在main函数中加入:</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> FilterRequestID = <span class="function"><span class="keyword">func</span><span class="params">(ctx *context.Context)</span></span> &#123;</span><br><span class="line">	requestId := uuid.NewV4().String()</span><br><span class="line">	ctx.Input.SetData(<span class="string">"requestId"</span>, requestId)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">beego.InsertFilter(<span class="string">"/*"</span>, beego.BeforeRouter, FilterRequestID)</span><br></pre></td></tr></table></figure>
+<p>在需要使用的地方，如</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @router /requestid [get]</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *MyController)</span> <span class="title">Requestid</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">//读取requestId</span></span><br><span class="line">	rid := this.Ctx.Input.GetData(<span class="string">"requestId"</span>).(<span class="keyword">string</span>)</span><br><span class="line"></span><br><span class="line">	fmt.Println(<span class="string">"requestId:"</span>,rid)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>或者</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(m *MyController)</span> <span class="title">Requestid</span><span class="params">()</span></span> &#123;</span><br><span class="line">	rid := m.Ctx.Input.GetData(<span class="string">"requestId"</span>).(<span class="keyword">string</span>)</span><br><span class="line"></span><br><span class="line">	fmt.Println(<span class="string">"requestId:"</span>,rid)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其实很简单，但是文档和查到的资料中都没有明确的说需要引用 “github.com/astaxie/beego/context”，导致写的时候浪费了一些时间。</p>
+<p>参考资料:</p>
+<p><a href="https://beego.me/docs/mvc/controller/filter.md" target="_blank" rel="noopener">过滤器</a><br><a href="https://gocn.io/article/95" target="_blank" rel="noopener">beego log中增加request id的一种方式</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://www.qichengzx.com/2017/03/06/insert-filter-in-beego.html" data-id="cjhrkq2rd002rzb2j2vu3sk4x" class="article-share-link">Share</a>
+      
+        <a href="https://www.qichengzx.com/2017/03/06/insert-filter-in-beego.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+  
     <article id="post-shortlen-url-by-go" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2016/12/27/shortlen-url-by-go.html" class="article-date">
@@ -130,7 +245,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/12/27/shortlen-url-by-go.html" data-id="cjh4i1sxt004lqr2j0cw5dejx" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/12/27/shortlen-url-by-go.html" data-id="cjhrkq2sb004lzb2joffhn03v" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/12/27/shortlen-url-by-go.html#comments" class="article-comment-link">Comments</a>
       
@@ -211,7 +326,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/12/14/toutiao-images-spider-by-golang.html" data-id="cjh4i1sxr004fqr2jtob3lo6y" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/12/14/toutiao-images-spider-by-golang.html" data-id="cjhrkq2sg004vzb2j7hpyg5xd" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/12/14/toutiao-images-spider-by-golang.html#comments" class="article-comment-link">Comments</a>
       
@@ -280,7 +395,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/12/04/go-qiubai.html" data-id="cjh4i1swl0021qr2jayo3rakt" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/12/04/go-qiubai.html" data-id="cjhrkq2r40025zb2j5cfcgmpe" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/12/04/go-qiubai.html#comments" class="article-comment-link">Comments</a>
       
@@ -334,7 +449,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/11/02/install-yaf-on-mac.html" data-id="cjh4i1swv002qqr2j7onc7itr" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/11/02/install-yaf-on-mac.html" data-id="cjhrkq2rg002yzb2j7n74huxh" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/11/02/install-yaf-on-mac.html#comments" class="article-comment-link">Comments</a>
       
@@ -387,7 +502,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/10/21/beego-in-docker.html" data-id="cjh4i1sw1000nqr2jb5ebfaes" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/10/21/beego-in-docker.html" data-id="cjhrkq2qf000lzb2jmdtdgmsc" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/10/21/beego-in-docker.html#comments" class="article-comment-link">Comments</a>
       
@@ -447,7 +562,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html" data-id="cjh4i1sw90017qr2jsm3frs4m" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html" data-id="cjhrkq2qv001izb2jhk5vpehx" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/09/28/custom-data-pagination-in-laravel-with-arrays.html#comments" class="article-comment-link">Comments</a>
       
@@ -519,7 +634,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/09/16/convert-xml-to-json-in-golang.html" data-id="cjh4i1sw5000yqr2jwo45wb3l" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/09/16/convert-xml-to-json-in-golang.html" data-id="cjhrkq2qm000yzb2jd612sya4" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/09/16/convert-xml-to-json-in-golang.html#comments" class="article-comment-link">Comments</a>
       
@@ -586,122 +701,12 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/09/11/Hello-Go.html" data-id="cjh4i1svd0000qr2jkl4emq7h" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/09/11/Hello-Go.html" data-id="cjhrkq2px0001zb2j46bcq2mx" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/09/11/Hello-Go.html#comments" class="article-comment-link">Comments</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-  
-    <article id="post-php-post-file-with-curl" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2016/07/02/php-post-file-with-curl.html" class="article-date">
-  <time datetime="2016-07-02T15:11:30.000Z" itemprop="datePublished">2016-07-02</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/php/">php</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/07/02/php-post-file-with-curl.html">PHP Curl 上传文件</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>有时候会遇到上传文件给第三方服务的情况，比如本身程序并不需要存储附件，而是把附件发送给一个公共的服务。</p>
-<p>最近正好碰到这个问题，记录一下。</p>
-<p>上代码。</p>
-<h4 id="发送端："><a href="#发送端：" class="headerlink" title="发送端："></a>发送端：</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 接口地址</span></span><br><span class="line">$api = <span class="string">'http://api.example.com/uploadfile'</span>;</span><br><span class="line">$file = $_FILES[<span class="string">'file'</span>];<span class="comment">//保存$_FILES到变量中。</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 此处可能存在上传失败等问题，需验证$_FILES["file"]["error"]。</span></span><br><span class="line"><span class="comment">// 做业务对应的规则验证，如文件格式，文件大小等。</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建一个 cURL 句柄</span></span><br><span class="line">$ch = curl_init($api);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建一个 CURLFile 对象</span></span><br><span class="line"><span class="comment">// 上传文件的路径，文件的Mimetype，文件名</span></span><br><span class="line">$cfile = curl_file_create($file[<span class="string">'tmp_name'</span>],$file[<span class="string">'type'</span>],$file[<span class="string">'name'</span>]);</span><br><span class="line"></span><br><span class="line">$data = [</span><br><span class="line">	<span class="string">'type'</span>=&gt;<span class="string">'image'</span>,</span><br><span class="line">	<span class="string">'data'</span>=&gt;$cfile</span><br><span class="line">];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置 POST 数据</span></span><br><span class="line">curl_setopt($ch, CURLOPT_POST,<span class="number">1</span>);</span><br><span class="line">curl_setopt($ch, CURLOPT_POSTFIELDS, $data);</span><br><span class="line"></span><br><span class="line">$resp = curl_exec($ch);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(!$resp) &#123;</span><br><span class="line">  <span class="keyword">die</span>(<span class="string">'Error: "'</span> . curl_error($ch) . <span class="string">'" - Code: '</span> . curl_errno($ch));</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  <span class="keyword">echo</span> <span class="string">"Response HTTP Status Code : "</span> . curl_getinfo($ch, CURLINFO_HTTP_CODE);</span><br><span class="line">  <span class="keyword">echo</span> <span class="string">"\nResponse HTTP Body : "</span> . $resp;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Close request to clear up some resources</span></span><br><span class="line">curl_close($ch);</span><br></pre></td></tr></table></figure>
-<h4 id="接收端："><a href="#接收端：" class="headerlink" title="接收端："></a>接收端：</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> </span><br><span class="line">var_dump($_FILES);<span class="comment">// 接收文件内容</span></span><br><span class="line">va_dump($_POST);<span class="comment">// 接收type</span></span><br></pre></td></tr></table></figure>
-<h4 id="前端："><a href="#前端：" class="headerlink" title="前端："></a>前端：</h4><p>前端可使用Form或其他Ajax方式上传。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html" data-id="cjh4i1sx7003cqr2jx0pu9bv8" class="article-share-link">Share</a>
-      
-        <a href="https://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html#comments" class="article-comment-link">Comments</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/php/">php</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-  
-    <article id="post-a-sample-redis-queue" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2016/05/15/a-sample-redis-queue.html" class="article-date">
-  <time datetime="2016-05-15T06:19:52.000Z" itemprop="datePublished">2016-05-15</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/php/">php</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/05/15/a-sample-redis-queue.html">一个简单的php+redis队列示例</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><img src="/images/redis/redis-300dpi.png" alt=""></p>
-<p>虽然RabbitMQ的坑年前就开始填了，但是并没有机会在项目中实际使用，机缘巧合，换工作后第一个比较重要的事就是做一个直播的页面，如果数据直接插入或读取自数据库，数据库端的压力就太大了，当时RabbitMQ还没看完，而其他的队列程序更是没有用过，只是稍微对Redis熟悉些，于是就使用了Redis做。</p>
-<p><a href="http://redis.io/" target="_blank" rel="noopener">Redis</a>比较常见的是作为数据缓存工具使用，数据存储在内存中，减少了数据库的连接和查询，效率高，又方便。</p>
-<p>而其实Redis也可以用来做消息队列。</p>
-<h3 id="发送"><a href="#发送" class="headerlink" title="发送"></a>发送</h3><p>发送端首先当然是做好数据的接收和检测，比如为空的情况下给个默认值或返回错误。</p>
-<p>特殊的情况下可能还要正则处理。</p>
-<p>处理完插入到Redis的list(<a href="http://www.redis.cn/topics/data-types-intro.html#lists" target="_blank" rel="noopener">列表</a>)中。如果插入失败抛出异常。</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line">$redis = <span class="keyword">new</span> Redis();</span><br><span class="line">$redis-&gt;connect(<span class="string">'127.0.0.1'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//如果redis需要认证</span></span><br><span class="line">$redis-&gt;auth(<span class="string">'redispasswd'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//命令行中使用，可以使用把信息作为参数的方式</span></span><br><span class="line">$data = $argv[<span class="number">1</span>];</span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">empty</span>($data)) $data = <span class="string">"Hello World..!"</span>:</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line">	<span class="comment">//便于调试，在信息后边加上当前时间</span></span><br><span class="line">	$data .= <span class="string">'-at-'</span>.date(<span class="string">'Y-m-d H:i:s'</span>);</span><br><span class="line">	$redis-&gt;LPUSH(<span class="string">'redis_queue_1'</span>,json_encode($data));</span><br><span class="line">&#125;<span class="keyword">catch</span>(<span class="keyword">Exception</span> $e)&#123;</span><br><span class="line">	<span class="keyword">echo</span> $e-&gt;getMessage().<span class="string">"\n"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="执行"><a href="#执行" class="headerlink" title="执行"></a>执行</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php push.php "testinfo"</span><br></pre></td></tr></table></figure>
-<h3 id="接收"><a href="#接收" class="headerlink" title="接收"></a>接收</h3><p>由于消息是源源不断发送到队列中，所以接收端程序一般会以后台进程的方式运行。</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$redis = <span class="keyword">new</span> Redis();</span><br><span class="line">$redis-&gt;connect(<span class="string">'127.0.0.1'</span>);</span><br><span class="line"></span><br><span class="line">$redis-&gt;auth(<span class="string">'redispasswd'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		$data = $redis-&gt;rPopLPush(<span class="string">'redis_queue_1'</span>,<span class="string">'redis_queue_1_bak'</span>).<span class="string">"\n"</span>;</span><br><span class="line">		<span class="keyword">if</span>($data)&#123;</span><br><span class="line">			<span class="keyword">echo</span> $data;</span><br><span class="line">		&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">			<span class="keyword">echo</span> <span class="string">"没有数据\n"</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125; <span class="keyword">catch</span> (<span class="keyword">Exception</span> $e) &#123;</span><br><span class="line">		<span class="keyword">echo</span> $e-&gt;getMessage().<span class="string">"\n"</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//每秒读取1次</span></span><br><span class="line">	sleep(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="执行-1"><a href="#执行-1" class="headerlink" title="执行"></a>执行</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php get.php</span><br></pre></td></tr></table></figure>
-<h3 id="更进一步"><a href="#更进一步" class="headerlink" title="更进一步"></a>更进一步</h3><p>如果想把数据写入到MySQL中，该怎么办？</p>
-<p>大多数情况下数据最终是需要持久化的，仅仅存在于redis中，也许内存会不够呢。</p>
-<p>改造一下get.php。</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$redis = <span class="keyword">new</span> Redis();</span><br><span class="line">$redis-&gt;connect(<span class="string">'127.0.0.1'</span>);</span><br><span class="line"></span><br><span class="line">$redis-&gt;auth(<span class="string">'redispasswd'</span>);</span><br><span class="line"></span><br><span class="line">$dsn = <span class="string">'mysql:dbname=test;host=127.0.0.1'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line">	$pdo = <span class="keyword">new</span> PDO($dsn,<span class="string">'root'</span>,<span class="string">'mysqlpasswd'</span>,<span class="keyword">array</span>(PDO::MYSQL_ATTR_INIT_COMMAND =&gt; <span class="string">'SET NAMES utf8'</span>));</span><br><span class="line">&#125;<span class="keyword">catch</span>(PDOExcetion $e)&#123;</span><br><span class="line">	<span class="keyword">echo</span> $e-&gt;getMessage().<span class="string">"\n"</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">	$data = $redis-&gt;rPopLPush(<span class="string">'redis_queue_1'</span>,<span class="string">'redis_queue_1_bak'</span>);</span><br><span class="line">	<span class="keyword">if</span>($data)&#123;</span><br><span class="line">		$sth = $pdo-&gt;prepare(<span class="string">"INSERT INTO tb_test(msg,time) VALUES (:msg,:time)"</span>);</span><br><span class="line">		</span><br><span class="line">		$time = time();</span><br><span class="line">		</span><br><span class="line">		$sth-&gt;bindParam(<span class="string">':msg'</span>,$data,PDO::PARAM_STR);</span><br><span class="line">		$sth-&gt;bindParam(<span class="string">':time'</span>,$time,PDO::PARAM_INT);</span><br><span class="line">		</span><br><span class="line">		$sth-&gt;execute();</span><br><span class="line">		$id = $pdo-&gt;lastInsertId();</span><br><span class="line">      </span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"插入成功，ID=$id \n"</span>;</span><br><span class="line">	&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"没有数据 \n"</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//实际任务中可能需要尽可能快的把数据导入到MySQL中</span></span><br><span class="line">	sleep(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h4><p>​    这里使用了<a href="http://php.net/manual/zh/book.pdo.php" target="_blank" rel="noopener">PDO</a>;</p>
-<p>​    <a href="http://php.net/manual/zh/pdostatement.bindparam.php" target="_blank" rel="noopener">bindParam</a>方法的第一个参数对应insert语句中的对应顺序的值，如第一个bindParam方法对应第一个value值。</p>
-<p>​    bindParam方法第二个参数为实际的值，传入变量或固定值，传入方法调用时如time()会提示：</p>
-<p>Strict standards: Only variables should be passed by reference in /www/get.php on line 24。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html" data-id="cjh4i1svu000gqr2j5w9vfmep" class="article-share-link">Share</a>
-      
-        <a href="https://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html#comments" class="article-comment-link">Comments</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/php/">php</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redis/">redis</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/队列/">队列</a></li></ul>
 
     </footer>
   </div>
@@ -751,7 +756,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/git/">git</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/nginx/">nginx</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">12</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/git/">git</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/nginx/">nginx</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">12</span></li></ul>
     </div>
   </div>
 
@@ -760,7 +765,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Keygen/">Keygen</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geo/">geo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">20</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redigo/">redigo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Keygen/">Keygen</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geo/">geo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">20</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redigo/">redigo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -769,7 +774,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/Keygen/" style="font-size: 10px;">Keygen</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/docker/" style="font-size: 11.43px;">docker</a> <a href="/tags/dropbox/" style="font-size: 11.43px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/geo/" style="font-size: 12.86px;">geo</a> <a href="/tags/gin/" style="font-size: 10px;">gin</a> <a href="/tags/git/" style="font-size: 11.43px;">git</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/go/" style="font-size: 20px;">go</a> <a href="/tags/goquery/" style="font-size: 11.43px;">goquery</a> <a href="/tags/hexo/" style="font-size: 12.86px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 12.86px;">javascript</a> <a href="/tags/js/" style="font-size: 11.43px;">js</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/leetcode/" style="font-size: 10px;">leetcode</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 17.14px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 18.57px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 15.71px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redigo/" style="font-size: 12.86px;">redigo</a> <a href="/tags/redis/" style="font-size: 14.29px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/今日头条/" style="font-size: 10px;">今日头条</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/短网址/" style="font-size: 10px;">短网址</a> <a href="/tags/糗百/" style="font-size: 10px;">糗百</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
+      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/Keygen/" style="font-size: 10px;">Keygen</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/docker/" style="font-size: 11.25px;">docker</a> <a href="/tags/dropbox/" style="font-size: 11.25px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/geo/" style="font-size: 12.5px;">geo</a> <a href="/tags/gin/" style="font-size: 10px;">gin</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/go/" style="font-size: 20px;">go</a> <a href="/tags/goquery/" style="font-size: 11.25px;">goquery</a> <a href="/tags/hexo/" style="font-size: 12.5px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 12.5px;">javascript</a> <a href="/tags/js/" style="font-size: 11.25px;">js</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/leetcode/" style="font-size: 10px;">leetcode</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 17.5px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 18.75px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 16.25px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redigo/" style="font-size: 12.5px;">redigo</a> <a href="/tags/redis/" style="font-size: 15px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/今日头条/" style="font-size: 10px;">今日头条</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/短网址/" style="font-size: 10px;">短网址</a> <a href="/tags/糗百/" style="font-size: 10px;">糗百</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
     </div>
   </div>
 
@@ -778,7 +783,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
     </div>
   </div>
 
@@ -788,6 +793,10 @@
     <h3 class="widget-title">Recents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2018/05/29/git-pull-upstream.html">Git 同步上游源更改</a>
+          </li>
         
           <li>
             <a href="/2018/05/13/create-a-single-page-app-with-go-echo-and-vue.html">【译】使用 Go，Echo 和 Vue 创建单页 TODO 应用</a>
@@ -802,11 +811,7 @@
           </li>
         
           <li>
-            <a href="/2018/05/03/go-recursion.html">Go 递归</a>
-          </li>
-        
-          <li>
-            <a href="/2018/05/02/go-closure.html">Go 闭包</a>
+            <a href="/2018/05/10/gp-database-sql-prepare.html">Git rebase 笔记</a>
           </li>
         
       </ul>
