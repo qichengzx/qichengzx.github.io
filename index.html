@@ -65,6 +65,91 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-qq-007-captcha" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/06/15/qq-007-captcha.html" class="article-date">
+  <time datetime="2018-06-15T08:56:24.000Z" itemprop="datePublished">2018-06-15</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/javascript/">javascript</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/06/15/qq-007-captcha.html">腾讯防水墙验证码使用</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="/images/WX20180615-172557.png" alt=""></p>
+<p>前阵子腾讯出了个<a href="https://007.qq.com/" target="_blank" rel="noopener">验证码产品</a>，宣称“告别传统验证码的单点防御，十道安全栅栏打造立体全面的安全验证，将黑产拒之门外”。看起来很不错的样子，正好之前使用过另外一家类似的产品，但是当时没有试用，今天特地注册了解了一下。</p>
+<p>注册很简单，填写手机号邮箱和域名等即可。由于是在本地环境测试，似乎填写的域名并没有什么影响。而且填写时可以选择适用场景，应该是针对不同的场景有不同的策略。</p>
+<p>功能也比较丰富，支持：</p>
+<ul>
+<li><p>2000次/小时安全防护</p>
+</li>
+<li><p>支持免验证+分级验证</p>
+</li>
+<li><p>三分钟快速接入</p>
+</li>
+<li><p>全功能配置后台</p>
+</li>
+<li><p>支持HTTPS</p>
+</li>
+<li><p>阈值内流量无广告</p>
+</li>
+</ul>
+<p>注册完之后会分配一个 <code>appid</code> 和 <code>App Secret Key</code>，<code>App Secret Key</code> 需要妥善保存，不可暴露出来。</p>
+<p>下面就简单的记录下普通场景下如何使用。（此场景指简单使用，非验证码配置的场景）</p>
+<h4 id="0-前端页面"><a href="#0-前端页面" class="headerlink" title="0.前端页面"></a>0.前端页面</h4><p>在 HTML 中引入js文件：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://ssl.captcha.qq.com/TCaptcha.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>然后在需要激活的位置加入：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">button</span> <span class="attr">id</span>=<span class="string">"TencentCaptcha"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">data-appid</span>=<span class="string">"200700xxxx"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">data-cbfn</span>=<span class="string">"callback"</span></span></span><br><span class="line"><span class="tag">&gt;</span>验证<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>官方文档表示可以使用其他标签，只需有 <code>id</code> 及 <code>cbfn</code> 属性即可。</p>
+<p>然后注册回调函数：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">window</span>.callback = <span class="function"><span class="keyword">function</span>(<span class="params">res</span>)</span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(res)</span><br><span class="line">  <span class="comment">// res（未通过验证）= &#123;ret: 1, ticket: null&#125;</span></span><br><span class="line">  <span class="comment">// res（验证成功） = &#123;ret: 0, ticket: "String", randstr: "String"&#125;</span></span><br><span class="line">  <span class="keyword">if</span>(res.ret === <span class="number">0</span>)&#123;</span><br><span class="line">      alert(res.ticket)   <span class="comment">// 票据</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>前端的 callback 如果验证成功后，就可以在提交信息的同时把腾讯返回的内容提交给后端，主要是验证票据：<code>ticket</code> 和随机字符串：<code>randstr</code>。</p>
+<p>我测试的例子中是这样的：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">"/verify"</span> <span class="attr">method</span>=<span class="string">"post"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"appid"</span> <span class="attr">value</span>=<span class="string">"200700xxxx"</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">id</span>=<span class="string">"ticket"</span> <span class="attr">name</span>=<span class="string">"ticket"</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">id</span>=<span class="string">"randstr"</span> <span class="attr">name</span>=<span class="string">"randstr"</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">button</span> <span class="attr">id</span>=<span class="string">"btn"</span> <span class="attr">disabled</span>&gt;</span>submit<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>修改回调函数：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">window</span>.callback = <span class="function"><span class="keyword">function</span>(<span class="params">res</span>)</span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(res)</span><br><span class="line">  <span class="keyword">if</span>(res.ret === <span class="number">0</span>)&#123;</span><br><span class="line">    <span class="built_in">document</span>.getElementById(<span class="string">'ticket'</span>).value = res.ticket</span><br><span class="line">    <span class="built_in">document</span>.getElementById(<span class="string">'randstr'</span>).value = res.randstr</span><br><span class="line">    <span class="built_in">document</span>.getElementById(<span class="string">'ticket'</span>).value = res.ticket</span><br><span class="line">    <span class="built_in">document</span>.getElementById(<span class="string">'btn'</span>).disabled = <span class="literal">false</span></span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    alert(<span class="string">'验证失败'</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>前端验证成功后，把 <code>ticket</code> 和 <code>randstr</code> 填充到表单中去。</p>
+<p>此时页面就可以使用这个验证服务了。</p>
+<h4 id="1-后端"><a href="#1-后端" class="headerlink" title="1.后端"></a>1.后端</h4><p>后端拿到提交的表单后，需要再去请求腾讯的接口验证是否成功。</p>
+<p>如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">serveVerify</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</span><br><span class="line">    <span class="keyword">if</span> r.Method != <span class="string">"POST"</span> &#123;</span><br><span class="line">        http.Error(w, <span class="string">"Method not allowed"</span>, <span class="number">405</span>)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    r.ParseForm()</span><br><span class="line"></span><br><span class="line">    aid := r.Form[<span class="string">"appid"</span>][<span class="number">0</span>]</span><br><span class="line">    AppSecretKey := <span class="string">"yourSecretKey"</span></span><br><span class="line">    UserIP := r.RemoteAddr</span><br><span class="line">    Ticket :=  r.Form[<span class="string">"ticket"</span>][<span class="number">0</span>]</span><br><span class="line">    Randstr := r.Form[<span class="string">"randstr"</span>][<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line">    req, err := http.NewRequest(<span class="string">"GET"</span>, API, <span class="literal">nil</span>)</span><br><span class="line">    req.Header.Set(<span class="string">"Content-Type"</span>, <span class="string">"application/x-www-form-urlencoded"</span>)</span><br><span class="line"></span><br><span class="line">    q := req.URL.Query()</span><br><span class="line">    q.Add(<span class="string">"aid"</span>, aid)</span><br><span class="line">    q.Add(<span class="string">"AppSecretKey"</span>, AppSecretKey)</span><br><span class="line">    q.Add(<span class="string">"UserIP"</span>, UserIP)</span><br><span class="line">    q.Add(<span class="string">"Ticket"</span>, Ticket)</span><br><span class="line">    q.Add(<span class="string">"Randstr"</span>, Randstr)</span><br><span class="line">    req.URL.RawQuery = q.Encode()</span><br><span class="line"></span><br><span class="line">    httpClient := &amp;http.Client&#123;</span><br><span class="line">        Timeout: <span class="number">10</span>*time.Second,</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    fmt.Println(<span class="string">"going to check :"</span>,req.URL.String())</span><br><span class="line"></span><br><span class="line">    resp, err := httpClient.Do(req)</span><br><span class="line">    <span class="keyword">defer</span> resp.Body.Close()</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        w.Write([]<span class="keyword">byte</span>(<span class="string">"got error"</span>))</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    body, err := ioutil.ReadAll(resp.Body)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        w.Write([]<span class="keyword">byte</span>(<span class="string">"got error"</span>))</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    w.Write(body)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>腾讯服务器将返回 <code>{response:1, evil_level:70, err_msg:&quot;&quot;}</code> 类似的内容。其中：</p>
+<p>response = 1 表示验证成功。</p>
+<p>evil_level 是恶意等级，范围为0-100。</p>
+<p>response = 1 即表示此次请求是“正常”的。</p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>确实很容易接入，而且还提供了验证数据的请求统计等，包括通过与拦截的数据，日请求量，通过量，拦截量。</p>
+<p>后台还提供了对场景更改的操作，也可以定制外观。</p>
+<p>整体还不错。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://www.qichengzx.com/2018/06/15/qq-007-captcha.html" data-id="cjifrud5w004bsks6dkvwp8ko" class="article-share-link">Share</a>
+      
+        <a href="https://www.qichengzx.com/2018/06/15/qq-007-captcha.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/captcha/">captcha</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/qq/">qq</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+  
     <article id="post-git-pull-upstream" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/05/29/git-pull-upstream.html" class="article-date">
@@ -110,7 +195,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/05/29/git-pull-upstream.html" data-id="cjhrkq2qy001rzb2j2tswf91z" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/05/29/git-pull-upstream.html" data-id="cjifrud4o001rsks6ky5bkc85" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/05/29/git-pull-upstream.html#comments" class="article-comment-link">Comments</a>
       
@@ -255,7 +340,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/05/13/create-a-single-page-app-with-go-echo-and-vue.html" data-id="cjhrkq2qh000nzb2jc8rxuotc" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/05/13/create-a-single-page-app-with-go-echo-and-vue.html" data-id="cjifrud49000tsks62e2gf4y7" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/05/13/create-a-single-page-app-with-go-echo-and-vue.html#comments" class="article-comment-link">Comments</a>
       
@@ -313,7 +398,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/05/12/generating-random-keys-with-keygen.html" data-id="cjhrkq2qs001azb2jbcb92epp" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/05/12/generating-random-keys-with-keygen.html" data-id="cjifrud4l001msks61vufy2zh" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/05/12/generating-random-keys-with-keygen.html#comments" class="article-comment-link">Comments</a>
       
@@ -370,7 +455,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/05/10/git-rebase.html" data-id="cjhrkq2qz001uzb2jfkhvhexb" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/05/10/git-rebase.html" data-id="cjifrud4q001usks6ld2g4fvg" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/05/10/git-rebase.html#comments" class="article-comment-link">Comments</a>
       
@@ -413,7 +498,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/05/10/gp-database-sql-prepare.html" data-id="cjhrkq2ra002kzb2j4xyl2jwn" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/05/10/gp-database-sql-prepare.html" data-id="cjifrud50002osks6vgrj8yj8" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/05/10/gp-database-sql-prepare.html#comments" class="article-comment-link">Comments</a>
       
@@ -480,7 +565,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/05/03/go-recursion.html" data-id="cjhrkq2r9002hzb2jpl5x2cvv" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/05/03/go-recursion.html" data-id="cjifrud4v002asks6b0127j9u" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/05/03/go-recursion.html#comments" class="article-comment-link">Comments</a>
       
@@ -532,7 +617,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/05/02/go-closure.html" data-id="cjhrkq2r30022zb2jwywzblex" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/05/02/go-closure.html" data-id="cjifrud4u0025sks6i1jcm5hb" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/05/02/go-closure.html#comments" class="article-comment-link">Comments</a>
       
@@ -584,7 +669,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/04/25/dockerfile-build-arg.html" data-id="cjhrkq2ql000uzb2jkbyswz2a" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/04/25/dockerfile-build-arg.html" data-id="cjifrud4d0015sks6k3zwqz5w" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/04/25/dockerfile-build-arg.html#comments" class="article-comment-link">Comments</a>
       
@@ -633,78 +718,12 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/04/22/github-pages.html" data-id="cjhrkq2r1001zzb2jrqzukjqd" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/04/22/github-pages.html" data-id="cjifrud4t0022sks6wbp81yr6" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/04/22/github-pages.html#comments" class="article-comment-link">Comments</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/github/">github</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-  
-    <article id="post-nginx-1-13-9-http2-server-push" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/02/27/nginx-1-13-9-http2-server-push.html" class="article-date">
-  <time datetime="2018-02-27T11:41:32.000Z" itemprop="datePublished">2018-02-27</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/nginx/">nginx</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/02/27/nginx-1-13-9-http2-server-push.html">Nginx HTTP/2 Server Push</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Nginx 在最新的 <a href="http://nginx.org/en/download.html" target="_blank" rel="noopener">1.13.9</a> 版本中，增加了对 HTTP/2 Server Push 的支持，以下就简单介绍下如何使用。</p>
-<p>以下内容主要来自 <a href="https://www.nginx.com/blog/nginx-1-13-9-http2-server-push/" target="_blank" rel="noopener">Introducing HTTP/2 Server Push with NGINX 1.13.9</a>，进行了简单的整理。</p>
-<h3 id="推送指定资源"><a href="#推送指定资源" class="headerlink" title="推送指定资源"></a>推送指定资源</h3><p>首先，在 Nginx 中进行配置：</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">server</span> &#123;</span><br><span class="line">    <span class="comment">#开启HTTP/2</span></span><br><span class="line">    <span class="attribute">listen</span> <span class="number">443</span> ssl http2;</span><br><span class="line"></span><br><span class="line">    <span class="attribute">ssl_certificate</span> ssl/certificate.pem;</span><br><span class="line">    <span class="attribute">ssl_certificate_key</span> ssl/key.pem;</span><br><span class="line"></span><br><span class="line">    <span class="attribute">root</span> /var/www/html;</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 当请求 demo.html 时，推送 /style.css, /image1.jpg, /image2.jpg</span></span><br><span class="line">    <span class="attribute">location</span> = /demo.html &#123;</span><br><span class="line">        <span class="attribute">http2_push</span> /style.css;</span><br><span class="line">        <span class="attribute">http2_push</span> /image1.jpg;</span><br><span class="line">        <span class="attribute">http2_push</span> /image2.jpg;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>可以通过 Chrome Developer Tools 查看效果。在 Network 中，可以看到 demo.html 的请求和推送到客户端的内容。</p>
-<p>如下图所示，可以看到 style.css，image1.jpg，image2.jpg。它们都是 demo.html 请求的一部分。</p>
-<p><img src="/images/http2-server-push-chrome-dev-tools.png" alt=""></p>
-<h3 id="自动推送"><a href="#自动推送" class="headerlink" title="自动推送"></a>自动推送</h3><p>以上是在页面加载时推送指定资源的例子，但是很多情况下，并不能指定要推送哪些资源，因此，Nginx 还支持通过 http2_push_preload 指令，自动分析响应头中的 Link header，来自动推送这些资源。</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">server</span> &#123;</span><br><span class="line">    <span class="comment">#开启HTTP/2</span></span><br><span class="line">    <span class="attribute">listen</span> <span class="number">443</span> ssl http2;</span><br><span class="line"></span><br><span class="line">    <span class="attribute">ssl_certificate</span> ssl/certificate.pem;</span><br><span class="line">    <span class="attribute">ssl_certificate_key</span> ssl/key.pem;</span><br><span class="line"></span><br><span class="line">    <span class="attribute">root</span> /var/www/html;</span><br><span class="line"></span><br><span class="line">    <span class="attribute">location</span> = /myapp &#123;</span><br><span class="line">        <span class="attribute">proxy_pass</span> http://upstream;</span><br><span class="line">        <span class="attribute">http2_push_preload</span> <span class="literal">on</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>通过如上的配置，当 upstream 返回的响应头中包含 Link header 时，</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Link: &lt;/style.css&gt;; as=style; rel=preload</span><br></pre></td></tr></table></figure>
-<p>Nginx 即会开启一个推送， 内容则是 /style.css ，Link header 的路径必须是绝对路径。</p>
-<p>如果想要推送多个资源，可以添加多个 Link header ， 或更直接一些，把所有资源添加到一个 Link header 中。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Link: &lt;/style.css&gt;; as=style; rel=preload, &lt;/favicon.ico&gt;; as=image; rel=preload</span><br></pre></td></tr></table></figure>
-<p>如果不想让 Nginx 推送某个资源，为该 header 添加一个 nopush 参数即可。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Link: &lt;/nginx.png&gt;; as=image; rel=preload; nopush</span><br></pre></td></tr></table></figure>
-<h3 id="有选择的推送"><a href="#有选择的推送" class="headerlink" title="有选择的推送"></a>有选择的推送</h3><p>由于 HTTP/2 规范并没有解决是否要推送哪些资源的问题，但是比较合理的方式是知道需要推送哪些资源，并且客户端没有缓存过这些资源，才进行推送。</p>
-<p>所以 Nginx 支持了添加条件，只在符合条件时才进行推送</p>
-<p>当客户端请求时包含了 cookie ，Nginx 将只会推送一次资源。</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">server</span> &#123;</span><br><span class="line">    <span class="attribute">listen</span> <span class="number">443</span> ssl http2 default_server;</span><br><span class="line"></span><br><span class="line">    <span class="attribute">ssl_certificate</span> ssl/certificate.pem;</span><br><span class="line">    <span class="attribute">ssl_certificate_key</span> ssl/key.pem;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="attribute">root</span> /var/www/html;</span><br><span class="line">    <span class="attribute">http2_push_preload</span> <span class="literal">on</span>;</span><br><span class="line"></span><br><span class="line">    <span class="attribute">location</span> = /demo.html &#123;</span><br><span class="line">        <span class="attribute">add_header</span> Set-Cookie <span class="string">"session=1"</span>;</span><br><span class="line">        <span class="attribute">add_header</span> Link <span class="variable">$resources</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="attribute">map</span> <span class="variable">$http_cookie</span> <span class="variable">$resources</span> &#123;</span><br><span class="line">    "~*session=1" "";</span><br><span class="line">    <span class="attribute">default</span> <span class="string">"&lt;/style.css&gt;; as=style; rel=preload, &lt;/image1.jpg&gt;; as=image; rel=preload,</span></span><br><span class="line"><span class="string">             &lt;/image2.jpg&gt;; as=style; rel=preload"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>相关链接:</p>
-<p><a href="https://www.qichengzx.com/2017/07/02/HTTP2-Server-Push.html">在Go中使用 HTTP/2 Server Push</a></p>
-<p>参考资料:</p>
-<p><a href="https://w3c.github.io/preload/#server-push-http-2" target="_blank" rel="noopener">Server Push (HTTP/2)</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/02/27/nginx-1-13-9-http2-server-push.html" data-id="cjhrkq2rq003fzb2jwj7ixdn7" class="article-share-link">Share</a>
-      
-        <a href="https://www.qichengzx.com/2018/02/27/nginx-1-13-9-http2-server-push.html#comments" class="article-comment-link">Comments</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nginx/">nginx</a></li></ul>
 
     </footer>
   </div>
@@ -754,7 +773,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/git/">git</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/nginx/">nginx</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">12</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/git/">git</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/nginx/">nginx</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">12</span></li></ul>
     </div>
   </div>
 
@@ -763,7 +782,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Keygen/">Keygen</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geo/">geo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">20</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redigo/">redigo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Keygen/">Keygen</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/captcha/">captcha</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geo/">geo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">20</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/qq/">qq</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redigo/">redigo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -772,7 +791,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/Keygen/" style="font-size: 10px;">Keygen</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/docker/" style="font-size: 11.25px;">docker</a> <a href="/tags/dropbox/" style="font-size: 11.25px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/geo/" style="font-size: 12.5px;">geo</a> <a href="/tags/gin/" style="font-size: 10px;">gin</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/go/" style="font-size: 20px;">go</a> <a href="/tags/goquery/" style="font-size: 11.25px;">goquery</a> <a href="/tags/hexo/" style="font-size: 12.5px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 12.5px;">javascript</a> <a href="/tags/js/" style="font-size: 11.25px;">js</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/leetcode/" style="font-size: 10px;">leetcode</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 17.5px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 18.75px;">php</a> <a href="/tags/rabbitmq/" style="font-size: 16.25px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redigo/" style="font-size: 12.5px;">redigo</a> <a href="/tags/redis/" style="font-size: 15px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/今日头条/" style="font-size: 10px;">今日头条</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/短网址/" style="font-size: 10px;">短网址</a> <a href="/tags/糗百/" style="font-size: 10px;">糗百</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
+      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/Keygen/" style="font-size: 10px;">Keygen</a> <a href="/tags/captcha/" style="font-size: 10px;">captcha</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/docker/" style="font-size: 11.25px;">docker</a> <a href="/tags/dropbox/" style="font-size: 11.25px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/geo/" style="font-size: 12.5px;">geo</a> <a href="/tags/gin/" style="font-size: 10px;">gin</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/go/" style="font-size: 20px;">go</a> <a href="/tags/goquery/" style="font-size: 11.25px;">goquery</a> <a href="/tags/hexo/" style="font-size: 12.5px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 12.5px;">javascript</a> <a href="/tags/js/" style="font-size: 12.5px;">js</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/leetcode/" style="font-size: 10px;">leetcode</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 17.5px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 18.75px;">php</a> <a href="/tags/qq/" style="font-size: 10px;">qq</a> <a href="/tags/rabbitmq/" style="font-size: 16.25px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redigo/" style="font-size: 12.5px;">redigo</a> <a href="/tags/redis/" style="font-size: 15px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/今日头条/" style="font-size: 10px;">今日头条</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/短网址/" style="font-size: 10px;">短网址</a> <a href="/tags/糗百/" style="font-size: 10px;">糗百</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
     </div>
   </div>
 
@@ -781,7 +800,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
     </div>
   </div>
 
@@ -791,6 +810,10 @@
     <h3 class="widget-title">Recents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2018/06/15/qq-007-captcha.html">腾讯防水墙验证码使用</a>
+          </li>
         
           <li>
             <a href="/2018/05/29/git-pull-upstream.html">Git 同步上游源更改</a>
@@ -806,10 +829,6 @@
         
           <li>
             <a href="/2018/05/10/git-rebase.html">Git rebase 笔记</a>
-          </li>
-        
-          <li>
-            <a href="/2018/05/10/gp-database-sql-prepare.html">Git rebase 笔记</a>
           </li>
         
       </ul>
