@@ -12,7 +12,6 @@
 <meta property="og:url" content="https://www.qichengzx.com/page/6/index.html">
 <meta property="og:site_name" content="启程">
 <meta property="og:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
-<meta property="og:locale" content="default">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="启程">
 <meta name="twitter:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
@@ -47,8 +46,6 @@
         
           <a class="main-nav-link" href="/archives">Archives</a>
         
-          <a class="main-nav-link" href="https://github.com/qichengzx">Github</a>
-        
       </nav>
       <nav id="sub-nav">
         
@@ -64,59 +61,6 @@
 </header>
       <div class="outer">
         <section id="main">
-  
-    <article id="post-export-results-of-mysql-to-excel" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2015/11/21/export-results-of-mysql-to-excel.html" class="article-date">
-  <time datetime="2015-11-21T13:24:35.000Z" itemprop="datePublished">2015-11-21</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/mysql/">mysql</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2015/11/21/export-results-of-mysql-to-excel.html">MySQL命令行导出结果集到Excel</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><img src="http://7b1hhm.com1.z0.glb.clouddn.com/hexo1631785_mysql.gif" alt=""></p>
-<p>某个需求，为了简单单独建表存储，而且没有相关的后台管理方法，无法查看，或导出，但是又突然出现需要导出这个需求。</p>
-<p>所以突然想到MySQL是否带了这种直接导出到文件中的方法，查资料后发现果然有。</p>
-<p>只需要在命令行中执行如下查询即可。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT * FROM my_table INTO OUTFILE &apos;file.csv&apos; FIELDS TERMINATED BY &apos;,&apos;;</span><br></pre></td></tr></table></figure>
-<p>有几点需要注意：</p>
-<pre><code>0.文件将在服务器上生成，所以需要需要MySQL进程有生成文件的权限。
-1.必须为一个不存在的文件名。
-</code></pre><p>其实还有一些功能，或者说是说明，这里并没有写。</p>
-<p>官方文档：</p>
-<p><a href="http://dev.mysql.com/doc/refman/5.5/en/select-into.html" target="_blank" rel="noopener">13.2.9.1 SELECT … INTO Syntax</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html" data-id="cjifrud4j001isks6zlx8ry0g" class="article-share-link">Share</a>
-      
-        <a href="https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html#comments" class="article-comment-link">Comments</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/excel/">excel</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/">mysql</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
   
     <article id="post-js-names" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
@@ -145,7 +89,7 @@
     <div class="article-entry" itemprop="articleBody">
       
         <p>标识符由一个字母开头，其后可以选择性的加上一个或多个字母、数字或下划线。但是，不能使用下面这些保留字：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">abstract</span><br><span class="line">boolean break byte</span><br><span class="line">case catch char class const continue</span><br><span class="line">debugger default delete do double</span><br><span class="line">else enum export extends</span><br><span class="line">false final finally float for function</span><br><span class="line">goto</span><br><span class="line">if implements import in instanceof int interface </span><br><span class="line">long</span><br><span class="line">native new null</span><br><span class="line">package private protected public</span><br><span class="line">return</span><br><span class="line">short static super switch synchronized</span><br><span class="line">this throw throws transient true try typeof</span><br><span class="line">var volatile void</span><br><span class="line">while with</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">abstract</div><div class="line">boolean break byte</div><div class="line">case catch char class const continue</div><div class="line">debugger default delete do double</div><div class="line">else enum export extends</div><div class="line">false final finally float for function</div><div class="line">goto</div><div class="line">if implements import in instanceof int interface </div><div class="line">long</div><div class="line">native new null</div><div class="line">package private protected public</div><div class="line">return</div><div class="line">short static super switch synchronized</div><div class="line">this throw throws transient true try typeof</div><div class="line">var volatile void</div><div class="line">while with</div></pre></td></tr></table></figure>
 <p>这个列表里的大部分并未用在JS语言里，有一些已经逐渐在新标准中出现，但是这个列表也不包括一些本应该保留的字，如undefined,NaN,Infinity。</p>
 <p>JS不允许使用保留字来命名变量或参数，也不允许在对象字面量中，或者用 点运算符(.)提取对象属性时，使用保留字作为对象的属性名。</p>
 <p>标识符被用于语句，变量，参数，属性名，运算符和标记。</p>
@@ -154,7 +98,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/17/js-names.html" data-id="cjifrud55002ysks644bralu8" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/17/js-names.html" data-id="cjp6spvva002q7u0r6ikfaysv" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/17/js-names.html#comments" class="article-comment-link">Comments</a>
       
@@ -198,20 +142,20 @@
 2.服务器Dropbox设置的同步目录接收本地的内容并cp到专门用于生成的hexo目录里
 3.服务器用于生成的hexo生成新日志，cp到web目录中
 </code></pre><p>这么做的原因是，如果一共（是整个博客一共）只有一篇文章或几篇文章，那几乎没影响，如果，有几十篇了，据我观察，生成很耗时，可能会导致搜索引擎访问出现404，用户打开一个生成到一半的文件，用户打开一个木有样式的文章。</p>
-<h3 id="STEP-0-安装Dropbox"><a href="#STEP-0-安装Dropbox" class="headerlink" title="STEP 0 安装Dropbox"></a>STEP 0 安装Dropbox</h3><p><a href="https://db.tt/mMNtRA6x" target="_blank" rel="noopener">注册Dropbox</a>。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if( ! has_dropbox_account() )&#123;</span><br><span class="line">	return &quot;请先注册个账户啊亲&quot;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="STEP-0-安装Dropbox"><a href="#STEP-0-安装Dropbox" class="headerlink" title="STEP 0 安装Dropbox"></a>STEP 0 安装Dropbox</h3><p><a href="https://db.tt/mMNtRA6x" target="_blank" rel="external">注册Dropbox</a>。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">if( ! has_dropbox_account() )&#123;</div><div class="line">	return &quot;请先注册个账户啊亲&quot;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>由于Dropbox默认安装在~，所以建议新建一个专用于同步的账户，如dbox。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adduser dbox</span><br><span class="line">passwd dbox</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">adduser dbox</div><div class="line">passwd dbox</div></pre></td></tr></table></figure>
 <p><strong> 请记住密码。请记住密码。请记住密码。 </strong></p>
 <p>然后，用新建的账户登录进去。</p>
 <p>终于可以安装Dropbox了。</p>
 <p>这里要区分一下你的系统，</p>
 <p><strong> 32位: </strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd ~ &amp;&amp; wget -O - &quot;https://www.dropbox.com/download?plat=lnx.x86&quot; | tar xzf -</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cd ~ &amp;&amp; wget -O - &quot;https://www.dropbox.com/download?plat=lnx.x86&quot; | tar xzf -</div></pre></td></tr></table></figure>
 <p><strong> 64位: </strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd ~ &amp;&amp; wget -O - &quot;https://www.dropbox.com/download?plat=lnx.x86_64&quot; | tar xzf -</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cd ~ &amp;&amp; wget -O - &quot;https://www.dropbox.com/download?plat=lnx.x86_64&quot; | tar xzf -</div></pre></td></tr></table></figure>
 <p>然后就可以运行Dropbox的守护程序了</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">~/.dropbox-dist/dropboxd &amp;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">~/.dropbox-dist/dropboxd &amp;</div></pre></td></tr></table></figure>
 <p>第一次在新的电脑上启动，会提示：</p>
 <pre><code>此电脑尚未与任何 Dropbox 帐户关联...
 
@@ -226,16 +170,16 @@
 <p>此时，如果你打开了 top，那应该发现此时服务器的内存有点捉急了，原因是Dropbox这个进程占的很多，所以一般情况下killall dropbox 退出就好了，壕请随意。</p>
 <h3 id="STEP-1-设置文件夹监测"><a href="#STEP-1-设置文件夹监测" class="headerlink" title="STEP 1 设置文件夹监测"></a>STEP 1 设置文件夹监测</h3><p><strong>安装incron服务</strong></p>
 <p>incron是Linux下一个监测文件变化的服务</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apt-get install incron</span><br><span class="line">yum install incron</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">apt-get install incron</div><div class="line">yum install incron</div></pre></td></tr></table></figure>
 <p><strong> 设置开机启动 </strong></p>
 <p>安装sysv-rc-conf，用于管理服务的启动</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apt-get install sysv-rc-conf</span><br><span class="line">sysv-rc-conf incron on</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">apt-get install sysv-rc-conf</div><div class="line">sysv-rc-conf incron on</div></pre></td></tr></table></figure>
 <p><strong> 创建监测任务 </strong></p>
 <p>先修改下incron的编辑器</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi /etc/incron.conf</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">vi /etc/incron.conf</div></pre></td></tr></table></figure>
 <p>（此时可能需要sudo权限，因为是dbox用户）在文件的最后一行，去掉editor = vi前的#，保存退出。</p>
 <p>输入：incrontab -e</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/home/dbox/Dropbox/yourfolder/ IN_ATTRIB,IN_MOVE /home/dbox/hexo.bash</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/home/dbox/Dropbox/yourfolder/ IN_ATTRIB,IN_MOVE /home/dbox/hexo.bash</div></pre></td></tr></table></figure>
 <p>第一个参数：用来接收Dropbox同步的文件夹</p>
 <p>第二个参数：指监测的动作</p>
 <p>第三个参数：处理脚本</p>
@@ -257,8 +201,8 @@ IN_CLOSE，文件被关闭，等同于(IN_CLOSE_WRITE | IN_CLOSE_NOWRITE)
 IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
 #上面所说的文件也包括目录。
 </code></pre><p>可以选自己需要的动作</p>
-<p>接下来写处理脚本<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi hexo.bash</span><br></pre></td></tr></table></figure></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cp -R /home/dbox/Dropbox/yourfolder/* /home/dbox/dropasync/source/_posts/;</span><br><span class="line">cd /home/dbox/dropasync/ &amp;&amp; hexo gm</span><br><span class="line">cd ~ &amp;&amp; ./.dropbox-dist/dropboxd</span><br></pre></td></tr></table></figure>
+<p>接下来写处理脚本<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">vi hexo.bash</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">cp -R /home/dbox/Dropbox/yourfolder/* /home/dbox/dropasync/source/_posts/;</div><div class="line">cd /home/dbox/dropasync/ &amp;&amp; hexo gm</div><div class="line">cd ~ &amp;&amp; ./.dropbox-dist/dropboxd</div></pre></td></tr></table></figure>
 <p>理论上到这里已经可以了。</p>
 <p><del>但是实际上我本人在测试的时候，512内存的服务器会只剩下4M内存，然后再执行任何命令都提示<br><code>-bash: fork: Cannot allocate memory</code>，持续很长时间，一开始以为是同时跑的进程太多导致内存不够，把没用的mongodb，redis都kill之后还是这样，后来干脆在执行这个脚本的时候把Dropbox的后台禁掉，也不行，之后想到了在这段脚本里echo一段数字到log中，执行的时候发现会写入多次，但是还是不清楚为什么会出现这种情况，进程里也是出现了两个或多个hexo，于是干脆就在这段脚本开始时先kill dropbox和hexo，在末尾再kill hexo。实际运行起来，内存还是会降到最低，但是持续时间明显减少到可以接受的程度。</del></p>
 <hr>
@@ -270,17 +214,17 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
 <p>后续应该还会继续改进这个脚本。</p>
 <p><strong>另外，在安装这个用于生成日志的hexo程序的时候也出现了npm killed的问题，查了资料发现也是因为内存不足，npm install -d 可以查看安装过程，如果出错可以用来定位到底是什么原因引起错误</strong></p>
 <p>一些参考资料：</p>
-<p><a href="http://lucifr.com/2013/06/02/hexo-on-cloud-with-dropbox-and-vps/" target="_blank" rel="noopener">Hexo 服务器端布署及 Dropbox 同步</a></p>
-<p><a href="http://www.fanicy.com/2014/06/01/0001.hexowithvpsdropbox/" target="_blank" rel="noopener">用Hexo+Vps搭建博客并用Dropbox同步自动发布</a></p>
-<p><a href="http://linux.die.net/man/5/incrontab" target="_blank" rel="noopener">incrontab(5) - Linux man page</a></p>
-<p><a href="http://wlx.westgis.ac.cn/tag/incrontab/" target="_blank" rel="noopener">incron：linux下基于文件的事件触发</a></p>
-<p><a href="http://askubuntu.com/questions/221293/why-is-chkconfig-no-longer-available-in-ubuntu" target="_blank" rel="noopener">Why is chkconfig no longer available in Ubuntu?</a></p>
-<p><a href="https://www.garron.me/en/linux/use-incron-rsync-dropbox-backup.html" target="_blank" rel="noopener">Use incron to Trigger Action when File Changes 如果设置incrontab出现问题可以参考这篇</a></p>
+<p><a href="http://lucifr.com/2013/06/02/hexo-on-cloud-with-dropbox-and-vps/" target="_blank" rel="external">Hexo 服务器端布署及 Dropbox 同步</a></p>
+<p><a href="http://www.fanicy.com/2014/06/01/0001.hexowithvpsdropbox/" target="_blank" rel="external">用Hexo+Vps搭建博客并用Dropbox同步自动发布</a></p>
+<p><a href="http://linux.die.net/man/5/incrontab" target="_blank" rel="external">incrontab(5) - Linux man page</a></p>
+<p><a href="http://wlx.westgis.ac.cn/tag/incrontab/" target="_blank" rel="external">incron：linux下基于文件的事件触发</a></p>
+<p><a href="http://askubuntu.com/questions/221293/why-is-chkconfig-no-longer-available-in-ubuntu" target="_blank" rel="external">Why is chkconfig no longer available in Ubuntu?</a></p>
+<p><a href="https://www.garron.me/en/linux/use-incron-rsync-dropbox-backup.html" target="_blank" rel="external">Use incron to Trigger Action when File Changes 如果设置incrontab出现问题可以参考这篇</a></p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html" data-id="cjifrud4f0018sks6znan60p0" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html" data-id="cjp6spvun00117u0rapnkqnii" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html#comments" class="article-comment-link">Comments</a>
       
@@ -314,7 +258,7 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>之前在 <a href="http://segmentfault.com/a/1190000003055672" target="_blank" rel="noopener">HTML+CSS3再加一点点JS做的一个小时钟</a> 看到的这个问题，觉得很好把代码存下来了，今天突发奇想把它放到hexo的新博客上。</p>
+        <p>之前在 <a href="http://segmentfault.com/a/1190000003055672" target="_blank" rel="external">HTML+CSS3再加一点点JS做的一个小时钟</a> 看到的这个问题，觉得很好把代码存下来了，今天突发奇想把它放到hexo的新博客上。</p>
 <h3 id="STEP-0"><a href="#STEP-0" class="headerlink" title="STEP 0"></a>STEP 0</h3><p>把HTML内容放到新建的模板里，我命名为time.ejs。</p>
 <pre><code>    &lt;div class=&quot;widget-wrap&quot;&gt;
     &lt;h3 class=&quot;widget-title&quot;&gt;Time&lt;/h3&gt;
@@ -604,7 +548,7 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html" data-id="cjifrud68004xsks64v8hfhdj" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html" data-id="cjp6spvwu007f7u0rzlzic658" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/11/time-widget-for-hexo.html#comments" class="article-comment-link">Comments</a>
       
@@ -638,9 +582,9 @@ IN_MOVE，文件被移动，等同于(IN_MOVED_FROM | IN_MOVED_TO)
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>以下内容主要来自<br>    <a href="https://www.digitalocean.com/community/tutorials/how-to-set-up-a-private-git-server-on-a-vps" target="_blank" rel="noopener">How To Set Up a Private Git Server on a VPS</a></p>
+        <p>以下内容主要来自<br>    <a href="https://www.digitalocean.com/community/tutorials/how-to-set-up-a-private-git-server-on-a-vps" target="_blank" rel="external">How To Set Up a Private Git Server on a VPS</a></p>
 <p>之前在DigitalOcean买了个5刀的vps，本来是想搞VPN的，但是没成功，后来把个人博客放这了，后来又觉得有点浪费，索性重新启用这个域名来写技术文章。</p>
-<p>本来是用的WP的但是也一直没写，后来又想折腾别的程序试一下，就选了现在的<a href="https://hexo.io" target="_blank" rel="noopener">hexo</a>，昨天在自己电脑上安装了，也可以写文章页可以默认 <code>hexo server</code> 运行，然后，我愉快的把命令行关掉之后，就傻了。</p>
+<p>本来是用的WP的但是也一直没写，后来又想折腾别的程序试一下，就选了现在的<a href="https://hexo.io" target="_blank" rel="external">hexo</a>，昨天在自己电脑上安装了，也可以写文章页可以默认 <code>hexo server</code> 运行，然后，我愉快的把命令行关掉之后，就傻了。</p>
 <p>后来也在官方文档和Google里看有什么办法能让它在后台运行，官方说可以 <code>hexo s &amp;</code>，然并卵，官方和Google都说可以用 <code>forever</code> <code>pm2</code> ，一样然并卵，今天早晨起来继续弄的时候，觉得还是放弃吧，既然有public文件夹，还是用nginx去解析吧。这个都是后话了。</p>
 <p>下边说怎么在vps上安装git服务器，昨天和今天上午也看了一些资料一直也不成功。晚上从DigitalOcean社区里看到这篇文章，然后就成功了。</p>
 <h4 id="0-在本地生成ssh-key"><a href="#0-在本地生成ssh-key" class="headerlink" title="0 在本地生成ssh key"></a>0 在本地生成ssh key</h4><pre><code>ssh-keygen -C &quot;youremail@mailprovider.com&quot;
@@ -684,10 +628,10 @@ Ubuntu/Debian: apt-get install git
 <p><code>git init --bare project.git</code>，这样，在你的开发机和服务器环境是就可以用到这个project.git了。</p>
 <p>（为已存在的git项目）设置远程仓库的URL</p>
 <p><code>git remote set-url origin git@git.droplet.com:project.git</code></p>
-<p><a href="mailto:git@git.droplet.com" target="_blank" rel="noopener">git@git.droplet.com</a>:project.git 替换成你的git用户名，你的ip或域名，及你的服务器上git的文件夹</p>
+<p>git@git.droplet.com:project.git 替换成你的git用户名，你的ip或域名，及你的服务器上git的文件夹</p>
 <p>如果是一个新的仓库，是这样</p>
 <p><code>git init &amp;&amp; git remote add origin git@git.droplet.com:project.git</code></p>
-<p><a href="mailto:git@git.droplet.com" target="_blank" rel="noopener">git@git.droplet.com</a>:my-project.gi 只是服务器上</p>
+<p>git@git.droplet.com:my-project.gi 只是服务器上</p>
 <h3 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h3><pre><code>所以实际上上边的流程是
 
 0. 在服务器上比如home/git 目录里git init --bare project.git
@@ -698,13 +642,13 @@ Ubuntu/Debian: apt-get install git
 
 本地添加一个新文件，git add . , git commit -m &quot;test&quot; ,git push origin master，登录服务器，切换到www目录，git pull origin master，就可以了。
 </code></pre><p>参考资料:</p>
-<p><a href="https://www.digitalocean.com/community/tutorials/how-to-set-up-a-private-git-server-on-a-vps" target="_blank" rel="noopener">How To Set Up a Private Git Server on a VPS</a></p>
-<p><a href="https://git-scm.com/book/it/v2/Git-on-the-Server-Setting-Up-the-Server" target="_blank" rel="noopener">Git on the Server - Setting Up the Server</a></p>
+<p><a href="https://www.digitalocean.com/community/tutorials/how-to-set-up-a-private-git-server-on-a-vps" target="_blank" rel="external">How To Set Up a Private Git Server on a VPS</a></p>
+<p><a href="https://git-scm.com/book/it/v2/Git-on-the-Server-Setting-Up-the-Server" target="_blank" rel="external">Git on the Server - Setting Up the Server</a></p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html" data-id="cjifrud3v000asks640hpwykx" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html" data-id="cjp6spvub000a7u0rcc8ge3rg" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/07/Set Up a Private Git Server on a VPS.html#comments" class="article-comment-link">Comments</a>
       
@@ -738,7 +682,7 @@ Ubuntu/Debian: apt-get install git
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>先贴一个官方文档。<br><a href="https://facebook.github.io/react-native/docs/network.html#content" target="_blank" rel="noopener">Network</a></p>
+        <p>先贴一个官方文档。<br><a href="https://facebook.github.io/react-native/docs/network.html#content" target="_blank" rel="external">Network</a></p>
 <pre><code>fetch(&apos;https://mywebsite.com/endpoint/&apos;, {
     method: &apos;POST&apos;,
     headers: {
@@ -776,13 +720,13 @@ fetch(url, {
     })
 }) 
 </code></pre><p>这样，在后台就可以正常的用$_POST[‘firstParam’];接收了。</p>
-<p><a href="http://stackoverflow.com/questions/32448862/how-can-i-use-react-native-with-php-with-fetch-return-data-is-always-null" target="_blank" rel="noopener">Sending data as key-value pair using fetch polyfill in react-native</a></p>
-<p><a href="http://stackoverflow.com/questions/31201940/sending-data-as-key-value-pair-using-fetch-polyfill-in-react-native" target="_blank" rel="noopener">How can I use react-native with php with fetch return data is always null</a></p>
+<p><a href="http://stackoverflow.com/questions/32448862/how-can-i-use-react-native-with-php-with-fetch-return-data-is-always-null" target="_blank" rel="external">Sending data as key-value pair using fetch polyfill in react-native</a></p>
+<p><a href="http://stackoverflow.com/questions/31201940/sending-data-as-key-value-pair-using-fetch-polyfill-in-react-native" target="_blank" rel="external">How can I use react-native with php with fetch return data is always null</a></p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/06/React-Native-Fetch.html" data-id="cjifrud3s0006sks626gqf6on" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/06/React-Native-Fetch.html" data-id="cjp6spvu900067u0rj0etdb1r" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/06/React-Native-Fetch.html#comments" class="article-comment-link">Comments</a>
       
@@ -816,20 +760,20 @@ fetch(url, {
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>Welcome to <a href="http://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="http://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="http://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="http://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="http://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="http://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="http://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+        <p>Welcome to <a href="http://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="http://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="http://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
+<p>More info: <a href="http://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
+<p>More info: <a href="http://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
+<p>More info: <a href="http://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
+<p>More info: <a href="http://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2015/11/06/hello-world.html" data-id="cjifrud4y002hsks62bncaygm" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2015/11/06/hello-world.html" data-id="cjp6spvv5002c7u0r9vy5sny5" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2015/11/06/hello-world.html#comments" class="article-comment-link">Comments</a>
       
@@ -882,7 +826,7 @@ fetch(url, {
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/git/">git</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/nginx/">nginx</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">12</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/git/">git</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/nginx/">nginx</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">12</span></li></ul>
     </div>
   </div>
 
@@ -891,7 +835,7 @@ fetch(url, {
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Keygen/">Keygen</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/captcha/">captcha</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geo/">geo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">20</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/qq/">qq</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redigo/">redigo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Keygen/">Keygen</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/captcha/">captcha</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geo/">geo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">20</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/qq/">qq</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redigo/">redigo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -900,7 +844,7 @@ fetch(url, {
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/Keygen/" style="font-size: 10px;">Keygen</a> <a href="/tags/captcha/" style="font-size: 10px;">captcha</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/docker/" style="font-size: 11.25px;">docker</a> <a href="/tags/dropbox/" style="font-size: 11.25px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/geo/" style="font-size: 12.5px;">geo</a> <a href="/tags/gin/" style="font-size: 10px;">gin</a> <a href="/tags/git/" style="font-size: 13.75px;">git</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/go/" style="font-size: 20px;">go</a> <a href="/tags/goquery/" style="font-size: 11.25px;">goquery</a> <a href="/tags/hexo/" style="font-size: 12.5px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 12.5px;">javascript</a> <a href="/tags/js/" style="font-size: 12.5px;">js</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/leetcode/" style="font-size: 10px;">leetcode</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 17.5px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 18.75px;">php</a> <a href="/tags/qq/" style="font-size: 10px;">qq</a> <a href="/tags/rabbitmq/" style="font-size: 16.25px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redigo/" style="font-size: 12.5px;">redigo</a> <a href="/tags/redis/" style="font-size: 15px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/今日头条/" style="font-size: 10px;">今日头条</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/短网址/" style="font-size: 10px;">短网址</a> <a href="/tags/糗百/" style="font-size: 10px;">糗百</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
+      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/Keygen/" style="font-size: 10px;">Keygen</a> <a href="/tags/captcha/" style="font-size: 10px;">captcha</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/docker/" style="font-size: 11.43px;">docker</a> <a href="/tags/dropbox/" style="font-size: 11.43px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/geo/" style="font-size: 12.86px;">geo</a> <a href="/tags/gin/" style="font-size: 10px;">gin</a> <a href="/tags/git/" style="font-size: 12.86px;">git</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/go/" style="font-size: 20px;">go</a> <a href="/tags/goquery/" style="font-size: 11.43px;">goquery</a> <a href="/tags/hexo/" style="font-size: 12.86px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 12.86px;">javascript</a> <a href="/tags/js/" style="font-size: 11.43px;">js</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/leetcode/" style="font-size: 10px;">leetcode</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 17.14px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 18.57px;">php</a> <a href="/tags/qq/" style="font-size: 10px;">qq</a> <a href="/tags/rabbitmq/" style="font-size: 15.71px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redigo/" style="font-size: 12.86px;">redigo</a> <a href="/tags/redis/" style="font-size: 14.29px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/今日头条/" style="font-size: 10px;">今日头条</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/短网址/" style="font-size: 10px;">短网址</a> <a href="/tags/糗百/" style="font-size: 10px;">糗百</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
     </div>
   </div>
 
@@ -909,7 +853,7 @@ fetch(url, {
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
     </div>
   </div>
 
@@ -954,6 +898,7 @@ fetch(url, {
     <div id="footer-info" class="inner">
       &copy; 2018 qichengzx<br>
       Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+      Hosted by <a href="https://www.vultr.com/?ref=7241986" target="_blank">Vultr</a>
     </div>
   </div>
 </footer>
@@ -973,8 +918,6 @@ var _hmt = _hmt || [];
     <a href="/" class="mobile-nav-link">Home</a>
   
     <a href="/archives" class="mobile-nav-link">Archives</a>
-  
-    <a href="https://github.com/qichengzx" class="mobile-nav-link">Github</a>
   
 </nav>
     <script src="//cdn.bootcss.com/jquery/2.0.3/jquery.min.js"></script>

@@ -7,50 +7,50 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/categories/mysql/</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
+        <loc>https://www.qichengzx.com/categories/linux/</loc>
+        <lastmod>2018-12-02T07:44:18.480Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/categories/linux/</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
+        <loc>https://www.qichengzx.com/categories/mysql/</loc>
+        <lastmod>2018-12-02T07:44:18.490Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
         <loc>https://www.qichengzx.com/categories/nginx/</loc>
-        <lastmod>2018-02-27T13:14:16.000Z</lastmod>
+        <lastmod>2018-12-02T07:44:18.490Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
         <loc>https://www.qichengzx.com/categories/php/</loc>
-        <lastmod>2018-05-12T14:18:35.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>https://www.qichengzx.com/categories/golang/</loc>
-        <lastmod>2018-05-13T07:29:53.000Z</lastmod>
+        <lastmod>2018-12-02T08:22:07.806Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
         <loc>https://www.qichengzx.com/categories/git/</loc>
-        <lastmod>2018-05-29T11:02:43.000Z</lastmod>
+        <lastmod>2018-12-02T08:42:45.232Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/categories/golang/</loc>
+        <lastmod>2018-12-02T11:15:40.658Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
         <loc>https://www.qichengzx.com/categories/javascript/</loc>
-        <lastmod>2018-06-15T09:29:12.000Z</lastmod>
+        <lastmod>2018-12-02T11:21:43.193Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
