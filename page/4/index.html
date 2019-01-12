@@ -62,6 +62,73 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-Hello-Go" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/09/11/Hello-Go.html" class="article-date">
+  <time datetime="2016-09-11T09:21:03.000Z" itemprop="datePublished">2016-09-11</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/golang/">golang</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/09/11/Hello-Go.html">Hello Go</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h5 id="Mac-安装-GO"><a href="#Mac-安装-GO" class="headerlink" title="Mac 安装 GO"></a>Mac 安装 GO</h5><p>本人使用了Brew来安装。</p>
+<h5 id="安装前首先更新Brew。"><a href="#安装前首先更新Brew。" class="headerlink" title="安装前首先更新Brew。"></a>安装前首先更新Brew。</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">brew update &amp;&amp; brew upgrade</div></pre></td></tr></table></figure>
+<h5 id="安装Go"><a href="#安装Go" class="headerlink" title="安装Go"></a>安装Go</h5><p>使用brew安装go</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">brew install go</div></pre></td></tr></table></figure>
+<h5 id="设置-GOPATH"><a href="#设置-GOPATH" class="headerlink" title="设置$GOPATH"></a>设置$GOPATH</h5><p>Go从1.1版本开始必须设置这个变量，也就是说通过以上方式安装后就必须要设置$GOPATH了。</p>
+<p>这个目录用来存放Go源码，可运行文件，和编译之后的包文件。</p>
+<p>Mac系统设置</p>
+<p>在bash中加入：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">export GOPATH=/your/path</div></pre></td></tr></table></figure>
+<p>以上目录需要存在，不存在就自己手动创建一个。</p>
+<p>然后运行</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">source ~/.zshrc</div></pre></td></tr></table></figure>
+<p>替换成你自己使用的shell，如.bashrc等。</p>
+<p>然后，需要在/your/path目录下，新建 pkg，bin，src目录。</p>
+<p>​    src目录存放源代码，如hello.go</p>
+<p>​    pkg目录存放编译后的文件，如hello.a</p>
+<p>​    bin目录存放生成后的可执行文件</p>
+<p>src目录就是主要开发目录。如hello项目，则在src下新建hello目录。</p>
+<p>到这里，就可以开始Go之旅了。</p>
+<h5 id="Hello-Go"><a href="#Hello-Go" class="headerlink" title="Hello Go"></a>Hello Go</h5><p>需要注意的是，在Go中，包名和文件名是可以不同的，包名为main的时候即为可以独立运行的包。</p>
+<p>在src目录新建hello目录，创建hello.go文件。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> main <span class="comment">//包名</span></div><div class="line"></div><div class="line"><span class="keyword">import</span> <span class="string">"fmt"</span> <span class="comment">//导入一个系统级别的fmt包</span></div><div class="line"></div><div class="line"><span class="comment">//使用func定义函数</span></div><div class="line"><span class="comment">//main函数没有参数，没有返回值</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</div><div class="line">  fmt.Println(<span class="string">"Hello Go"</span>) <span class="comment">//调用包函数的方法为 pkgName.funcName</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>一个hello.go就写好了，在命令行输入</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">go</span> run hello.<span class="keyword">go</span></div></pre></td></tr></table></figure>
+<p>就可以看到输出Hello Go了。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://www.qichengzx.com/2016/09/11/Hello-Go.html" data-id="cjqt2sqly0001xy0rilg9me3n" class="article-share-link">Share</a>
+      
+        <a href="https://www.qichengzx.com/2016/09/11/Hello-Go.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+  
     <article id="post-php-post-file-with-curl" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2016/07/02/php-post-file-with-curl.html" class="article-date">
@@ -98,7 +165,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html" data-id="cjp6spvvh003b7u0r40nunc4k" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html" data-id="cjqt2sqn90039xy0rr4ahw6ps" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/07/02/php-post-file-with-curl.html#comments" class="article-comment-link">Comments</a>
       
@@ -160,7 +227,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html" data-id="cjp6spvue000g7u0ruib917dv" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html" data-id="cjqt2sqm7000bxy0r7suq68wg" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html#comments" class="article-comment-link">Comments</a>
       
@@ -216,7 +283,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html" data-id="cjp6spvui000n7u0r028rogcv" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html" data-id="cjqt2sqmc000nxy0rhrkbpisf" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/05/08/cant-post-iqiyi-video-to-discuz.html#comments" class="article-comment-link">Comments</a>
       
@@ -312,7 +379,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html" data-id="cjp6spvwo007a7u0r8qa0qy9s" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html" data-id="cjqt2sqon007axy0rz1n97xs4" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/05/03/php-rabbitmq-tutorial-six.html#comments" class="article-comment-link">Comments</a>
       
@@ -401,7 +468,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html" data-id="cjp6spvvi003f7u0r8wjmf4wd" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html" data-id="cjqt2sqna003dxy0rbwy3fk3m" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/04/27/php-rabbitmq-tutorial-five.html#comments" class="article-comment-link">Comments</a>
       
@@ -482,7 +549,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html" data-id="cjp6spvvj003i7u0rkxb03f8a" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html" data-id="cjqt2sqna003gxy0r3alkqh59" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html#comments" class="article-comment-link">Comments</a>
       
@@ -583,7 +650,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html" data-id="cjp6spvwr007d7u0rl0wv739o" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html" data-id="cjqt2sqop007exy0rwnky3ai0" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html#comments" class="article-comment-link">Comments</a>
       
@@ -689,7 +756,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html" data-id="cjp6spvwp007b7u0rs05vac2t" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html" data-id="cjqt2sqoo007cxy0rgmfhs6bh" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html#comments" class="article-comment-link">Comments</a>
       
@@ -788,58 +855,12 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html" data-id="cjp6spvvk003m7u0rsemjx908" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html" data-id="cjqt2sqnc003kxy0rk16ia9sf" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html#comments" class="article-comment-link">Comments</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/php/">php</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/rabbitmq/">rabbitmq</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-  
-    <article id="post-a-piece-of-interesting-code-of-js-for-function" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html" class="article-date">
-  <time datetime="2016-02-25T09:10:43.000Z" itemprop="datePublished">2016-02-25</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/javascript/">javascript</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html">一段有意思的JS For循环代码</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">var a =0;</div><div class="line">for (var i =0,j =0; i &lt;10,j&lt;6;i++,j++) &#123;</div><div class="line">	a = i+j;</div><div class="line">	console.log(&quot;i=&quot;+i);</div><div class="line">	console.log(&quot;j=&quot;+j);</div><div class="line">	console.log(&quot;a=&quot;+a);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>朋友面试，遇到的面试题，电话跟我说完就回来写下来试了一下，结果与自己预想的一样。</p>
-<p>没写之前，电话里说的思路是，因为 j 限制了 小于 6，那么应该只循环6次，实际上也确实是这样。</p>
-<p>所以最终结果，a = 10。</p>
-<h6 id="但是想不明白为什么会有这样的面试题，或者说，什么样的情况会需要写这样的代码呢？"><a href="#但是想不明白为什么会有这样的面试题，或者说，什么样的情况会需要写这样的代码呢？" class="headerlink" title="但是想不明白为什么会有这样的面试题，或者说，什么样的情况会需要写这样的代码呢？"></a>但是想不明白为什么会有这样的面试题，或者说，什么样的情况会需要写这样的代码呢？</h6>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html" data-id="cjp6spvud000b7u0r4nx35u48" class="article-share-link">Share</a>
-      
-        <a href="https://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html#comments" class="article-comment-link">Comments</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/">js</a></li></ul>
 
     </footer>
   </div>
@@ -889,7 +910,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/git/">git</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/nginx/">nginx</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">12</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/git/">git</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">22</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/nginx/">nginx</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">12</span></li></ul>
     </div>
   </div>
 
@@ -898,7 +919,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Keygen/">Keygen</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/captcha/">captcha</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geo/">geo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">20</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/qq/">qq</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redigo/">redigo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Keygen/">Keygen</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/captcha/">captcha</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geo/">geo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">21</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/qq/">qq</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redigo/">redigo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -916,7 +937,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
     </div>
   </div>
 
@@ -926,6 +947,10 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
     <h3 class="widget-title">Recents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2019/01/01/go-in-the-browser.html">【译】Go和WebAssembly：在浏览器中运行Go程序</a>
+          </li>
         
           <li>
             <a href="/2018/06/15/qq-007-captcha.html">腾讯防水墙验证码使用</a>
@@ -943,10 +968,6 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
             <a href="/2018/05/12/generating-random-keys-with-keygen.html">Keygen 包简介</a>
           </li>
         
-          <li>
-            <a href="/2018/05/10/git-rebase.html">Git rebase 笔记</a>
-          </li>
-        
       </ul>
     </div>
   </div>
@@ -959,7 +980,7 @@ Q2 想知道所有关于兔子（rabbits）和懒惰动物（lazy animals）的�
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2018 qichengzx<br>
+      &copy; 2019 qichengzx<br>
       Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
       Hosted by <a href="https://www.vultr.com/?ref=7241986" target="_blank">Vultr</a>
     </div>

@@ -62,6 +62,104 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-go-in-the-browser" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/01/01/go-in-the-browser.html" class="article-date">
+  <time datetime="2019-01-01T07:53:01.000Z" itemprop="datePublished">2019-01-01</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/golang/">golang</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/01/01/go-in-the-browser.html">【译】Go和WebAssembly：在浏览器中运行Go程序</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在过去很长一段时间里，Javascript是Web开发人员中的通用语言。如果你想写一个稳定成熟的 Web 应用程序，用javascript几乎是唯一的方法。</p>
+<p>WebAssembly（也称为wasm）将很快改变这种情况。使用WebAssembly可以用任何语言编写Web应用程序。在本文中，我们将了解如何编写Go程序并使用wasm在浏览器中运行它们。</p>
+<h2 id="但首先，什么是WebAssembly"><a href="#但首先，什么是WebAssembly" class="headerlink" title="但首先，什么是WebAssembly"></a>但首先，什么是WebAssembly</h2><p><a href="https://webassembly.org/" target="_blank" rel="external">webassembly.org</a> 将其定义为“基于堆栈的虚拟机的二进制指令格式”。这是一个很好的定义，但让我们将其分解为我们可以轻松理解的内容。</p>
+<p>从本质上讲，wasm是一种二进制格式; 就像ELF，Mach和PE一样。唯一的区别是它适用于虚拟编译目标，而不是实际的物理机器。为何虚拟？因为不同于 C/C++ 二进制文件，wasm二进制文件不针对特定平台。因此，您可以在Linux，Windows和Mac中使用相同的二进制文件而无需进行任何更改。 因此，我们需要另一个“代理”，它将二进制文件中的wasm指令转换为特定于平台的指令并运行它们。通常，这个“代理”是一个浏览器，但从理论上讲，它也可以是其他任何东西。</p>
+<p>这为我们提供了一个通用的编译目标，可以使用我们选择的任何编程语言构建Web应用程序！只要我们编译为wasm格式，我们就不必担心目标平台。就像我们编写一个Web应用程序一样，但是现在我们有了用我们选择的任何语言编写它的优势。</p>
+<h2 id="你好-WASM"><a href="#你好-WASM" class="headerlink" title="你好 WASM"></a>你好 WASM</h2><p>让我们从一个简单的“hello world”程序开始，但是要确保您的Go版本至少为1.11。我们可以这样写：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> main</div><div class="line"></div><div class="line"><span class="keyword">import</span> (</div><div class="line">	<span class="string">"fmt"</span></div><div class="line">)</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</div><div class="line">	fmt.Println(<span class="string">"hello wasm"</span>)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>保存为<code>test.go</code>。看起来像是一个普通的Go程序。现在让我们将它编译为wasm平台程序。我们需要设置<code>GOOS</code>和<code>GOARCH</code>。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$GOOS=js GOARCH=wasm <span class="keyword">go</span> build -o test.wasm test.<span class="keyword">go</span></div></pre></td></tr></table></figure>
+<p>现在我们生成了 wasm 二进制文件。但与原生系统不同，我们需要在浏览器中运行它。为此，还需要再做一点工作来实现这一目标：</p>
+<ul>
+<li>Web服务器来运行应用</li>
+<li>一个index.html文件，其中包含加载wasm二进制文件所需的一些js代码。</li>
+<li>还有一个js文件，它作为浏览器和我们的wasm二进制文件之间的通信接口。</li>
+</ul>
+<p>我喜欢把它想象成制作The PowerPuff Girls所需要的东西。</p>
+<p><img src="/images/go/powerpuff.jpg" alt=""></p>
+<p>然后，BOOM，我们有了一个WebAssembly应用程序！</p>
+<p>现在Go目录中已经包含了html和js文件，因此我们将其复制过来。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span><span class="bash">cp <span class="string">"<span class="variable">$(go env GOROOT)</span>/misc/wasm/wasm_exec.js"</span> .</span></div><div class="line"><span class="meta">$</span><span class="bash">cp <span class="string">"<span class="variable">$(go env GOROOT)</span>/misc/wasm/wasm_exec.html"</span> .</span></div><div class="line"><span class="meta">$</span><span class="bash"><span class="comment"># we rename the html file to index.html for convenience.</span></span></div><div class="line"><span class="meta">$</span><span class="bash">mv wasm_exec.html index.html</span></div><div class="line"><span class="meta">$</span><span class="bash">ls -l</span></div><div class="line">total 8960</div><div class="line">-rw-r--r-- 1 agniva agniva    1258 Dec  6 12:16 index.html</div><div class="line">-rwxrwxr-x 1 agniva agniva 6721905 Sep 24 12:28 serve</div><div class="line">-rw-rw-r-- 1 agniva agniva      76 Dec  6 12:08 test.go</div><div class="line">-rwxrwxr-x 1 agniva agniva 2425246 Dec  6 12:09 test.wasm</div><div class="line">-rw-r--r-- 1 agniva agniva   11905 Dec  6 12:16 wasm_exec.js</div></pre></td></tr></table></figure>
+<p><code>serve</code>是Go二进制文件，是一个Web服务器。但几乎任何Web服务器都可以。（译者注:原文并没有提供serve二进制文件的源代码，相信聪明的你一定知道怎样编写。）</p>
+<p>一旦运行它，并打开浏览器。可以看到一个<code>Run</code>按钮，点击它，将执行我们的应用程序。然后我们点击它并检查控制台：</p>
+<p><img src="/images/go/hellowasm.png" alt=""></p>
+<p>真牛，我们刚刚在Go中编写了一个程序并在浏览器中运行它。</p>
+<p>到现在为止一切顺利。但这是一个简单的“hello world”程序。真实的Web应用程序需要与DOM交互。我们需要响应按钮单击事件，从文本框中获取输入数据，并将数据发送回DOM。现在我们将构建一个最小的图像编辑器，它将使用所有这些功能。</p>
+<h2 id="DOM-API"><a href="#DOM-API" class="headerlink" title="DOM API"></a>DOM API</h2><p>但首先，要使Go代码与浏览器进行交互，我们需要一个DOM API。我们有<code>syscall/js</code>库来帮助我们解决这个问题。它是一个非常简单却功能强大的DOM API形式，我们可以在其上构建我们的应用程序。在我们制作应用程序之前，让我们快速了解它的一些功能。</p>
+<h3 id="回调"><a href="#回调" class="headerlink" title="回调"></a>回调</h3><p>为了响应DOM事件，我们声明了回调并用这样的事件将它们连接起来：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> “syscall/js”</div><div class="line"></div><div class="line"><span class="comment">// Declare callback</span></div><div class="line">cb := js.NewEventCallback(js.PreventDefault, <span class="function"><span class="keyword">func</span><span class="params">(ev js.Value)</span></span> &#123;</div><div class="line">	<span class="comment">// handle event</span></div><div class="line">&#125;)</div><div class="line"></div><div class="line"></div><div class="line"><span class="comment">// Hook it up with a DOM event</span></div><div class="line">js.Global().Get(<span class="string">"document"</span>).</div><div class="line">	Call(<span class="string">"getElementById"</span>, <span class="string">"myBtn"</span>).</div><div class="line">	Call(<span class="string">"addEventListener"</span>, <span class="string">"click"</span>, cb)</div><div class="line"></div><div class="line"></div><div class="line"><span class="comment">// Call cb.Release() on your way out.</span></div></pre></td></tr></table></figure>
+<h3 id="更新DOM"><a href="#更新DOM" class="headerlink" title="更新DOM"></a>更新DOM</h3><p>要从Go中更新DOM，我们可以</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> “syscall/js”</div><div class="line"></div><div class="line">js.Global().Get(<span class="string">"document"</span>).</div><div class="line">		Call(<span class="string">"getElementById"</span>, <span class="string">"myTextBox"</span>).</div><div class="line">		Set(<span class="string">"value"</span>, <span class="string">"hello wasm"</span>)</div></pre></td></tr></table></figure>
+<p>您甚至可以调用JS函数并操作本机JS对象，如 <code>FileReader</code>或<code>Canvas</code>。查看<a href="https://golang.org/pkg/syscall/js/" target="_blank" rel="external"><code>syscall/js</code></a>文档以获取更多详细信息。</p>
+<h2 id="正确的-Web-应用程序"><a href="#正确的-Web-应用程序" class="headerlink" title="正确的 Web 应用程序"></a>正确的 Web 应用程序</h2><p>接下来我们将构建一个小应用程序，它将获取输入的图像，然后对图像执行一些操作，如亮度，对比度，色调，饱和度，最后将输出图像发送回浏览器。 每个效果都会有滑块，用户可以更改这些效果并实时查看目标图像的变化。</p>
+<p>首先，我们需要从浏览器获取输入的图像给到我们的Go代码，以便可以处理它。为了有效地做到这一点，我们需要采取一些<code>不安全</code>的技巧，这里跳过具体细节。拥有图像后，它完全在我们的控制之下，我们可以自由地做任何事情。下面是图像加载器回调的简短片段，为简洁起见略有简化：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">onImgLoadCb = js.NewCallback(<span class="function"><span class="keyword">func</span><span class="params">(args []js.Value)</span></span> &#123;</div><div class="line">	reader := bytes.NewReader(inBuf) <span class="comment">// inBuf is a []uint8 slice where our image is loaded</span></div><div class="line">	sourceImg, _, err := image.Decode(reader)</div><div class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</div><div class="line">		<span class="comment">// handle error</span></div><div class="line">	&#125;</div><div class="line">	<span class="comment">// Now the sourceImg is an image.Image with which we are free to do anything!</span></div><div class="line">&#125;)</div><div class="line"></div><div class="line">js.Global().Set(<span class="string">"loadImage"</span>, onImgLoadCb)</div></pre></td></tr></table></figure>
+<p>然后我们从效果滑块中获取用户值，并操纵图像。我们使用了很棒的<a href="https://github.com/anthonynsimon/bild" target="_blank" rel="external"><code>bild</code></a>库。下面是回调的一小部分：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> <span class="string">"github.com/anthonynsimon/bild/adjust"</span></div><div class="line"></div><div class="line">contrastCb = js.NewEventCallback(js.PreventDefault, <span class="function"><span class="keyword">func</span><span class="params">(ev js.Value)</span></span> &#123;</div><div class="line">	delta := ev.Get(<span class="string">"target"</span>).Get(<span class="string">"valueAsNumber"</span>).Float()</div><div class="line">	res := adjust.Contrast(sourceImg, delta)</div><div class="line">&#125;)</div><div class="line"></div><div class="line">js.Global().Get(<span class="string">"document"</span>).</div><div class="line">		Call(<span class="string">"getElementById"</span>, <span class="string">"contrast"</span>).</div><div class="line">		Call(<span class="string">"addEventListener"</span>, <span class="string">"change"</span>, contrastCb)</div></pre></td></tr></table></figure>
+<p>在此之后，我们将目标图像编码为jpeg并将其发送回浏览器。这是完整的应用程序：</p>
+<p>加载图片：</p>
+<p><img src="/images/go/initial.png" alt=""></p>
+<p>改变对比：</p>
+<p><img src="/images/go/contrast.png" alt=""></p>
+<p>改变色调：</p>
+<p><img src="/images/go/hue.png" alt=""></p>
+<p>太棒了，我们可以在浏览器中本地操作图像而无需编写一行Javascript！ 源代码可以在<a href="https://github.com/agnivade/shimmer" target="_blank" rel="external">这里</a>找到。</p>
+<p>请注意，所有这些都是在浏览器本身中完成的。这里没有Flash插件，Java Applet或Silverlight。而是使用浏览器本身支持的开箱即用的WebAssembly。</p>
+<h2 id="最后的话"><a href="#最后的话" class="headerlink" title="最后的话"></a>最后的话</h2><p>我的一些结束语：</p>
+<ul>
+<li><p>由于Go是一种垃圾收集语言，因此整个运行时都在wasm二进制文件中。因此，二进制文件通常有几MB的大小。与C/Rust等其他语言相比，这仍然是一个痛点; 因为向浏览器发送MB级数据并不理想。但是，如果wasm规范本身支持GC，那么这可能会改变。</p>
+</li>
+<li><p>Go中的Wasm支持正式进行试验。<code>syscall/js</code> API本身也在不断变化，未来可能会发生变化。如果您发现错误，请随时在我们<a href="https://github.com/golang/go/issues" target="_blank" rel="external">issues</a>报告问题。</p>
+</li>
+<li><p>与所有技术一样，WebAssembly也不是一颗银弹。有时，简单的JS更快更容易编写。然而，wasm规范本身正在开发中，并且即将推出更多功能。线程支持就是这样一个特性。</p>
+</li>
+</ul>
+<p>希望这篇文章展示了WebAssembly的一些很酷的方面，以及如何使用Go编写功能齐全的Web应用程序。如果您发现错误，请尝试一下，并提出问题。如果您需要任何帮助，请随时访问 <a href="https://gophers.slack.com/" target="_blank" rel="external">#webassembly</a>频道。</p>
+<h4 id="原文链接"><a href="#原文链接" class="headerlink" title="原文链接"></a>原文链接</h4><p><a href="https://blog.gopheracademy.com/advent-2018/go-in-the-browser/" target="_blank" rel="external">Go and WebAssembly: running Go programs in your browser</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://www.qichengzx.com/2019/01/01/go-in-the-browser.html" data-id="cjqt2sqol0079xy0ru5xmg6w3" class="article-share-link">Share</a>
+      
+        <a href="https://www.qichengzx.com/2019/01/01/go-in-the-browser.html#comments" class="article-comment-link">Comments</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+  
     <article id="post-qq-007-captcha" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/06/15/qq-007-captcha.html" class="article-date">
@@ -136,7 +234,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/06/15/qq-007-captcha.html" data-id="cjp6spvvo003u7u0r3yl2aapk" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/06/15/qq-007-captcha.html" data-id="cjqt2sqni003txy0rfp13opu2" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/06/15/qq-007-captcha.html#comments" class="article-comment-link">Comments</a>
       
@@ -192,7 +290,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/05/29/git-pull-upstream.html" data-id="cjp6spvuu001l7u0rixusjxm7" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/05/29/git-pull-upstream.html" data-id="cjqt2sqmn001lxy0rwh2yxnsx" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/05/29/git-pull-upstream.html#comments" class="article-comment-link">Comments</a>
       
@@ -337,7 +435,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/05/13/create-a-single-page-app-with-go-echo-and-vue.html" data-id="cjp6spvx6007s7u0ru2wa4x5s" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/05/13/create-a-single-page-app-with-go-echo-and-vue.html" data-id="cjqt2sqp3007uxy0rjvm032g9" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/05/13/create-a-single-page-app-with-go-echo-and-vue.html#comments" class="article-comment-link">Comments</a>
       
@@ -395,7 +493,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/05/12/generating-random-keys-with-keygen.html" data-id="cjp6spvur001e7u0r5gfz5ix8" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/05/12/generating-random-keys-with-keygen.html" data-id="cjqt2sqml001exy0rs9rwak1d" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/05/12/generating-random-keys-with-keygen.html#comments" class="article-comment-link">Comments</a>
       
@@ -452,7 +550,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/05/10/git-rebase.html" data-id="cjp6spvuu001o7u0rluai3wl1" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/05/10/git-rebase.html" data-id="cjqt2sqmo001oxy0ra71jes7f" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/05/10/git-rebase.html#comments" class="article-comment-link">Comments</a>
       
@@ -519,7 +617,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/05/03/go-recursion.html" data-id="cjp6spvv100247u0rpuqt4u7b" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/05/03/go-recursion.html" data-id="cjqt2sqmu0024xy0rcw1fzw3s" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/05/03/go-recursion.html#comments" class="article-comment-link">Comments</a>
       
@@ -571,7 +669,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/05/02/go-closure.html" data-id="cjp6spvuy001w7u0rpioa7ju4" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/05/02/go-closure.html" data-id="cjqt2sqmr001wxy0r33btzw9v" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/05/02/go-closure.html#comments" class="article-comment-link">Comments</a>
       
@@ -624,7 +722,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/04/25/dockerfile-build-arg.html" data-id="cjp6spvum00107u0rt1bel22g" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/04/25/dockerfile-build-arg.html" data-id="cjqt2sqmf000zxy0rk33tbmo5" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/04/25/dockerfile-build-arg.html#comments" class="article-comment-link">Comments</a>
       
@@ -673,78 +771,12 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/04/22/github-pages.html" data-id="cjp6spvux001t7u0rs0oogds9" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/04/22/github-pages.html" data-id="cjqt2sqmq001txy0rgii6kyea" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/04/22/github-pages.html#comments" class="article-comment-link">Comments</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/github/">github</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-  
-    <article id="post-nginx-1-13-9-http2-server-push" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/02/27/nginx-1-13-9-http2-server-push.html" class="article-date">
-  <time datetime="2018-02-27T11:41:32.000Z" itemprop="datePublished">2018-02-27</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/nginx/">nginx</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/02/27/nginx-1-13-9-http2-server-push.html">Nginx HTTP/2 Server Push</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Nginx 在最新的 <a href="http://nginx.org/en/download.html" target="_blank" rel="external">1.13.9</a> 版本中，增加了对 HTTP/2 Server Push 的支持，以下就简单介绍下如何使用。</p>
-<p>以下内容主要来自 <a href="https://www.nginx.com/blog/nginx-1-13-9-http2-server-push/" target="_blank" rel="external">Introducing HTTP/2 Server Push with NGINX 1.13.9</a>，进行了简单的整理。</p>
-<h3 id="推送指定资源"><a href="#推送指定资源" class="headerlink" title="推送指定资源"></a>推送指定资源</h3><p>首先，在 Nginx 中进行配置：</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="section">server</span> &#123;</div><div class="line">    <span class="comment">#开启HTTP/2</span></div><div class="line">    <span class="attribute">listen</span> <span class="number">443</span> ssl http2;</div><div class="line"></div><div class="line">    <span class="attribute">ssl_certificate</span> ssl/certificate.pem;</div><div class="line">    <span class="attribute">ssl_certificate_key</span> ssl/key.pem;</div><div class="line"></div><div class="line">    <span class="attribute">root</span> /var/www/html;</div><div class="line"></div><div class="line">    <span class="comment"># 当请求 demo.html 时，推送 /style.css, /image1.jpg, /image2.jpg</span></div><div class="line">    <span class="attribute">location</span> = /demo.html &#123;</div><div class="line">        <span class="attribute">http2_push</span> /style.css;</div><div class="line">        <span class="attribute">http2_push</span> /image1.jpg;</div><div class="line">        <span class="attribute">http2_push</span> /image2.jpg;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>可以通过 Chrome Developer Tools 查看效果。在 Network 中，可以看到 demo.html 的请求和推送到客户端的内容。</p>
-<p>如下图所示，可以看到 style.css，image1.jpg，image2.jpg。它们都是 demo.html 请求的一部分。</p>
-<p><img src="/images/http2-server-push-chrome-dev-tools.png" alt=""></p>
-<h3 id="自动推送"><a href="#自动推送" class="headerlink" title="自动推送"></a>自动推送</h3><p>以上是在页面加载时推送指定资源的例子，但是很多情况下，并不能指定要推送哪些资源，因此，Nginx 还支持通过 http2_push_preload 指令，自动分析响应头中的 Link header，来自动推送这些资源。</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="section">server</span> &#123;</div><div class="line">    <span class="comment">#开启HTTP/2</span></div><div class="line">    <span class="attribute">listen</span> <span class="number">443</span> ssl http2;</div><div class="line"></div><div class="line">    <span class="attribute">ssl_certificate</span> ssl/certificate.pem;</div><div class="line">    <span class="attribute">ssl_certificate_key</span> ssl/key.pem;</div><div class="line"></div><div class="line">    <span class="attribute">root</span> /var/www/html;</div><div class="line"></div><div class="line">    <span class="attribute">location</span> = /myapp &#123;</div><div class="line">        <span class="attribute">proxy_pass</span> http://upstream;</div><div class="line">        <span class="attribute">http2_push_preload</span> <span class="literal">on</span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>通过如上的配置，当 upstream 返回的响应头中包含 Link header 时，</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Link: &lt;/style.css&gt;; as=style; rel=preload</div></pre></td></tr></table></figure>
-<p>Nginx 即会开启一个推送， 内容则是 /style.css ，Link header 的路径必须是绝对路径。</p>
-<p>如果想要推送多个资源，可以添加多个 Link header ， 或更直接一些，把所有资源添加到一个 Link header 中。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Link: &lt;/style.css&gt;; as=style; rel=preload, &lt;/favicon.ico&gt;; as=image; rel=preload</div></pre></td></tr></table></figure>
-<p>如果不想让 Nginx 推送某个资源，为该 header 添加一个 nopush 参数即可。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Link: &lt;/nginx.png&gt;; as=image; rel=preload; nopush</div></pre></td></tr></table></figure>
-<h3 id="有选择的推送"><a href="#有选择的推送" class="headerlink" title="有选择的推送"></a>有选择的推送</h3><p>由于 HTTP/2 规范并没有解决是否要推送哪些资源的问题，但是比较合理的方式是知道需要推送哪些资源，并且客户端没有缓存过这些资源，才进行推送。</p>
-<p>所以 Nginx 支持了添加条件，只在符合条件时才进行推送</p>
-<p>当客户端请求时包含了 cookie ，Nginx 将只会推送一次资源。</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="section">server</span> &#123;</div><div class="line">    <span class="attribute">listen</span> <span class="number">443</span> ssl http2 default_server;</div><div class="line"></div><div class="line">    <span class="attribute">ssl_certificate</span> ssl/certificate.pem;</div><div class="line">    <span class="attribute">ssl_certificate_key</span> ssl/key.pem;</div><div class="line"></div><div class="line"></div><div class="line">    <span class="attribute">root</span> /var/www/html;</div><div class="line">    <span class="attribute">http2_push_preload</span> <span class="literal">on</span>;</div><div class="line"></div><div class="line">    <span class="attribute">location</span> = /demo.html &#123;</div><div class="line">        <span class="attribute">add_header</span> Set-Cookie <span class="string">"session=1"</span>;</div><div class="line">        <span class="attribute">add_header</span> Link <span class="variable">$resources</span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line"><span class="attribute">map</span> <span class="variable">$http_cookie</span> <span class="variable">$resources</span> &#123;</div><div class="line">    "~*session=1" "";</div><div class="line">    <span class="attribute">default</span> <span class="string">"&lt;/style.css&gt;; as=style; rel=preload, &lt;/image1.jpg&gt;; as=image; rel=preload,</span></div><div class="line"><span class="string">             &lt;/image2.jpg&gt;; as=style; rel=preload"</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>相关链接:</p>
-<p><a href="https://www.qichengzx.com/2017/07/02/HTTP2-Server-Push.html">在Go中使用 HTTP/2 Server Push</a></p>
-<p>参考资料:</p>
-<p><a href="https://w3c.github.io/preload/#server-push-http-2" target="_blank" rel="external">Server Push (HTTP/2)</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/02/27/nginx-1-13-9-http2-server-push.html" data-id="cjp6spvvd00307u0ra20s899f" class="article-share-link">Share</a>
-      
-        <a href="https://www.qichengzx.com/2018/02/27/nginx-1-13-9-http2-server-push.html#comments" class="article-comment-link">Comments</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nginx/">nginx</a></li></ul>
 
     </footer>
   </div>
@@ -794,7 +826,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/git/">git</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">21</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/nginx/">nginx</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">12</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/git/">git</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">22</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/nginx/">nginx</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">12</span></li></ul>
     </div>
   </div>
 
@@ -803,7 +835,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Keygen/">Keygen</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/captcha/">captcha</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geo/">geo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">20</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/qq/">qq</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redigo/">redigo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Keygen/">Keygen</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/captcha/">captcha</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geo/">geo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">21</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/qq/">qq</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redigo/">redigo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -821,7 +853,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
     </div>
   </div>
 
@@ -831,6 +863,10 @@
     <h3 class="widget-title">Recents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2019/01/01/go-in-the-browser.html">【译】Go和WebAssembly：在浏览器中运行Go程序</a>
+          </li>
         
           <li>
             <a href="/2018/06/15/qq-007-captcha.html">腾讯防水墙验证码使用</a>
@@ -848,10 +884,6 @@
             <a href="/2018/05/12/generating-random-keys-with-keygen.html">Keygen 包简介</a>
           </li>
         
-          <li>
-            <a href="/2018/05/10/git-rebase.html">Git rebase 笔记</a>
-          </li>
-        
       </ul>
     </div>
   </div>
@@ -864,7 +896,7 @@
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2018 qichengzx<br>
+      &copy; 2019 qichengzx<br>
       Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
       Hosted by <a href="https://www.vultr.com/?ref=7241986" target="_blank">Vultr</a>
     </div>
