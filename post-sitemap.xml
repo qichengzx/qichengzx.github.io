@@ -8,7 +8,7 @@
 
     <url>
         <loc>https://www.qichengzx.com/2019/01/01/go-in-the-browser.html</loc>
-        <lastmod>2019-01-12T05:32:56.160Z</lastmod>
+        <lastmod>2019-01-27T11:29:22.165Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -271,7 +271,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2018/05/29/git-pull-upstream.html</loc>
+        <loc>https://www.qichengzx.com/2018/05/10/git-rebase.html</loc>
         <lastmod>2019-01-08T13:15:32.453Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -279,7 +279,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2018/05/10/git-rebase.html</loc>
+        <loc>https://www.qichengzx.com/2018/05/29/git-pull-upstream.html</loc>
         <lastmod>2019-01-08T13:15:32.453Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -351,7 +351,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2018/05/13/create-a-single-page-app-with-go-echo-and-vue.html</loc>
+        <loc>https://www.qichengzx.com/2017/07/15/create-real-time-chat-app-golang-angular-2-websockets.html</loc>
         <lastmod>2019-01-08T13:15:32.449Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -359,7 +359,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2017/07/15/create-real-time-chat-app-golang-angular-2-websockets.html</loc>
+        <loc>https://www.qichengzx.com/2018/05/13/create-a-single-page-app-with-go-echo-and-vue.html</loc>
         <lastmod>2019-01-08T13:15:32.449Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -415,7 +415,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html</loc>
+        <loc>https://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html</loc>
         <lastmod>2019-01-08T13:15:32.445Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -423,7 +423,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html</loc>
+        <loc>https://www.qichengzx.com/2016/05/15/a-sample-redis-queue.html</loc>
         <lastmod>2019-01-08T13:15:32.445Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
