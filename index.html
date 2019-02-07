@@ -115,9 +115,9 @@
 <p>到现在为止一切顺利。但这是一个简单的“hello world”程序。真实的Web应用程序需要与DOM交互。我们需要响应按钮单击事件，从文本框中获取输入数据，并将数据发送回DOM。现在我们将构建一个最小的图像编辑器，它将使用所有这些功能。</p>
 <h2 id="DOM-API"><a href="#DOM-API" class="headerlink" title="DOM API"></a>DOM API</h2><p>但首先，要使Go代码与浏览器进行交互，我们需要一个DOM API。我们有<code>syscall/js</code>库来帮助我们解决这个问题。它是一个非常简单却功能强大的DOM API形式，我们可以在其上构建我们的应用程序。在我们制作应用程序之前，让我们快速了解它的一些功能。</p>
 <h3 id="回调"><a href="#回调" class="headerlink" title="回调"></a>回调</h3><p>为了响应DOM事件，我们声明了回调并用这样的事件将它们连接起来：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> “syscall/js”</div><div class="line"></div><div class="line"><span class="comment">// Declare callback</span></div><div class="line">cb := js.NewEventCallback(js.PreventDefault, <span class="function"><span class="keyword">func</span><span class="params">(ev js.Value)</span></span> &#123;</div><div class="line">	<span class="comment">// handle event</span></div><div class="line">&#125;)</div><div class="line"></div><div class="line"></div><div class="line"><span class="comment">// Hook it up with a DOM event</span></div><div class="line">js.Global().Get(<span class="string">"document"</span>).</div><div class="line">	Call(<span class="string">"getElementById"</span>, <span class="string">"myBtn"</span>).</div><div class="line">	Call(<span class="string">"addEventListener"</span>, <span class="string">"click"</span>, cb)</div><div class="line"></div><div class="line"></div><div class="line"><span class="comment">// Call cb.Release() on your way out.</span></div></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> <span class="string">"syscall/js"</span></div><div class="line"></div><div class="line"><span class="comment">// Declare callback</span></div><div class="line">cb := js.NewEventCallback(js.PreventDefault, <span class="function"><span class="keyword">func</span><span class="params">(ev js.Value)</span></span> &#123;</div><div class="line">	<span class="comment">// handle event</span></div><div class="line">&#125;)</div><div class="line"></div><div class="line"></div><div class="line"><span class="comment">// Hook it up with a DOM event</span></div><div class="line">js.Global().Get(<span class="string">"document"</span>).</div><div class="line">	Call(<span class="string">"getElementById"</span>, <span class="string">"myBtn"</span>).</div><div class="line">	Call(<span class="string">"addEventListener"</span>, <span class="string">"click"</span>, cb)</div><div class="line"></div><div class="line"></div><div class="line"><span class="comment">// Call cb.Release() on your way out.</span></div></pre></td></tr></table></figure>
 <h3 id="更新DOM"><a href="#更新DOM" class="headerlink" title="更新DOM"></a>更新DOM</h3><p>要从Go中更新DOM，我们可以</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> “syscall/js”</div><div class="line"></div><div class="line">js.Global().Get(<span class="string">"document"</span>).</div><div class="line">		Call(<span class="string">"getElementById"</span>, <span class="string">"myTextBox"</span>).</div><div class="line">		Set(<span class="string">"value"</span>, <span class="string">"hello wasm"</span>)</div></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> <span class="string">"syscall/js"</span></div><div class="line"></div><div class="line">js.Global().Get(<span class="string">"document"</span>).</div><div class="line">		Call(<span class="string">"getElementById"</span>, <span class="string">"myTextBox"</span>).</div><div class="line">		Set(<span class="string">"value"</span>, <span class="string">"hello wasm"</span>)</div></pre></td></tr></table></figure>
 <p>您甚至可以调用JS函数并操作本机JS对象，如 <code>FileReader</code>或<code>Canvas</code>。查看<a href="https://golang.org/pkg/syscall/js/" target="_blank" rel="external"><code>syscall/js</code></a>文档以获取更多详细信息。</p>
 <h2 id="正确的-Web-应用程序"><a href="#正确的-Web-应用程序" class="headerlink" title="正确的 Web 应用程序"></a>正确的 Web 应用程序</h2><p>接下来我们将构建一个小应用程序，它将获取输入的图像，然后对图像执行一些操作，如亮度，对比度，色调，饱和度，最后将输出图像发送回浏览器。 每个效果都会有滑块，用户可以更改这些效果并实时查看目标图像的变化。</p>
 <p>首先，我们需要从浏览器获取输入的图像给到我们的Go代码，以便可以处理它。为了有效地做到这一点，我们需要采取一些<code>不安全</code>的技巧，这里跳过具体细节。拥有图像后，它完全在我们的控制之下，我们可以自由地做任何事情。下面是图像加载器回调的简短片段，为简洁起见略有简化：</p>
@@ -148,7 +148,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2019/01/01/go-in-the-browser.html" data-id="cjretnr5j007ai50rv9h58tlc" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2019/01/01/go-in-the-browser.html" data-id="cjru4tr5s0079dd0rihpxwcdc" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2019/01/01/go-in-the-browser.html#comments" class="article-comment-link">Comments</a>
       
@@ -234,7 +234,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/06/15/qq-007-captcha.html" data-id="cjretnr4h003ui50rkmtq2906" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/06/15/qq-007-captcha.html" data-id="cjru4tr4v003udd0rtdmpbk9y" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/06/15/qq-007-captcha.html#comments" class="article-comment-link">Comments</a>
       
@@ -290,7 +290,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/05/29/git-pull-upstream.html" data-id="cjretnr3r001oi50ryi19bsse" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/05/29/git-pull-upstream.html" data-id="cjru4tr44001mdd0rixmry8ef" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/05/29/git-pull-upstream.html#comments" class="article-comment-link">Comments</a>
       
@@ -435,7 +435,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/05/13/create-a-single-page-app-with-go-echo-and-vue.html" data-id="cjretnr5w007wi50rm3x9gu00" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/05/13/create-a-single-page-app-with-go-echo-and-vue.html" data-id="cjru4tr66007vdd0rhhn1ykye" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/05/13/create-a-single-page-app-with-go-echo-and-vue.html#comments" class="article-comment-link">Comments</a>
       
@@ -493,7 +493,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/05/12/generating-random-keys-with-keygen.html" data-id="cjretnr3o001ei50rzcjr7lic" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/05/12/generating-random-keys-with-keygen.html" data-id="cjru4tr400019dd0roibvnnj5" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/05/12/generating-random-keys-with-keygen.html#comments" class="article-comment-link">Comments</a>
       
@@ -550,7 +550,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/05/10/git-rebase.html" data-id="cjretnr3q001li50ridb4mn4j" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/05/10/git-rebase.html" data-id="cjru4tr45001pdd0rgrkdmyik" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/05/10/git-rebase.html#comments" class="article-comment-link">Comments</a>
       
@@ -617,7 +617,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/05/03/go-recursion.html" data-id="cjretnr3w0020i50rt3q0xss2" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/05/03/go-recursion.html" data-id="cjru4tr490021dd0rcjyhqyci" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/05/03/go-recursion.html#comments" class="article-comment-link">Comments</a>
       
@@ -669,7 +669,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/05/02/go-closure.html" data-id="cjretnr3u001wi50rd01w6n5e" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/05/02/go-closure.html" data-id="cjru4tr47001udd0r4dqfh2ki" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/05/02/go-closure.html#comments" class="article-comment-link">Comments</a>
       
@@ -722,7 +722,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/04/25/dockerfile-build-arg.html" data-id="cjretnr3j000zi50rsn1v4j8t" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/04/25/dockerfile-build-arg.html" data-id="cjru4tr3x0011dd0rxt88fjyd" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/04/25/dockerfile-build-arg.html#comments" class="article-comment-link">Comments</a>
       
@@ -771,7 +771,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2018/04/22/github-pages.html" data-id="cjretnr3t001ti50rtmhc9qaa" class="article-share-link">Share</a>
+      <a data-url="https://www.qichengzx.com/2018/04/22/github-pages.html" data-id="cjru4tr4d0028dd0rs5lngncj" class="article-share-link">Share</a>
       
         <a href="https://www.qichengzx.com/2018/04/22/github-pages.html#comments" class="article-comment-link">Comments</a>
       
