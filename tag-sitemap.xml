@@ -93,14 +93,14 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/tags/ECharts/</loc>
+        <loc>https://www.qichengzx.com/tags/excel/</loc>
         <lastmod>2019-01-08T13:15:32.451Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/tags/excel/</loc>
+        <loc>https://www.qichengzx.com/tags/ECharts/</loc>
         <lastmod>2019-01-08T13:15:32.451Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
@@ -226,20 +226,6 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/tags/qq/</loc>
-        <lastmod>2019-01-08T13:15:32.473Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>https://www.qichengzx.com/tags/captcha/</loc>
-        <lastmod>2019-01-08T13:15:32.473Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>https://www.qichengzx.com/tags/redigo/</loc>
         <lastmod>2019-01-08T13:15:32.473Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -262,6 +248,20 @@
 
     <url>
         <loc>https://www.qichengzx.com/tags/ssl/</loc>
+        <lastmod>2019-01-08T13:15:32.473Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/qq/</loc>
+        <lastmod>2019-01-08T13:15:32.473Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/tags/captcha/</loc>
         <lastmod>2019-01-08T13:15:32.473Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>

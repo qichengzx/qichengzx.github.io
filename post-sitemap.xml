@@ -39,7 +39,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2018/06/15/qq-007-captcha.html</loc>
+        <loc>https://www.qichengzx.com/2017/09/23/redis-geo-with-redigo-in-golang-part-2.html</loc>
         <lastmod>2019-01-08T13:15:32.473Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -48,14 +48,6 @@
 
     <url>
         <loc>https://www.qichengzx.com/2017/09/17/redis-geo-with-redigo-in-golang-part-1.html</loc>
-        <lastmod>2019-01-08T13:15:32.473Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://www.qichengzx.com/2017/09/23/redis-geo-with-redigo-in-golang-part-2.html</loc>
         <lastmod>2019-01-08T13:15:32.473Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -72,6 +64,14 @@
 
     <url>
         <loc>https://www.qichengzx.com/2015/12/19/secure-your-website-with-lets-encrypt.html</loc>
+        <lastmod>2019-01-08T13:15:32.473Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2018/06/15/qq-007-captcha.html</loc>
         <lastmod>2019-01-08T13:15:32.473Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -111,14 +111,6 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html</loc>
-        <lastmod>2019-01-08T13:15:32.471Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
         <loc>https://www.qichengzx.com/2016/04/24/php-rabbitmq-tutorial-four.html</loc>
         <lastmod>2019-01-08T13:15:32.471Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -127,7 +119,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html</loc>
+        <loc>https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html</loc>
         <lastmod>2019-01-08T13:15:32.471Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -143,15 +135,15 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2018/02/27/nginx-1-13-9-http2-server-push.html</loc>
-        <lastmod>2019-01-08T13:15:32.470Z</lastmod>
+        <loc>https://www.qichengzx.com/2016/04/23/php-rabbitmq-tutorial-three.html</loc>
+        <lastmod>2019-01-08T13:15:32.471Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2015/12/03/nodejs-mysql.html</loc>
+        <loc>https://www.qichengzx.com/2018/02/27/nginx-1-13-9-http2-server-push.html</loc>
         <lastmod>2019-01-08T13:15:32.470Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -175,7 +167,15 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/11/02/install-yaf-on-mac.html</loc>
+        <loc>https://www.qichengzx.com/2015/12/03/nodejs-mysql.html</loc>
+        <lastmod>2019-01-08T13:15:32.470Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2017/03/06/insert-filter-in-beego.html</loc>
         <lastmod>2019-01-08T13:15:32.469Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -191,15 +191,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2017/03/06/insert-filter-in-beego.html</loc>
-        <lastmod>2019-01-08T13:15:32.469Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://www.qichengzx.com/2017/11/27/multi-stage-builds-in-docker.html</loc>
+        <loc>https://www.qichengzx.com/2016/11/02/install-yaf-on-mac.html</loc>
         <lastmod>2019-01-08T13:15:32.469Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -208,6 +200,14 @@
 
     <url>
         <loc>https://www.qichengzx.com/2017/08/13/leetcode-array-partition-i.html</loc>
+        <lastmod>2019-01-08T13:15:32.469Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2017/11/27/multi-stage-builds-in-docker.html</loc>
         <lastmod>2019-01-08T13:15:32.469Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -247,7 +247,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2018/05/02/go-closure.html</loc>
+        <loc>https://www.qichengzx.com/2016/12/04/go-qiubai.html</loc>
         <lastmod>2019-01-08T13:15:32.456Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -255,7 +255,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/12/04/go-qiubai.html</loc>
+        <loc>https://www.qichengzx.com/2018/05/02/go-closure.html</loc>
         <lastmod>2019-01-08T13:15:32.456Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -311,14 +311,6 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2016/01/19/echarts-pie.html</loc>
-        <lastmod>2019-01-08T13:15:32.451Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
         <loc>https://www.qichengzx.com/2015/11/13/dropbox-sync-hexo-and-autobuild-itself.html</loc>
         <lastmod>2019-01-08T13:15:32.451Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -328,6 +320,14 @@
 
     <url>
         <loc>https://www.qichengzx.com/2015/11/21/export-results-of-mysql-to-excel.html</loc>
+        <lastmod>2019-01-08T13:15:32.451Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.qichengzx.com/2016/01/19/echarts-pie.html</loc>
         <lastmod>2019-01-08T13:15:32.451Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -351,7 +351,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2017/07/15/create-real-time-chat-app-golang-angular-2-websockets.html</loc>
+        <loc>https://www.qichengzx.com/2018/05/13/create-a-single-page-app-with-go-echo-and-vue.html</loc>
         <lastmod>2019-01-08T13:15:32.449Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -359,7 +359,7 @@
     </url>
 
     <url>
-        <loc>https://www.qichengzx.com/2018/05/13/create-a-single-page-app-with-go-echo-and-vue.html</loc>
+        <loc>https://www.qichengzx.com/2017/07/15/create-real-time-chat-app-golang-angular-2-websockets.html</loc>
         <lastmod>2019-01-08T13:15:32.449Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
