@@ -1,333 +1,792 @@
+
 <!DOCTYPE html>
 <html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="UTF-8">
+<title>
+
   
-  <title>PHP RabbitMQ 教程（一） - 介绍 | 启程</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta http-equiv="Access-Control-Allow-Origin" content="*">
-  <meta name="description" content="准备工作先决条件本教程先决条件是RabbitMQ已经安装并正在以5672端口运行在 localhost，如果你使用了不同的域，端口，用户，密码，连接配置需要适当改变。 获得帮助如果在本教程中遇到问题，可以通过邮件列表进行联系。 介绍RabbitMQ是一个消息代理，它的本质是，从producers（生产者）接收消息，然后发送给consumers（消费者），在这个过程中，可以根据自己的配置规则使用路由">
-<meta name="keywords" content="php,rabbitmq">
-<meta property="og:type" content="article">
-<meta property="og:title" content="PHP RabbitMQ 教程（一） - 介绍">
-<meta property="og:url" content="https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html">
+  PHP RabbitMQ 教程（一） - 介绍 - 启程
+
+</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<link href="/css/style.css" rel="stylesheet" type="text/css">
+<meta property="og:type" content="website">
+<meta property="og:title" content="启程">
+<meta property="og:url" content="https://www.qichengzx.com">
 <meta property="og:site_name" content="启程">
-<meta property="og:description" content="准备工作先决条件本教程先决条件是RabbitMQ已经安装并正在以5672端口运行在 localhost，如果你使用了不同的域，端口，用户，密码，连接配置需要适当改变。 获得帮助如果在本教程中遇到问题，可以通过邮件列表进行联系。 介绍RabbitMQ是一个消息代理，它的本质是，从producers（生产者）接收消息，然后发送给consumers（消费者），在这个过程中，可以根据自己的配置规则使用路由">
-<meta property="og:image" content="https://www.qichengzx.com/images/rabbitmq/producer.png">
-<meta property="og:image" content="https://www.qichengzx.com/images/rabbitmq/queue.png">
-<meta property="og:image" content="https://www.qichengzx.com/images/rabbitmq/consumer.png">
-<meta property="og:image" content="https://www.qichengzx.com/images/rabbitmq/python-one.png">
-<meta property="og:image" content="https://www.qichengzx.com/images/rabbitmq/sending.png">
-<meta property="og:image" content="https://www.qichengzx.com/images/rabbitmq/receiving.png">
-<meta property="og:updated_time" content="2019-01-08T13:15:32.471Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="PHP RabbitMQ 教程（一） - 介绍">
-<meta name="twitter:description" content="准备工作先决条件本教程先决条件是RabbitMQ已经安装并正在以5672端口运行在 localhost，如果你使用了不同的域，端口，用户，密码，连接配置需要适当改变。 获得帮助如果在本教程中遇到问题，可以通过邮件列表进行联系。 介绍RabbitMQ是一个消息代理，它的本质是，从producers（生产者）接收消息，然后发送给consumers（消费者），在这个过程中，可以根据自己的配置规则使用路由">
-<meta name="twitter:image" content="https://www.qichengzx.com/images/rabbitmq/producer.png">
-<meta name="twitter:creator" content="@qichengzx">
-  
-    <link rel="alternative" href="/atom.xml" title="启程" type="application/atom+xml">
-  
-  
-    <link rel="icon" href="/favicon.png">
-  
-  <link rel="stylesheet" href="/css/style.css">
-  
+<meta property="og:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
+<link rel="icon" href="/favicon.ico">
 
 </head>
 <body>
-  <div id="container">
-    <div id="wrap">
-      <header id="header">
-  <div id="banner"></div>
-  <div id="header-outer" class="outer">
-    <div id="header-title" class="inner">
-      <h1 id="logo-wrap">
-        <a href="/" id="logo">启程</a>
-      </h1>
-      
-    </div>
-    <div id="header-inner" class="inner">
-      <nav id="main-nav">
-        <a id="main-nav-toggle" class="nav-icon"></a>
-        
-          <a class="main-nav-link" href="/">Home</a>
-        
-          <a class="main-nav-link" href="/archives">Archives</a>
-        
-      </nav>
-      <nav id="sub-nav">
-        
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
-        
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
-      </nav>
-      <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://www.qichengzx.com"></form>
-      </div>
-    </div>
-  </div>
-</header>
-      <div class="outer">
-        <section id="main"><article id="post-php-rabbitmq-tutorial-one" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2016/02/28/php-rabbitmq-tutorial-one.html" class="article-date">
-  <time datetime="2016-02-28T03:10:03.000Z" itemprop="datePublished">2016-02-28</time>
-</a>
+<div id="container">
+  <div id="wrap">
     
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/php/">php</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 class="article-title" itemprop="name">
-      PHP RabbitMQ 教程（一） - 介绍
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><h3 id="先决条件"><a href="#先决条件" class="headerlink" title="先决条件"></a>先决条件</h3><p>本教程先决条件是RabbitMQ已经安装并正在以5672端口运行在 localhost，如果你使用了不同的域，端口，用户，密码，连接配置需要适当改变。</p>
-<h3 id="获得帮助"><a href="#获得帮助" class="headerlink" title="获得帮助"></a>获得帮助</h3><p>如果在本教程中遇到问题，可以通过邮件列表进行联系。</p>
-<h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>RabbitMQ是一个消息代理，它的本质是，从producers（生产者）接收消息，然后发送给consumers（消费者），在这个过程中，可以根据自己的配置规则使用路由，缓冲区，保存消息。</p>
-<p>通常的，RabbitMQ，信息传送（messaging），使用一些专业术语。（RabbitMQ, and messaging in general, uses some jargon.）</p>
-<pre><code>&gt;生产（Producing）仅仅意味着发送，发送信息的程序叫做生产者（producers），以下图表示：
-</code></pre><p><img src="/images/rabbitmq/producer.png" alt=""></p>
-<pre><code>&gt;队列就是一个信箱的名字，存在于RabbitMQ内部，虽然消息在RabbitMQ和你的应用之间传输，但是只能存在于队列里，队列没有大小限制，它可以存储尽可能多的消息，本质上它是一个无限大的缓冲区，多个producers（生产者）可以通过一个队列发送消息，多个consumers（消费者）也可以尝试从一个队列接收消息，队列以下图表示，队列的名字在图的上边：
-</code></pre><p><img src="/images/rabbitmq/queue.png" alt="">    </p>
-<pre><code>&gt;consumers（消费者）的意思与接收相似，消费者主要是等待接收消息的程序，以下图表示：
-</code></pre><p><img src="/images/rabbitmq/consumer.png" alt="">    </p>
-<p>需要注意的是，生产者，消费者，和代理，不需要一定在一台机器上，事实上在大多数情况下他们确实不在一台机器上。</p>
-<h3 id="“Hello-World”"><a href="#“Hello-World”" class="headerlink" title="“Hello World”"></a>“Hello World”</h3><p>（使用<a href="https://github.com/php-amqplib/php-amqplib" target="_blank" rel="external">php-amqplib</a>库）</p>
-<p>在这一部分，我们使用PHP写两段程序，一个生产者发送一条消息，一个消费者接收消息并打印出来。我们会忽略一些php-amqplib API的细节，从简单的事情开始学习，这是一段内容为“Hello World”的消息。</p>
-<p>在下边的示意图中，“P”是生产者，“C”是消费者，中间的盒子是队列 — 一个RabbitMQ代表消费者的消息缓冲区。</p>
-<p><img src="/images/rabbitmq/python-one.png" alt=""></p>
-<h4 id="php-amqplib库"><a href="#php-amqplib库" class="headerlink" title="php-amqplib库"></a>php-amqplib库</h4><p>RabbitMQ支持很多协议，本教程包含AMQP 0-9-1，一个开放，通用信息协议，RabbitMQ支持Python、Ruby、.NET、Java、JMS、C、PHP、ActionScript、XMPP、STOMP等多种语言（详见<a href="http://www.rabbitmq.com/devtools.html" target="_blank" rel="external">这里</a>），在本教程中我们使用php-amqplib，使用<a href="https://getcomposer.org/doc/00-intro.md" target="_blank" rel="external">Composer</a> 管理依赖。</p>
-<p>添加一个composer.json文件到你的项目目录。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    &quot;require&quot;: &#123;</div><div class="line">        &quot;php-amqplib/php-amqplib&quot;: &quot;2.5.*&quot;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>如果你已经安装了 Composer ，可以运行如下的代码：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">composer.phar install</div></pre></td></tr></table></figure>
-<p>这是一个Windows系统下的Composer安装文件。</p>
-<p>现在我们已经安装了php-amqplib，可以写程序了。</p>
-<h3 id="发送"><a href="#发送" class="headerlink" title="发送"></a>发送</h3><p><img src="/images/rabbitmq/sending.png" alt=""></p>
-<p>新建一个send.php作为发送端，receive.php作为接收端，发送端会连接RabbitMQ，发送一条信息，然后退出。</p>
-<p>在send.php中，需要引用php-amqplib库，和使用其中的一些必要的类。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">require_once __DIR__ . &apos;/vendor/autoload.php&apos;;</div><div class="line">use PhpAmqpLib\Connection\AMQPStreamConnection;</div><div class="line">use PhpAmqpLib\Message\AMQPMessage;</div></pre></td></tr></table></figure>
-<p>接下来，建立到RabbitMQ服务器的连接：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$connection = new AMQPStreamConnection(&apos;localhost&apos;, 5672, &apos;guest&apos;, &apos;guest&apos;);</div><div class="line">$channel = $connection-&gt;channel();</div></pre></td></tr></table></figure>
-<p>这里我们使用socket进行连接，处理协议和鉴定，这样就已经连接到了本机的代理，如果想要连接不同的主机，只要更改localhost为该主机的名称或IP地址即可。</p>
-<p>下一步，建立频道，大部分API的工作都在这完成。</p>
-<p>要想发送信息，需要声明一个队列，之后可以向这个队列里发布消息。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">$channel-&gt;queue_declare(&apos;hello&apos;, false, false, false, false);</div><div class="line"></div><div class="line">$msg = new AMQPMessage(&apos;Hello World!&apos;);</div><div class="line">$channel-&gt;basic_publish($msg, &apos;&apos;, &apos;hello&apos;);</div><div class="line"></div><div class="line">echo &quot; [x] Sent &apos;Hello World!&apos;\n&quot;;</div></pre></td></tr></table></figure>
-<p>声明队列是幂等的 — 它仅在不存在的时候才会被创建，如果存在也不会受影响。消息内容是一个字节数组（byte array），所以可以发送任何内容。</p>
-<p>最后，关闭频道和连接。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$channel-&gt;close();</div><div class="line">$connection-&gt;close();</div></pre></td></tr></table></figure>
-<p><a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/send.php" target="_blank" rel="external">这是send.php类的完整内容。</a></p>
-<h3 id="发送失败"><a href="#发送失败" class="headerlink" title="发送失败"></a>发送失败</h3><p>如果这是第一次使用RabbitMQ，并且没有看到“Sent”信息（即“ [x] Sent ‘Hello World!”），也许你抓耳挠腮的想知道为什么出错了，也许是代理没有足够的硬盘空间（默认情况下需要至少1G的空间）导致拒绝接收信息。检查日志文件，有必要的花调低限值。<a href="http://www.rabbitmq.com/configure.html#config-items" target="_blank" rel="external">这个配置文件</a>文档将会展示给你如何设置disk_free_limit。</p>
-<h3 id="接收"><a href="#接收" class="headerlink" title="接收"></a>接收</h3><p>收件人，与发送者只发送一条消息不同，接收者会一直运行以监听信息并输出。</p>
-<p><img src="/images/rabbitmq/receiving.png" alt=""></p>
-<p>receive.php中与send.php中的 include和use 部分的代码一样。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">require_once __DIR__ . &apos;/vendor/autoload.php&apos;;</div><div class="line">use PhpAmqpLib\Connection\AMQPStreamConnection;</div></pre></td></tr></table></figure>
-<p>设置连接与send.php一样，打开连接和频道，命名一个队列，需要注意的是，队列名需要与send.php所发布的队列的名字一致。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">$connection = new AMQPStreamConnection(&apos;localhost&apos;, 5672, &apos;guest&apos;, &apos;guest&apos;);</div><div class="line">$channel = $connection-&gt;channel();</div><div class="line"></div><div class="line">$channel-&gt;queue_declare(&apos;hello&apos;, false, false, false, false);</div><div class="line"></div><div class="line">echo &apos; [*] Waiting for messages. To exit press CTRL+C&apos;, &quot;\n&quot;;</div></pre></td></tr></table></figure>
-<p>注意，我们在此声明了一个队列，因为有可能会在send程序开启前先开启receive程序，我们想要确保在试着接收消息之前队列就已经存在了。</p>
-<p>下一步，告诉服务器去从队列传送消息，我们会定义一个用于从服务器接收消息的函数，记住，消息会异步的从服务器发送到客户端。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">$callback = function($msg) &#123;</div><div class="line">  echo &quot; [x] Received &quot;, $msg-&gt;body, &quot;\n&quot;;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">$channel-&gt;basic_consume(&apos;hello&apos;, &apos;&apos;, false, true, false, false, $callback);</div><div class="line"></div><div class="line">while(count($channel-&gt;callbacks)) &#123;</div><div class="line">    $channel-&gt;wait();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>此处使用while方法，当收到消息时，会把收到的消息传入到$callback方法里。</p>
-<p><a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/receive.php" target="_blank" rel="external">这是receive.php类的全部内容。</a></p>
-<p>现在我们可以运行两段脚本了，在命令行里，执行sender程序。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">php send.php</div></pre></td></tr></table></figure>
-<p>然后，执行receiver程序</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">php receive.php</div></pre></td></tr></table></figure>
-<p>receiver程序会把通过sender程序发送的内容打印出来，receiver程序会一直运行，监听新消息（使用ctrl+c停止），所以试着运行sender程序从另一个命令行。</p>
-<p>如果想查看队列，可以运行rabbitmqctl list_queues。</p>
-<p>Hello World！</p>
-<p>查看第二部分，建立一个简单的队列。</p>
-<p>原文地址：<a href="https://www.rabbitmq.com/tutorials/tutorial-one-php.html" target="_blank" rel="external">“Hello World!”</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html" data-id="cjsso1nnj003jkh0r1i928759" class="article-share-link">Share</a>
-      
-        <a href="https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html#comments" class="article-comment-link">Comments</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/php/">php</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/rabbitmq/">rabbitmq</a></li></ul>
-
-    </footer>
-  </div>
-  
-    
-<nav id="article-nav">
-  
-    <a href="/2016/04/17/php-rabbitmq-tutorial-two.html" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Newer</strong>
-      <div class="article-nav-title">
-        
-          PHP RabbitMQ 教程（二） - 工作队列
-        
-      </div>
-    </a>
-  
-  
-    <a href="/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">一段有意思的JS For循环代码</div>
-    </a>
-  
-</nav>
-
-  
-</article></section>
-        
-          <aside id="sidebar">
-  
-      <div class="widget-wrap">
-    <h3 class="widget-title">Time</h3>
-    <div class="widget time">
-      <style id="clock-animations"></style>
-      <div class="clock-wrapper">
-        <div class="clock-base">
-            <div class="clock-indicator">
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
+        <header id="header">
+          <div id="banner"></div>
+          <div id="header-outer" class="outer">
+            <div id="header-title" class="inner">
+              <h1 id="logo-wrap">
+                <a href="https://www.qichengzx.com" id="logo">启程</a>
+              </h1>
+              
             </div>
-            <div class="clock-hour"></div>
-            <div class="clock-minute"></div>
-            <div class="clock-second"></div>
-            <div class="clock-center"></div>
-        </div>
-      </div>
-    </div>
-  </div>
+            <div id="header-inner" class="inner">
+              <nav id="main-nav">
+                <a id="main-nav-toggle" class="nav-icon"></a>
+                
+                <a class="main-nav-link" href="/">Home</a>
+                
+                <a class="main-nav-link" href="/archives">Archives</a>
+                
+                <a class="main-nav-link" href="https://github.com">GitHub</a>
+                
+              </nav>
+              <nav id="sub-nav">
+              
+                <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+              </nav>
+              <div id="search-form-wrap">
+                <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form">
+                  <input type="search" name="q" class="search-form-input" placeholder="Search">
+                  <button type="submit" class="search-form-submit">&#xF002;</button>
+                  <input type="hidden" name="sitesearch" value="https://www.qichengzx.com">
+                </form>
+              </div>
+            </div>
+          </div>
+        </header>
 
-  
+    <div class="outer">
+      <section id="main">
+      
+        
+                <article id="26e041e47801b0b67683255fa56c4cfd" class="article" itemscope itemprop="blogPost">
+                  <div class="article-meta">
+                    <a href="https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html" class="article-date">
+                      <time itemprop="datePublished">2016-02-28 11:10:03</time>
+                    </a>
+                    <div class="article-category">
+                      <a class="article-category-link" href="/categories/php">php</a>
+                    </div>
+                  </div>
+                  <div class="article-inner">
+                    <header class="article-header">
+                      <h1 itemprop="name">
+                        <a class="article-title" href="https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html">PHP RabbitMQ 教程（一） - 介绍</a>
+                      </h1>
+                    </header>
+                    <div class="article-entry" itemprop="articleBody">
+                      <h2>准备工作</h2>
+
+<h3>先决条件</h3>
+
+<p>本教程先决条件是RabbitMQ已经安装并正在以5672端口运行在 localhost，如果你使用了不同的域，端口，用户，密码，连接配置需要适当改变。</p>
+
+<h3>获得帮助</h3>
+
+<p>如果在本教程中遇到问题，可以通过邮件列表进行联系。</p>
+
+<h3>介绍</h3>
+
+<p>RabbitMQ是一个消息代理，它的本质是，从producers（生产者）接收消息，然后发送给consumers（消费者），在这个过程中，可以根据自己的配置规则使用路由，缓冲区，保存消息。</p>
+
+<p>通常的，RabbitMQ，信息传送（messaging），使用一些专业术语。（RabbitMQ, and messaging in general, uses some jargon.）</p>
+
+<pre><code>&gt;生产（Producing）仅仅意味着发送，发送信息的程序叫做生产者（producers），以下图表示：
+</code></pre>
+
+<p><img src="/images/rabbitmq/producer.png" alt="" /></p>
+
+<pre><code>&gt;队列就是一个信箱的名字，存在于RabbitMQ内部，虽然消息在RabbitMQ和你的应用之间传输，但是只能存在于队列里，队列没有大小限制，它可以存储尽可能多的消息，本质上它是一个无限大的缓冲区，多个producers（生产者）可以通过一个队列发送消息，多个consumers（消费者）也可以尝试从一个队列接收消息，队列以下图表示，队列的名字在图的上边：
+</code></pre>
+
+<p><img src="/images/rabbitmq/queue.png" alt="" /></p>
+
+<pre><code>&gt;consumers（消费者）的意思与接收相似，消费者主要是等待接收消息的程序，以下图表示：
+</code></pre>
+
+<p><img src="/images/rabbitmq/consumer.png" alt="" /></p>
+
+<p>需要注意的是，生产者，消费者，和代理，不需要一定在一台机器上，事实上在大多数情况下他们确实不在一台机器上。</p>
+
+<h3>“Hello World”</h3>
+
+<p>（使用<a href="https://github.com/php-amqplib/php-amqplib">php-amqplib</a>库）</p>
+
+<p>在这一部分，我们使用PHP写两段程序，一个生产者发送一条消息，一个消费者接收消息并打印出来。我们会忽略一些php-amqplib API的细节，从简单的事情开始学习，这是一段内容为“Hello World”的消息。</p>
+
+<p>在下边的示意图中，“P”是生产者，“C”是消费者，中间的盒子是队列 — 一个RabbitMQ代表消费者的消息缓冲区。</p>
+
+<p><img src="/images/rabbitmq/python-one.png" alt="" /></p>
+
+<h4>php-amqplib库</h4>
+
+<p>RabbitMQ支持很多协议，本教程包含AMQP 0-9-1，一个开放，通用信息协议，RabbitMQ支持Python、Ruby、.NET、Java、JMS、C、PHP、ActionScript、XMPP、STOMP等多种语言（详见<a href="http://www.rabbitmq.com/devtools.html">这里</a>），在本教程中我们使用php-amqplib，使用<a href="https://getcomposer.org/doc/00-intro.md">Composer</a> 管理依赖。</p>
+
+<p>添加一个composer.json文件到你的项目目录。</p>
+
+<pre><code>{
+    &quot;require&quot;: {
+        &quot;php-amqplib/php-amqplib&quot;: &quot;2.5.*&quot;
+    }
+}
+</code></pre>
+
+<p>如果你已经安装了 Composer ，可以运行如下的代码：</p>
+
+<pre><code>composer.phar install
+</code></pre>
+
+<p>这是一个Windows系统下的Composer安装文件。</p>
+
+<p>现在我们已经安装了php-amqplib，可以写程序了。</p>
+
+<h3>发送</h3>
+
+<p><img src="/images/rabbitmq/sending.png" alt="" /></p>
+
+<p>新建一个send.php作为发送端，receive.php作为接收端，发送端会连接RabbitMQ，发送一条信息，然后退出。</p>
+
+<p>在send.php中，需要引用php-amqplib库，和使用其中的一些必要的类。</p>
+
+<pre><code>require_once __DIR__ . '/vendor/autoload.php';
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
+
+</code></pre>
+
+<p>接下来，建立到RabbitMQ服务器的连接：</p>
+
+<pre><code>$connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest');
+$channel = $connection-&gt;channel();
+
+</code></pre>
+
+<p>这里我们使用socket进行连接，处理协议和鉴定，这样就已经连接到了本机的代理，如果想要连接不同的主机，只要更改localhost为该主机的名称或IP地址即可。</p>
+
+<p>下一步，建立频道，大部分API的工作都在这完成。</p>
+
+<p>要想发送信息，需要声明一个队列，之后可以向这个队列里发布消息。</p>
+
+<pre><code>$channel-&gt;queue_declare('hello', false, false, false, false);
+
+$msg = new AMQPMessage('Hello World!');
+$channel-&gt;basic_publish($msg, '', 'hello');
+
+echo &quot; [x] Sent 'Hello World!'\n&quot;;
+
+</code></pre>
+
+<p>声明队列是幂等的 — 它仅在不存在的时候才会被创建，如果存在也不会受影响。消息内容是一个字节数组（byte array），所以可以发送任何内容。</p>
+
+<p>最后，关闭频道和连接。</p>
+
+<pre><code>$channel-&gt;close();
+$connection-&gt;close();
+</code></pre>
+
+<p><a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/send.php">这是send.php类的完整内容。</a></p>
+
+<h3>发送失败</h3>
+
+<p>如果这是第一次使用RabbitMQ，并且没有看到“Sent”信息（即“ [x] Sent &lsquo;Hello World!”），也许你抓耳挠腮的想知道为什么出错了，也许是代理没有足够的硬盘空间（默认情况下需要至少1G的空间）导致拒绝接收信息。检查日志文件，有必要的花调低限值。<a href="http://www.rabbitmq.com/configure.html#config-items">这个配置文件</a>文档将会展示给你如何设置disk_free_limit。</p>
+
+<h3>接收</h3>
+
+<p>收件人，与发送者只发送一条消息不同，接收者会一直运行以监听信息并输出。</p>
+
+<p><img src="/images/rabbitmq/receiving.png" alt="" /></p>
+
+<p>receive.php中与send.php中的 include和use 部分的代码一样。</p>
+
+<pre><code>require_once __DIR__ . '/vendor/autoload.php';
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+
+</code></pre>
+
+<p>设置连接与send.php一样，打开连接和频道，命名一个队列，需要注意的是，队列名需要与send.php所发布的队列的名字一致。</p>
+
+<pre><code>$connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest');
+$channel = $connection-&gt;channel();
+
+$channel-&gt;queue_declare('hello', false, false, false, false);
+
+echo ' [*] Waiting for messages. To exit press CTRL+C', &quot;\n&quot;;
+
+</code></pre>
+
+<p>注意，我们在此声明了一个队列，因为有可能会在send程序开启前先开启receive程序，我们想要确保在试着接收消息之前队列就已经存在了。</p>
+
+<p>下一步，告诉服务器去从队列传送消息，我们会定义一个用于从服务器接收消息的函数，记住，消息会异步的从服务器发送到客户端。</p>
+
+<pre><code>$callback = function($msg) {
+  echo &quot; [x] Received &quot;, $msg-&gt;body, &quot;\n&quot;;
+};
+
+$channel-&gt;basic_consume('hello', '', false, true, false, false, $callback);
+
+while(count($channel-&gt;callbacks)) {
+    $channel-&gt;wait();
+}
+</code></pre>
+
+<p>此处使用while方法，当收到消息时，会把收到的消息传入到$callback方法里。</p>
+
+<p><a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/receive.php">这是receive.php类的全部内容。</a></p>
+
+<p>现在我们可以运行两段脚本了，在命令行里，执行sender程序。</p>
+
+<pre><code>php send.php
+
+</code></pre>
+
+<p>然后，执行receiver程序</p>
+
+<pre><code>php receive.php
+
+</code></pre>
+
+<p>receiver程序会把通过sender程序发送的内容打印出来，receiver程序会一直运行，监听新消息（使用ctrl+c停止），所以试着运行sender程序从另一个命令行。</p>
+
+<p>如果想查看队列，可以运行rabbitmqctl list_queues。</p>
+
+<p>Hello World！</p>
+
+<p>查看第二部分，建立一个简单的队列。</p>
+
+<p>原文地址：<a href="https://www.rabbitmq.com/tutorials/tutorial-one-php.html">&ldquo;Hello World!&rdquo;</a></p>
+
+                    </div>
+                    <footer class="article-footer">
+                      <a href="https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html#comments" class="article-comment-link">Comments</a>
+                      
+                        <ul class="article-tag-list">
+                        
+                          <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="/tags/php">php</a>
+                          </li>
+                        
+                          <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="/tags/rabbitmq">rabbitmq</a>
+                          </li>
+                        
+                        </ul>
+                      
+                    </footer>
+                  </div>
+                  <nav id="article-nav">
+                    
+                    <a href="https://www.qichengzx.com/2016/04/17/php-rabbitmq-tutorial-two.html" id="article-nav-newer" class="article-nav-link-wrap">
+                      <strong class="article-nav-caption">Newer</strong>
+                      <div class="article-nav-title">
+                      PHP RabbitMQ 教程（二） - 工作队列
+                      </div>
+                    </a>
+                    
+
+                    
+                    <a href="https://www.qichengzx.com/2016/02/25/a-piece-of-interesting-code-of-js-for-function.html" id="article-nav-older" class="article-nav-link-wrap">
+                      <strong class="article-nav-caption">Older</strong>
+                      <div class="article-nav-title">
+                      一段有意思的JS For循环代码
+                      </div>
+                    </a>
+                    
+                  </nav>
+                </article>
+
+      
+      </section>
+      
+      
+            <aside id="sidebar">
+            
     
-  <div class="widget-wrap">
-    <h3 class="widget-title">Categories</h3>
-    <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/git/">git</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">22</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/nginx/">nginx</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">12</span></li></ul>
-    </div>
-  </div>
-
-  
+                <div class="widget-wrap">
+                  <h3 class="widget-title">Categories</h3>
+                  <div class="widget">
+                    <ul class="category-list">
+                      
+                      
+                      <li class="category-list-item">
+                        <a class="category-list-link" href="/categories/default/">default</a>
+                        <span class="category-list-count">7</span>
+                      </li>
+                      
+                      <li class="category-list-item">
+                        <a class="category-list-link" href="/categories/git/">git</a>
+                        <span class="category-list-count">3</span>
+                      </li>
+                      
+                      <li class="category-list-item">
+                        <a class="category-list-link" href="/categories/golang/">golang</a>
+                        <span class="category-list-count">22</span>
+                      </li>
+                      
+                      <li class="category-list-item">
+                        <a class="category-list-link" href="/categories/javascript/">javascript</a>
+                        <span class="category-list-count">7</span>
+                      </li>
+                      
+                      <li class="category-list-item">
+                        <a class="category-list-link" href="/categories/linux/">linux</a>
+                        <span class="category-list-count">1</span>
+                      </li>
+                      
+                      <li class="category-list-item">
+                        <a class="category-list-link" href="/categories/mysql/">mysql</a>
+                        <span class="category-list-count">4</span>
+                      </li>
+                      
+                      <li class="category-list-item">
+                        <a class="category-list-link" href="/categories/nginx/">nginx</a>
+                        <span class="category-list-count">1</span>
+                      </li>
+                      
+                      <li class="category-list-item">
+                        <a class="category-list-link" href="/categories/php/">php</a>
+                        <span class="category-list-count">12</span>
+                      </li>
+                      
+                    </ul>
+                  </div>
+                </div>
     
-  <div class="widget-wrap">
-    <h3 class="widget-title">Tags</h3>
-    <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Keygen/">Keygen</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/captcha/">captcha</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geo/">geo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">21</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/qq/">qq</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redigo/">redigo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
-    </div>
-  </div>
 
-  
+            
     
-  <div class="widget-wrap">
-    <h3 class="widget-title">Tag Cloud</h3>
-    <div class="widget tagcloud">
-      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/Keygen/" style="font-size: 10px;">Keygen</a> <a href="/tags/captcha/" style="font-size: 10px;">captcha</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/docker/" style="font-size: 11.43px;">docker</a> <a href="/tags/dropbox/" style="font-size: 11.43px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/geo/" style="font-size: 12.86px;">geo</a> <a href="/tags/gin/" style="font-size: 10px;">gin</a> <a href="/tags/git/" style="font-size: 12.86px;">git</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/go/" style="font-size: 20px;">go</a> <a href="/tags/goquery/" style="font-size: 11.43px;">goquery</a> <a href="/tags/hexo/" style="font-size: 12.86px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 12.86px;">javascript</a> <a href="/tags/js/" style="font-size: 11.43px;">js</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/leetcode/" style="font-size: 10px;">leetcode</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 17.14px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 18.57px;">php</a> <a href="/tags/qq/" style="font-size: 10px;">qq</a> <a href="/tags/rabbitmq/" style="font-size: 15.71px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redigo/" style="font-size: 12.86px;">redigo</a> <a href="/tags/redis/" style="font-size: 14.29px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/今日头条/" style="font-size: 10px;">今日头条</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/短网址/" style="font-size: 10px;">短网址</a> <a href="/tags/糗百/" style="font-size: 10px;">糗百</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
-    </div>
-  </div>
-
-  
+                <div class="widget-wrap">
+                  <h3 class="widget-title">Tags</h3>
+                  <div class="widget">
+                    <ul class="tag-list">
+                      
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/ECharts/">ECharts</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/Keygen/">Keygen</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/captcha/">captcha</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/crontab/">crontab</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/discuz/">discuz</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/docker/">docker</a>
+                        <span class="tag-list-count">2</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/dropbox/">dropbox</a>
+                        <span class="tag-list-count">2</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/excel/">excel</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/fetch/">fetch</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/geo/">geo</a>
+                        <span class="tag-list-count">3</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/gin/">gin</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/git/">git</a>
+                        <span class="tag-list-count">3</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/github/">github</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/go/">go</a>
+                        <span class="tag-list-count">21</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/goquery/">goquery</a>
+                        <span class="tag-list-count">2</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/hexo/">hexo</a>
+                        <span class="tag-list-count">3</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/https/">https</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/input/">input</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/javascript/">javascript</a>
+                        <span class="tag-list-count">3</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/js/">js</a>
+                        <span class="tag-list-count">2</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/laravel/">laravel</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/leetcode/">leetcode</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/linux/">linux</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/mysql/">mysql</a>
+                        <span class="tag-list-count">7</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/nginx/">nginx</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/node/">node</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/pdo/">pdo</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/php/">php</a>
+                        <span class="tag-list-count">14</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/qq/">qq</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a>
+                        <span class="tag-list-count">6</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/react-native/">react-native</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/redigo/">redigo</a>
+                        <span class="tag-list-count">3</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/redis/">redis</a>
+                        <span class="tag-list-count">5</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/ssl/">ssl</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/time/">time</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/vps/">vps</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/vue/">vue</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/widget/">widget</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/%e4%bb%8a%e6%97%a5%e5%a4%b4%e6%9d%a1/">今日头条</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/%e6%a0%87%e8%af%86%e7%ac%a6/">标识符</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/%e7%88%b1%e5%a5%87%e8%89%ba/">爱奇艺</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/%e7%9f%ad%e7%bd%91%e5%9d%80/">短网址</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/%e7%b3%97%e7%99%be/">糗百</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/%e7%bd%91%e7%bb%9c%e8%af%b7%e6%b1%82/">网络请求</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/%e9%98%9f%e5%88%97/">队列</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                    </ul>
+                  </div>
+                </div>
     
-  <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
-    </div>
-  </div>
 
-  
+            
     
-  <div class="widget-wrap">
-    <h3 class="widget-title">Recents</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/2019/01/01/go-in-the-browser.html">【译】Go和WebAssembly：在浏览器中运行Go程序</a>
-          </li>
-        
-          <li>
-            <a href="/2018/06/15/qq-007-captcha.html">腾讯防水墙验证码使用</a>
-          </li>
-        
-          <li>
-            <a href="/2018/05/29/git-pull-upstream.html">Git 同步上游源更改</a>
-          </li>
-        
-          <li>
-            <a href="/2018/05/13/create-a-single-page-app-with-go-echo-and-vue.html">【译】使用 Go，Echo 和 Vue 创建单页 TODO 应用</a>
-          </li>
-        
-          <li>
-            <a href="/2018/05/12/generating-random-keys-with-keygen.html">Keygen 包简介</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
+            <div class="widget-wrap">
+              <h3 class="widget-title">Archives</h3>
+              <div class="widget">
+                <ul class="archive-list">
+                  
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2015/11">2015/11</a>
+                    <span class="archive-list-count">7</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2015/12">2015/12</a>
+                    <span class="archive-list-count">4</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2016/01">2016/01</a>
+                    <span class="archive-list-count">3</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2016/02">2016/02</a>
+                    <span class="archive-list-count">4</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2016/04">2016/04</a>
+                    <span class="archive-list-count">4</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2016/05">2016/05</a>
+                    <span class="archive-list-count">3</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2016/07">2016/07</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2016/09">2016/09</a>
+                    <span class="archive-list-count">3</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2016/10">2016/10</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2016/11">2016/11</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2016/12">2016/12</a>
+                    <span class="archive-list-count">3</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2017/03">2017/03</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2017/06">2017/06</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2017/07">2017/07</a>
+                    <span class="archive-list-count">2</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2017/08">2017/08</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2017/09">2017/09</a>
+                    <span class="archive-list-count">3</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2017/11">2017/11</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2018/02">2018/02</a>
+                    <span class="archive-list-count">4</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2018/04">2018/04</a>
+                    <span class="archive-list-count">2</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2018/05">2018/05</a>
+                    <span class="archive-list-count">6</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2018/06">2018/06</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2019/01">2019/01</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
+                </ul>
+              </div>
+            </div>
+    
 
-  
-</aside>
-        
-      </div>
-      <footer id="footer">
-  
-  <div class="outer">
-    <div id="footer-info" class="inner">
-      &copy; 2019 qichengzx<br>
-      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
-      Hosted by <a href="https://www.vultr.com/?ref=7241986" target="_blank">Vultr</a>
+            
+    
+            <div class="widget-wrap">
+              <h3 class="widget-title">RECENTS</h3>
+              <div class="widget">
+                <ul>
+                  
+                  <li>
+                    <a href="https://www.qichengzx.com/2019/01/01/go-in-the-browser.html">【译】Go和WebAssembly：在浏览器中运行Go程序</a>
+                  </li>
+                  
+                  <li>
+                    <a href="https://www.qichengzx.com/2018/06/15/qq-007-captcha.html">腾讯防水墙验证码使用</a>
+                  </li>
+                  
+                  <li>
+                    <a href="https://www.qichengzx.com/2018/05/29/git-pull-upstream.html">Git 同步上游源更改</a>
+                  </li>
+                  
+                  <li>
+                    <a href="https://www.qichengzx.com/2018/05/13/create-a-single-page-app-with-go-echo-and-vue.html">【译】使用 Go，Echo 和 Vue 创建单页 TODO 应用</a>
+                  </li>
+                  
+                  <li>
+                    <a href="https://www.qichengzx.com/2018/05/12/generating-random-keys-with-keygen.html">Keygen 包简介</a>
+                  </li>
+                  
+                </ul>
+              </div>
+            </div>
+    
+
+            </aside>
+
+      
     </div>
+    
+        <footer id="footer">
+          <div class="outer">
+            <div id="footer-info" class="inner">
+              &copy; 2019 启程<br>
+              Powered by <a href="https://github.com/qichengzx/gopress" target="_blank">gopress</a>
+            </div>
+            </div>
+        </footer>
+
   </div>
-</footer>
-<script>
-var _hmt = _hmt || [];
-(function() {
-  var hm = document.createElement("script");
-  hm.src = "//hm.baidu.com/hm.js?199f8980952ead3f1af440507b4b2a7c";
-  var s = document.getElementsByTagName("script")[0]; 
-  s.parentNode.insertBefore(hm, s);
-})();
-</script>
-<script src="//tajs.qq.com/stats?sId=59998269"></script>
-    </div>
-    <nav id="mobile-nav">
   
-    <a href="/" class="mobile-nav-link">Home</a>
+<nav id="mobile-nav">
   
-    <a href="/archives" class="mobile-nav-link">Archives</a>
+  <a class="mobile-nav-link" href="/">Home</a>
+  
+  <a class="mobile-nav-link" href="/archives">Archives</a>
+  
+  <a class="mobile-nav-link" href="https://github.com">GitHub</a>
   
 </nav>
-    <script src="//cdn.bootcss.com/jquery/2.0.3/jquery.min.js"></script>
+
+  
+
+<script src="//cdn.bootcss.com/jquery/2.0.3/jquery.min.js"></script>
 
 
-  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
-  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
 
 
 <script src="/js/script.js"></script>
 
-  </div>
+
+</div>
 </body>
 </html>

@@ -1,310 +1,901 @@
+
 <!DOCTYPE html>
 <html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="UTF-8">
+<title>
+
   
-  <title>Go 福利小爬虫 爬取今日头条美女图 | 启程</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta http-equiv="Access-Control-Allow-Origin" content="*">
-  <meta name="description" content="写完爬取糗百热门后没几天，又开始写了爬取今日头条图片的工具。 灵感来源于Python 福利小爬虫，爬取今日头条街拍美女图，作者很详细的分析了今日头条一个搜索接口，并列出了步骤。 而我用Go写的，稍稍做了改动，加入了可以自定义爬取标签的功能，并在写本文前完成了以 “标签/文章名/图片名” 结构存储图片的功能。 分析网页依然使用goquery。 分析接口返回结构1234567891011121314">
-<meta name="keywords" content="go,goquery,今日头条">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Go 福利小爬虫 爬取今日头条美女图">
-<meta property="og:url" content="https://www.qichengzx.com/2016/12/14/toutiao-images-spider-by-golang.html">
+  Go 福利小爬虫 爬取今日头条美女图 - 启程
+
+</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<link href="/css/style.css" rel="stylesheet" type="text/css">
+<meta property="og:type" content="website">
+<meta property="og:title" content="启程">
+<meta property="og:url" content="https://www.qichengzx.com">
 <meta property="og:site_name" content="启程">
-<meta property="og:description" content="写完爬取糗百热门后没几天，又开始写了爬取今日头条图片的工具。 灵感来源于Python 福利小爬虫，爬取今日头条街拍美女图，作者很详细的分析了今日头条一个搜索接口，并列出了步骤。 而我用Go写的，稍稍做了改动，加入了可以自定义爬取标签的功能，并在写本文前完成了以 “标签/文章名/图片名” 结构存储图片的功能。 分析网页依然使用goquery。 分析接口返回结构1234567891011121314">
-<meta property="og:image" content="https://www.qichengzx.com/images/go/toutiao.gif">
-<meta property="og:updated_time" content="2019-01-08T13:15:32.475Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Go 福利小爬虫 爬取今日头条美女图">
-<meta name="twitter:description" content="写完爬取糗百热门后没几天，又开始写了爬取今日头条图片的工具。 灵感来源于Python 福利小爬虫，爬取今日头条街拍美女图，作者很详细的分析了今日头条一个搜索接口，并列出了步骤。 而我用Go写的，稍稍做了改动，加入了可以自定义爬取标签的功能，并在写本文前完成了以 “标签/文章名/图片名” 结构存储图片的功能。 分析网页依然使用goquery。 分析接口返回结构1234567891011121314">
-<meta name="twitter:image" content="https://www.qichengzx.com/images/go/toutiao.gif">
-<meta name="twitter:creator" content="@qichengzx">
-  
-    <link rel="alternative" href="/atom.xml" title="启程" type="application/atom+xml">
-  
-  
-    <link rel="icon" href="/favicon.png">
-  
-  <link rel="stylesheet" href="/css/style.css">
-  
+<meta property="og:description" content="记录写代码过程中的成长，不要把你仅知道的那一点点东西当成全世界">
+<link rel="icon" href="/favicon.ico">
 
 </head>
 <body>
-  <div id="container">
-    <div id="wrap">
-      <header id="header">
-  <div id="banner"></div>
-  <div id="header-outer" class="outer">
-    <div id="header-title" class="inner">
-      <h1 id="logo-wrap">
-        <a href="/" id="logo">启程</a>
-      </h1>
-      
-    </div>
-    <div id="header-inner" class="inner">
-      <nav id="main-nav">
-        <a id="main-nav-toggle" class="nav-icon"></a>
-        
-          <a class="main-nav-link" href="/">Home</a>
-        
-          <a class="main-nav-link" href="/archives">Archives</a>
-        
-      </nav>
-      <nav id="sub-nav">
-        
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
-        
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
-      </nav>
-      <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://www.qichengzx.com"></form>
-      </div>
-    </div>
-  </div>
-</header>
-      <div class="outer">
-        <section id="main"><article id="post-toutiao-images-spider-by-golang" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2016/12/14/toutiao-images-spider-by-golang.html" class="article-date">
-  <time datetime="2016-12-14T08:28:36.000Z" itemprop="datePublished">2016-12-14</time>
-</a>
+<div id="container">
+  <div id="wrap">
     
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/golang/">golang</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 class="article-title" itemprop="name">
-      Go 福利小爬虫 爬取今日头条美女图
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><img src="/images/go/toutiao.gif" alt=""></p>
-<p>写完爬取糗百热门后没几天，又开始写了爬取今日头条图片的<a href="https://github.com/qichengzx/toutiaoSpider" target="_blank" rel="external">工具</a>。</p>
-<p>灵感来源于<a href="http://www.jianshu.com/p/d67b1d4b99ad" target="_blank" rel="external">Python 福利小爬虫，爬取今日头条街拍美女图</a>，作者很详细的分析了今日头条一个搜索接口，并列出了步骤。</p>
-<p>而我用Go写的，稍稍做了改动，加入了可以自定义爬取标签的功能，并在写本文前完成了以 “标签/文章名/图片名” 结构存储图片的功能。</p>
-<p>分析网页依然使用<a href="https://github.com/PuerkitoBio/goquery" target="_blank" rel="external">goquery</a>。</p>
-<h3 id="分析接口返回结构"><a href="#分析接口返回结构" class="headerlink" title="分析接口返回结构"></a>分析接口返回结构</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">	<span class="attr">"count"</span>: <span class="number">30</span>,</div><div class="line">	<span class="attr">"action_label"</span>: <span class="string">"click_search"</span>,</div><div class="line">	<span class="attr">"return_count"</span>: <span class="number">0</span>,</div><div class="line">	<span class="attr">"has_more"</span>: <span class="number">0</span>,</div><div class="line">	<span class="attr">"page_id"</span>: <span class="string">"/search/"</span>,</div><div class="line">	<span class="attr">"cur_tab"</span>: <span class="number">1</span>,</div><div class="line">	<span class="attr">"offset"</span>: <span class="number">150</span>,</div><div class="line">	<span class="attr">"action_label_web"</span>: <span class="string">"click_search"</span>,</div><div class="line">	<span class="attr">"show_tabs"</span>: <span class="number">1</span>,</div><div class="line">	<span class="attr">"data"</span>: [</div><div class="line">		&#123;</div><div class="line">			<span class="attr">"play_effective_count"</span>: <span class="string">"6412"</span>,</div><div class="line">			<span class="attr">"media_name"</span>: <span class="string">"开物志"</span>,</div><div class="line">			<span class="attr">"repin_count"</span>: <span class="number">49</span>,</div><div class="line">			<span class="attr">"ban_comment"</span>: <span class="number">0</span>,</div><div class="line">			<span class="attr">"show_play_effective_count"</span>: <span class="number">1</span>,</div><div class="line">			<span class="attr">"abstract"</span>: <span class="string">""</span>,</div><div class="line">			<span class="attr">"display_title"</span>: <span class="string">""</span>,</div><div class="line">			<span class="attr">"datetime"</span>: <span class="string">"2016-12-13 21:35"</span>,</div><div class="line">			<span class="attr">"article_type"</span>: <span class="number">0</span>,</div><div class="line">			<span class="attr">"more_mode"</span>: <span class="literal">false</span>,</div><div class="line">			<span class="attr">"create_time"</span>: <span class="number">1481636117</span>,</div><div class="line">			<span class="attr">"has_m3u8_video"</span>: <span class="number">0</span>,</div><div class="line">			<span class="attr">"keywords"</span>: <span class="string">""</span>,</div><div class="line">			<span class="attr">"video_duration"</span>: <span class="number">161</span>,</div><div class="line">			<span class="attr">"has_mp4_video"</span>: <span class="number">0</span>,</div><div class="line">			<span class="attr">"favorite_count"</span>: <span class="number">49</span>,</div><div class="line">			<span class="attr">"aggr_type"</span>: <span class="number">0</span>,</div><div class="line">			<span class="attr">"article_sub_type"</span>: <span class="number">0</span>,</div><div class="line">			<span class="attr">"bury_count"</span>: <span class="number">2</span>,</div><div class="line">			<span class="attr">"title"</span>: <span class="string">"沃尔沃Tier 4 Final大型引擎的工作原理揭秘"</span>,</div><div class="line">			<span class="attr">"has_video"</span>: <span class="literal">true</span>,</div><div class="line">			<span class="attr">"share_url"</span>: <span class="string">"http://toutiao.com/group/6363577276176531969/?iid=0&amp;app=news_article"</span>,</div><div class="line">			<span class="attr">"id"</span>: <span class="number">6363577276176532000</span>,</div><div class="line">			<span class="attr">"source"</span>: <span class="string">"开物志"</span>,</div><div class="line">			<span class="attr">"comment_count"</span>: <span class="number">4</span>,</div><div class="line">			<span class="attr">"article_url"</span>: <span class="string">"http://toutiao.com/group/6363577276176531969/"</span>,</div><div class="line">			<span class="attr">"image_url"</span>: <span class="string">"http://p3.pstatp.com/list/12f0000909de79ceeabc"</span>,</div><div class="line">			<span class="attr">"middle_mode"</span>: <span class="literal">true</span>,</div><div class="line">			<span class="attr">"large_mode"</span>: <span class="literal">false</span>,</div><div class="line">			<span class="attr">"item_source_url"</span>: <span class="string">"/group/6363577276176531969/"</span>,</div><div class="line">			<span class="attr">"media_url"</span>: <span class="string">"http://toutiao.com/m6643043415/"</span>,</div><div class="line">			<span class="attr">"display_time"</span>: <span class="number">1481635793</span>,</div><div class="line">			<span class="attr">"publish_time"</span>: <span class="number">1481635793</span>,</div><div class="line">			<span class="attr">"go_detail_count"</span>: <span class="number">2290</span>,</div><div class="line">			<span class="attr">"image_list"</span>: [],</div><div class="line">			<span class="attr">"item_seo_url"</span>: <span class="string">"/group/6363577276176531969/"</span>,</div><div class="line">			<span class="attr">"video_duration_str"</span>: <span class="string">"02:41"</span>,</div><div class="line">			<span class="attr">"source_url"</span>: <span class="string">"/group/6363577276176531969/"</span>,</div><div class="line">			<span class="attr">"tag_id"</span>: <span class="number">6363577276176532000</span>,</div><div class="line">			<span class="attr">"natant_level"</span>: <span class="number">0</span>,</div><div class="line">			<span class="attr">"seo_url"</span>: <span class="string">"/group/6363577276176531969/"</span>,</div><div class="line">			<span class="attr">"display_url"</span>: <span class="string">"http://toutiao.com/group/6363577276176531969/"</span>,</div><div class="line">			<span class="attr">"url"</span>: <span class="string">"http://toutiao.com/group/6363577276176531969/"</span>,</div><div class="line">			<span class="attr">"level"</span>: <span class="number">0</span>,</div><div class="line">			<span class="attr">"digg_count"</span>: <span class="number">4</span>,</div><div class="line">			<span class="attr">"behot_time"</span>: <span class="number">1481635793</span>,</div><div class="line">			<span class="attr">"tag"</span>: <span class="string">"news_car"</span>,</div><div class="line">			<span class="attr">"has_gallery"</span>: <span class="literal">false</span>,</div><div class="line">			<span class="attr">"has_image"</span>: <span class="literal">false</span>,</div><div class="line">			<span class="attr">"highlight"</span>: &#123;</div><div class="line">			<span class="attr">"source"</span>: [],</div><div class="line">			<span class="attr">"abstract"</span>: [],</div><div class="line">			<span class="attr">"title"</span>: []</div><div class="line">			&#125;,</div><div class="line">			<span class="attr">"group_id"</span>: <span class="number">6363577276176532000</span>,</div><div class="line">			<span class="attr">"middle_image"</span>: <span class="string">"http://p3.pstatp.com/list/12f0000909de79ceeabc"</span></div><div class="line">		&#125;,</div><div class="line">	],</div><div class="line">	<span class="attr">"message"</span>: <span class="string">"success"</span>,</div><div class="line">	<span class="attr">"action_label_pgc"</span>: <span class="string">"click_search"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>嗯，特别多，其实只需要 data 里的内容就可以了。</p>
-<p>所以</p>
-<h4 id="构造一个请求结果的struct。"><a href="#构造一个请求结果的struct。" class="headerlink" title="构造一个请求结果的struct。"></a>构造一个请求结果的struct。</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">type</span> ApiData <span class="keyword">struct</span> &#123;</div><div class="line">	Has_more <span class="keyword">int</span>    <span class="string">`json:"has_more"`</span></div><div class="line">	Data     []Data <span class="string">`json:"data"`</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>再看下data里，嗯，没用的又一大堆。</p>
-<h4 id="只需要文章链接就够了。"><a href="#只需要文章链接就够了。" class="headerlink" title="只需要文章链接就够了。"></a>只需要文章链接就够了。</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">type</span> Data <span class="keyword">struct</span> &#123;</div><div class="line">	Article_url <span class="keyword">string</span> <span class="string">`json:"article_url"`</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>有了文章链接，那就好说了，啥都好商量。</p>
-<h4 id="分析文章结构"><a href="#分析文章结构" class="headerlink" title="分析文章结构"></a>分析文章结构</h4><p>id=”J_content” 下是文章的主要内容，class=”article-title”是文章标题，class=”article-content”里是文章内容，只需要article-content里所有img元素就可以了。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">type</span> Img <span class="keyword">struct</span> &#123;</div><div class="line">	Src <span class="keyword">string</span> <span class="string">`json:"src"`</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>由于需要一直更改查询接口的offset参数，所以直接把接口地址拿到外边做了全局变量。并且默认存在下一页。tag用来表示当前爬取的标签的名称。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> (</div><div class="line">	host    <span class="keyword">string</span> = <span class="string">"http://www.toutiao.com/search_content/?format=json&amp;keyword=%s&amp;count=30&amp;offset=%d"</span></div><div class="line">	hasmore <span class="keyword">bool</span>   = <span class="literal">true</span></div><div class="line">	tag     <span class="keyword">string</span></div><div class="line">)</div></pre></td></tr></table></figure>
-<h3 id="正菜"><a href="#正菜" class="headerlink" title="正菜"></a>正菜</h3><h4 id="0-接收参数"><a href="#0-接收参数" class="headerlink" title="0. 接收参数"></a>0. 接收参数</h4><p>首先，接收并遍历命令行中传入的标签。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</div><div class="line">	<span class="keyword">for</span> _, tag = <span class="keyword">range</span> os.Args[<span class="number">1</span>:] &#123;</div><div class="line">		hasmore = <span class="literal">true</span></div><div class="line">		getByTag()</div><div class="line">	&#125;</div><div class="line">	log.Println(<span class="string">"全部抓取完毕"</span>)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>每个循环开始时重置 hasmore 。</p>
-<h4 id="1-循环请求接口"><a href="#1-循环请求接口" class="headerlink" title="1. 循环请求接口"></a>1. 循环请求接口</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">getByTag</span><span class="params">()</span></span> &#123;</div><div class="line">	i, offset := <span class="number">1</span>, <span class="number">0</span></div><div class="line">	<span class="keyword">for</span> &#123;</div><div class="line">		<span class="keyword">if</span> hasmore &#123;</div><div class="line">			log.Printf(<span class="string">"标签: '%s'，第 '%d' 页, OFFSET: '%d' \n"</span>, tag, i, offset)</div><div class="line">			tmpUrl := fmt.Sprintf(host, tag, offset)</div><div class="line">			getResFromApi(tmpUrl)</div><div class="line">			offset += <span class="number">30</span></div><div class="line">			i++</div><div class="line"></div><div class="line">			time.Sleep(<span class="number">500</span> * time.Millisecond)</div><div class="line">		&#125; <span class="keyword">else</span> &#123;</div><div class="line">			<span class="keyword">break</span></div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	log.Printf(<span class="string">"标签: '%s', 共 %v 页，爬取完毕\n"</span>, tag, i<span class="number">-1</span>)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>重置当前页，和当前offset。页数从第一页开始，主要是显示进度看起来更人性化一些。但是程序员的世界是从0开始。。。想改成0就改成0吧。</p>
-<p>hasmore = true 表示存在下一页，使用fmt包的Sprintf方法格式化请求链接。然后对offset+30，对当前页i+1。再之后停顿了500毫秒。</p>
-<p>这里其实有个问题，如果实际内容以每页30请求，可能恰好有150条，即每页数量的整数倍，但是这个时候接口返回的has_more依然等于1，即服务端认为还有下一页。。。但是其实没有了，所以会有一次空循环。</p>
-<h4 id="2-处理请求结果"><a href="#2-处理请求结果" class="headerlink" title="2. 处理请求结果"></a>2. 处理请求结果</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">getResFromApi</span><span class="params">(url <span class="keyword">string</span>)</span></span> &#123;</div><div class="line">	resp, err := http.Get(url)</div><div class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</div><div class="line">		log.Fatal(err)</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="keyword">defer</span> resp.Body.Close()</div><div class="line">	body, err := ioutil.ReadAll(resp.Body)</div><div class="line"></div><div class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</div><div class="line">		log.Fatal(err)</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="keyword">var</span> res ApiData</div><div class="line">	json.Unmarshal([]<span class="keyword">byte</span>(<span class="keyword">string</span>(body)), &amp;res)</div><div class="line"></div><div class="line">	<span class="keyword">for</span> _, item := <span class="keyword">range</span> res.Data &#123;</div><div class="line">		getImgByPage(item.Article_url)</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="keyword">if</span> res.Has_more == <span class="number">0</span> &#123;</div><div class="line">		hasmore = <span class="literal">false</span></div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>没啥说的，拿到每一个请求接口的链接后打开，把结果数组中的data解析到ApiData中，于是就拿到了文章链接，然后遍历处理。</p>
-<p>遍历完后要看下has_more的值，如果为0表示没有下一页了，修改全局变量hasmore的值，结束最外层的循环。</p>
-<h4 id="3-处理文章"><a href="#3-处理文章" class="headerlink" title="3. 处理文章"></a>3. 处理文章</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">getImgByPage</span><span class="params">(url <span class="keyword">string</span>)</span></span> &#123;</div><div class="line">	<span class="comment">//部分请求结果中包含其他网站的链接，会导致下面的query出现问题</span></div><div class="line">	<span class="keyword">if</span> strings.Contains(url, <span class="string">"toutiao.com"</span>) &#123;</div><div class="line">		doc, err := goquery.NewDocument(url)</div><div class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</div><div class="line">			log.Fatal(err)</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		title := doc.Find(<span class="string">"#article-main .article-title"</span>).Text()</div><div class="line">		title = strings.Replace(title, <span class="string">"/"</span>, <span class="string">""</span>, <span class="number">-1</span>)</div><div class="line">		os.MkdirAll(tag+<span class="string">"/"</span>+title, <span class="number">0777</span>)</div><div class="line"></div><div class="line">		doc.Find(<span class="string">"#J_content .article-content img"</span>).Each(<span class="function"><span class="keyword">func</span><span class="params">(i <span class="keyword">int</span>, s *goquery.Selection)</span></span> &#123;</div><div class="line">			src, _ := s.Attr(<span class="string">"src"</span>)</div><div class="line">			log.Println(title, src)</div><div class="line">			getImgAndSave(src, title)</div><div class="line">		&#125;)</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>最外层加了判断，是因为有一部分结果的链接是其他网站的。。。。</p>
-<p>虽然这个判断很low，但是也够用了。</p>
-<p>然后终于该用上goquery了，拿到标题，然后遍历文章内容中的img标签，就拿到了每一篇文章的每一张图片。</p>
-<h4 id="4-保存图片"><a href="#4-保存图片" class="headerlink" title="4. 保存图片"></a>4. 保存图片</h4><p>在上一步把图片地址和文章名称传递给了getImgAndSave。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">getImgAndSave</span><span class="params">(url <span class="keyword">string</span>, dirname <span class="keyword">string</span>)</span></span> &#123;</div><div class="line">	path := strings.Split(url, <span class="string">"/"</span>)</div><div class="line">	<span class="keyword">var</span> name <span class="keyword">string</span></div><div class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(path) &gt; <span class="number">1</span> &#123;</div><div class="line">		name = path[<span class="built_in">len</span>(path)<span class="number">-1</span>]</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	resp, err := http.Get(url)</div><div class="line">	<span class="keyword">defer</span> resp.Body.Close()</div><div class="line"></div><div class="line">	<span class="keyword">if</span> resp.StatusCode != http.StatusOK &#123;</div><div class="line">		log.Fatal(<span class="string">"请求失败"</span>, err)</div><div class="line">		<span class="keyword">return</span></div><div class="line">	&#125;</div><div class="line"></div><div class="line">	contents, err := ioutil.ReadAll(resp.Body)</div><div class="line">	<span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</div><div class="line">		<span class="keyword">if</span> x := <span class="built_in">recover</span>(); x != <span class="literal">nil</span> &#123;</div><div class="line">			<span class="keyword">return</span></div><div class="line">		&#125;</div><div class="line">	&#125;()</div><div class="line">	err = ioutil.WriteFile(<span class="string">"./"</span>+tag+<span class="string">"/"</span>+dirname+<span class="string">"/"</span>+name+<span class="string">".jpg"</span>, contents, <span class="number">0644</span>)</div><div class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</div><div class="line">		log.Fatal(<span class="string">"写入文件失败"</span>, err)</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>先分割图片链接，把最后一个”/“后的内容当成文件名。</p>
-<p>后边get图片内容，但是有时候会出现对方服务器出错的情况，http状态码为500，所以加了判断请求是否成功的判断。</p>
-<p>然后就是读取内容，保存到文件中了。</p>
-<p>这里使用了WriteFile方式，查资料的时候还看到有闲Create文件，然后io.Copy写入的。</p>
-<h4 id="到这里就结束了。"><a href="#到这里就结束了。" class="headerlink" title="到这里就结束了。"></a>到这里就结束了。</h4><h3 id="RUN"><a href="#RUN" class="headerlink" title="RUN"></a>RUN</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">go run main.go 美女 模特</div></pre></td></tr></table></figure>
-<p>等着看图吧。</p>
-<p>github地址：<a href="https://github.com/qichengzx/toutiaoSpider" target="_blank" rel="external">toutiaoSpider</a>，欢迎star。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://www.qichengzx.com/2016/12/14/toutiao-images-spider-by-golang.html" data-id="cjsso1nnv0048kh0refe77cxk" class="article-share-link">Share</a>
-      
-        <a href="https://www.qichengzx.com/2016/12/14/toutiao-images-spider-by-golang.html#comments" class="article-comment-link">Comments</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/">go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/goquery/">goquery</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/今日头条/">今日头条</a></li></ul>
-
-    </footer>
-  </div>
-  
-    
-<nav id="article-nav">
-  
-    <a href="/2016/12/27/shortlen-url-by-go.html" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Newer</strong>
-      <div class="article-nav-title">
-        
-          Go语言写的一个短网址服务
-        
-      </div>
-    </a>
-  
-  
-    <a href="/2016/12/04/go-qiubai.html" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">Go语言写爬取糗百热门帖子</div>
-    </a>
-  
-</nav>
-
-  
-</article></section>
-        
-          <aside id="sidebar">
-  
-      <div class="widget-wrap">
-    <h3 class="widget-title">Time</h3>
-    <div class="widget time">
-      <style id="clock-animations"></style>
-      <div class="clock-wrapper">
-        <div class="clock-base">
-            <div class="clock-indicator">
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
+        <header id="header">
+          <div id="banner"></div>
+          <div id="header-outer" class="outer">
+            <div id="header-title" class="inner">
+              <h1 id="logo-wrap">
+                <a href="https://www.qichengzx.com" id="logo">启程</a>
+              </h1>
+              
             </div>
-            <div class="clock-hour"></div>
-            <div class="clock-minute"></div>
-            <div class="clock-second"></div>
-            <div class="clock-center"></div>
-        </div>
-      </div>
-    </div>
-  </div>
+            <div id="header-inner" class="inner">
+              <nav id="main-nav">
+                <a id="main-nav-toggle" class="nav-icon"></a>
+                
+                <a class="main-nav-link" href="/">Home</a>
+                
+                <a class="main-nav-link" href="/archives">Archives</a>
+                
+                <a class="main-nav-link" href="https://github.com">GitHub</a>
+                
+              </nav>
+              <nav id="sub-nav">
+              
+                <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+              </nav>
+              <div id="search-form-wrap">
+                <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form">
+                  <input type="search" name="q" class="search-form-input" placeholder="Search">
+                  <button type="submit" class="search-form-submit">&#xF002;</button>
+                  <input type="hidden" name="sitesearch" value="https://www.qichengzx.com">
+                </form>
+              </div>
+            </div>
+          </div>
+        </header>
 
-  
+    <div class="outer">
+      <section id="main">
+      
+        
+                <article id="a613e354bbefc581f5bedca0a0968c2d" class="article" itemscope itemprop="blogPost">
+                  <div class="article-meta">
+                    <a href="https://www.qichengzx.com/2016/12/14/toutiao-images-spider-by-golang.html" class="article-date">
+                      <time itemprop="datePublished">2016-12-14 16:28:36</time>
+                    </a>
+                    <div class="article-category">
+                      <a class="article-category-link" href="/categories/golang">golang</a>
+                    </div>
+                  </div>
+                  <div class="article-inner">
+                    <header class="article-header">
+                      <h1 itemprop="name">
+                        <a class="article-title" href="https://www.qichengzx.com/2016/12/14/toutiao-images-spider-by-golang.html">Go 福利小爬虫 爬取今日头条美女图</a>
+                      </h1>
+                    </header>
+                    <div class="article-entry" itemprop="articleBody">
+                      <p><img src="/images/go/toutiao.gif" alt="" /></p>
+
+<p>写完爬取糗百热门后没几天，又开始写了爬取今日头条图片的<a href="https://github.com/qichengzx/toutiaoSpider">工具</a>。</p>
+
+<p>灵感来源于<a href="http://www.jianshu.com/p/d67b1d4b99ad">Python 福利小爬虫，爬取今日头条街拍美女图</a>，作者很详细的分析了今日头条一个搜索接口，并列出了步骤。</p>
+
+<p>而我用Go写的，稍稍做了改动，加入了可以自定义爬取标签的功能，并在写本文前完成了以 &ldquo;标签/文章名/图片名&rdquo; 结构存储图片的功能。</p>
+
+<p>分析网页依然使用<a href="https://github.com/PuerkitoBio/goquery">goquery</a>。</p>
+
+<h3>分析接口返回结构</h3>
+
+<pre><code class="language-json">{
+	&quot;count&quot;: 30,
+	&quot;action_label&quot;: &quot;click_search&quot;,
+	&quot;return_count&quot;: 0,
+	&quot;has_more&quot;: 0,
+	&quot;page_id&quot;: &quot;/search/&quot;,
+	&quot;cur_tab&quot;: 1,
+	&quot;offset&quot;: 150,
+	&quot;action_label_web&quot;: &quot;click_search&quot;,
+	&quot;show_tabs&quot;: 1,
+	&quot;data&quot;: [
+		{
+			&quot;play_effective_count&quot;: &quot;6412&quot;,
+			&quot;media_name&quot;: &quot;开物志&quot;,
+			&quot;repin_count&quot;: 49,
+			&quot;ban_comment&quot;: 0,
+			&quot;show_play_effective_count&quot;: 1,
+			&quot;abstract&quot;: &quot;&quot;,
+			&quot;display_title&quot;: &quot;&quot;,
+			&quot;datetime&quot;: &quot;2016-12-13 21:35&quot;,
+			&quot;article_type&quot;: 0,
+			&quot;more_mode&quot;: false,
+			&quot;create_time&quot;: 1481636117,
+			&quot;has_m3u8_video&quot;: 0,
+			&quot;keywords&quot;: &quot;&quot;,
+			&quot;video_duration&quot;: 161,
+			&quot;has_mp4_video&quot;: 0,
+			&quot;favorite_count&quot;: 49,
+			&quot;aggr_type&quot;: 0,
+			&quot;article_sub_type&quot;: 0,
+			&quot;bury_count&quot;: 2,
+			&quot;title&quot;: &quot;沃尔沃Tier 4 Final大型引擎的工作原理揭秘&quot;,
+			&quot;has_video&quot;: true,
+			&quot;share_url&quot;: &quot;http://toutiao.com/group/6363577276176531969/?iid=0&amp;app=news_article&quot;,
+			&quot;id&quot;: 6363577276176532000,
+			&quot;source&quot;: &quot;开物志&quot;,
+			&quot;comment_count&quot;: 4,
+			&quot;article_url&quot;: &quot;http://toutiao.com/group/6363577276176531969/&quot;,
+			&quot;image_url&quot;: &quot;http://p3.pstatp.com/list/12f0000909de79ceeabc&quot;,
+			&quot;middle_mode&quot;: true,
+			&quot;large_mode&quot;: false,
+			&quot;item_source_url&quot;: &quot;/group/6363577276176531969/&quot;,
+			&quot;media_url&quot;: &quot;http://toutiao.com/m6643043415/&quot;,
+			&quot;display_time&quot;: 1481635793,
+			&quot;publish_time&quot;: 1481635793,
+			&quot;go_detail_count&quot;: 2290,
+			&quot;image_list&quot;: [],
+			&quot;item_seo_url&quot;: &quot;/group/6363577276176531969/&quot;,
+			&quot;video_duration_str&quot;: &quot;02:41&quot;,
+			&quot;source_url&quot;: &quot;/group/6363577276176531969/&quot;,
+			&quot;tag_id&quot;: 6363577276176532000,
+			&quot;natant_level&quot;: 0,
+			&quot;seo_url&quot;: &quot;/group/6363577276176531969/&quot;,
+			&quot;display_url&quot;: &quot;http://toutiao.com/group/6363577276176531969/&quot;,
+			&quot;url&quot;: &quot;http://toutiao.com/group/6363577276176531969/&quot;,
+			&quot;level&quot;: 0,
+			&quot;digg_count&quot;: 4,
+			&quot;behot_time&quot;: 1481635793,
+			&quot;tag&quot;: &quot;news_car&quot;,
+			&quot;has_gallery&quot;: false,
+			&quot;has_image&quot;: false,
+			&quot;highlight&quot;: {
+			&quot;source&quot;: [],
+			&quot;abstract&quot;: [],
+			&quot;title&quot;: []
+			},
+			&quot;group_id&quot;: 6363577276176532000,
+			&quot;middle_image&quot;: &quot;http://p3.pstatp.com/list/12f0000909de79ceeabc&quot;
+		},
+	],
+	&quot;message&quot;: &quot;success&quot;,
+	&quot;action_label_pgc&quot;: &quot;click_search&quot;
+}
+</code></pre>
+
+<p>嗯，特别多，其实只需要 data 里的内容就可以了。</p>
+
+<p>所以</p>
+
+<h4>构造一个请求结果的struct。</h4>
+
+<pre><code class="language-go">type ApiData struct {
+	Has_more int    `json:&quot;has_more&quot;`
+	Data     []Data `json:&quot;data&quot;`
+}
+</code></pre>
+
+<p>再看下data里，嗯，没用的又一大堆。</p>
+
+<h4>只需要文章链接就够了。</h4>
+
+<pre><code class="language-go">type Data struct {
+	Article_url string `json:&quot;article_url&quot;`
+}
+</code></pre>
+
+<p>有了文章链接，那就好说了，啥都好商量。</p>
+
+<h4>分析文章结构</h4>
+
+<p>id=&ldquo;J_content&rdquo; 下是文章的主要内容，class=&ldquo;article-title&rdquo;是文章标题，class=&ldquo;article-content&rdquo;里是文章内容，只需要article-content里所有img元素就可以了。</p>
+
+<pre><code class="language-go">type Img struct {
+	Src string `json:&quot;src&quot;`
+}
+</code></pre>
+
+<p>由于需要一直更改查询接口的offset参数，所以直接把接口地址拿到外边做了全局变量。并且默认存在下一页。tag用来表示当前爬取的标签的名称。</p>
+
+<pre><code class="language-go">var (
+	host    string = &quot;http://www.toutiao.com/search_content/?format=json&amp;keyword=%s&amp;count=30&amp;offset=%d&quot;
+	hasmore bool   = true
+	tag     string
+)
+</code></pre>
+
+<h3>正菜</h3>
+
+<h4>0. 接收参数</h4>
+
+<p>首先，接收并遍历命令行中传入的标签。</p>
+
+<pre><code class="language-go">func main() {
+	for _, tag = range os.Args[1:] {
+		hasmore = true
+		getByTag()
+	}
+	log.Println(&quot;全部抓取完毕&quot;)
+}
+</code></pre>
+
+<p>每个循环开始时重置 hasmore 。</p>
+
+<h4>1. 循环请求接口</h4>
+
+<pre><code class="language-go">func getByTag() {
+	i, offset := 1, 0
+	for {
+		if hasmore {
+			log.Printf(&quot;标签: '%s'，第 '%d' 页, OFFSET: '%d' \n&quot;, tag, i, offset)
+			tmpUrl := fmt.Sprintf(host, tag, offset)
+			getResFromApi(tmpUrl)
+			offset += 30
+			i++
+
+			time.Sleep(500 * time.Millisecond)
+		} else {
+			break
+		}
+	}
+	log.Printf(&quot;标签: '%s', 共 %v 页，爬取完毕\n&quot;, tag, i-1)
+}
+</code></pre>
+
+<p>重置当前页，和当前offset。页数从第一页开始，主要是显示进度看起来更人性化一些。但是程序员的世界是从0开始。。。想改成0就改成0吧。</p>
+
+<p>hasmore = true 表示存在下一页，使用fmt包的Sprintf方法格式化请求链接。然后对offset+30，对当前页i+1。再之后停顿了500毫秒。</p>
+
+<p>这里其实有个问题，如果实际内容以每页30请求，可能恰好有150条，即每页数量的整数倍，但是这个时候接口返回的has_more依然等于1，即服务端认为还有下一页。。。但是其实没有了，所以会有一次空循环。</p>
+
+<h4>2. 处理请求结果</h4>
+
+<pre><code class="language-go">func getResFromApi(url string) {
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var res ApiData
+	json.Unmarshal([]byte(string(body)), &amp;res)
+
+	for _, item := range res.Data {
+		getImgByPage(item.Article_url)
+	}
+
+	if res.Has_more == 0 {
+		hasmore = false
+	}
+}
+</code></pre>
+
+<p>没啥说的，拿到每一个请求接口的链接后打开，把结果数组中的data解析到ApiData中，于是就拿到了文章链接，然后遍历处理。</p>
+
+<p>遍历完后要看下has_more的值，如果为0表示没有下一页了，修改全局变量hasmore的值，结束最外层的循环。</p>
+
+<h4>3. 处理文章</h4>
+
+<pre><code class="language-go">func getImgByPage(url string) {
+	//部分请求结果中包含其他网站的链接，会导致下面的query出现问题
+	if strings.Contains(url, &quot;toutiao.com&quot;) {
+		doc, err := goquery.NewDocument(url)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		title := doc.Find(&quot;#article-main .article-title&quot;).Text()
+		title = strings.Replace(title, &quot;/&quot;, &quot;&quot;, -1)
+		os.MkdirAll(tag+&quot;/&quot;+title, 0777)
+
+		doc.Find(&quot;#J_content .article-content img&quot;).Each(func(i int, s *goquery.Selection) {
+			src, _ := s.Attr(&quot;src&quot;)
+			log.Println(title, src)
+			getImgAndSave(src, title)
+		})
+	}
+}
+
+</code></pre>
+
+<p>最外层加了判断，是因为有一部分结果的链接是其他网站的。。。。</p>
+
+<p>虽然这个判断很low，但是也够用了。</p>
+
+<p>然后终于该用上goquery了，拿到标题，然后遍历文章内容中的img标签，就拿到了每一篇文章的每一张图片。</p>
+
+<h4>4. 保存图片</h4>
+
+<p>在上一步把图片地址和文章名称传递给了getImgAndSave。</p>
+
+<pre><code class="language-go">func getImgAndSave(url string, dirname string) {
+	path := strings.Split(url, &quot;/&quot;)
+	var name string
+	if len(path) &gt; 1 {
+		name = path[len(path)-1]
+	}
+
+	resp, err := http.Get(url)
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		log.Fatal(&quot;请求失败&quot;, err)
+		return
+	}
+
+	contents, err := ioutil.ReadAll(resp.Body)
+	defer func() {
+		if x := recover(); x != nil {
+			return
+		}
+	}()
+	err = ioutil.WriteFile(&quot;./&quot;+tag+&quot;/&quot;+dirname+&quot;/&quot;+name+&quot;.jpg&quot;, contents, 0644)
+	if err != nil {
+		log.Fatal(&quot;写入文件失败&quot;, err)
+	}
+}
+</code></pre>
+
+<p>先分割图片链接，把最后一个&rdquo;/&ldquo;后的内容当成文件名。</p>
+
+<p>后边get图片内容，但是有时候会出现对方服务器出错的情况，http状态码为500，所以加了判断请求是否成功的判断。</p>
+
+<p>然后就是读取内容，保存到文件中了。</p>
+
+<p>这里使用了WriteFile方式，查资料的时候还看到有闲Create文件，然后io.Copy写入的。</p>
+
+<h4>到这里就结束了。</h4>
+
+<h3>RUN</h3>
+
+<pre><code>go run main.go 美女 模特
+</code></pre>
+
+<p>等着看图吧。</p>
+
+<p>github地址：<a href="https://github.com/qichengzx/toutiaoSpider">toutiaoSpider</a>，欢迎star。</p>
+
+                    </div>
+                    <footer class="article-footer">
+                      <a href="https://www.qichengzx.com/2016/12/14/toutiao-images-spider-by-golang.html#comments" class="article-comment-link">Comments</a>
+                      
+                        <ul class="article-tag-list">
+                        
+                          <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="/tags/go">go</a>
+                          </li>
+                        
+                          <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="/tags/%e4%bb%8a%e6%97%a5%e5%a4%b4%e6%9d%a1">今日头条</a>
+                          </li>
+                        
+                          <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="/tags/goquery">goquery</a>
+                          </li>
+                        
+                        </ul>
+                      
+                    </footer>
+                  </div>
+                  <nav id="article-nav">
+                    
+                    <a href="https://www.qichengzx.com/2016/12/27/shortlen-url-by-go.html" id="article-nav-newer" class="article-nav-link-wrap">
+                      <strong class="article-nav-caption">Newer</strong>
+                      <div class="article-nav-title">
+                      Go语言写的一个短网址服务
+                      </div>
+                    </a>
+                    
+
+                    
+                    <a href="https://www.qichengzx.com/2016/12/04/go-qiubai.html" id="article-nav-older" class="article-nav-link-wrap">
+                      <strong class="article-nav-caption">Older</strong>
+                      <div class="article-nav-title">
+                      Go语言写爬取糗百热门帖子
+                      </div>
+                    </a>
+                    
+                  </nav>
+                </article>
+
+      
+      </section>
+      
+      
+            <aside id="sidebar">
+            
     
-  <div class="widget-wrap">
-    <h3 class="widget-title">Categories</h3>
-    <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/git/">git</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">22</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/javascript/">javascript</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/">linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/nginx/">nginx</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/php/">php</a><span class="category-list-count">12</span></li></ul>
-    </div>
-  </div>
-
-  
+                <div class="widget-wrap">
+                  <h3 class="widget-title">Categories</h3>
+                  <div class="widget">
+                    <ul class="category-list">
+                      
+                      
+                      <li class="category-list-item">
+                        <a class="category-list-link" href="/categories/default/">default</a>
+                        <span class="category-list-count">7</span>
+                      </li>
+                      
+                      <li class="category-list-item">
+                        <a class="category-list-link" href="/categories/git/">git</a>
+                        <span class="category-list-count">3</span>
+                      </li>
+                      
+                      <li class="category-list-item">
+                        <a class="category-list-link" href="/categories/golang/">golang</a>
+                        <span class="category-list-count">22</span>
+                      </li>
+                      
+                      <li class="category-list-item">
+                        <a class="category-list-link" href="/categories/javascript/">javascript</a>
+                        <span class="category-list-count">7</span>
+                      </li>
+                      
+                      <li class="category-list-item">
+                        <a class="category-list-link" href="/categories/linux/">linux</a>
+                        <span class="category-list-count">1</span>
+                      </li>
+                      
+                      <li class="category-list-item">
+                        <a class="category-list-link" href="/categories/mysql/">mysql</a>
+                        <span class="category-list-count">4</span>
+                      </li>
+                      
+                      <li class="category-list-item">
+                        <a class="category-list-link" href="/categories/nginx/">nginx</a>
+                        <span class="category-list-count">1</span>
+                      </li>
+                      
+                      <li class="category-list-item">
+                        <a class="category-list-link" href="/categories/php/">php</a>
+                        <span class="category-list-count">12</span>
+                      </li>
+                      
+                    </ul>
+                  </div>
+                </div>
     
-  <div class="widget-wrap">
-    <h3 class="widget-title">Tags</h3>
-    <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECharts/">ECharts</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Keygen/">Keygen</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/captcha/">captcha</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crontab/">crontab</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/discuz/">discuz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dropbox/">dropbox</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/excel/">excel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/fetch/">fetch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/geo/">geo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin/">gin</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">21</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/goquery/">goquery</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/">https</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/input/">input</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/">js</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/laravel/">laravel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node/">node</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pdo/">pdo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/qq/">qq</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react-native/">react-native</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redigo/">redigo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/">ssl</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/time/">time</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vps/">vps</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/widget/">widget</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/今日头条/">今日头条</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/标识符/">标识符</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爱奇艺/">爱奇艺</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/短网址/">短网址</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/糗百/">糗百</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/网络请求/">网络请求</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/队列/">队列</a><span class="tag-list-count">1</span></li></ul>
-    </div>
-  </div>
 
-  
+            
     
-  <div class="widget-wrap">
-    <h3 class="widget-title">Tag Cloud</h3>
-    <div class="widget tagcloud">
-      <a href="/tags/ECharts/" style="font-size: 10px;">ECharts</a> <a href="/tags/Keygen/" style="font-size: 10px;">Keygen</a> <a href="/tags/captcha/" style="font-size: 10px;">captcha</a> <a href="/tags/crontab/" style="font-size: 10px;">crontab</a> <a href="/tags/discuz/" style="font-size: 10px;">discuz</a> <a href="/tags/docker/" style="font-size: 11.43px;">docker</a> <a href="/tags/dropbox/" style="font-size: 11.43px;">dropbox</a> <a href="/tags/excel/" style="font-size: 10px;">excel</a> <a href="/tags/fetch/" style="font-size: 10px;">fetch</a> <a href="/tags/geo/" style="font-size: 12.86px;">geo</a> <a href="/tags/gin/" style="font-size: 10px;">gin</a> <a href="/tags/git/" style="font-size: 12.86px;">git</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/go/" style="font-size: 20px;">go</a> <a href="/tags/goquery/" style="font-size: 11.43px;">goquery</a> <a href="/tags/hexo/" style="font-size: 12.86px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/input/" style="font-size: 10px;">input</a> <a href="/tags/javascript/" style="font-size: 12.86px;">javascript</a> <a href="/tags/js/" style="font-size: 11.43px;">js</a> <a href="/tags/laravel/" style="font-size: 10px;">laravel</a> <a href="/tags/leetcode/" style="font-size: 10px;">leetcode</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/mysql/" style="font-size: 17.14px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/node/" style="font-size: 10px;">node</a> <a href="/tags/pdo/" style="font-size: 10px;">pdo</a> <a href="/tags/php/" style="font-size: 18.57px;">php</a> <a href="/tags/qq/" style="font-size: 10px;">qq</a> <a href="/tags/rabbitmq/" style="font-size: 15.71px;">rabbitmq</a> <a href="/tags/react-native/" style="font-size: 10px;">react-native</a> <a href="/tags/redigo/" style="font-size: 12.86px;">redigo</a> <a href="/tags/redis/" style="font-size: 14.29px;">redis</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/time/" style="font-size: 10px;">time</a> <a href="/tags/vps/" style="font-size: 10px;">vps</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a> <a href="/tags/widget/" style="font-size: 10px;">widget</a> <a href="/tags/今日头条/" style="font-size: 10px;">今日头条</a> <a href="/tags/标识符/" style="font-size: 10px;">标识符</a> <a href="/tags/爱奇艺/" style="font-size: 10px;">爱奇艺</a> <a href="/tags/短网址/" style="font-size: 10px;">短网址</a> <a href="/tags/糗百/" style="font-size: 10px;">糗百</a> <a href="/tags/网络请求/" style="font-size: 10px;">网络请求</a> <a href="/tags/队列/" style="font-size: 10px;">队列</a>
-    </div>
-  </div>
-
-  
+                <div class="widget-wrap">
+                  <h3 class="widget-title">Tags</h3>
+                  <div class="widget">
+                    <ul class="tag-list">
+                      
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/ECharts/">ECharts</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/Keygen/">Keygen</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/captcha/">captcha</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/crontab/">crontab</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/discuz/">discuz</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/docker/">docker</a>
+                        <span class="tag-list-count">2</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/dropbox/">dropbox</a>
+                        <span class="tag-list-count">2</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/excel/">excel</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/fetch/">fetch</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/geo/">geo</a>
+                        <span class="tag-list-count">3</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/gin/">gin</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/git/">git</a>
+                        <span class="tag-list-count">3</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/github/">github</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/go/">go</a>
+                        <span class="tag-list-count">21</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/goquery/">goquery</a>
+                        <span class="tag-list-count">2</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/hexo/">hexo</a>
+                        <span class="tag-list-count">3</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/https/">https</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/input/">input</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/javascript/">javascript</a>
+                        <span class="tag-list-count">3</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/js/">js</a>
+                        <span class="tag-list-count">2</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/laravel/">laravel</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/leetcode/">leetcode</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/linux/">linux</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/mysql/">mysql</a>
+                        <span class="tag-list-count">7</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/nginx/">nginx</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/node/">node</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/pdo/">pdo</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/php/">php</a>
+                        <span class="tag-list-count">14</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/qq/">qq</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/rabbitmq/">rabbitmq</a>
+                        <span class="tag-list-count">6</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/react-native/">react-native</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/redigo/">redigo</a>
+                        <span class="tag-list-count">3</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/redis/">redis</a>
+                        <span class="tag-list-count">5</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/ssl/">ssl</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/time/">time</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/vps/">vps</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/vue/">vue</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/widget/">widget</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/%e4%bb%8a%e6%97%a5%e5%a4%b4%e6%9d%a1/">今日头条</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/%e6%a0%87%e8%af%86%e7%ac%a6/">标识符</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/%e7%88%b1%e5%a5%87%e8%89%ba/">爱奇艺</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/%e7%9f%ad%e7%bd%91%e5%9d%80/">短网址</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/%e7%b3%97%e7%99%be/">糗百</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/%e7%bd%91%e7%bb%9c%e8%af%b7%e6%b1%82/">网络请求</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/%e9%98%9f%e5%88%97/">队列</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                    </ul>
+                  </div>
+                </div>
     
-  <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">July 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a><span class="archive-list-count">7</span></li></ul>
-    </div>
-  </div>
 
-  
+            
     
-  <div class="widget-wrap">
-    <h3 class="widget-title">Recents</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/2019/01/01/go-in-the-browser.html">【译】Go和WebAssembly：在浏览器中运行Go程序</a>
-          </li>
-        
-          <li>
-            <a href="/2018/06/15/qq-007-captcha.html">腾讯防水墙验证码使用</a>
-          </li>
-        
-          <li>
-            <a href="/2018/05/29/git-pull-upstream.html">Git 同步上游源更改</a>
-          </li>
-        
-          <li>
-            <a href="/2018/05/13/create-a-single-page-app-with-go-echo-and-vue.html">【译】使用 Go，Echo 和 Vue 创建单页 TODO 应用</a>
-          </li>
-        
-          <li>
-            <a href="/2018/05/12/generating-random-keys-with-keygen.html">Keygen 包简介</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
+            <div class="widget-wrap">
+              <h3 class="widget-title">Archives</h3>
+              <div class="widget">
+                <ul class="archive-list">
+                  
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2015/11">2015/11</a>
+                    <span class="archive-list-count">7</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2015/12">2015/12</a>
+                    <span class="archive-list-count">4</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2016/01">2016/01</a>
+                    <span class="archive-list-count">3</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2016/02">2016/02</a>
+                    <span class="archive-list-count">4</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2016/04">2016/04</a>
+                    <span class="archive-list-count">4</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2016/05">2016/05</a>
+                    <span class="archive-list-count">3</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2016/07">2016/07</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2016/09">2016/09</a>
+                    <span class="archive-list-count">3</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2016/10">2016/10</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2016/11">2016/11</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2016/12">2016/12</a>
+                    <span class="archive-list-count">3</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2017/03">2017/03</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2017/06">2017/06</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2017/07">2017/07</a>
+                    <span class="archive-list-count">2</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2017/08">2017/08</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2017/09">2017/09</a>
+                    <span class="archive-list-count">3</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2017/11">2017/11</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2018/02">2018/02</a>
+                    <span class="archive-list-count">4</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2018/04">2018/04</a>
+                    <span class="archive-list-count">2</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2018/05">2018/05</a>
+                    <span class="archive-list-count">6</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2018/06">2018/06</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2019/01">2019/01</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
+                </ul>
+              </div>
+            </div>
+    
 
-  
-</aside>
-        
-      </div>
-      <footer id="footer">
-  
-  <div class="outer">
-    <div id="footer-info" class="inner">
-      &copy; 2019 qichengzx<br>
-      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
-      Hosted by <a href="https://www.vultr.com/?ref=7241986" target="_blank">Vultr</a>
+            
+    
+            <div class="widget-wrap">
+              <h3 class="widget-title">RECENTS</h3>
+              <div class="widget">
+                <ul>
+                  
+                  <li>
+                    <a href="https://www.qichengzx.com/2019/01/01/go-in-the-browser.html">【译】Go和WebAssembly：在浏览器中运行Go程序</a>
+                  </li>
+                  
+                  <li>
+                    <a href="https://www.qichengzx.com/2018/06/15/qq-007-captcha.html">腾讯防水墙验证码使用</a>
+                  </li>
+                  
+                  <li>
+                    <a href="https://www.qichengzx.com/2018/05/29/git-pull-upstream.html">Git 同步上游源更改</a>
+                  </li>
+                  
+                  <li>
+                    <a href="https://www.qichengzx.com/2018/05/13/create-a-single-page-app-with-go-echo-and-vue.html">【译】使用 Go，Echo 和 Vue 创建单页 TODO 应用</a>
+                  </li>
+                  
+                  <li>
+                    <a href="https://www.qichengzx.com/2018/05/12/generating-random-keys-with-keygen.html">Keygen 包简介</a>
+                  </li>
+                  
+                </ul>
+              </div>
+            </div>
+    
+
+            </aside>
+
+      
     </div>
+    
+        <footer id="footer">
+          <div class="outer">
+            <div id="footer-info" class="inner">
+              &copy; 2019 启程<br>
+              Powered by <a href="https://github.com/qichengzx/gopress" target="_blank">gopress</a>
+            </div>
+            </div>
+        </footer>
+
   </div>
-</footer>
-<script>
-var _hmt = _hmt || [];
-(function() {
-  var hm = document.createElement("script");
-  hm.src = "//hm.baidu.com/hm.js?199f8980952ead3f1af440507b4b2a7c";
-  var s = document.getElementsByTagName("script")[0]; 
-  s.parentNode.insertBefore(hm, s);
-})();
-</script>
-<script src="//tajs.qq.com/stats?sId=59998269"></script>
-    </div>
-    <nav id="mobile-nav">
   
-    <a href="/" class="mobile-nav-link">Home</a>
+<nav id="mobile-nav">
   
-    <a href="/archives" class="mobile-nav-link">Archives</a>
+  <a class="mobile-nav-link" href="/">Home</a>
+  
+  <a class="mobile-nav-link" href="/archives">Archives</a>
+  
+  <a class="mobile-nav-link" href="https://github.com">GitHub</a>
   
 </nav>
-    <script src="//cdn.bootcss.com/jquery/2.0.3/jquery.min.js"></script>
+
+  
+
+<script src="//cdn.bootcss.com/jquery/2.0.3/jquery.min.js"></script>
 
 
-  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
-  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
 
 
 <script src="/js/script.js"></script>
 
-  </div>
+
+</div>
 </body>
 </html>
