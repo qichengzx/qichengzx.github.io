@@ -64,6 +64,215 @@
       
         
         
+                <article id="20dc7a4d7acd076d813c37a19293c4e1" class="article" itemscope itemprop="blogPost">
+                  <div class="article-meta">
+                    <a href="https://www.qichengzx.com/2016/09/16/convert-xml-to-json-in-golang.html" class="article-date">
+                      <time itemprop="datePublished">2016-09-16 11:28:20</time>
+                    </a>
+                    <div class="article-category">
+                      <a class="article-category-link" href="/categories/golang">golang</a>
+                    </div>
+                  </div>
+                  <div class="article-inner">
+                    <header class="article-header">
+                      <h1 itemprop="name">
+                        <a class="article-title" href="https://www.qichengzx.com/2016/09/16/convert-xml-to-json-in-golang.html">Golang XMl 转 JSON</a>
+                      </h1>
+                    </header>
+                    <div class="article-entry" itemprop="articleBody">
+                      <p><img src="/images/golang.png" alt="" /></p>
+
+<h4>起因</h4>
+
+<p>某个上古时代的API，依然在返回XML格式的数据，更奇葩的是，GBK格式的。</p>
+
+<p>用Go顺利的写到了发送数据，接收数据，然后取值有点麻烦啊。。。。</p>
+
+<p>各种Google后，终于解决，但是不保证是唯一，正确，最合适的答案。</p>
+
+<h4>说在前边</h4>
+
+<p>本文假设要解析的XMl数据为：</p>
+
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;GBK&quot; ?&gt;
+&lt;response&gt;
+    &lt;status&gt;200&lt;/status&gt;
+&lt;/response&gt;
+</code></pre>
+
+<p>要解决的问题是取出“200”这个状态值。</p>
+
+<h4>导入包</h4>
+
+<p>解析XML使用了&rdquo;encoding/xml&rdquo;这个包。</p>
+
+<p>所以先导入这个包。</p>
+
+<pre><code class="language-go">import &quot;encoding/xml&quot;
+</code></pre>
+
+<h4>定义struct</h4>
+
+<p>定义一个自定义类型的Response</p>
+
+<pre><code class="language-go">type Response struct {
+    Status int `xml:&quot;status&quot; json:&quot;status&quot;`
+}
+</code></pre>
+
+<p>定义一个Response类型的变量</p>
+
+<pre><code class="language-go">var result Response
+</code></pre>
+
+<h4>偷懒转格式</h4>
+
+<p>因为&rdquo;encoding/xml&rdquo;不支持GBK格式的XML，而返回的内容又固定标明了编码是GBK，所以这里偷懒，直接把GBK替换成UTF-8，本例中不影响结果。</p>
+
+<pre><code class="language-go">xmlstr := `?xml version=&quot;1.0&quot; encoding=&quot;GBK&quot; ?&gt;
+&lt;response&gt;
+    &lt;status&gt;200&lt;/status&gt;
+&lt;/response&gt;
+`
+xmlstr = strings.Replace(xmlstr, &quot;GBK&quot;, &quot;UTF-8&quot;, -1)
+</code></pre>
+
+<p>使用strings包，替换“GBK”，相信根据参数顺序能看出各个参数的意义，最后一个参数：-1，为替换全部，即字符串中所有出现的第二个参数全部替换。</p>
+
+<h4>解析，转换，取值</h4>
+
+<p>使用encoding/jon，go-simplejson包</p>
+
+<pre><code class="language-go">//解析XML
+err := xml.Unmarshal([]byte(xmlstr), &amp;result)
+
+if nil != err {
+  log.Fatal(err)
+}
+log.Printf(&quot;XML:%v \n&quot;, result) 
+
+//转换成JSON
+res, err := json.Marshal(result)
+
+if nil != err {
+  log.Fatal(err)
+}
+log.Printf(&quot;JSON:%s \n&quot;, res)
+
+js, err := simplejson.NewJson([]byte(res))
+
+if nil != err {
+  log.Fatal(err)
+}
+status, err := js.Get(&quot;status&quot;).Int()
+
+log.Printf(&quot;STATUS:%v \n&quot;, status)
+</code></pre>
+
+<p>以上是本人在处理XML 转 JSON 时的解决办法，应该还有更简单更合适的方案。仅供参考。</p>
+
+<h4>完整代码：</h4>
+
+<pre><code class="language-go">package main
+import (
+    &quot;encoding/xml&quot;
+    &quot;encoding/json&quot;
+    &quot;log&quot;
+    &quot;strings&quot;
+    simplejson &quot;github.com/bitly/go-simplejson&quot;
+)
+type Response struct {
+    Status int `xml:&quot;status&quot; json:&quot;status&quot;`
+}
+
+func main() {
+    
+    var result Response
+
+    //多行字符串，使用反引号`
+    xmlstr := `&lt;?xml version=&quot;1.0&quot; encoding=&quot;GBK&quot; ?&gt;
+&lt;response&gt;
+    &lt;status&gt;200&lt;/status&gt;
+&lt;/response&gt;`
+
+    xmlstr = strings.Replace(xmlstr, &quot;GBK&quot;, &quot;UTF-8&quot;, -1)
+
+    err := xml.Unmarshal([]byte(xmlstr), &amp;result)
+    if err != nil {
+        log.Fatal(err)
+    }
+    log.Printf(&quot;XML:%v&quot;,result)
+
+    r, err := json.Marshal(result)
+    if nil != err {
+        log.Fatal(err)
+    }
+
+    log.Printf(&quot;JSON:%s&quot;, r)
+
+    js, err := simplejson.NewJson([]byte(r))
+
+    if nil != err {
+        log.Fatal(err)
+    }
+    status, err := js.Get(&quot;status&quot;).Int()
+    log.Printf(&quot;VALUE:%v&quot;,status)
+
+}
+</code></pre>
+
+<h4>发现问题：</h4>
+
+<p>今天（2016-09-18），再看这段代码，发现跟另一个程序里有些不一样。</p>
+
+<p>另一个程序里是这样的：</p>
+
+<pre><code>type Response struct {
+    Status int `xml:&quot;status&quot;
+}
+</code></pre>
+
+<p>也可以正常返回值，但是在本文中的示例却不能正常输出status值，而是会输出空，看了半天发现，使用 log 时：</p>
+
+<pre><code>log.Printf(&quot;VALUE:%v&quot;,status)
+</code></pre>
+
+<p>如果struct没有写
+“json:&ldquo;status&rdquo;”，就不能输出，如果换成fmt，struct就可以不写“json:&ldquo;status&rdquo;。结果是一样的，其中的原因还要再查资料研究下。</p>
+
+<p>参考文章：</p>
+
+<p><a href="http://blog.studygolang.com/2012/12/%e6%a0%87%e5%87%86%e5%ba%93-xml%e5%a4%84%e7%90%86%ef%bc%88%e4%b8%80%ef%bc%89/">标准库—XML处理（一）</a></p>
+
+<p><a href="https://play.golang.org/p/7HNLEUnX-m">https://play.golang.org/p/7HNLEUnX-m</a></p>
+
+<p><a href="https://play.golang.org/p/m99B12RaLe">https://play.golang.org/p/m99B12RaLe</a></p>
+
+<p><a href="https://astaxie.gitbooks.io/build-web-application-with-golang/content/zh/07.1.html">XML处理</a></p>
+
+                    </div>
+                    <footer class="article-footer">
+                      <a href="https://www.qichengzx.com/2016/09/16/convert-xml-to-json-in-golang.html#comments" class="article-comment-link">Comments</a>
+                      
+                        <ul class="article-tag-list">
+                        
+                          <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="/tags/go">go</a>
+                          </li>
+                        
+                        </ul>
+                      
+                    </footer>
+                  </div>
+                  <nav id="article-nav">
+                    
+
+                    
+                  </nav>
+                </article>
+
+        
+        
                 <article id="67d9fcb5042c673afa2a38584d6f61e4" class="article" itemscope itemprop="blogPost">
                   <div class="article-meta">
                     <a href="https://www.qichengzx.com/2016/09/11/Hello-Go.html" class="article-date">
@@ -1818,229 +2027,6 @@ $connection-&gt;close();
                 </article>
 
         
-        
-                <article id="26e041e47801b0b67683255fa56c4cfd" class="article" itemscope itemprop="blogPost">
-                  <div class="article-meta">
-                    <a href="https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html" class="article-date">
-                      <time itemprop="datePublished">2016-02-28 11:10:03</time>
-                    </a>
-                    <div class="article-category">
-                      <a class="article-category-link" href="/categories/php">php</a>
-                    </div>
-                  </div>
-                  <div class="article-inner">
-                    <header class="article-header">
-                      <h1 itemprop="name">
-                        <a class="article-title" href="https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html">PHP RabbitMQ 教程（一） - 介绍</a>
-                      </h1>
-                    </header>
-                    <div class="article-entry" itemprop="articleBody">
-                      <h2>准备工作</h2>
-
-<h3>先决条件</h3>
-
-<p>本教程先决条件是RabbitMQ已经安装并正在以5672端口运行在 localhost，如果你使用了不同的域，端口，用户，密码，连接配置需要适当改变。</p>
-
-<h3>获得帮助</h3>
-
-<p>如果在本教程中遇到问题，可以通过邮件列表进行联系。</p>
-
-<h3>介绍</h3>
-
-<p>RabbitMQ是一个消息代理，它的本质是，从producers（生产者）接收消息，然后发送给consumers（消费者），在这个过程中，可以根据自己的配置规则使用路由，缓冲区，保存消息。</p>
-
-<p>通常的，RabbitMQ，信息传送（messaging），使用一些专业术语。（RabbitMQ, and messaging in general, uses some jargon.）</p>
-
-<pre><code>&gt;生产（Producing）仅仅意味着发送，发送信息的程序叫做生产者（producers），以下图表示：
-</code></pre>
-
-<p><img src="/images/rabbitmq/producer.png" alt="" /></p>
-
-<pre><code>&gt;队列就是一个信箱的名字，存在于RabbitMQ内部，虽然消息在RabbitMQ和你的应用之间传输，但是只能存在于队列里，队列没有大小限制，它可以存储尽可能多的消息，本质上它是一个无限大的缓冲区，多个producers（生产者）可以通过一个队列发送消息，多个consumers（消费者）也可以尝试从一个队列接收消息，队列以下图表示，队列的名字在图的上边：
-</code></pre>
-
-<p><img src="/images/rabbitmq/queue.png" alt="" /></p>
-
-<pre><code>&gt;consumers（消费者）的意思与接收相似，消费者主要是等待接收消息的程序，以下图表示：
-</code></pre>
-
-<p><img src="/images/rabbitmq/consumer.png" alt="" /></p>
-
-<p>需要注意的是，生产者，消费者，和代理，不需要一定在一台机器上，事实上在大多数情况下他们确实不在一台机器上。</p>
-
-<h3>“Hello World”</h3>
-
-<p>（使用<a href="https://github.com/php-amqplib/php-amqplib">php-amqplib</a>库）</p>
-
-<p>在这一部分，我们使用PHP写两段程序，一个生产者发送一条消息，一个消费者接收消息并打印出来。我们会忽略一些php-amqplib API的细节，从简单的事情开始学习，这是一段内容为“Hello World”的消息。</p>
-
-<p>在下边的示意图中，“P”是生产者，“C”是消费者，中间的盒子是队列 — 一个RabbitMQ代表消费者的消息缓冲区。</p>
-
-<p><img src="/images/rabbitmq/python-one.png" alt="" /></p>
-
-<h4>php-amqplib库</h4>
-
-<p>RabbitMQ支持很多协议，本教程包含AMQP 0-9-1，一个开放，通用信息协议，RabbitMQ支持Python、Ruby、.NET、Java、JMS、C、PHP、ActionScript、XMPP、STOMP等多种语言（详见<a href="http://www.rabbitmq.com/devtools.html">这里</a>），在本教程中我们使用php-amqplib，使用<a href="https://getcomposer.org/doc/00-intro.md">Composer</a> 管理依赖。</p>
-
-<p>添加一个composer.json文件到你的项目目录。</p>
-
-<pre><code>{
-    &quot;require&quot;: {
-        &quot;php-amqplib/php-amqplib&quot;: &quot;2.5.*&quot;
-    }
-}
-</code></pre>
-
-<p>如果你已经安装了 Composer ，可以运行如下的代码：</p>
-
-<pre><code>composer.phar install
-</code></pre>
-
-<p>这是一个Windows系统下的Composer安装文件。</p>
-
-<p>现在我们已经安装了php-amqplib，可以写程序了。</p>
-
-<h3>发送</h3>
-
-<p><img src="/images/rabbitmq/sending.png" alt="" /></p>
-
-<p>新建一个send.php作为发送端，receive.php作为接收端，发送端会连接RabbitMQ，发送一条信息，然后退出。</p>
-
-<p>在send.php中，需要引用php-amqplib库，和使用其中的一些必要的类。</p>
-
-<pre><code>require_once __DIR__ . '/vendor/autoload.php';
-use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Message\AMQPMessage;
-
-</code></pre>
-
-<p>接下来，建立到RabbitMQ服务器的连接：</p>
-
-<pre><code>$connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest');
-$channel = $connection-&gt;channel();
-
-</code></pre>
-
-<p>这里我们使用socket进行连接，处理协议和鉴定，这样就已经连接到了本机的代理，如果想要连接不同的主机，只要更改localhost为该主机的名称或IP地址即可。</p>
-
-<p>下一步，建立频道，大部分API的工作都在这完成。</p>
-
-<p>要想发送信息，需要声明一个队列，之后可以向这个队列里发布消息。</p>
-
-<pre><code>$channel-&gt;queue_declare('hello', false, false, false, false);
-
-$msg = new AMQPMessage('Hello World!');
-$channel-&gt;basic_publish($msg, '', 'hello');
-
-echo &quot; [x] Sent 'Hello World!'\n&quot;;
-
-</code></pre>
-
-<p>声明队列是幂等的 — 它仅在不存在的时候才会被创建，如果存在也不会受影响。消息内容是一个字节数组（byte array），所以可以发送任何内容。</p>
-
-<p>最后，关闭频道和连接。</p>
-
-<pre><code>$channel-&gt;close();
-$connection-&gt;close();
-</code></pre>
-
-<p><a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/send.php">这是send.php类的完整内容。</a></p>
-
-<h3>发送失败</h3>
-
-<p>如果这是第一次使用RabbitMQ，并且没有看到“Sent”信息（即“ [x] Sent &lsquo;Hello World!”），也许你抓耳挠腮的想知道为什么出错了，也许是代理没有足够的硬盘空间（默认情况下需要至少1G的空间）导致拒绝接收信息。检查日志文件，有必要的花调低限值。<a href="http://www.rabbitmq.com/configure.html#config-items">这个配置文件</a>文档将会展示给你如何设置disk_free_limit。</p>
-
-<h3>接收</h3>
-
-<p>收件人，与发送者只发送一条消息不同，接收者会一直运行以监听信息并输出。</p>
-
-<p><img src="/images/rabbitmq/receiving.png" alt="" /></p>
-
-<p>receive.php中与send.php中的 include和use 部分的代码一样。</p>
-
-<pre><code>require_once __DIR__ . '/vendor/autoload.php';
-use PhpAmqpLib\Connection\AMQPStreamConnection;
-
-</code></pre>
-
-<p>设置连接与send.php一样，打开连接和频道，命名一个队列，需要注意的是，队列名需要与send.php所发布的队列的名字一致。</p>
-
-<pre><code>$connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest');
-$channel = $connection-&gt;channel();
-
-$channel-&gt;queue_declare('hello', false, false, false, false);
-
-echo ' [*] Waiting for messages. To exit press CTRL+C', &quot;\n&quot;;
-
-</code></pre>
-
-<p>注意，我们在此声明了一个队列，因为有可能会在send程序开启前先开启receive程序，我们想要确保在试着接收消息之前队列就已经存在了。</p>
-
-<p>下一步，告诉服务器去从队列传送消息，我们会定义一个用于从服务器接收消息的函数，记住，消息会异步的从服务器发送到客户端。</p>
-
-<pre><code>$callback = function($msg) {
-  echo &quot; [x] Received &quot;, $msg-&gt;body, &quot;\n&quot;;
-};
-
-$channel-&gt;basic_consume('hello', '', false, true, false, false, $callback);
-
-while(count($channel-&gt;callbacks)) {
-    $channel-&gt;wait();
-}
-</code></pre>
-
-<p>此处使用while方法，当收到消息时，会把收到的消息传入到$callback方法里。</p>
-
-<p><a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/receive.php">这是receive.php类的全部内容。</a></p>
-
-<p>现在我们可以运行两段脚本了，在命令行里，执行sender程序。</p>
-
-<pre><code>php send.php
-
-</code></pre>
-
-<p>然后，执行receiver程序</p>
-
-<pre><code>php receive.php
-
-</code></pre>
-
-<p>receiver程序会把通过sender程序发送的内容打印出来，receiver程序会一直运行，监听新消息（使用ctrl+c停止），所以试着运行sender程序从另一个命令行。</p>
-
-<p>如果想查看队列，可以运行rabbitmqctl list_queues。</p>
-
-<p>Hello World！</p>
-
-<p>查看第二部分，建立一个简单的队列。</p>
-
-<p>原文地址：<a href="https://www.rabbitmq.com/tutorials/tutorial-one-php.html">&ldquo;Hello World!&rdquo;</a></p>
-
-                    </div>
-                    <footer class="article-footer">
-                      <a href="https://www.qichengzx.com/2016/02/28/php-rabbitmq-tutorial-one.html#comments" class="article-comment-link">Comments</a>
-                      
-                        <ul class="article-tag-list">
-                        
-                          <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="/tags/php">php</a>
-                          </li>
-                        
-                          <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="/tags/rabbitmq">rabbitmq</a>
-                          </li>
-                        
-                        </ul>
-                      
-                    </footer>
-                  </div>
-                  <nav id="article-nav">
-                    
-
-                    
-                  </nav>
-                </article>
-
-        
 
         
         
@@ -2115,7 +2101,7 @@ while(count($channel-&gt;callbacks)) {
                       
                       <li class="category-list-item">
                         <a class="category-list-link" href="/categories/golang/">golang</a>
-                        <span class="category-list-count">22</span>
+                        <span class="category-list-count">23</span>
                       </li>
                       
                       <li class="category-list-item">
@@ -2223,7 +2209,7 @@ while(count($channel-&gt;callbacks)) {
                       
                       <li class="tag-list-item">
                         <a class="tag-list-link" href="/tags/go/">go</a>
-                        <span class="tag-list-count">21</span>
+                        <span class="tag-list-count">22</span>
                       </li>
                       
                       <li class="tag-list-item">
@@ -2504,6 +2490,11 @@ while(count($channel-&gt;callbacks)) {
                     <span class="archive-list-count">1</span>
                   </li>
                   
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2020/02">2020/02</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
                 </ul>
               </div>
             </div>
@@ -2515,6 +2506,10 @@ while(count($channel-&gt;callbacks)) {
               <h3 class="widget-title">RECENTS</h3>
               <div class="widget">
                 <ul>
+                  
+                  <li>
+                    <a href="https://www.qichengzx.com/2020/02/02/graceful-shutdown-of-a-tcp-server-in-go.html">优雅的关闭Go TCP Server</a>
+                  </li>
                   
                   <li>
                     <a href="https://www.qichengzx.com/2019/01/01/go-in-the-browser.html">【译】Go和WebAssembly：在浏览器中运行Go程序</a>
@@ -2532,10 +2527,6 @@ while(count($channel-&gt;callbacks)) {
                     <a href="https://www.qichengzx.com/2018/05/13/create-a-single-page-app-with-go-echo-and-vue.html">【译】使用 Go，Echo 和 Vue 创建单页 TODO 应用</a>
                   </li>
                   
-                  <li>
-                    <a href="https://www.qichengzx.com/2018/05/12/generating-random-keys-with-keygen.html">Keygen 包简介</a>
-                  </li>
-                  
                 </ul>
               </div>
             </div>
@@ -2549,7 +2540,7 @@ while(count($channel-&gt;callbacks)) {
         <footer id="footer">
           <div class="outer">
             <div id="footer-info" class="inner">
-              &copy; 2019 启程<br>
+              &copy; 2020 启程<br>
               Powered by <a href="https://github.com/qichengzx/gopress" target="_blank">gopress</a>
             </div>
             </div>

@@ -64,6 +64,242 @@
       
         
         
+                <article id="183924edfb3af6d50e5fbb2470d95e78" class="article" itemscope itemprop="blogPost">
+                  <div class="article-meta">
+                    <a href="https://www.qichengzx.com/2020/02/02/graceful-shutdown-of-a-tcp-server-in-go.html" class="article-date">
+                      <time itemprop="datePublished">2020-02-02 11:15:48</time>
+                    </a>
+                    <div class="article-category">
+                      <a class="article-category-link" href="/categories/golang">golang</a>
+                    </div>
+                  </div>
+                  <div class="article-inner">
+                    <header class="article-header">
+                      <h1 itemprop="name">
+                        <a class="article-title" href="https://www.qichengzx.com/2020/02/02/graceful-shutdown-of-a-tcp-server-in-go.html">优雅的关闭Go TCP Server</a>
+                      </h1>
+                    </header>
+                    <div class="article-entry" itemprop="articleBody">
+                      <p>本文将讨论如何在Go中优雅地关闭TCP服务器。虽然服务器通常不会停止运行（直到进程终止），但在某些情况下（例如在测试中），以有序的方式关闭它们是有用的。</p>
+
+<h2>Go TCP server的高级结构</h2>
+
+<p>我们先快速回顾一下Go中实现的TCP服务器的高层结构。Go在套接字的顶层提供了一些方便的抽象。下面是典型服务器的伪代码：</p>
+
+<pre><code class="language-go">listener := net.Listen(&quot;tcp&quot;, ... address ...)
+for {
+  conn := listener.Accept()
+  go handler(conn)
+}
+</code></pre>
+
+<p>其中<code>handler</code>是一个阻塞函数，它等待来自客户端的命令，执行所需的处理，并将响应发送回。</p>
+
+<p>鉴于这种结构，我们应该明白“关闭服务器”的含义。服务器在任何给定时间都执行两种不同的功能：</p>
+
+<ol>
+<li>它监听新的连接</li>
+<li>它处理已有连接</li>
+</ol>
+
+<p>很明显，我们可以停止监听新的连接，从而处理（1）；但是现有的连接呢？</p>
+
+<p>不幸的是，这里没有简单的答案。TCP协议级别太低，无法最终解决此问题。如果我们想设计一个广泛适用的解决方案，我们必须保守。具体来说，最安全的方法是关闭服务器以等待客户端关闭其连接。这是我们将首先研究的方法。</p>
+
+<h2>步骤1:等待客户端连接关闭</h2>
+
+<p>在这个解决方案中，我们将显式地关闭侦听器（停止接受新连接），等待客户端结束其连接。这是一种保守的方法，但它在许多实际需要关闭服务器的场景（如测试）中非常有效。在测试中，使所有客户端在预期服务器关闭之前关闭连接很容易。</p>
+
+<p>我将一段一段地展示代码，但是<a href="https://github.com/eliben/code-for-blog/blob/master/2020/tcp-server-shutdown/shutdown1/shutdown1.go">这里</a>提供了完整的可运行代码示例。让我们从服务器类型和构造函数开始：</p>
+
+<pre><code class="language-go">type Server struct {
+  listener net.Listener
+  quit     chan interface{}
+  wg       sync.WaitGroup
+}
+
+func NewServer(addr string) *Server {
+  s := &amp;Server{
+    quit: make(chan interface{}),
+  }
+  l, err := net.Listen(&quot;tcp&quot;, addr)
+  if err != nil {
+    log.Fatal(err)
+  }
+  s.listener = l
+  s.wg.Add(1)
+  go s.serve()
+  return s
+}
+</code></pre>
+
+<p><code>NewServer</code>创建一个新的<code>Server</code>实例，该服务器在后台goroutine中侦听新连接。除了<code>net.Listener</code>之外，<code>Server</code>结构还包含一个用于发出关闭信号的通道和一个等待组，等待服务器的所有goroutine实际完成。</p>
+
+<p>以下是构造函数调用的服务方法：</p>
+
+<pre><code class="language-go">func (s *Server) serve() {
+  defer s.wg.Done()
+
+  for {
+    conn, err := s.listener.Accept()
+    if err != nil {
+      select {
+      case &lt;-s.quit:
+        return
+      default:
+        log.Println(&quot;accept error&quot;, err)
+      }
+    } else {
+      s.wg.Add(1)
+      go func() {
+        s.handleConection(conn)
+        s.wg.Done()
+      }()
+    }
+  }
+}
+</code></pre>
+
+<p>这是一个标准的<code>Accept</code>循环，除了<code>select</code>。此<code>select</code>所做的是在接受错误输出时检查（以非阻塞方式）<code>s.quit</code>通道上是否存在事件（例如发送或关闭）。如果有，则意味着错误是由我们关闭侦听器引起的，并且<code>服务</code>将安静地返回。如果<code>Accept</code>返回时没有错误，则运行连接处理程序[1]。</p>
+
+<p>下面是告诉服务器正常关闭的<code>Stop</code>方法：</p>
+
+<pre><code class="language-go">func (s *Server) Stop() {
+  close(s.quit)
+  s.listener.Close()
+  s.wg.Wait()
+}
+</code></pre>
+
+<p>首先关闭<code>s.quit通道</code>。然后它关闭监听器。这将导致服务中的<code>Accept</code>调用返回错误。由于<code>s.quit</code>此时已关闭，服务将返回，不再处理。</p>
+
+<p><code>Stop</code>方法的最后一行是在<code>s.wg</code>，这也是关键。注意，<code>serve</code>通知等待组它在返回时完成。但这不是我们等待的唯一一次。对<code>handleConnection</code>的每个调用也由<code>wg</code> add/done包装。因此，<code>Stop</code>将阻塞直到所有处理程序都返回，而<code>serve</code>将停止接受新连接。这是一个安全的关闭点。</p>
+
+<p>为了完整起见，这里是<code>handleConnection</code>；这里的<code>handleConnection</code>只读取客户端数据并将其记录下来，而不发送任何数据。当然，这部分代码对于每个服务器都是不同的：</p>
+
+<pre><code class="language-go">func (s *Server) handleConection(conn net.Conn) {
+  defer conn.Close()
+  buf := make([]byte, 2048)
+  for {
+    n, err := conn.Read(buf)
+    if err != nil &amp;&amp; err != io.EOF {
+      log.Println(&quot;read error&quot;, err)
+      return
+    }
+    if n == 0 {
+      return
+    }
+    log.Printf(&quot;received from %v: %s&quot;, conn.RemoteAddr(), string(buf[:n]))
+  }
+}
+</code></pre>
+
+<p>使用此服务器很简单：</p>
+
+<pre><code class="language-go">s := NewServer(addr)
+// do whatever here...
+s.Stop()
+</code></pre>
+
+<p>回想一下，<code>NewServer</code>返回一个服务器，但不阻塞。<code>s.Stop</code>确实会阻塞。在测试中，您要做的是：</p>
+
+<ol>
+<li>确保与服务器交互的所有客户端都已关闭其连接。</li>
+<li>等待s.Stop。</li>
+</ol>
+
+<h2>步骤2：主动关闭打开的客户端连接</h2>
+
+<p>在步骤1中，我们希望所有客户端在声明关闭进程成功之前关闭其连接。在这里，我们将看到一种更激进的方法，在<code>Stop()</code>中，服务器将主动尝试关闭打开的客户端连接。首先，我将介绍一种既简单又健壮的技术，以牺牲一些性能为代价。之后，我们将讨论一些替代方案。</p>
+
+<p>此步骤的<a href="https://github.com/eliben/code-for-blog/blob/master/2020/tcp-server-shutdown/shutdown2/shutdown2.go">完整代码</a>。与步骤1相同，只是<code>handleConection</code>的代码：</p>
+
+<pre><code class="language-go">func (s *Server) handleConection(conn net.Conn) {
+  defer conn.Close()
+  buf := make([]byte, 2048)
+ReadLoop:
+  for {
+    select {
+    case &lt;-s.quit:
+      return
+    default:
+      conn.SetDeadline(time.Now().Add(200 * time.Millisecond))
+      n, err := conn.Read(buf)
+      if err != nil {
+        if opErr, ok := err.(*net.OpError); ok &amp;&amp; opErr.Timeout() {
+          continue ReadLoop
+        } else if err != io.EOF {
+          log.Println(&quot;read error&quot;, err)
+          return
+        }
+      }
+      if n == 0 {
+        return
+      }
+      log.Printf(&quot;received from %v: %s&quot;, conn.RemoteAddr(), string(buf[:n]))
+    }
+  }
+}
+</code></pre>
+
+<p>此处理程序为每个套接字读取设置一个截止日期。这里的截止时间是200毫秒，但可以设置为对您的特定应用程序有意义的任何其他时间。如果读取返回超时，则表示客户端在超时期间处于空闲状态，连接可以安全关闭。所以循环的每次迭代都会检查<code>s.quit</code>并返回是否存在事件。</p>
+
+<p>这种方法是健壮的，因为我们（很可能）不会在客户端主动发送消息时关闭连接。它也很简单，因为它将所有额外的逻辑限制为<code>handleConnection</code>。</p>
+
+<p>当然，这里还有一些性能损耗。首先，每200毫秒发出一次<code>conn.Read</code>调用，这比单个阻塞调用稍慢；不过，我认为这可以忽略不计。更严重的是，每一个<code>Stop</code>请求都会延迟200毫秒。在大多数情况下，如果我们想关闭服务器，这可能是可以的，但是可以根据特定的协议需要调整截止时间。</p>
+
+<p>这种设计的另一种方法是跟踪<code>handleconaction</code>外部所有打开的连接，并在调用<code>Stop</code>时强制关闭它们。这将可能是更高效的，以实现复杂性和一些缺乏鲁棒性为代价。这样的<code>Stop</code>很容易在客户端主动发送数据时关闭连接，从而导致客户端错误。</p>
+
+<p>为了获得正确路径上的灵感，我们可以查看标准库的<code>http.Server.Shutdown</code>方法，其文档如下：</p>
+
+<blockquote>
+<p>Shutdown gracefully shuts down the server without interrupting any active connections. Shutdown works by first closing all open listeners, then closing all idle connections, and then waiting indefinitely for connections to return to idle and then shut down</p>
+</blockquote>
+
+<p>“idle”在这里是什么意思？大致上，客户端已经有一段时间没有发送任何请求了。HTTP服务器比一般的TCP服务器有优势，因为它是一个更高级别的协议，所以它知道客户端通信模式。在不同的协议中，不同的关闭策略可能是有意义的。</p>
+
+<p>另一个例子是服务端发起消息的协议，或者至少其中一些消息。例如，给定的连接可能处于客户端等待服务器发送某个事件的状态。服务端关闭此连接通常是安全的，无需等待任何东西。</p>
+
+<h2>结论</h2>
+
+<p>我将用两个一般准则来总结这篇文章：</p>
+
+<ol>
+<li>尽可能安全地关闭</li>
+<li>考虑更高层次的协议</li>
+</ol>
+
+<p>我通常在编写测试时遇到关闭TCP服务器的需要。我希望每个测试都是独立的，并在测试完成后进行清理，包括所有的客户端-服务器连接和监听服务器。对于这个场景，步骤1非常有效。关闭所有客户端连接后，<code>Server.Stop</code>将立即返回。</p>
+
+<p>[^1]: 注意使用WaitGroup的模式：wg.Add(1)是在go语句启动goroutine之前调用的。这是在启动go s.serve()之前在构造函数中完成的。这种方式对安全很重要。如果我们在goroutine内部调用wg.Add(1)，在goroutine有机会运行之前调用wg.Wait()的执行序列可能会发生；因为在这种情况下，Wait组中尚未添加任何内容，Wait将返回；这显然不是我们想要的。</p>
+
+<h2>原文链接</h2>
+
+<p><a href="https://eli.thegreenplace.net/2020/graceful-shutdown-of-a-tcp-server-in-go/">Graceful shutdown of a TCP server in Go</a></p>
+
+                    </div>
+                    <footer class="article-footer">
+                      <a href="https://www.qichengzx.com/2020/02/02/graceful-shutdown-of-a-tcp-server-in-go.html#comments" class="article-comment-link">Comments</a>
+                      
+                        <ul class="article-tag-list">
+                        
+                          <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="/tags/go">go</a>
+                          </li>
+                        
+                        </ul>
+                      
+                    </footer>
+                  </div>
+                  <nav id="article-nav">
+                    
+
+                    
+                  </nav>
+                </article>
+
+        
+        
                 <article id="3cf71223f82a73e481f1528acdfcc6f7" class="article" itemscope itemprop="blogPost">
                   <div class="article-meta">
                     <a href="https://www.qichengzx.com/2019/01/01/go-in-the-browser.html" class="article-date">
@@ -1688,59 +1924,6 @@ ENV APP_ENV $app_env
                 </article>
 
         
-        
-                <article id="40a50a318d552a1567f12e16aa60e22f" class="article" itemscope itemprop="blogPost">
-                  <div class="article-meta">
-                    <a href="https://www.qichengzx.com/2018/04/22/github-pages.html" class="article-date">
-                      <time itemprop="datePublished">2018-04-22 18:58:49</time>
-                    </a>
-                    <div class="article-category">
-                      <a class="article-category-link" href="/categories/git">git</a>
-                    </div>
-                  </div>
-                  <div class="article-inner">
-                    <header class="article-header">
-                      <h1 itemprop="name">
-                        <a class="article-title" href="https://www.qichengzx.com/2018/04/22/github-pages.html">迁移到 GitHub pages 小记</a>
-                      </h1>
-                    </header>
-                    <div class="article-entry" itemprop="articleBody">
-                      <p><img src="/images/github-pages.jpeg" alt="" /></p>
-
-<p>在 Vultr vps 挂了N个月之后，无奈只能选择把这堆东西迁到 GitHub pages 了，看起来是唯一能选的比较不错的选择。虽然很早以前也看过一些迁到 GitHub pages 的教程，但是实施起来还是有些新的收获。</p>
-
-<p>开始前没注意看文档，其实创建 repo 的时候对于 usrename 的项目，repo 名必须是 username.github.io。</p>
-
-<p>如果不想使用 username.github.io 作为域名的话，要在 repo-&gt;settings-&gt;GitHub Pages 中，设置一个 Custom domain，然后 Save。</p>
-
-<p>GitHub 默认是提供了使用 jekyll 作为 GitHub pages 的内容处理程序。而如果并不想使用 jekyll 的话，也可以。比如我就是使用 hexo ，把 generate 的内容作为 git 内容提交了的。</p>
-
-<p>但是还有一个要注意的是，把静态内容提交到 repo 后，需要过一会才会生效。所以刚提交完时，会返回 404 ，不要着急，过一会就好了。</p>
-
-<p>另外目前 GitHub 还提供了使用自定义域名时启用 HTTPS 的选项，启用后就会强制使用 HTTPS 打开网站了。</p>
-
-                    </div>
-                    <footer class="article-footer">
-                      <a href="https://www.qichengzx.com/2018/04/22/github-pages.html#comments" class="article-comment-link">Comments</a>
-                      
-                        <ul class="article-tag-list">
-                        
-                          <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="/tags/github">github</a>
-                          </li>
-                        
-                        </ul>
-                      
-                    </footer>
-                  </div>
-                  <nav id="article-nav">
-                    
-
-                    
-                  </nav>
-                </article>
-
-        
 
         
         
@@ -1811,7 +1994,7 @@ ENV APP_ENV $app_env
                       
                       <li class="category-list-item">
                         <a class="category-list-link" href="/categories/golang/">golang</a>
-                        <span class="category-list-count">22</span>
+                        <span class="category-list-count">23</span>
                       </li>
                       
                       <li class="category-list-item">
@@ -1919,7 +2102,7 @@ ENV APP_ENV $app_env
                       
                       <li class="tag-list-item">
                         <a class="tag-list-link" href="/tags/go/">go</a>
-                        <span class="tag-list-count">21</span>
+                        <span class="tag-list-count">22</span>
                       </li>
                       
                       <li class="tag-list-item">
@@ -2200,6 +2383,11 @@ ENV APP_ENV $app_env
                     <span class="archive-list-count">1</span>
                   </li>
                   
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2020/02">2020/02</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
                 </ul>
               </div>
             </div>
@@ -2211,6 +2399,10 @@ ENV APP_ENV $app_env
               <h3 class="widget-title">RECENTS</h3>
               <div class="widget">
                 <ul>
+                  
+                  <li>
+                    <a href="https://www.qichengzx.com/2020/02/02/graceful-shutdown-of-a-tcp-server-in-go.html">优雅的关闭Go TCP Server</a>
+                  </li>
                   
                   <li>
                     <a href="https://www.qichengzx.com/2019/01/01/go-in-the-browser.html">【译】Go和WebAssembly：在浏览器中运行Go程序</a>
@@ -2228,10 +2420,6 @@ ENV APP_ENV $app_env
                     <a href="https://www.qichengzx.com/2018/05/13/create-a-single-page-app-with-go-echo-and-vue.html">【译】使用 Go，Echo 和 Vue 创建单页 TODO 应用</a>
                   </li>
                   
-                  <li>
-                    <a href="https://www.qichengzx.com/2018/05/12/generating-random-keys-with-keygen.html">Keygen 包简介</a>
-                  </li>
-                  
                 </ul>
               </div>
             </div>
@@ -2245,7 +2433,7 @@ ENV APP_ENV $app_env
         <footer id="footer">
           <div class="outer">
             <div id="footer-info" class="inner">
-              &copy; 2019 启程<br>
+              &copy; 2020 启程<br>
               Powered by <a href="https://github.com/qichengzx/gopress" target="_blank">gopress</a>
             </div>
             </div>
