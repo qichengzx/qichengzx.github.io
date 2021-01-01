@@ -64,6 +64,79 @@
       
         
         
+                <article id="bee73a7b35bd0a8bb91af3fbded57dea" class="article" itemscope itemprop="blogPost">
+                  <div class="article-meta">
+                    <a href="https://www.qichengzx.com/2018/04/25/dockerfile-build-arg.html" class="article-date">
+                      <time itemprop="datePublished">2018-04-25 15:29:29</time>
+                    </a>
+                    <div class="article-category">
+                      <a class="article-category-link" href="/categories/golang">golang</a>
+                    </div>
+                  </div>
+                  <div class="article-inner">
+                    <header class="article-header">
+                      <h1 itemprop="name">
+                        <a class="article-title" href="https://www.qichengzx.com/2018/04/25/dockerfile-build-arg.html">Dockerfile 构建参数</a>
+                      </h1>
+                    </header>
+                    <div class="article-entry" itemprop="articleBody">
+                      <p>使用 Docker 做服务部署的时候，经常需要在构建的时候区分环境，让程序能够拿到环境变量，或者让程序能够针对不同环境做出不同的处理。</p>
+
+<p>之前的写法比较原始，在本地打包 Docker 镜像后 push 到服务器，所以就可以在打包的时候修改环境变量的值。虽然只用到了一个区分开发，生产的变量，但是每次都这么做还是比较烦。</p>
+
+<p>最近重新整理 Dockerfile ， 又看了下文档，发现可以在 docker build 阶段传入参数的。</p>
+
+<p>如下所示：</p>
+
+<pre><code>FROM golang
+
+ARG app_env
+
+ENV APP_ENV $app_env
+
+...
+</code></pre>
+
+<p>build 时，可以这样写</p>
+
+<pre><code>docker build -t app -f Dockerfile . --build-arg app_env=dev
+</code></pre>
+
+<p>这样就可以在 go 程序里 通过 os.Getenv(“APP_ENV”) 拿到环境变量信息，进行不同处理了。</p>
+
+<p>参考资料:</p>
+
+<p><a href="https://yeasy.gitbooks.io/docker_practice/content/image/dockerfile/arg.html">ARG 构建参数</a></p>
+
+<p><a href="https://medium.com/statuscode/golang-docker-for-development-and-production-ce3ad4e69673">Golang and Docker for development and production</a></p>
+
+                    </div>
+                    <footer class="article-footer">
+                      <a href="https://www.qichengzx.com/2018/04/25/dockerfile-build-arg.html#comments" class="article-comment-link">Comments</a>
+                      
+                        <ul class="article-tag-list">
+                        
+                          <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="/tags/docker">docker</a>
+                          </li>
+                        
+                          <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="/tags/go">go</a>
+                          </li>
+                        
+                        </ul>
+                      
+                    </footer>
+                  </div>
+                  <nav id="article-nav">
+                    
+
+                    
+                  </nav>
+                </article>
+
+        
+        
                 <article id="40a50a318d552a1567f12e16aa60e22f" class="article" itemscope itemprop="blogPost">
                   <div class="article-meta">
                     <a href="https://www.qichengzx.com/2018/04/22/github-pages.html" class="article-date">
@@ -988,105 +1061,6 @@ fmt.Println(&quot;北京-保定&quot;, rs3)
                 </article>
 
         
-        
-                <article id="5876f4d8a7d4aaa11e4c60f44565d74d" class="article" itemscope itemprop="blogPost">
-                  <div class="article-meta">
-                    <a href="https://www.qichengzx.com/2017/08/13/leetcode-array-partition-i.html" class="article-date">
-                      <time itemprop="datePublished">2017-08-13 10:14:49</time>
-                    </a>
-                    <div class="article-category">
-                      <a class="article-category-link" href="/categories/golang">golang</a>
-                    </div>
-                  </div>
-                  <div class="article-inner">
-                    <header class="article-header">
-                      <h1 itemprop="name">
-                        <a class="article-title" href="https://www.qichengzx.com/2017/08/13/leetcode-array-partition-i.html">LeetCode 561.Array Partition I(数组分区 1) - Go实现</a>
-                      </h1>
-                    </header>
-                    <div class="article-entry" itemprop="articleBody">
-                      <p>题目地址:<a href="https://leetcode.com/problems/array-partition-i/description/">561. Array Partition I</a></p>
-
-<p>题目描述：</p>
-
-<p>Given an array of 2n integers, your task is to group these integers into n pairs of integer, say (a1, b1), (a2, b2), &hellip;, (an, bn) which makes sum of min(ai, bi) for all i from 1 to n as large as possible.</p>
-
-<h6>Example 1:</h6>
-
-<pre><code>Input: [1,4,3,2]
-
-Output: 4
-
-Explanation: n is 2, and the maximum sum of pairs is 4 = min(1, 2) + min(3, 4).
-</code></pre>
-
-<h6>Note:</h6>
-
-<p>​   n is a positive integer, which is in the range of [1, 10000].
-​   All the integers in the array will be in the range of [-10000, 10000].</p>
-
-<p>题目大意：</p>
-
-<p>给定一个长度为2n的数组，要把它分成n个分组，即每组有两个数，返回每组中最小值的总和，使和最大。</p>
-
-<p>理解了大意就知道思路了，又看了下论坛里的<a href="https://discuss.leetcode.com/topic/87206/java-solution-sorting-and-rough-proof-of-algorithm">算法分析</a></p>
-
-<p>解决方案基本就是先按从小到大排序，这样相邻的数字是最接近的，然后再分成两两一组，取每组中的第一个数相加即可。</p>
-
-<pre><code class="language-go">package main
-
-import (
-	&quot;fmt&quot;
-	&quot;sort&quot;
-)
-
-func main() {
-	nums := []int{4, 5, 6, 1}
-	n := arrayPairSum(nums)
-	fmt.Println(n)
-}
-
-func arrayPairSum(nums []int) int {
-	sort.Ints(nums)
-	sum := 0
-	length := len(nums)
-	for i := 0; i &lt; length; i += 2 {
-		sum += nums[i]
-	}
-	return sum
-}
-</code></pre>
-
-<p>在线查看结果:<a href="https://play.golang.org/p/2tkZyayXUB">The Go Playground</a></p>
-
-<p>其实这里主要用到了Go的<a href="https://golang.org/pkg/sort/#Ints">sort包给int数组排序</a>。排序后遍历数组，每次递增2就可以了。</p>
-
-                    </div>
-                    <footer class="article-footer">
-                      <a href="https://www.qichengzx.com/2017/08/13/leetcode-array-partition-i.html#comments" class="article-comment-link">Comments</a>
-                      
-                        <ul class="article-tag-list">
-                        
-                          <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="/tags/go">go</a>
-                          </li>
-                        
-                          <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="/tags/leetcode">leetcode</a>
-                          </li>
-                        
-                        </ul>
-                      
-                    </footer>
-                  </div>
-                  <nav id="article-nav">
-                    
-
-                    
-                  </nav>
-                </article>
-
-        
 
         
         
@@ -1161,7 +1135,7 @@ func arrayPairSum(nums []int) int {
                       
                       <li class="category-list-item">
                         <a class="category-list-link" href="/categories/golang/">golang</a>
-                        <span class="category-list-count">23</span>
+                        <span class="category-list-count">24</span>
                       </li>
                       
                       <li class="category-list-item">
@@ -1269,7 +1243,7 @@ func arrayPairSum(nums []int) int {
                       
                       <li class="tag-list-item">
                         <a class="tag-list-link" href="/tags/go/">go</a>
-                        <span class="tag-list-count">22</span>
+                        <span class="tag-list-count">23</span>
                       </li>
                       
                       <li class="tag-list-item">
@@ -1555,6 +1529,11 @@ func arrayPairSum(nums []int) int {
                     <span class="archive-list-count">1</span>
                   </li>
                   
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2021/01">2021/01</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
                 </ul>
               </div>
             </div>
@@ -1566,6 +1545,10 @@ func arrayPairSum(nums []int) int {
               <h3 class="widget-title">RECENTS</h3>
               <div class="widget">
                 <ul>
+                  
+                  <li>
+                    <a href="https://www.qichengzx.com/2021/01/01/unmarshaling-time-values-from-json.html">Go json 时间格式解析</a>
+                  </li>
                   
                   <li>
                     <a href="https://www.qichengzx.com/2020/02/02/graceful-shutdown-of-a-tcp-server-in-go.html">优雅的关闭Go TCP Server</a>
@@ -1583,10 +1566,6 @@ func arrayPairSum(nums []int) int {
                     <a href="https://www.qichengzx.com/2018/05/29/git-pull-upstream.html">Git 同步上游源更改</a>
                   </li>
                   
-                  <li>
-                    <a href="https://www.qichengzx.com/2018/05/13/create-a-single-page-app-with-go-echo-and-vue.html">【译】使用 Go，Echo 和 Vue 创建单页 TODO 应用</a>
-                  </li>
-                  
                 </ul>
               </div>
             </div>
@@ -1600,7 +1579,7 @@ func arrayPairSum(nums []int) int {
         <footer id="footer">
           <div class="outer">
             <div id="footer-info" class="inner">
-              &copy; 2020 启程<br>
+              &copy; 2021 启程<br>
               Powered by <a href="https://github.com/qichengzx/gopress" target="_blank">gopress</a>
             </div>
             </div>

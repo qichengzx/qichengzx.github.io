@@ -64,6 +64,149 @@
       
         
         
+                <article id="0d027961b52d0be2f9036355eaf42e99" class="article" itemscope itemprop="blogPost">
+                  <div class="article-meta">
+                    <a href="https://www.qichengzx.com/2021/01/01/unmarshaling-time-values-from-json.html" class="article-date">
+                      <time itemprop="datePublished">2021-01-01 10:16:26</time>
+                    </a>
+                    <div class="article-category">
+                      <a class="article-category-link" href="/categories/golang">golang</a>
+                    </div>
+                  </div>
+                  <div class="article-inner">
+                    <header class="article-header">
+                      <h1 itemprop="name">
+                        <a class="article-title" href="https://www.qichengzx.com/2021/01/01/unmarshaling-time-values-from-json.html">Go json 时间格式解析</a>
+                      </h1>
+                    </header>
+                    <div class="article-entry" itemprop="articleBody">
+                      <h3>默认RFC 3339</h3>
+
+<p>在Go中，解析json的时间格式默认是<a href="https://tools.ietf.org/html/rfc3339">RFC 3339</a>，一般情况下 struct 转 json，或 json 转回 struct都没有问题。</p>
+
+<pre><code class="language-Go">type Data struct {
+	Name    string    `json:&quot;name&quot;`
+	Started time.Time `json:&quot;started&quot;`
+}
+
+var jsonStr = []byte(`
+{
+  &quot;name&quot;: &quot;new year&quot;,
+  &quot;started&quot;: &quot;2021-01-01T00:00:00.000+08:00&quot;
+}`)
+
+func main() {
+	var data Data
+	if err := json.Unmarshal(jsonStr, &amp;data); err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf(&quot;%+v\n&quot;, data)
+}
+</code></pre>
+
+<h3>Z,T</h3>
+
+<p>上述代码中，日期和时间使用<code>T</code>分隔开，其实 RFC 3339规范中允许使用空格分隔，目前Go的time包还是使用<code>T</code>分隔。</p>
+
+<p>+8:00则表示时区，如果不想使用时区，可以使用<code>Z</code>代替：<code>2021-01-01T00:00:00.000Z</code>。</p>
+
+<p>还有一点需要注意的是，在Go中，RFC 3339的定义是：</p>
+
+<pre><code class="language-Go">RFC3339     = &quot;2006-01-02T15:04:05Z07:00&quot;
+</code></pre>
+
+<p>但是如果这样写，却不行。</p>
+
+<pre><code class="language-Go">t, err := time.Parse(time.RFC3339, time.RFC3339)
+if err != nil {
+	log.Fatal(err)
+}
+fmt.Println(t)
+</code></pre>
+
+<p>会报错：&rdquo;parsing time &ldquo;2006-01-02T15:04:05Z07:00&rdquo;: extra text: 07:00&rdquo;。</p>
+
+<p>但是如果是把上述json的时间值修改成<code>2021-01-01T00:00:00.000Z</code>就没有问题。</p>
+
+<h3>格式</h3>
+
+<p>默认的时间格式是RFC 3339，如果想换成其他格式，需要自己实现。</p>
+
+<p>先看一下时间格式的<a href="https://pkg.go.dev/time#pkg-constants">定义</a></p>
+
+<p>一般情况下格式化时间可以这样做：</p>
+
+<pre><code class="language-GO">t, err := time.Parse(&quot;2006-01-02&quot;, &quot;2021-01-01&quot;)
+</code></pre>
+
+<p>但是如果想从json中解析成不同格式，需要自己实现<code>json.Unmarshaler</code>接口。</p>
+
+<pre><code class="language-Go">type MyTime struct {
+	time.Time
+}
+
+const layout = &quot;2006-01-02&quot;
+
+func (ct *MyTime) UnmarshalJSON(b []byte) (err error) {
+	s := strings.Trim(string(b), &quot;\&quot;&quot;)
+	if s == &quot;null&quot; {
+		ct.Time = time.Time{}
+		return
+	}
+	ct.Time, err = time.Parse(layout, s)
+	return
+}
+
+</code></pre>
+
+<p>然后，就可以使用自己的时间类型了。</p>
+
+<pre><code class="language-Go">
+type Data struct {
+	Name    string `json:&quot;name&quot;`
+	Started MyTime `json:&quot;started&quot;`
+}
+
+var jsonStr = []byte(`
+{
+  &quot;name&quot;: &quot;new year&quot;,
+  &quot;started&quot;: &quot;2021-01-01&quot;
+}`)
+
+func main() {
+	var data Data
+	if err := json.Unmarshal(jsonStr, &amp;data); err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf(&quot;%+v\n&quot;, data)
+}
+</code></pre>
+
+                    </div>
+                    <footer class="article-footer">
+                      <a href="https://www.qichengzx.com/2021/01/01/unmarshaling-time-values-from-json.html#comments" class="article-comment-link">Comments</a>
+                      
+                        <ul class="article-tag-list">
+                        
+                          <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="/tags/go">go</a>
+                          </li>
+                        
+                        </ul>
+                      
+                    </footer>
+                  </div>
+                  <nav id="article-nav">
+                    
+
+                    
+                  </nav>
+                </article>
+
+        
+        
                 <article id="183924edfb3af6d50e5fbb2470d95e78" class="article" itemscope itemprop="blogPost">
                   <div class="article-meta">
                     <a href="https://www.qichengzx.com/2020/02/02/graceful-shutdown-of-a-tcp-server-in-go.html" class="article-date">
@@ -272,10 +415,6 @@ ReadLoop:
 <p>我通常在编写测试时遇到关闭TCP服务器的需要。我希望每个测试都是独立的，并在测试完成后进行清理，包括所有的客户端-服务器连接和监听服务器。对于这个场景，步骤1非常有效。关闭所有客户端连接后，<code>Server.Stop</code>将立即返回。</p>
 
 <p>[^1]: 注意使用WaitGroup的模式：wg.Add(1)是在go语句启动goroutine之前调用的。这是在启动go s.serve()之前在构造函数中完成的。这种方式对安全很重要。如果我们在goroutine内部调用wg.Add(1)，在goroutine有机会运行之前调用wg.Wait()的执行序列可能会发生；因为在这种情况下，Wait组中尚未添加任何内容，Wait将返回；这显然不是我们想要的。</p>
-
-<h2>原文链接</h2>
-
-<p><a href="https://eli.thegreenplace.net/2020/graceful-shutdown-of-a-tcp-server-in-go/">Graceful shutdown of a TCP server in Go</a></p>
 
                     </div>
                     <footer class="article-footer">
@@ -1851,79 +1990,6 @@ func main() {
                 </article>
 
         
-        
-                <article id="bee73a7b35bd0a8bb91af3fbded57dea" class="article" itemscope itemprop="blogPost">
-                  <div class="article-meta">
-                    <a href="https://www.qichengzx.com/2018/04/25/dockerfile-build-arg.html" class="article-date">
-                      <time itemprop="datePublished">2018-04-25 15:29:29</time>
-                    </a>
-                    <div class="article-category">
-                      <a class="article-category-link" href="/categories/golang">golang</a>
-                    </div>
-                  </div>
-                  <div class="article-inner">
-                    <header class="article-header">
-                      <h1 itemprop="name">
-                        <a class="article-title" href="https://www.qichengzx.com/2018/04/25/dockerfile-build-arg.html">Dockerfile 构建参数</a>
-                      </h1>
-                    </header>
-                    <div class="article-entry" itemprop="articleBody">
-                      <p>使用 Docker 做服务部署的时候，经常需要在构建的时候区分环境，让程序能够拿到环境变量，或者让程序能够针对不同环境做出不同的处理。</p>
-
-<p>之前的写法比较原始，在本地打包 Docker 镜像后 push 到服务器，所以就可以在打包的时候修改环境变量的值。虽然只用到了一个区分开发，生产的变量，但是每次都这么做还是比较烦。</p>
-
-<p>最近重新整理 Dockerfile ， 又看了下文档，发现可以在 docker build 阶段传入参数的。</p>
-
-<p>如下所示：</p>
-
-<pre><code>FROM golang
-
-ARG app_env
-
-ENV APP_ENV $app_env
-
-...
-</code></pre>
-
-<p>build 时，可以这样写</p>
-
-<pre><code>docker build -t app -f Dockerfile . --build-arg app_env=dev
-</code></pre>
-
-<p>这样就可以在 go 程序里 通过 os.Getenv(“APP_ENV”) 拿到环境变量信息，进行不同处理了。</p>
-
-<p>参考资料:</p>
-
-<p><a href="https://yeasy.gitbooks.io/docker_practice/content/image/dockerfile/arg.html">ARG 构建参数</a></p>
-
-<p><a href="https://medium.com/statuscode/golang-docker-for-development-and-production-ce3ad4e69673">Golang and Docker for development and production</a></p>
-
-                    </div>
-                    <footer class="article-footer">
-                      <a href="https://www.qichengzx.com/2018/04/25/dockerfile-build-arg.html#comments" class="article-comment-link">Comments</a>
-                      
-                        <ul class="article-tag-list">
-                        
-                          <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="/tags/docker">docker</a>
-                          </li>
-                        
-                          <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="/tags/go">go</a>
-                          </li>
-                        
-                        </ul>
-                      
-                    </footer>
-                  </div>
-                  <nav id="article-nav">
-                    
-
-                    
-                  </nav>
-                </article>
-
-        
 
         
         
@@ -1994,7 +2060,7 @@ ENV APP_ENV $app_env
                       
                       <li class="category-list-item">
                         <a class="category-list-link" href="/categories/golang/">golang</a>
-                        <span class="category-list-count">23</span>
+                        <span class="category-list-count">24</span>
                       </li>
                       
                       <li class="category-list-item">
@@ -2102,7 +2168,7 @@ ENV APP_ENV $app_env
                       
                       <li class="tag-list-item">
                         <a class="tag-list-link" href="/tags/go/">go</a>
-                        <span class="tag-list-count">22</span>
+                        <span class="tag-list-count">23</span>
                       </li>
                       
                       <li class="tag-list-item">
@@ -2388,6 +2454,11 @@ ENV APP_ENV $app_env
                     <span class="archive-list-count">1</span>
                   </li>
                   
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2021/01">2021/01</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
                 </ul>
               </div>
             </div>
@@ -2399,6 +2470,10 @@ ENV APP_ENV $app_env
               <h3 class="widget-title">RECENTS</h3>
               <div class="widget">
                 <ul>
+                  
+                  <li>
+                    <a href="https://www.qichengzx.com/2021/01/01/unmarshaling-time-values-from-json.html">Go json 时间格式解析</a>
+                  </li>
                   
                   <li>
                     <a href="https://www.qichengzx.com/2020/02/02/graceful-shutdown-of-a-tcp-server-in-go.html">优雅的关闭Go TCP Server</a>
@@ -2416,10 +2491,6 @@ ENV APP_ENV $app_env
                     <a href="https://www.qichengzx.com/2018/05/29/git-pull-upstream.html">Git 同步上游源更改</a>
                   </li>
                   
-                  <li>
-                    <a href="https://www.qichengzx.com/2018/05/13/create-a-single-page-app-with-go-echo-and-vue.html">【译】使用 Go，Echo 和 Vue 创建单页 TODO 应用</a>
-                  </li>
-                  
                 </ul>
               </div>
             </div>
@@ -2433,7 +2504,7 @@ ENV APP_ENV $app_env
         <footer id="footer">
           <div class="outer">
             <div id="footer-info" class="inner">
-              &copy; 2020 启程<br>
+              &copy; 2021 启程<br>
               Powered by <a href="https://github.com/qichengzx/gopress" target="_blank">gopress</a>
             </div>
             </div>
