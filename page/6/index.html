@@ -64,6 +64,192 @@
       
         
         
+                <article id="9c8b68332d0168f56a9420715c4ecb53" class="article" itemscope itemprop="blogPost">
+                  <div class="article-meta">
+                    <a href="https://qichengzx.github.io/2015/12/19/secure-your-website-with-lets-encrypt.html" class="article-date">
+                      <time itemprop="datePublished">2015-12-19 16:38:37</time>
+                    </a>
+                    <div class="article-category">
+                      <a class="article-category-link" href="/categories/default">default</a>
+                    </div>
+                  </div>
+                  <div class="article-inner">
+                    <header class="article-header">
+                      <h1 itemprop="name">
+                        <a class="article-title" href="https://qichengzx.github.io/2015/12/19/secure-your-website-with-lets-encrypt.html">使用Let&#39;s Encrypt制作数字证书</a>
+                      </h1>
+                    </header>
+                    <div class="article-entry" itemprop="articleBody">
+                      <p><img src="https://s.qichengzx.com/img/201512/https.png" alt="" /></p>
+
+<p>Let&rsquo;s Encrypt是一个新的CA机构，提供非常简单并且免费的TLS／SSL证书服务。</p>
+
+<p>可谓万众期待。</p>
+
+<p>说下我的环境：</p>
+
+<pre><code>Ubuntu 14.04.3
+Nginx 1.4.6
+</code></pre>
+
+<p>首先你要有个域名，其次要有个服务器。</p>
+
+<h3>STEP 0 － 安装Let&rsquo;s Encrypt 客户端</h3>
+
+<h5>安装git</h5>
+
+<p>先更新下系统</p>
+
+<pre><code>sudo apt-get update
+sudo apt-get -y install git
+</code></pre>
+
+<h5>Clone Let&rsquo;s Encrypt</h5>
+
+<pre><code>sudo git clone https://github.com/letsencrypt/letsencrypt /opt/letsencrypt
+</code></pre>
+
+<p>这里把下载的文件放到了/opt/letsencrypt文件夹</p>
+
+<h3>STEP 1－生成证书</h3>
+
+<p>首先需要关闭80端口</p>
+
+<pre><code>sudo nginx -s stop
+</code></pre>
+
+<p>接下来运行Let&rsquo;s Encrypt</p>
+
+<pre><code>cd /opt/letsencrypt
+./letsencrypt-auto certonly --standalone
+</code></pre>
+
+<p>注意：需要超级用户权限，所以需要输入密码</p>
+
+<p>之后会出现提示框，需要输入邮箱，用于接收提醒和，如果不幸丢失了Key，找回的时候也需要邮箱。</p>
+
+<p>根据提示进行操作即可，接下来啥同意用户协议。</p>
+
+<p>下一步则是输入你需要生成证书的域名了，如果需要一个证书给多个域名使用，这些域名则要全部输入，（example.com和www.example.com是不同的域名），域名之间用空格，逗号，左斜杠 分隔。</p>
+
+<p>成功后会有如下提示：</p>
+
+<pre><code>IMPORTANT NOTES:
+
+ - If you lose your account credentials, you can recover through
+   e-mails sent to sammy@digitalocean.com
+ - Congratulations! Your certificate and chain have been saved at
+    /etc/letsencrypt/live/example.com/fullchain.pem. Your
+   cert will expire on 2016-03-15. To obtain a new version of the
+   certificate in the future, simply run Let's Encrypt again.
+ - Your account credentials have been saved in your Let's Encrypt
+   configuration directory at /etc/letsencrypt. You should make a
+   secure backup of this folder now. This configuration directory will
+   also contain certificates and private keys obtained by Let's
+   Encrypt so making regular backups of this folder is ideal.
+ - If like Let's Encrypt, please consider supporting our work by:
+
+   Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
+   Donating to EFF:                    https://eff.org/donate-le
+
+</code></pre>
+
+<p>证书位置：/etc/letsencrypt/live/example.com/fullchain.pem</p>
+
+<p>过期时间：2016-03-15</p>
+
+<p>至于过期时间为什么这么短则是出于安全考虑。不宜使用同一个证书太长时间。</p>
+
+<h5>证书文件：</h5>
+
+<p>上一步成功后，会有如下4个文件生成。</p>
+
+<pre><code>sudo ls /etc/letsencrypt/live/your_domain_name
+</code></pre>
+
+<pre><code>cert.pem: 证书
+chain.pem: The Let's Encrypt chain certificate（不知道什么鬼）
+fullchain.pem: cert.pem and chain.pem combined
+privkey.pem: 证书私钥
+</code></pre>
+
+<h3>STEP 2－配置Web服务器(Nginx)</h3>
+
+<p>证书生成完毕，现在可以配置Web服务器了。</p>
+
+<p>编辑配置文件：</p>
+
+<pre><code>sudo vi /etc/nginx/sites-available/default
+</code></pre>
+
+<p>在server区块中，增加如下代码：</p>
+
+<pre><code>listen 443 ssl;
+server_name example.com;
+ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
+ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
+</code></pre>
+
+<p>如果之前是绑定的80端口，直接改为443即可，后边增加 ssl 。</p>
+
+<p>如果想使用最安全的SSL协议，增加如下代码：</p>
+
+<pre><code>ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+ssl_prefer_server_ciphers on;
+ssl_ciphers AES256+EECDH:AES256+EDH:!aNULL;
+</code></pre>
+
+<p>最后，在server区块后再增加一段，用于从HTTP跳转到HTTPS。</p>
+
+<pre><code>server {
+    listen 80;
+    server_name example.com;
+    rewrite ^/(.*) https://example.com/$1 permanent;
+}
+
+</code></pre>
+
+<p>保存，退出。</p>
+
+<p>重启Nginx服务器。</p>
+
+<pre><code>sudo nginx -s reopen
+</code></pre>
+
+<p>现在已经可以通过HTTPS访问网站了。</p>
+
+<p>原文中还有设置自动生成证书的部分，出于懒的原因此处不再写。</p>
+
+<p>参考资料：
+<a href="https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-14-04">How To Secure Nginx with Let&rsquo;s Encrypt on Ubuntu 14.04</a></p>
+
+                    </div>
+                    <footer class="article-footer">
+                      <a href="https://qichengzx.github.io/2015/12/19/secure-your-website-with-lets-encrypt.html#comments" class="article-comment-link">Comments</a>
+                      
+                        <ul class="article-tag-list">
+                        
+                          <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="/tags/https">https</a>
+                          </li>
+                        
+                          <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="/tags/ssl">ssl</a>
+                          </li>
+                        
+                        </ul>
+                      
+                    </footer>
+                  </div>
+                  <nav id="article-nav">
+                    
+
+                    
+                  </nav>
+                </article>
+
+        
+        
                 <article id="33ff7aa189193a26a8ad227e25930fc7" class="article" itemscope itemprop="blogPost">
                   <div class="article-meta">
                     <a href="https://qichengzx.github.io/2015/12/05/php-use-pdo-cache-query-result-with-redis.html" class="article-date">
@@ -1522,7 +1708,7 @@ fetch(url, {
                       
                       <li class="category-list-item">
                         <a class="category-list-link" href="/categories/default/">default</a>
-                        <span class="category-list-count">7</span>
+                        <span class="category-list-count">8</span>
                       </li>
                       
                       <li class="category-list-item">
@@ -1640,7 +1826,7 @@ fetch(url, {
                       
                       <li class="tag-list-item">
                         <a class="tag-list-link" href="/tags/go/">go</a>
-                        <span class="tag-list-count">23</span>
+                        <span class="tag-list-count">24</span>
                       </li>
                       
                       <li class="tag-list-item">
@@ -1931,6 +2117,11 @@ fetch(url, {
                     <span class="archive-list-count">1</span>
                   </li>
                   
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2021/07">2021/07</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
                 </ul>
               </div>
             </div>
@@ -1942,6 +2133,10 @@ fetch(url, {
               <h3 class="widget-title">RECENTS</h3>
               <div class="widget">
                 <ul>
+                  
+                  <li>
+                    <a href="https://qichengzx.github.io/2021/07/18/pipeline-pattern-in-go-part-1.html">Go 流水线模式</a>
+                  </li>
                   
                   <li>
                     <a href="https://qichengzx.github.io/2021/01/01/unmarshaling-time-values-from-json.html">Go json 时间格式解析</a>
@@ -1957,10 +2152,6 @@ fetch(url, {
                   
                   <li>
                     <a href="https://qichengzx.github.io/2018/06/15/qq-007-captcha.html">腾讯防水墙验证码使用</a>
-                  </li>
-                  
-                  <li>
-                    <a href="https://qichengzx.github.io/2018/05/29/git-pull-upstream.html">Git 同步上游源更改</a>
                   </li>
                   
                 </ul>

@@ -64,6 +64,257 @@
       
         
         
+                <article id="c17518e6e0380a4b4b7aad4d7ad7457b" class="article" itemscope itemprop="blogPost">
+                  <div class="article-meta">
+                    <a href="https://qichengzx.github.io/2016/04/23/php-rabbitmq-tutorial-three.html" class="article-date">
+                      <time itemprop="datePublished">2016-04-23 19:58:17</time>
+                    </a>
+                    <div class="article-category">
+                      <a class="article-category-link" href="/categories/php">php</a>
+                    </div>
+                  </div>
+                  <div class="article-inner">
+                    <header class="article-header">
+                      <h1 itemprop="name">
+                        <a class="article-title" href="https://qichengzx.github.io/2016/04/23/php-rabbitmq-tutorial-three.html">PHP RabbitMQ 教程（三） - 发布/订阅</a>
+                      </h1>
+                    </header>
+                    <div class="article-entry" itemprop="articleBody">
+                      <h3>发布/订阅</h3>
+
+<p>我们在<a href="/2016/04/17/php-rabbitmq-tutorial-two.html">上一节</a>创建了一个工作队列，并假定队列对应的任务传送给了某个客户端。在这一章节我们会做一些完全不一样的东西&ndash;我们会发送一条消息到多个消费者，也称之为“发布/订阅”模式。</p>
+
+<p>为了说明这个模式，我们会创建一个简单的日志系统（logging system，以下简称日志系统），它由两个程序组成&ndash;第一个是发送日志信息，第二个是接收日志并打印。</p>
+
+<p>日志系统的每一个运行的接收端程序都会接收信息，这样就可以运行一个接收端就把日志保存到硬盘里，同时运行另一个接收端去实时显示日志到屏幕。</p>
+
+<p>本质上，日志内容是广播给所有的接收端的。</p>
+
+<h3>交换器</h3>
+
+<p>在之前的章节中我们从一个队列里发送和接收消息，现在该把完整的RabbitMQ消息模型介绍给大家了。</p>
+
+<p>让我们快速的回看一遍在之前的章节中的内容：</p>
+
+<pre><code>&gt;生产者是一个用来发送消息的程序
+
+&gt;队列是一个存储消息的缓冲区
+
+&gt;消费者是一个接收消息的程序
+</code></pre>
+
+<p>RabbitMQ消息模型的核心思想是，生产者永远不会直接发送给任何消息队列，实际上，生产者一般情况下甚至不知道消息应该发送给哪个队列。</p>
+
+<p>生产者只能发送消息到交换器中，交换器非常简单。一方面从生产者接收消息，另一方面把消息推送到队列中。交换器必须知道如何处理接收到的消息，是推送到某个队列？推送到多个队列？还是丢弃这条消息。这个规则通过交换器类型(exchange type)来指定。</p>
+
+<p><img src="/images/rabbitmq/exchanges.png" alt="" /></p>
+
+<p>这里是交换器的几个类型：direct,topic,headers,fanout。这里我们主要关注最后一个&ndash;fanout，创建一个类型为 fanout 的交换器，命名为 logs。</p>
+
+<pre><code>$channel-&gt;exchange_declare('logs','fanout',false,false,false);
+</code></pre>
+
+<p>fanout交换器非常简单，你可以从名称中猜出它的功能，它把所有接收到的消息广播给所有它知道的队列，这也正是我们的日志系统需要的功能。</p>
+
+<h4>列出交换器</h4>
+
+<p>可以使用rabbitmqctl 命令列出服务器上的所有交换器：</p>
+
+<pre><code>sudo rabbitmqctl list_exchanges
+
+Listing exchanges ...
+        direct
+amq.direct      direct
+amq.fanout      fanout
+amq.headers     headers
+amq.match       headers
+amq.rabbitmq.log        topic
+amq.rabbitmq.trace      topic
+amq.topic       topic
+logs    fanout
+...done.
+</code></pre>
+
+<p>结果中有一些amq.*和一些未命名的交换器，这是一些默认创建的交换器，它们不太可能是现在需要用到的。</p>
+
+<h4>未命名交换器</h4>
+
+<p>在之前的章节中我们对交换器一无所知，直到可以发送消息给队列。大概是因为我们当时正在使用一个以空字符串“”定义的默认的交换器。</p>
+
+<p>回想一下之前怎么发布消息：</p>
+
+<pre><code>$channel-&gt;basic_publish($msg,'','hello');
+</code></pre>
+
+<p>这里就是使用默认或者说未命名的交换器：消息被routing_key的值
+Here we use the default or nameless exchange: messages are routed to the queue with the name specified by routing_key, if it exists. The routing key is the second argument to basic_publish</p>
+
+<p>现在，可以发布消息到这个队列。</p>
+
+<pre><code>$channel-&gt;exchange_declare('logs','fanout',false,false,false);
+$channel-&gt;basic_publish($msg,'logs');
+</code></pre>
+
+<h3>临时队列</h3>
+
+<p>也许你还记得在之前我们使用了一个指定的队列（还记得 hello 队列 和 task_queue 队列吗？）。可以命名一个队列是至关重要的&ndash;我们需要指定一个worker到同一个队列。当想让生产者和消费者使用同一个队列时给队列命名是非常重要的。</p>
+
+<p>但是在我们的日志系统中情况不同了，我们想要接收所有的消息，不仅仅是其中的一部分，我们关心的是最新的消息而不是旧的，因此需要做两件事。</p>
+
+<p>首先，当连接到RabbitMQ时，需要一个空的队列，可以手动创建一个名字随机的队列，或者，更好的办法是，让服务器为我们随机选一个队列名字。</p>
+
+<p>其次，一旦与消费者失去连接，队列需要自动删除。</p>
+
+<p>在<a href="https://github.com/php-amqplib/php-amqplib">php-amqplib</a>中，当我们创建了一个名字为空的队列时，实际上是创建了一个被生成了名字的非持久化的队列。</p>
+
+<pre><code>list($queue_name, ,) = $channel-&gt;queue_declare(&quot;&quot;);
+</code></pre>
+
+<p>方法执行后，$queue_name变量包含了一个RabbitMQ生成的字符串。比如也许是这样的：amq.gen-JzTY20BRgKO-HjmUJj0wLg。</p>
+
+<p>当连接被关闭的时候，队列也会被删掉，因为队列是独有的。</p>
+
+<h3>绑定(Bindlings)</h3>
+
+<p><img src="/images/rabbitmq/bindings.png" alt="" /></p>
+
+<p>我们已经创建了一个fanout类型的交换器和一个队列。现在需要让交换器发送消息给队列。交换器和队列之间的关系称之为绑定(binding)</p>
+
+<pre><code>$channel-&gt;queue_bind($queue_name,'logs');
+</code></pre>
+
+<p>现在开始，logs 交换器会把消息附加到队列中。</p>
+
+<h4>列出绑定（Listing bindings）</h4>
+
+<p>可以使用 rabbitmqctl list_bindings列出所有存在的正在使用的绑定。</p>
+
+<h3>整合</h3>
+
+<p><img src="/images/rabbitmq/python-three-overall.png" alt="" /></p>
+
+<p>发送日志消息的生产者，与之前的代码看起来没什么不同，最重要的变化是现在想要发送消息到我们的 logs 交换器中，需要在发送时提供一个routing_key，但是在 fanout类型的交换器中这个值是可以忽略的。下边是emit_log.php的代码。</p>
+
+<pre><code class="language-php">&lt;?php
+
+require_once __DIR__ .'/verdor/autoload.php';
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
+
+$connection = new AMQPStreamConnection('localhost',5672,'guest','guest');
+$channel = $channel-&gt;channel();
+
+$channel-&gt;exchange_declare('logs','fanout',false,false,false);
+
+$data = implode(' ',array_slice($argv,1));
+
+if(empty($data)) $data = &quot;info:Hello World&quot;;
+$msg = new AMQPMessage($data);
+
+$channel-&gt;basic_publish($msg,'logs');
+
+echo &quot;[x]Sent &quot;,$data,&quot;\n&quot;;
+
+$channel-&gt;close();
+$connection-&gt;close();
+?&gt;
+</code></pre>
+
+<p>(<a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/emit_log.php">emit_log.php</a>)</p>
+
+<p>如你所见，建立连接后声明了交换器，这一步是必须的，因为发送消息到一个不存在的交换器是被禁止的。</p>
+
+<p>如果还没有队列绑定到交换器，信息会丢失，但是这对于我们是可以的，如果没有消费者监听，我们可以安全的丢弃消息。</p>
+
+<p>receive_logs.php：</p>
+
+<pre><code class="language-php">&lt;?php
+
+require_once __DIR__ .'/vendor/autoload.php';
+use PhpAmqpLib\Connection\QMAPStreamConnection;
+
+$connection = new AMQPStreamConnection('localhost',5672,'guest','guest');
+$channel = $connection-&gt;channel();
+
+$channel-&gt;queue_bind($queue_name,'logs');
+
+echo '[*] Waiting for logs. To exit press CTRL+C',&quot;\n&quot;;
+
+$callback = function($msg){
+	echo '[x]',$msg-&gt;body,&quot;\n&quot;;
+};
+
+$channel-&gt;basic_consume($queue_name,'',false,true,false,false,$callback);
+
+whild(count($channel-&gt;callbacks)){
+	$channel-&gt;wait();
+}
+
+$channel-&gt;close();
+$connection-&gt;close();
+?&gt;
+</code></pre>
+
+<p>(<a href="https://github.com/rabbitmq/rabbitmq-tutorials/blob/master/php/receive_logs.php">receive_logs.php</a>)</p>
+
+<p>如果想保存日志到文件中，可以在命令中输入</p>
+
+<pre><code>php receive_logs.php &gt; logs_from_rabbit.log
+</code></pre>
+
+<p>如果想在屏幕上查看日志，新打开一个终端并运行：</p>
+
+<pre><code>php receive_logs.php
+</code></pre>
+
+<p>发送日志：</p>
+
+<pre><code>php emit_log.php
+</code></pre>
+
+<p>使用 rabbitmqctl list_bindings 可以确认代码确实创建了绑定和队列，当两个receive_logs.php在运行的时候会看到类似这样的：</p>
+
+<pre><code>sudo rabbitmqctl list_bindings
+Listing bindings ...
+logs    exchange        amq.gen-JzTY20BRgKO-HjmUJj0wLg  queue           []
+logs    exchange        amq.gen-vso0PVvyiRIL2WoV3i48Yg  queue           []
+...done.
+
+</code></pre>
+
+<p>对于结果的解释很简单，logs交换器中的数据发送到两个服务器指定的队列，而这正是我们要实现的。</p>
+
+<p>想要弄明白怎样去监听部分消息，转到第四部分。</p>
+
+<p>原文地址：<a href="https://www.rabbitmq.com/tutorials/tutorial-three-php.html">Publish/Subscribe</a></p>
+
+                    </div>
+                    <footer class="article-footer">
+                      <a href="https://qichengzx.github.io/2016/04/23/php-rabbitmq-tutorial-three.html#comments" class="article-comment-link">Comments</a>
+                      
+                        <ul class="article-tag-list">
+                        
+                          <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="/tags/php">php</a>
+                          </li>
+                        
+                          <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="/tags/rabbitmq">rabbitmq</a>
+                          </li>
+                        
+                        </ul>
+                      
+                    </footer>
+                  </div>
+                  <nav id="article-nav">
+                    
+
+                    
+                  </nav>
+                </article>
+
+        
+        
                 <article id="084cd06d288b3261464bee7560a21d01" class="article" itemscope itemprop="blogPost">
                   <div class="article-meta">
                     <a href="https://qichengzx.github.io/2016/04/17/php-rabbitmq-tutorial-two.html" class="article-date">
@@ -1374,192 +1625,6 @@ cp -R public/ /var/www/yoursite/
                 </article>
 
         
-        
-                <article id="9c8b68332d0168f56a9420715c4ecb53" class="article" itemscope itemprop="blogPost">
-                  <div class="article-meta">
-                    <a href="https://qichengzx.github.io/2015/12/19/secure-your-website-with-lets-encrypt.html" class="article-date">
-                      <time itemprop="datePublished">2015-12-19 16:38:37</time>
-                    </a>
-                    <div class="article-category">
-                      <a class="article-category-link" href="/categories/default">default</a>
-                    </div>
-                  </div>
-                  <div class="article-inner">
-                    <header class="article-header">
-                      <h1 itemprop="name">
-                        <a class="article-title" href="https://qichengzx.github.io/2015/12/19/secure-your-website-with-lets-encrypt.html">使用Let&#39;s Encrypt制作数字证书</a>
-                      </h1>
-                    </header>
-                    <div class="article-entry" itemprop="articleBody">
-                      <p><img src="https://s.qichengzx.com/img/201512/https.png" alt="" /></p>
-
-<p>Let&rsquo;s Encrypt是一个新的CA机构，提供非常简单并且免费的TLS／SSL证书服务。</p>
-
-<p>可谓万众期待。</p>
-
-<p>说下我的环境：</p>
-
-<pre><code>Ubuntu 14.04.3
-Nginx 1.4.6
-</code></pre>
-
-<p>首先你要有个域名，其次要有个服务器。</p>
-
-<h3>STEP 0 － 安装Let&rsquo;s Encrypt 客户端</h3>
-
-<h5>安装git</h5>
-
-<p>先更新下系统</p>
-
-<pre><code>sudo apt-get update
-sudo apt-get -y install git
-</code></pre>
-
-<h5>Clone Let&rsquo;s Encrypt</h5>
-
-<pre><code>sudo git clone https://github.com/letsencrypt/letsencrypt /opt/letsencrypt
-</code></pre>
-
-<p>这里把下载的文件放到了/opt/letsencrypt文件夹</p>
-
-<h3>STEP 1－生成证书</h3>
-
-<p>首先需要关闭80端口</p>
-
-<pre><code>sudo nginx -s stop
-</code></pre>
-
-<p>接下来运行Let&rsquo;s Encrypt</p>
-
-<pre><code>cd /opt/letsencrypt
-./letsencrypt-auto certonly --standalone
-</code></pre>
-
-<p>注意：需要超级用户权限，所以需要输入密码</p>
-
-<p>之后会出现提示框，需要输入邮箱，用于接收提醒和，如果不幸丢失了Key，找回的时候也需要邮箱。</p>
-
-<p>根据提示进行操作即可，接下来啥同意用户协议。</p>
-
-<p>下一步则是输入你需要生成证书的域名了，如果需要一个证书给多个域名使用，这些域名则要全部输入，（example.com和www.example.com是不同的域名），域名之间用空格，逗号，左斜杠 分隔。</p>
-
-<p>成功后会有如下提示：</p>
-
-<pre><code>IMPORTANT NOTES:
-
- - If you lose your account credentials, you can recover through
-   e-mails sent to sammy@digitalocean.com
- - Congratulations! Your certificate and chain have been saved at
-    /etc/letsencrypt/live/example.com/fullchain.pem. Your
-   cert will expire on 2016-03-15. To obtain a new version of the
-   certificate in the future, simply run Let's Encrypt again.
- - Your account credentials have been saved in your Let's Encrypt
-   configuration directory at /etc/letsencrypt. You should make a
-   secure backup of this folder now. This configuration directory will
-   also contain certificates and private keys obtained by Let's
-   Encrypt so making regular backups of this folder is ideal.
- - If like Let's Encrypt, please consider supporting our work by:
-
-   Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
-   Donating to EFF:                    https://eff.org/donate-le
-
-</code></pre>
-
-<p>证书位置：/etc/letsencrypt/live/example.com/fullchain.pem</p>
-
-<p>过期时间：2016-03-15</p>
-
-<p>至于过期时间为什么这么短则是出于安全考虑。不宜使用同一个证书太长时间。</p>
-
-<h5>证书文件：</h5>
-
-<p>上一步成功后，会有如下4个文件生成。</p>
-
-<pre><code>sudo ls /etc/letsencrypt/live/your_domain_name
-</code></pre>
-
-<pre><code>cert.pem: 证书
-chain.pem: The Let's Encrypt chain certificate（不知道什么鬼）
-fullchain.pem: cert.pem and chain.pem combined
-privkey.pem: 证书私钥
-</code></pre>
-
-<h3>STEP 2－配置Web服务器(Nginx)</h3>
-
-<p>证书生成完毕，现在可以配置Web服务器了。</p>
-
-<p>编辑配置文件：</p>
-
-<pre><code>sudo vi /etc/nginx/sites-available/default
-</code></pre>
-
-<p>在server区块中，增加如下代码：</p>
-
-<pre><code>listen 443 ssl;
-server_name example.com;
-ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
-ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
-</code></pre>
-
-<p>如果之前是绑定的80端口，直接改为443即可，后边增加 ssl 。</p>
-
-<p>如果想使用最安全的SSL协议，增加如下代码：</p>
-
-<pre><code>ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
-ssl_prefer_server_ciphers on;
-ssl_ciphers AES256+EECDH:AES256+EDH:!aNULL;
-</code></pre>
-
-<p>最后，在server区块后再增加一段，用于从HTTP跳转到HTTPS。</p>
-
-<pre><code>server {
-    listen 80;
-    server_name example.com;
-    rewrite ^/(.*) https://example.com/$1 permanent;
-}
-
-</code></pre>
-
-<p>保存，退出。</p>
-
-<p>重启Nginx服务器。</p>
-
-<pre><code>sudo nginx -s reopen
-</code></pre>
-
-<p>现在已经可以通过HTTPS访问网站了。</p>
-
-<p>原文中还有设置自动生成证书的部分，出于懒的原因此处不再写。</p>
-
-<p>参考资料：
-<a href="https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-14-04">How To Secure Nginx with Let&rsquo;s Encrypt on Ubuntu 14.04</a></p>
-
-                    </div>
-                    <footer class="article-footer">
-                      <a href="https://qichengzx.github.io/2015/12/19/secure-your-website-with-lets-encrypt.html#comments" class="article-comment-link">Comments</a>
-                      
-                        <ul class="article-tag-list">
-                        
-                          <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="/tags/https">https</a>
-                          </li>
-                        
-                          <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="/tags/ssl">ssl</a>
-                          </li>
-                        
-                        </ul>
-                      
-                    </footer>
-                  </div>
-                  <nav id="article-nav">
-                    
-
-                    
-                  </nav>
-                </article>
-
-        
 
         
         
@@ -1624,7 +1689,7 @@ ssl_ciphers AES256+EECDH:AES256+EDH:!aNULL;
                       
                       <li class="category-list-item">
                         <a class="category-list-link" href="/categories/default/">default</a>
-                        <span class="category-list-count">7</span>
+                        <span class="category-list-count">8</span>
                       </li>
                       
                       <li class="category-list-item">
@@ -1742,7 +1807,7 @@ ssl_ciphers AES256+EECDH:AES256+EDH:!aNULL;
                       
                       <li class="tag-list-item">
                         <a class="tag-list-link" href="/tags/go/">go</a>
-                        <span class="tag-list-count">23</span>
+                        <span class="tag-list-count">24</span>
                       </li>
                       
                       <li class="tag-list-item">
@@ -2033,6 +2098,11 @@ ssl_ciphers AES256+EECDH:AES256+EDH:!aNULL;
                     <span class="archive-list-count">1</span>
                   </li>
                   
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2021/07">2021/07</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
                 </ul>
               </div>
             </div>
@@ -2044,6 +2114,10 @@ ssl_ciphers AES256+EECDH:AES256+EDH:!aNULL;
               <h3 class="widget-title">RECENTS</h3>
               <div class="widget">
                 <ul>
+                  
+                  <li>
+                    <a href="https://qichengzx.github.io/2021/07/18/pipeline-pattern-in-go-part-1.html">Go 流水线模式</a>
+                  </li>
                   
                   <li>
                     <a href="https://qichengzx.github.io/2021/01/01/unmarshaling-time-values-from-json.html">Go json 时间格式解析</a>
@@ -2059,10 +2133,6 @@ ssl_ciphers AES256+EECDH:AES256+EDH:!aNULL;
                   
                   <li>
                     <a href="https://qichengzx.github.io/2018/06/15/qq-007-captcha.html">腾讯防水墙验证码使用</a>
-                  </li>
-                  
-                  <li>
-                    <a href="https://qichengzx.github.io/2018/05/29/git-pull-upstream.html">Git 同步上游源更改</a>
                   </li>
                   
                 </ul>

@@ -64,6 +64,99 @@
       
         
         
+                <article id="0df34dd8d17e32d099eb2490e59ea5f2" class="article" itemscope itemprop="blogPost">
+                  <div class="article-meta">
+                    <a href="https://qichengzx.github.io/2018/05/02/go-closure.html" class="article-date">
+                      <time itemprop="datePublished">2018-05-02 10:32:04</time>
+                    </a>
+                    <div class="article-category">
+                      <a class="article-category-link" href="/categories/golang">golang</a>
+                    </div>
+                  </div>
+                  <div class="article-inner">
+                    <header class="article-header">
+                      <h1 itemprop="name">
+                        <a class="article-title" href="https://qichengzx.github.io/2018/05/02/go-closure.html">Go 闭包</a>
+                      </h1>
+                    </header>
+                    <div class="article-entry" itemprop="articleBody">
+                      <p>在 Go 中可以在一个函数里创建另一个函数。如下：</p>
+
+<pre><code class="language-golang">func main() {
+	add := func(x, y int) int {
+		return x + y
+	}
+
+	fmt.Println(add(1,1))
+}
+</code></pre>
+
+<p>add 是一个属性为 func(int, int) int (两个 int 类型参数，返回值类型为 int 的函数)的局部变量。这样的局部函数还可以访问其他局部变量。</p>
+
+<pre><code class="language-golang">func main() {
+	x := 0
+	increment := func() int {
+		x++
+		return x
+	}
+
+	fmt.Println(increment())
+	fmt.Println(increment())
+}
+</code></pre>
+
+<p>increment 函数为在 main 函数作用域中定义的变量 x 加1。 变量 x 可以被 increment 函数访问和修改。所以以上程序第一行将会输出：1，第二行将会输出：2。</p>
+
+<p>这样的函数以及它引用的非本地变量称为闭包。 在本示例中，increment 函数和变量 x 形成闭包。</p>
+
+<p>使用闭包的一种方法是编写一个函数，该函数返回另一个函数 - 当被调用时 - 可以生成一个数字序列。 例如，我们可以生成所有的偶数：</p>
+
+<pre><code class="language-golang">func makeEvenGenerator() func() uint {
+	i := uint(0)
+	return func() (ret uint) {
+		ret = i
+		i += 2
+		return
+	}
+}
+
+func main() {
+	nextEven := makeEvenGenerator()
+	fmt.Println(nextEven()) // 0
+	fmt.Println(nextEven()) // 2
+	fmt.Println(nextEven()) // 4
+}
+</code></pre>
+
+<p>makeEvenGenerator 返回一个生成偶数的函数。 每次调用它时，它会将2添加到本地i变量中 - 与正常的局部变量不同，它会在调用之间保持不变。</p>
+
+<h3>原文</h3>
+
+<p><a href="https://www.golang-book.com/books/intro/7#section4">Closure</a></p>
+
+                    </div>
+                    <footer class="article-footer">
+                      <a href="https://qichengzx.github.io/2018/05/02/go-closure.html#comments" class="article-comment-link">Comments</a>
+                      
+                        <ul class="article-tag-list">
+                        
+                          <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="/tags/go">go</a>
+                          </li>
+                        
+                        </ul>
+                      
+                    </footer>
+                  </div>
+                  <nav id="article-nav">
+                    
+
+                    
+                  </nav>
+                </article>
+
+        
+        
                 <article id="bee73a7b35bd0a8bb91af3fbded57dea" class="article" itemscope itemprop="blogPost">
                   <div class="article-meta">
                     <a href="https://qichengzx.github.io/2018/04/25/dockerfile-build-arg.html" class="article-date">
@@ -912,155 +1005,6 @@ fmt.Println(&quot;北京-保定&quot;, rs3)
                 </article>
 
         
-        
-                <article id="9ea3b5631aa06bd499297293aeb51d6a" class="article" itemscope itemprop="blogPost">
-                  <div class="article-meta">
-                    <a href="https://qichengzx.github.io/2017/09/17/redis-geo-with-redigo-in-golang-part-1.html" class="article-date">
-                      <time itemprop="datePublished">2017-09-17 19:45:29</time>
-                    </a>
-                    <div class="article-category">
-                      <a class="article-category-link" href="/categories/golang">golang</a>
-                    </div>
-                  </div>
-                  <div class="article-inner">
-                    <header class="article-header">
-                      <h1 itemprop="name">
-                        <a class="article-title" href="https://qichengzx.github.io/2017/09/17/redis-geo-with-redigo-in-golang-part-1.html">Go语言使用redigo操作GEO(1) - 添加和查询</a>
-                      </h1>
-                    </header>
-                    <div class="article-entry" itemprop="articleBody">
-                      <p>周五的时候群里有人遇到在Go中使用Redis GEO的问题，顺手搜了下解决办法。发现还挺简单的，周末无事，写下来记一下。</p>
-
-<p>GEO是在Redis 3.2加入的功能，手册<a href="http://redisdoc.com/geo/index.html">见此</a></p>
-
-<p>本示例中只演示GEOADD和GEOPOS功能。</p>
-
-<p><a href="https://github.com/garyburd/redigo/tree/master/redis">redigo</a>这个客户端还挺好用的，但是个人觉得略有不足的是文档不全（指的是中文的文档），但是好在可以看源码解决一些不太清楚的问题。</p>
-
-<h4>0.连接Redis</h4>
-
-<p>首先习惯性的创建了连接池，嗯，连接池。</p>
-
-<pre><code class="language-Go">func init() {
-	RedisClient = &amp;redis.Pool{
-		MaxIdle:   MaxIdle,
-		MaxActive: MaxActive,
-
-		IdleTimeout: 60 * time.Second,
-
-		Dial: func() (redis.Conn, error) {
-			c, err := redis.Dial(&quot;tcp&quot;, RedisHost)
-
-			if err != nil {
-				return nil, err
-			}
-
-			/*if _, err := c.Do(&quot;AUTH&quot;, RedisPwd); err != nil {
-				c.Close()
-				return nil, err
-			}*/
-			c.Do(&quot;SELECT&quot;, RedisDb)
-
-			return c, nil
-		},
-	}
-}
-</code></pre>
-
-<h4>1.添加值</h4>
-
-<p>为了简单起见，创建了一个方法用于向传入的key中写入name的坐标点。</p>
-
-<p>直接返回错误。</p>
-
-<pre><code class="language-Go">func push(key, name string, lat, lng float64) error {
-	rc := RedisClient.Get()
-	defer rc.Close()
-
-	_, err := rc.Do(&quot;GEOADD&quot;, key, lng, lat, name)
-	return err
-}
-
-</code></pre>
-
-<h4>2.取回值</h4>
-
-<p>同样，创建一个方法，在Redis中取回key中name的坐标点的值。</p>
-
-<p>但是注意，这里在执行完 <code>GEOPOS</code> 后，调用 redigo 包中的 <code>Positions</code> 方法把返回结果转成 <code>float64</code> 的数组。</p>
-
-<p>然后返回这个数组和错误</p>
-
-<pre><code class="language-Go">func get(key, name string) ([]*[2]float64, error) {
-	rc := RedisClient.Get()
-	defer rc.Close()
-
-	res, err := redis.Positions(rc.Do(&quot;GEOPOS&quot;, key, name))
-
-	return res, err
-}
-</code></pre>
-
-<h4>3.main方法中的简单代码</h4>
-
-<pre><code class="language-Go">func main() {
-	key := &quot;citylist&quot;
-	name := &quot;beijing&quot;
-	lat := 39.9329
-	lng := 116.280316
-	err := push(key, name, lat, lng)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(&quot;坐标写入完成&quot;)
-	fmt.Println(&quot;获取刚刚写入的值&quot;)
-
-	res, err := get(key, name)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(res[0][0], res[0][1])
-}
-</code></pre>
-
-<p>就这么简单。</p>
-
-<p>import部分和定义的几个全局变量就不用写了，</p>
-
-                    </div>
-                    <footer class="article-footer">
-                      <a href="https://qichengzx.github.io/2017/09/17/redis-geo-with-redigo-in-golang-part-1.html#comments" class="article-comment-link">Comments</a>
-                      
-                        <ul class="article-tag-list">
-                        
-                          <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="/tags/go">go</a>
-                          </li>
-                        
-                          <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="/tags/redis">redis</a>
-                          </li>
-                        
-                          <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="/tags/redigo">redigo</a>
-                          </li>
-                        
-                          <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="/tags/geo">geo</a>
-                          </li>
-                        
-                        </ul>
-                      
-                    </footer>
-                  </div>
-                  <nav id="article-nav">
-                    
-
-                    
-                  </nav>
-                </article>
-
-        
 
         
         
@@ -1125,7 +1069,7 @@ fmt.Println(&quot;北京-保定&quot;, rs3)
                       
                       <li class="category-list-item">
                         <a class="category-list-link" href="/categories/default/">default</a>
-                        <span class="category-list-count">7</span>
+                        <span class="category-list-count">8</span>
                       </li>
                       
                       <li class="category-list-item">
@@ -1243,7 +1187,7 @@ fmt.Println(&quot;北京-保定&quot;, rs3)
                       
                       <li class="tag-list-item">
                         <a class="tag-list-link" href="/tags/go/">go</a>
-                        <span class="tag-list-count">23</span>
+                        <span class="tag-list-count">24</span>
                       </li>
                       
                       <li class="tag-list-item">
@@ -1534,6 +1478,11 @@ fmt.Println(&quot;北京-保定&quot;, rs3)
                     <span class="archive-list-count">1</span>
                   </li>
                   
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2021/07">2021/07</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
                 </ul>
               </div>
             </div>
@@ -1545,6 +1494,10 @@ fmt.Println(&quot;北京-保定&quot;, rs3)
               <h3 class="widget-title">RECENTS</h3>
               <div class="widget">
                 <ul>
+                  
+                  <li>
+                    <a href="https://qichengzx.github.io/2021/07/18/pipeline-pattern-in-go-part-1.html">Go 流水线模式</a>
+                  </li>
                   
                   <li>
                     <a href="https://qichengzx.github.io/2021/01/01/unmarshaling-time-values-from-json.html">Go json 时间格式解析</a>
@@ -1560,10 +1513,6 @@ fmt.Println(&quot;北京-保定&quot;, rs3)
                   
                   <li>
                     <a href="https://qichengzx.github.io/2018/06/15/qq-007-captcha.html">腾讯防水墙验证码使用</a>
-                  </li>
-                  
-                  <li>
-                    <a href="https://qichengzx.github.io/2018/05/29/git-pull-upstream.html">Git 同步上游源更改</a>
                   </li>
                   
                 </ul>

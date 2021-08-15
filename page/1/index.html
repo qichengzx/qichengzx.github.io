@@ -64,6 +64,268 @@
       
         
         
+                <article id="37e6ad89f012b41081720afaf9458635" class="article" itemscope itemprop="blogPost">
+                  <div class="article-meta">
+                    <a href="https://qichengzx.github.io/2021/07/18/pipeline-pattern-in-go-part-1.html" class="article-date">
+                      <time itemprop="datePublished">2021-07-18 11:58:49</time>
+                    </a>
+                    <div class="article-category">
+                      <a class="article-category-link" href="/categories/default">default</a>
+                    </div>
+                  </div>
+                  <div class="article-inner">
+                    <header class="article-header">
+                      <h1 itemprop="name">
+                        <a class="article-title" href="https://qichengzx.github.io/2021/07/18/pipeline-pattern-in-go-part-1.html">Go 流水线模式</a>
+                      </h1>
+                    </header>
+                    <div class="article-entry" itemprop="articleBody">
+                      <p>我将把这篇文章分为两部分，在第一部分我将尝试解释管道的基本构建块，在第二篇文章中我将尝试围绕这个设计构建一个通用库。</p>
+
+<p>我最近在阅读<a href="https://learning.oreilly.com/library/view/concurrency-in-go/9781491941294/">Concurrency In Go</a>时遇到了一种叫做管道处理模式的东西。想法是您可以将逻辑功能分解为多个阶段。每个阶段都进行自己的处理，并将输出传递到下一个阶段进行处理。您可以修改彼此独立的阶段，限制阶段的速率等等。</p>
+
+<h2>管道基础知识</h2>
+
+<p>来看下这两个函数：</p>
+
+<pre><code class="language-Go">func Multiply(value ,multiplier int) int { 
+	return value*multiplier
+}
+func Add(value,additive int) int { 
+	return value+additive
+}
+</code></pre>
+
+<p>这两个函数很简单，只是对数字进行运算并返回它。您可以将这些视为管道的“阶段”。为了完成管道，我们可以将两个阶段结合起来。</p>
+
+<pre><code class="language-Go">ints := []int{1,2,3,4}
+
+for _,v := range ints {
+	fmt.Println(multiply(add(multiply(v,2),1),2))
+}
+</code></pre>
+
+<p>在这里可以看到 stage 处理输入，处理后返回相同的类型以供进一步的 stage 处理。</p>
+
+<h2>并发管道</h2>
+
+<p>这个简单的模型现在可以扩展到利用 go 的通道和 goroutines 来同时执行阶段的处理。在我们这样做之前，我们的管道中必须有以下实体。</p>
+
+<ul>
+<li><p>Generator，它将负责生成管道处理的输入。这是管道的第一阶段。</p></li>
+
+<li><p>阶段，可以在其中执行实际处理。</p></li>
+
+<li><p>Canceller，一种通过管道发出取消或处理结束信号的机制。</p></li>
+</ul>
+
+<p>让我们从生成器开始</p>
+
+<pre><code class="language-Go">func generator(done &lt;-chan interface{}, integers ...int) &lt;-chan int {
+	intStream := make(chan int)
+	go func() {
+		defer close(intStream)
+		for _, i := range integers {
+			select {
+			case &lt;-done: return
+			case intStream &lt;- i:
+			}
+		}
+
+	}()
+	return intStream
+}
+</code></pre>
+
+<p>这个函数将生成一个 goroutine，它将在一个通道上生成数值，并且该函数只是简单地返回那个通道。在此通道上生成的值用作进一步阶段的输入。我们还在函数中传递了 done 通道来退出生成流程，这也称为毒丸模式(<a href="https://java-design-patterns.com/patterns/poison-pill/">Poison Pill Pattern</a>)</p>
+
+<p>扩展相同的想法，我们可以重写乘法和加法函数来并发处理。</p>
+
+<pre><code class="language-Go">func multiply(done &lt;-chan interface{}, intStream &lt;-chan int, multiplier int) chan int {
+	multipliedStream := make(chan int)
+	go func() {
+		defer close(multipliedStream)
+		for i := range intStream {
+			select {
+			case &lt;-done: return
+			case multipliedStream &lt;- i * multiplier:
+			}
+		}
+	}()
+	return multipliedStream
+}
+
+func add(done &lt;-chan interface{}, intStream &lt;-chan int, adder int) chan int {
+	addedStream := make(chan int)
+	go func() {
+		defer close(addedStream)
+		for i := range intStream {
+			select {
+			case &lt;-done:return
+			case addedStream &lt;- i * adder:
+			}
+		}
+	}()
+	return addedStream
+}
+</code></pre>
+
+<p>旁注：也许我们可以重写这些函数来接受接口或函数，而不是编写两次共享大部分代码的函数，但我试图在这里保持简单。</p>
+
+<p>为了构建管道，我们可以将管道的这些阶段组合为如下形式：</p>
+
+<pre><code class="language-Go">done := make(chan interface{})
+intStream := generator(done, 1, 2, 3, 4)
+
+pipeline := add(done, multiply(done, intStream, 2), 5)
+
+for i := range pipeline {
+    fmt.Println(i)
+}
+</code></pre>
+
+<p>这段代码将在不同的管道中同时运行阶段，通过 go 通道将它们的结果传递到下一个阶段。我们可以通过阅读最后阶段的频道来获得最终结果。</p>
+
+<h2>更实际的用例</h2>
+
+<p>好的，但是更实用的东西怎么样？我们可以使用这种设计实现一个shopify的爬虫。目的是抓取shopify页面并抓取有用的信息。</p>
+
+<p>这是我们可以遵循的基本设计算法。</p>
+
+<p>转到应用程序目录页面，例如<a href="https://apps.shopify.com/browse/all?page=1">https://apps.shopify.com/browse/all?page=1</a></p>
+
+<p><img src="/images/pipeline/noNqhT8.png" alt="" /></p>
+
+<p>从每个应用程序目录页面抓取不同应用程序的 URL。</p>
+
+<p>访问每个应用 URL 抓取应用信息并填充我们的结构。</p>
+
+<p><img src="/images/pipeline/NxPEgfB.png" alt="" /></p>
+
+<p>遍历分页以转到下一个应用程序目录页面并重复。</p>
+
+<p>在管道方面，我们需要构建这样的东西</p>
+
+<p><img src="/images/pipeline/qTBtL19.png" alt="" /></p>
+
+<p>让我们定义 App 结构</p>
+
+<pre><code class="language-Go">type App struct {
+    Rating     float64
+    Review     int
+    Name       string
+    Category   []string
+    AppLink    string
+    PageLink   string
+}
+</code></pre>
+
+<p>我没有编写实际的抓取代码来保持简短和简单，但是可以轻松增加抓取逻辑而无需更改代码结构。</p>
+
+<pre><code class="language-Go">
+type ShopifyScraper struct {}
+
+
+
+// Generation Stage, This stage will generate app directory URLs.
+func (s *ShopifyScraper) Generate(done &lt;-chan bool) chan App {
+
+	links := make(chan App)
+	go func() {
+		defer close(links)
+		for i := 0; i &lt; 5; i++ {
+			select {
+			case &lt;-done: return
+			case links &lt;- App{PageLink: fmt.Sprintf(&quot;https://apps.shopify.com/browse/all?page=%d&quot;, i)}:
+			}
+		}
+	}()
+	return links
+}
+
+// App Directory Scraper Stage, This stage will visit directory page and scrape different app URLs from the page for further processing.
+func (s *ShopifyScraper) AppDirectoryScraper(done &lt;-chan bool, input &lt;-chan App) chan App {
+
+	apps := make(chan App, 5)
+	go func() {
+		defer close(apps)
+		for app := range input {
+
+			// Extract Different App URLs by scraping  using app.PageLink
+
+			select {
+			case &lt;-done: return
+			case apps &lt;- app:
+			}
+		}
+	}()
+	return apps
+}
+
+// App Scraper Stage, This stage will visit app page and scrape app information
+func (s *ShopifyScraper) AppScraper(done &lt;-chan bool, input &lt;-chan App) chan App {
+	apps := make(chan App)
+	go func() {
+		defer close(apps)
+		for app := range input {
+			
+			// Extract Different App Information by scraping by using app.AppLink
+			
+			select {
+			case &lt;-done: return
+			case apps &lt;- app:
+
+			}
+		}
+	}()
+	return apps
+}
+</code></pre>
+
+<p>最后，将各个阶段连接在一起以形成管道。</p>
+
+<pre><code class="language-Go">func (s *ShopifyScraper) Do() []AppInfo {
+
+	var result []AppInfo
+	done := make(chan bool)
+	defer close(done)
+
+	for i := range s.AppScraper(done, s.AppDirectoryScraper(done, s.Generate(done))) {
+		result = append(result, i)
+	}
+	return result
+}
+</code></pre>
+
+<p>在下一篇文章中，我们将尝试将管道构建为一个库，它可以处理 (1) 管道排序 (2) 在多个 goroutine 中同时执行同一阶段 (3) 取消 (4) 可能的错误处理/重试</p>
+
+<h2>原文链接</h2>
+
+<p><a href="https://ketansingh.me/posts/pipeline-pattern-in-go-part-1/">Pipeline Pattern in Go Part 1</a></p>
+
+                    </div>
+                    <footer class="article-footer">
+                      <a href="https://qichengzx.github.io/2021/07/18/pipeline-pattern-in-go-part-1.html#comments" class="article-comment-link">Comments</a>
+                      
+                        <ul class="article-tag-list">
+                        
+                          <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="/tags/go">go</a>
+                          </li>
+                        
+                        </ul>
+                      
+                    </footer>
+                  </div>
+                  <nav id="article-nav">
+                    
+
+                    
+                  </nav>
+                </article>
+
+        
+        
                 <article id="0d027961b52d0be2f9036355eaf42e99" class="article" itemscope itemprop="blogPost">
                   <div class="article-meta">
                     <a href="https://qichengzx.github.io/2021/01/01/unmarshaling-time-values-from-json.html" class="article-date">
@@ -1897,99 +2159,6 @@ commit 4
                 </article>
 
         
-        
-                <article id="0df34dd8d17e32d099eb2490e59ea5f2" class="article" itemscope itemprop="blogPost">
-                  <div class="article-meta">
-                    <a href="https://qichengzx.github.io/2018/05/02/go-closure.html" class="article-date">
-                      <time itemprop="datePublished">2018-05-02 10:32:04</time>
-                    </a>
-                    <div class="article-category">
-                      <a class="article-category-link" href="/categories/golang">golang</a>
-                    </div>
-                  </div>
-                  <div class="article-inner">
-                    <header class="article-header">
-                      <h1 itemprop="name">
-                        <a class="article-title" href="https://qichengzx.github.io/2018/05/02/go-closure.html">Go 闭包</a>
-                      </h1>
-                    </header>
-                    <div class="article-entry" itemprop="articleBody">
-                      <p>在 Go 中可以在一个函数里创建另一个函数。如下：</p>
-
-<pre><code class="language-golang">func main() {
-	add := func(x, y int) int {
-		return x + y
-	}
-
-	fmt.Println(add(1,1))
-}
-</code></pre>
-
-<p>add 是一个属性为 func(int, int) int (两个 int 类型参数，返回值类型为 int 的函数)的局部变量。这样的局部函数还可以访问其他局部变量。</p>
-
-<pre><code class="language-golang">func main() {
-	x := 0
-	increment := func() int {
-		x++
-		return x
-	}
-
-	fmt.Println(increment())
-	fmt.Println(increment())
-}
-</code></pre>
-
-<p>increment 函数为在 main 函数作用域中定义的变量 x 加1。 变量 x 可以被 increment 函数访问和修改。所以以上程序第一行将会输出：1，第二行将会输出：2。</p>
-
-<p>这样的函数以及它引用的非本地变量称为闭包。 在本示例中，increment 函数和变量 x 形成闭包。</p>
-
-<p>使用闭包的一种方法是编写一个函数，该函数返回另一个函数 - 当被调用时 - 可以生成一个数字序列。 例如，我们可以生成所有的偶数：</p>
-
-<pre><code class="language-golang">func makeEvenGenerator() func() uint {
-	i := uint(0)
-	return func() (ret uint) {
-		ret = i
-		i += 2
-		return
-	}
-}
-
-func main() {
-	nextEven := makeEvenGenerator()
-	fmt.Println(nextEven()) // 0
-	fmt.Println(nextEven()) // 2
-	fmt.Println(nextEven()) // 4
-}
-</code></pre>
-
-<p>makeEvenGenerator 返回一个生成偶数的函数。 每次调用它时，它会将2添加到本地i变量中 - 与正常的局部变量不同，它会在调用之间保持不变。</p>
-
-<h3>原文</h3>
-
-<p><a href="https://www.golang-book.com/books/intro/7#section4">Closure</a></p>
-
-                    </div>
-                    <footer class="article-footer">
-                      <a href="https://qichengzx.github.io/2018/05/02/go-closure.html#comments" class="article-comment-link">Comments</a>
-                      
-                        <ul class="article-tag-list">
-                        
-                          <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="/tags/go">go</a>
-                          </li>
-                        
-                        </ul>
-                      
-                    </footer>
-                  </div>
-                  <nav id="article-nav">
-                    
-
-                    
-                  </nav>
-                </article>
-
-        
 
         
         
@@ -2050,7 +2219,7 @@ func main() {
                       
                       <li class="category-list-item">
                         <a class="category-list-link" href="/categories/default/">default</a>
-                        <span class="category-list-count">7</span>
+                        <span class="category-list-count">8</span>
                       </li>
                       
                       <li class="category-list-item">
@@ -2168,7 +2337,7 @@ func main() {
                       
                       <li class="tag-list-item">
                         <a class="tag-list-link" href="/tags/go/">go</a>
-                        <span class="tag-list-count">23</span>
+                        <span class="tag-list-count">24</span>
                       </li>
                       
                       <li class="tag-list-item">
@@ -2459,6 +2628,11 @@ func main() {
                     <span class="archive-list-count">1</span>
                   </li>
                   
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2021/07">2021/07</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
                 </ul>
               </div>
             </div>
@@ -2470,6 +2644,10 @@ func main() {
               <h3 class="widget-title">RECENTS</h3>
               <div class="widget">
                 <ul>
+                  
+                  <li>
+                    <a href="https://qichengzx.github.io/2021/07/18/pipeline-pattern-in-go-part-1.html">Go 流水线模式</a>
+                  </li>
                   
                   <li>
                     <a href="https://qichengzx.github.io/2021/01/01/unmarshaling-time-values-from-json.html">Go json 时间格式解析</a>
@@ -2485,10 +2663,6 @@ func main() {
                   
                   <li>
                     <a href="https://qichengzx.github.io/2018/06/15/qq-007-captcha.html">腾讯防水墙验证码使用</a>
-                  </li>
-                  
-                  <li>
-                    <a href="https://qichengzx.github.io/2018/05/29/git-pull-upstream.html">Git 同步上游源更改</a>
                   </li>
                   
                 </ul>

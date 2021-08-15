@@ -64,6 +64,155 @@
       
         
         
+                <article id="9ea3b5631aa06bd499297293aeb51d6a" class="article" itemscope itemprop="blogPost">
+                  <div class="article-meta">
+                    <a href="https://qichengzx.github.io/2017/09/17/redis-geo-with-redigo-in-golang-part-1.html" class="article-date">
+                      <time itemprop="datePublished">2017-09-17 19:45:29</time>
+                    </a>
+                    <div class="article-category">
+                      <a class="article-category-link" href="/categories/golang">golang</a>
+                    </div>
+                  </div>
+                  <div class="article-inner">
+                    <header class="article-header">
+                      <h1 itemprop="name">
+                        <a class="article-title" href="https://qichengzx.github.io/2017/09/17/redis-geo-with-redigo-in-golang-part-1.html">Go语言使用redigo操作GEO(1) - 添加和查询</a>
+                      </h1>
+                    </header>
+                    <div class="article-entry" itemprop="articleBody">
+                      <p>周五的时候群里有人遇到在Go中使用Redis GEO的问题，顺手搜了下解决办法。发现还挺简单的，周末无事，写下来记一下。</p>
+
+<p>GEO是在Redis 3.2加入的功能，手册<a href="http://redisdoc.com/geo/index.html">见此</a></p>
+
+<p>本示例中只演示GEOADD和GEOPOS功能。</p>
+
+<p><a href="https://github.com/garyburd/redigo/tree/master/redis">redigo</a>这个客户端还挺好用的，但是个人觉得略有不足的是文档不全（指的是中文的文档），但是好在可以看源码解决一些不太清楚的问题。</p>
+
+<h4>0.连接Redis</h4>
+
+<p>首先习惯性的创建了连接池，嗯，连接池。</p>
+
+<pre><code class="language-Go">func init() {
+	RedisClient = &amp;redis.Pool{
+		MaxIdle:   MaxIdle,
+		MaxActive: MaxActive,
+
+		IdleTimeout: 60 * time.Second,
+
+		Dial: func() (redis.Conn, error) {
+			c, err := redis.Dial(&quot;tcp&quot;, RedisHost)
+
+			if err != nil {
+				return nil, err
+			}
+
+			/*if _, err := c.Do(&quot;AUTH&quot;, RedisPwd); err != nil {
+				c.Close()
+				return nil, err
+			}*/
+			c.Do(&quot;SELECT&quot;, RedisDb)
+
+			return c, nil
+		},
+	}
+}
+</code></pre>
+
+<h4>1.添加值</h4>
+
+<p>为了简单起见，创建了一个方法用于向传入的key中写入name的坐标点。</p>
+
+<p>直接返回错误。</p>
+
+<pre><code class="language-Go">func push(key, name string, lat, lng float64) error {
+	rc := RedisClient.Get()
+	defer rc.Close()
+
+	_, err := rc.Do(&quot;GEOADD&quot;, key, lng, lat, name)
+	return err
+}
+
+</code></pre>
+
+<h4>2.取回值</h4>
+
+<p>同样，创建一个方法，在Redis中取回key中name的坐标点的值。</p>
+
+<p>但是注意，这里在执行完 <code>GEOPOS</code> 后，调用 redigo 包中的 <code>Positions</code> 方法把返回结果转成 <code>float64</code> 的数组。</p>
+
+<p>然后返回这个数组和错误</p>
+
+<pre><code class="language-Go">func get(key, name string) ([]*[2]float64, error) {
+	rc := RedisClient.Get()
+	defer rc.Close()
+
+	res, err := redis.Positions(rc.Do(&quot;GEOPOS&quot;, key, name))
+
+	return res, err
+}
+</code></pre>
+
+<h4>3.main方法中的简单代码</h4>
+
+<pre><code class="language-Go">func main() {
+	key := &quot;citylist&quot;
+	name := &quot;beijing&quot;
+	lat := 39.9329
+	lng := 116.280316
+	err := push(key, name, lat, lng)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(&quot;坐标写入完成&quot;)
+	fmt.Println(&quot;获取刚刚写入的值&quot;)
+
+	res, err := get(key, name)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(res[0][0], res[0][1])
+}
+</code></pre>
+
+<p>就这么简单。</p>
+
+<p>import部分和定义的几个全局变量就不用写了，</p>
+
+                    </div>
+                    <footer class="article-footer">
+                      <a href="https://qichengzx.github.io/2017/09/17/redis-geo-with-redigo-in-golang-part-1.html#comments" class="article-comment-link">Comments</a>
+                      
+                        <ul class="article-tag-list">
+                        
+                          <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="/tags/go">go</a>
+                          </li>
+                        
+                          <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="/tags/redis">redis</a>
+                          </li>
+                        
+                          <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="/tags/redigo">redigo</a>
+                          </li>
+                        
+                          <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="/tags/geo">geo</a>
+                          </li>
+                        
+                        </ul>
+                      
+                    </footer>
+                  </div>
+                  <nav id="article-nav">
+                    
+
+                    
+                  </nav>
+                </article>
+
+        
+        
                 <article id="5876f4d8a7d4aaa11e4c60f44565d74d" class="article" itemscope itemprop="blogPost">
                   <div class="article-meta">
                     <a href="https://qichengzx.github.io/2017/08/13/leetcode-array-partition-i.html" class="article-date">
@@ -1942,131 +2091,6 @@ yaf.environ=&quot;dev&quot;
                 </article>
 
         
-        
-                <article id="c5fa95094cfb7a0da8abdcbe35816973" class="article" itemscope itemprop="blogPost">
-                  <div class="article-meta">
-                    <a href="https://qichengzx.github.io/2016/10/21/beego-in-docker.html" class="article-date">
-                      <time itemprop="datePublished">2016-10-21 10:02:02</time>
-                    </a>
-                    <div class="article-category">
-                      <a class="article-category-link" href="/categories/golang">golang</a>
-                    </div>
-                  </div>
-                  <div class="article-inner">
-                    <header class="article-header">
-                      <h1 itemprop="name">
-                        <a class="article-title" href="https://qichengzx.github.io/2016/10/21/beego-in-docker.html">用Docker部署Golang Beego框架应用</a>
-                      </h1>
-                    </header>
-                    <div class="article-entry" itemprop="articleBody">
-                      <p>Docker是什么就不说了。
-Golang是什么也不说了。
-Beego是什么就更不用说了。</p>
-
-<p>最近Beego项目完成，研究怎么部署。因为Docker部署起来更简单更快速，所以就说下怎么在docker里部署beego应用。</p>
-
-<h4>写在前面</h4>
-
-<p>假设你的应用路径为 /go/app；
-假设已配置好docker的相关东西。
-假设使用 <a href="https://github.com/tools/godep">godep</a> 作为依赖管理工具
-示例中开放端口为80，需要与app.conf中的端口一致，可以自行修改。</p>
-
-<h4>配置</h4>
-
-<p>在 /go/app 目录新建Dockerfile。</p>
-
-<pre><code>FROM golang:1.7.1-alpine
-
-MAINTAINER youremail &lt;youremail@xxx.com&gt;
-
-RUN apk add --update go git
-
-ADD ./ /go/src/app
-
-RUN cd /go/src/app \
-	&amp;&amp; go get github.com/astaxie/beego \
-	&amp;&amp; go get github.com/tools/godep \
-	&amp;&amp; godep update -goversion \
-	&amp;&amp; godep get \
-	&amp;&amp; godep save \
-	&amp;&amp; go build
-
-EXPOSE 80
-
-EXTRYPOINT /go/src/app/app
-</code></pre>
-
-<p>本例使用 golang:1.7.1-alpine 作为基础镜像。golang的所有镜像见<a href="https://hub.docker.com/_/golang/">这里</a>。</p>
-
-<h4>构建</h4>
-
-<pre><code>docker build -t app .
-</code></pre>
-
-<h4>运行</h4>
-
-<pre><code>docker run -d -p 8080:80 app
-</code></pre>
-
-<h4>访问</h4>
-
-<p>使用nginx反向代理访问docker中的go应用。</p>
-
-<pre><code>server {
-    listen       80;
-    server_name  app.com;
-
-    charset utf-8;
-    access_log  logs/app.access.log;
-
-    location / {
-        try_files /_not_exists_ @backend;
-    }
-    if (!-e $request_filename) {
-        return 404;
-    }
-
-    location @backend {
-        proxy_set_header X-Forwarded-For $remote_addr;
-        proxy_set_header Host            $http_host;
-
-        proxy_pass http://192.168.99.100:8080; // 192.168.99.100为docker machine的ip,8080为 docker run 时指定的本地端口。
-    }
-}
-</code></pre>
-
-<h4>相关资料</h4>
-
-<p><a href="https://yq.aliyun.com/articles/57247">如何使用Docker快速部署go-web应用程序</a>
-<a href="https://blog.golang.org/docker">Deploying Go servers with Docker</a>
-<a href="http://www.infoq.com/cn/articles/how-to-deploy-a-go-web-application-with-docker?utm_source=infoq&amp;utm_medium=related_content_link&amp;utm_campaign=relatedContent_articles_clk">如何使用Docker部署Go Web应用程序</a>
-<a href="https://www.iron.io/the-easiest-way-to-develop-with-go%E2%80%8A-%E2%80%8Aintroducing-a-docker-based-go-tool/">The Easiest Way to Develop with Go — Introducing a Docker Based Go Tool</a>
-<a href="https://semaphoreci.com/community/tutorials/how-to-deploy-a-go-web-application-with-docker">How To Deploy a Go Web Application with Docker</a>
-<a href="https://beego.me/docs/deploy/nginx.md">nginx 部署</a></p>
-
-                    </div>
-                    <footer class="article-footer">
-                      <a href="https://qichengzx.github.io/2016/10/21/beego-in-docker.html#comments" class="article-comment-link">Comments</a>
-                      
-                        <ul class="article-tag-list">
-                        
-                          <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="/tags/go">go</a>
-                          </li>
-                        
-                        </ul>
-                      
-                    </footer>
-                  </div>
-                  <nav id="article-nav">
-                    
-
-                    
-                  </nav>
-                </article>
-
-        
 
         
         
@@ -2131,7 +2155,7 @@ EXTRYPOINT /go/src/app/app
                       
                       <li class="category-list-item">
                         <a class="category-list-link" href="/categories/default/">default</a>
-                        <span class="category-list-count">7</span>
+                        <span class="category-list-count">8</span>
                       </li>
                       
                       <li class="category-list-item">
@@ -2249,7 +2273,7 @@ EXTRYPOINT /go/src/app/app
                       
                       <li class="tag-list-item">
                         <a class="tag-list-link" href="/tags/go/">go</a>
-                        <span class="tag-list-count">23</span>
+                        <span class="tag-list-count">24</span>
                       </li>
                       
                       <li class="tag-list-item">
@@ -2540,6 +2564,11 @@ EXTRYPOINT /go/src/app/app
                     <span class="archive-list-count">1</span>
                   </li>
                   
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2021/07">2021/07</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
                 </ul>
               </div>
             </div>
@@ -2551,6 +2580,10 @@ EXTRYPOINT /go/src/app/app
               <h3 class="widget-title">RECENTS</h3>
               <div class="widget">
                 <ul>
+                  
+                  <li>
+                    <a href="https://qichengzx.github.io/2021/07/18/pipeline-pattern-in-go-part-1.html">Go 流水线模式</a>
+                  </li>
                   
                   <li>
                     <a href="https://qichengzx.github.io/2021/01/01/unmarshaling-time-values-from-json.html">Go json 时间格式解析</a>
@@ -2566,10 +2599,6 @@ EXTRYPOINT /go/src/app/app
                   
                   <li>
                     <a href="https://qichengzx.github.io/2018/06/15/qq-007-captcha.html">腾讯防水墙验证码使用</a>
-                  </li>
-                  
-                  <li>
-                    <a href="https://qichengzx.github.io/2018/05/29/git-pull-upstream.html">Git 同步上游源更改</a>
                   </li>
                   
                 </ul>
