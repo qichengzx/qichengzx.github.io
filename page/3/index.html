@@ -64,6 +64,116 @@
       
         
         
+                <article id="d1d4df1faa6ad7a8b057ed819f7660d0" class="article" itemscope itemprop="blogPost">
+                  <div class="article-meta">
+                    <a href="https://qichengzx.github.io/2017/09/23/redis-geo-with-redigo-in-golang-part-2.html" class="article-date">
+                      <time itemprop="datePublished">2017-09-23 18:22:01</time>
+                    </a>
+                    <div class="article-category">
+                      <a class="article-category-link" href="/categories/golang">golang</a>
+                    </div>
+                  </div>
+                  <div class="article-inner">
+                    <header class="article-header">
+                      <h1 itemprop="name">
+                        <a class="article-title" href="https://qichengzx.github.io/2017/09/23/redis-geo-with-redigo-in-golang-part-2.html">Go语言使用redigo操作GEO(2) - 获取两点距离</a>
+                      </h1>
+                    </header>
+                    <div class="article-entry" itemprop="articleBody">
+                      <p><a href="/2017/09/17/redis-geo-with-redigo-in-golang-part-1.html">上一篇</a>简单记录了在Go中使用redigo这个包操作Redis，简单的使用了添加和查询。</p>
+
+<p>今天来试一下计算距离。之前也写到过在<a href="/2017/06/27/order-by-distance-in-mysql.html">MySQL中计算坐标的距离，及排序</a>。</p>
+
+<p>在上一篇中疏忽了一个问题，使用的几个坐标点是用高德地图获取到的，但是Redis中GEO是使用了 WGS84 坐标系的。实际使用中需要注意一下，这里有一篇文章详细介绍了不同坐标系的区别。</p>
+
+<h4>添加测试数据</h4>
+
+<p>先添加几条测试用的数据。</p>
+
+<pre><code class="language-Go">push(&quot;citylist&quot;, &quot;tianjin&quot;, 39.1252291, 117.0153461)
+push(&quot;citylist&quot;, &quot;tangshan&quot;, 39.0507819, 116.9421939)
+push(&quot;citylist&quot;, &quot;baoding&quot;, 38.8712164, 115.3353061)
+</code></pre>
+
+<p>添加了三个城市。</p>
+
+<h4>查询距离</h4>
+
+<p>使用GEODIST方法查询两点的距离。手册<a href="http://redisdoc.com/geo/geodist.html">见此</a>。</p>
+
+<p>语法： GEODIST key member1 member2 [unit]</p>
+
+<p>第四个参数可选,可选值为：</p>
+
+<ul>
+<li>m 表示单位为米。</li>
+<li>km 表示单位为千米。</li>
+<li>mi 表示单位为英里。</li>
+<li>ft 表示单位为英尺。</li>
+</ul>
+
+<p>默认是米。</p>
+
+<p>简单写一个方法，传入key和要查询的两点，及距离单位。</p>
+
+<pre><code class="language-Go">func dist(key, m1, m2, unit string) float64 {
+	rc := RedisClient.Get()
+	defer rc.Close()
+
+	rs1, _ := redis.Float64(rc.Do(&quot;GEODIST&quot;, key, m1, m2, unit))
+
+	return rs
+}
+</code></pre>
+
+<p>GEODIST返回值是双精度浮点数，这里直接使用redigo包的Float64方法转换返回了。</p>
+
+<h4>使用</h4>
+
+<pre><code class="language-Go">rs1 := dist(&quot;citylist&quot;, &quot;beijing&quot;, &quot;tianjin&quot;, &quot;km&quot;)
+rs2 := dist(&quot;citylist&quot;, &quot;beijing&quot;, &quot;tangshan&quot;, &quot;km&quot;)
+rs3 := dist(&quot;citylist&quot;, &quot;beijing&quot;, &quot;baoding&quot;, &quot;km&quot;)
+
+fmt.Println(&quot;北京-天津&quot;, rs1)
+fmt.Println(&quot;北京-唐山&quot;, rs2)
+fmt.Println(&quot;北京-保定&quot;, rs3)
+</code></pre>
+
+                    </div>
+                    <footer class="article-footer">
+                      <a href="https://qichengzx.github.io/2017/09/23/redis-geo-with-redigo-in-golang-part-2.html#comments" class="article-comment-link">Comments</a>
+                      
+                        <ul class="article-tag-list">
+                        
+                          <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="/tags/go">go</a>
+                          </li>
+                        
+                          <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="/tags/redis">redis</a>
+                          </li>
+                        
+                          <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="/tags/redigo">redigo</a>
+                          </li>
+                        
+                          <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="/tags/geo">geo</a>
+                          </li>
+                        
+                        </ul>
+                      
+                    </footer>
+                  </div>
+                  <nav id="article-nav">
+                    
+
+                    
+                  </nav>
+                </article>
+
+        
+        
                 <article id="9ea3b5631aa06bd499297293aeb51d6a" class="article" itemscope itemprop="blogPost">
                   <div class="article-meta">
                     <a href="https://qichengzx.github.io/2017/09/17/redis-geo-with-redigo-in-golang-part-1.html" class="article-date">
@@ -246,8 +356,8 @@ Explanation: n is 2, and the maximum sum of pairs is 4 = min(1, 2) + min(3, 4).
 
 <h6>Note:</h6>
 
-<p>​   n is a positive integer, which is in the range of [1, 10000].
-​   All the integers in the array will be in the range of [-10000, 10000].</p>
+<p>​	n is a positive integer, which is in the range of [1, 10000].
+​	All the integers in the array will be in the range of [-10000, 10000].</p>
 
 <p>题目大意：</p>
 
@@ -883,11 +993,11 @@ form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 
 
 <p>如果没有提到以下几个注意事项，将是我们的失职。</p>
 
-<p>​   首先，只能推送当前服务器上的资源-这意味着无法推送托管在第三方服务器或CDN上的资源。</p>
+<p>​	首先，只能推送当前服务器上的资源-这意味着无法推送托管在第三方服务器或CDN上的资源。</p>
 
-<p>​   第二，除非能确定客户端确实需要，否则不要推送，这样会浪费带宽。当浏览器已经缓存了某些资源时， 必须要避免推送。</p>
+<p>​	第二，除非能确定客户端确实需要，否则不要推送，这样会浪费带宽。当浏览器已经缓存了某些资源时， 必须要避免推送。</p>
 
-<p>​   第三，天真的把所有资源推送到页面会使性能更糟糕。</p>
+<p>​	第三，天真的把所有资源推送到页面会使性能更糟糕。</p>
 
 <p>以下链接可以作为补充阅读：</p>
 
@@ -2013,84 +2123,6 @@ r.GET(&quot;/&quot;, Index)
                 </article>
 
         
-        
-                <article id="21b1d6bb006767ea7ba5a2566c9d7e1b" class="article" itemscope itemprop="blogPost">
-                  <div class="article-meta">
-                    <a href="https://qichengzx.github.io/2016/11/02/install-yaf-on-mac.html" class="article-date">
-                      <time itemprop="datePublished">2016-11-02 17:57:38</time>
-                    </a>
-                    <div class="article-category">
-                      <a class="article-category-link" href="/categories/php">php</a>
-                    </div>
-                  </div>
-                  <div class="article-inner">
-                    <header class="article-header">
-                      <h1 itemprop="name">
-                        <a class="article-title" href="https://qichengzx.github.io/2016/11/02/install-yaf-on-mac.html">Mac brew php7.1环境下安装Yaf</a>
-                      </h1>
-                    </header>
-                    <div class="article-entry" itemprop="articleBody">
-                      <p><img src="/images/php/think201-emergence-of-php7.jpg" alt="" /></p>
-
-<p>开发机一直使用brew来安装PHP及其他的环境，今天把PHP升到7.1，由于7.1版本下还没有<a href="http://www.laruence.com/manual/">yaf</a>的源，所以无法使用brew安装，只能编译安装了。</p>
-
-<p>首先下载yaf，解压，进入目录。</p>
-
-<pre><code>git clone git@github.com:laruence/yaf.git
-
-$(brew --prefix homebrew/php/php71)/bin/phpize
-
-./configure --with-php-config=$(brew --prefix homebrew/php/php71)/bin/php-config
-
-make &amp;&amp; make install
-
-make test
-
-</code></pre>
-
-<p>$(brew &ndash;prefix homebrew/php/php71) 即 brew info php71结果中的path值。</p>
-
-<p>由于brew安装PHP会在php.ini同级目录创建conf.d目录，并把扩展的配置文件写在这里，一目了然知道都安装了哪些扩展，所以也以同样方式在此目录创建ext-yaf.ini。</p>
-
-<p>make install 后会显示，具体路径可能会不一样。</p>
-
-<pre><code>Installing shared extensions:     /usr/local/Cellar/php71/7.1.0-rc.5_9/lib/php/extensions/no-debug-non-zts-20160303/
-</code></pre>
-
-<p>这个目录即扩展.so的存放目录。下边会用到。</p>
-
-<pre><code>[yaf]
-extension=&quot;/usr/local/opt/php71/lib/php/extensions/no-debug-non-zts-20160303/yaf.so&quot;
-yaf.environ=&quot;dev&quot;
-;yaf.use_namespace = 1
-</code></pre>
-
-<p>至此，重启php-fpm就可以了。</p>
-
-<p>图片来自：<a href="https://think201.com/blog/2016/emergence-of-php7/">Emergence of PHP7</a></p>
-
-                    </div>
-                    <footer class="article-footer">
-                      <a href="https://qichengzx.github.io/2016/11/02/install-yaf-on-mac.html#comments" class="article-comment-link">Comments</a>
-                      
-                        <ul class="article-tag-list">
-                        
-                          <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="/tags/php">php</a>
-                          </li>
-                        
-                        </ul>
-                      
-                    </footer>
-                  </div>
-                  <nav id="article-nav">
-                    
-
-                    
-                  </nav>
-                </article>
-
-        
 
         
         
@@ -2133,6 +2165,10 @@ yaf.environ=&quot;dev&quot;
 
 
 
+  <a class="page-number" href="/page/7/">7</a>
+
+
+
 
   <a class="extend next" rel="next" href="/page/4/">Next »</a>
 
@@ -2155,7 +2191,7 @@ yaf.environ=&quot;dev&quot;
                       
                       <li class="category-list-item">
                         <a class="category-list-link" href="/categories/default/">default</a>
-                        <span class="category-list-count">8</span>
+                        <span class="category-list-count">9</span>
                       </li>
                       
                       <li class="category-list-item">
@@ -2372,6 +2408,11 @@ yaf.environ=&quot;dev&quot;
                       </li>
                       
                       <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/rust/">rust</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
                         <a class="tag-list-link" href="/tags/ssl/">ssl</a>
                         <span class="tag-list-count">1</span>
                       </li>
@@ -2569,6 +2610,11 @@ yaf.environ=&quot;dev&quot;
                     <span class="archive-list-count">1</span>
                   </li>
                   
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2025/01">2025/01</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
                 </ul>
               </div>
             </div>
@@ -2580,6 +2626,10 @@ yaf.environ=&quot;dev&quot;
               <h3 class="widget-title">RECENTS</h3>
               <div class="widget">
                 <ul>
+                  
+                  <li>
+                    <a href="https://qichengzx.github.io/2025/01/12/08-rustlings-enums.html">08-rustlings-enums</a>
+                  </li>
                   
                   <li>
                     <a href="https://qichengzx.github.io/2021/07/18/pipeline-pattern-in-go-part-1.html">Go 流水线模式</a>
@@ -2597,10 +2647,6 @@ yaf.environ=&quot;dev&quot;
                     <a href="https://qichengzx.github.io/2019/01/01/go-in-the-browser.html">【译】Go和WebAssembly：在浏览器中运行Go程序</a>
                   </li>
                   
-                  <li>
-                    <a href="https://qichengzx.github.io/2018/06/15/qq-007-captcha.html">腾讯防水墙验证码使用</a>
-                  </li>
-                  
                 </ul>
               </div>
             </div>
@@ -2614,7 +2660,7 @@ yaf.environ=&quot;dev&quot;
         <footer id="footer">
           <div class="outer">
             <div id="footer-info" class="inner">
-              &copy; 2021 启程<br>
+              &copy; 2025 启程<br>
               Powered by <a href="https://github.com/qichengzx/gopress" target="_blank">gopress</a>
             </div>
             </div>

@@ -113,7 +113,7 @@ $channel-&gt;queue_bind($queue_name,$exchange_name,$binding_key);
 
 <p>为了说明，考虑如下的场景：</p>
 
-<p><img src="/images/rabbitmq/direct-exchange.png" alt="" /></p>
+<p><img src="/images/rabbitmq/direct-exchange.png" alt="" title="" /></p>
 
 <p>在这个场景中，我们可以看到direct类型的交换器X有两个队列，第一个队列使用orange作为binding key，第二个队列有两个绑定，一个是black另一个是green。</p>
 
@@ -121,7 +121,7 @@ $channel-&gt;queue_bind($queue_name,$exchange_name,$binding_key);
 
 <h3>多个绑定</h3>
 
-<p><img src="/images/rabbitmq/direct-exchange-multiple.png" alt="" /></p>
+<p><img src="/images/rabbitmq/direct-exchange-multiple.png" alt="" title="" /></p>
 
 <p>使用相同的binding key绑定多个队列是合法的。在这个例子中，我们会使用black作为binding key为X和Q1之间添加一个绑定。这样一来，direct 交换器就表现得跟fanout交换器一样，分发消息到匹配的队列。routing key为black的消息就会被分发到Q1和Q2。</p>
 
@@ -153,7 +153,7 @@ $channel-&gt;basic_publish($msg,'direct_logs',$severity);
 
 <h3>整合</h3>
 
-<p><img src="/images/rabbitmq/python-four.png" alt="" /></p>
+<p><img src="/images/rabbitmq/python-four.png" alt="" title="" /></p>
 
 <p>emit_log_direct.php类的代码为：</p>
 
@@ -297,7 +297,7 @@ $connection-&gt;close();
                       
                       <li class="category-list-item">
                         <a class="category-list-link" href="/categories/default/">default</a>
-                        <span class="category-list-count">8</span>
+                        <span class="category-list-count">9</span>
                       </li>
                       
                       <li class="category-list-item">
@@ -514,6 +514,11 @@ $connection-&gt;close();
                       </li>
                       
                       <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/rust/">rust</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
                         <a class="tag-list-link" href="/tags/ssl/">ssl</a>
                         <span class="tag-list-count">1</span>
                       </li>
@@ -711,6 +716,11 @@ $connection-&gt;close();
                     <span class="archive-list-count">1</span>
                   </li>
                   
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2025/01">2025/01</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
                 </ul>
               </div>
             </div>
@@ -722,6 +732,10 @@ $connection-&gt;close();
               <h3 class="widget-title">RECENTS</h3>
               <div class="widget">
                 <ul>
+                  
+                  <li>
+                    <a href="https://qichengzx.github.io/2025/01/12/08-rustlings-enums.html">08-rustlings-enums</a>
+                  </li>
                   
                   <li>
                     <a href="https://qichengzx.github.io/2021/07/18/pipeline-pattern-in-go-part-1.html">Go 流水线模式</a>
@@ -739,10 +753,6 @@ $connection-&gt;close();
                     <a href="https://qichengzx.github.io/2019/01/01/go-in-the-browser.html">【译】Go和WebAssembly：在浏览器中运行Go程序</a>
                   </li>
                   
-                  <li>
-                    <a href="https://qichengzx.github.io/2018/06/15/qq-007-captcha.html">腾讯防水墙验证码使用</a>
-                  </li>
-                  
                 </ul>
               </div>
             </div>
@@ -756,7 +766,7 @@ $connection-&gt;close();
         <footer id="footer">
           <div class="outer">
             <div id="footer-info" class="inner">
-              &copy; 2021 启程<br>
+              &copy; 2025 启程<br>
               Powered by <a href="https://github.com/qichengzx/gopress" target="_blank">gopress</a>
             </div>
             </div>

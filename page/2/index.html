@@ -64,6 +64,83 @@
       
         
         
+                <article id="269e871b9f4cf4386dbc37a70393b0bb" class="article" itemscope itemprop="blogPost">
+                  <div class="article-meta">
+                    <a href="https://qichengzx.github.io/2018/05/03/go-recursion.html" class="article-date">
+                      <time itemprop="datePublished">2018-05-03 15:15:41</time>
+                    </a>
+                    <div class="article-category">
+                      <a class="article-category-link" href="/categories/golang">golang</a>
+                    </div>
+                  </div>
+                  <div class="article-inner">
+                    <header class="article-header">
+                      <h1 itemprop="name">
+                        <a class="article-title" href="https://qichengzx.github.io/2018/05/03/go-recursion.html">Go 递归</a>
+                      </h1>
+                    </header>
+                    <div class="article-entry" itemprop="articleBody">
+                      <p>递归，就是在运行的过程中调用自己。</p>
+
+<p>通过以下阶乘函数来看下递归的写法：</p>
+
+<pre><code class="language-golang">func factorial(x uint) uint {
+  if x == 0 {
+    return 1
+  }
+  return x * factorial(x-1)
+}
+</code></pre>
+
+<p>factorial 函数调用自己，形成函数递归，为了更好地理解这个函数是如何工作的，可以通过 factorial(2) 来理解。</p>
+
+<ul>
+<li><p>x == 0 ？ 不等于, x = 2</p></li>
+
+<li><p>计算 x - 1 的阶乘</p>
+
+<ul>
+<li><p>x == 0 ? 不等于, x = 1</p></li>
+
+<li><p>计算 x - 1 的阶乘</p>
+
+<ul>
+<li>x == 0 ? 等于, 返回 1</li>
+</ul></li>
+
+<li><p>返回 1 * 1</p></li>
+</ul></li>
+
+<li><p>返回 2 * 1</p></li>
+</ul>
+
+<p>递归函数通过不断的调用自身完成需求，需要注意的是需要设置退出条件，否则就死循环了。</p>
+
+<p>递归函数可以非常方便的解决数学上的问题，如阶乘，斐波那契数列等。</p>
+
+                    </div>
+                    <footer class="article-footer">
+                      <a href="https://qichengzx.github.io/2018/05/03/go-recursion.html#comments" class="article-comment-link">Comments</a>
+                      
+                        <ul class="article-tag-list">
+                        
+                          <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="/tags/go">go</a>
+                          </li>
+                        
+                        </ul>
+                      
+                    </footer>
+                  </div>
+                  <nav id="article-nav">
+                    
+
+                    
+                  </nav>
+                </article>
+
+        
+        
                 <article id="0df34dd8d17e32d099eb2490e59ea5f2" class="article" itemscope itemprop="blogPost">
                   <div class="article-meta">
                     <a href="https://qichengzx.github.io/2018/05/02/go-closure.html" class="article-date">
@@ -895,116 +972,6 @@ CMD [&quot;./app&quot;]
                 </article>
 
         
-        
-                <article id="d1d4df1faa6ad7a8b057ed819f7660d0" class="article" itemscope itemprop="blogPost">
-                  <div class="article-meta">
-                    <a href="https://qichengzx.github.io/2017/09/23/redis-geo-with-redigo-in-golang-part-2.html" class="article-date">
-                      <time itemprop="datePublished">2017-09-23 18:22:01</time>
-                    </a>
-                    <div class="article-category">
-                      <a class="article-category-link" href="/categories/golang">golang</a>
-                    </div>
-                  </div>
-                  <div class="article-inner">
-                    <header class="article-header">
-                      <h1 itemprop="name">
-                        <a class="article-title" href="https://qichengzx.github.io/2017/09/23/redis-geo-with-redigo-in-golang-part-2.html">Go语言使用redigo操作GEO(2) - 获取两点距离</a>
-                      </h1>
-                    </header>
-                    <div class="article-entry" itemprop="articleBody">
-                      <p><a href="/2017/09/17/redis-geo-with-redigo-in-golang-part-1.html">上一篇</a>简单记录了在Go中使用redigo这个包操作Redis，简单的使用了添加和查询。</p>
-
-<p>今天来试一下计算距离。之前也写到过在<a href="/2017/06/27/order-by-distance-in-mysql.html">MySQL中计算坐标的距离，及排序</a>。</p>
-
-<p>在上一篇中疏忽了一个问题，使用的几个坐标点是用高德地图获取到的，但是Redis中GEO是使用了 WGS84 坐标系的。实际使用中需要注意一下，这里有一篇文章详细介绍了不同坐标系的区别。</p>
-
-<h4>添加测试数据</h4>
-
-<p>先添加几条测试用的数据。</p>
-
-<pre><code class="language-Go">push(&quot;citylist&quot;, &quot;tianjin&quot;, 39.1252291, 117.0153461)
-push(&quot;citylist&quot;, &quot;tangshan&quot;, 39.0507819, 116.9421939)
-push(&quot;citylist&quot;, &quot;baoding&quot;, 38.8712164, 115.3353061)
-</code></pre>
-
-<p>添加了三个城市。</p>
-
-<h4>查询距离</h4>
-
-<p>使用GEODIST方法查询两点的距离。手册<a href="http://redisdoc.com/geo/geodist.html">见此</a>。</p>
-
-<p>语法： GEODIST key member1 member2 [unit]</p>
-
-<p>第四个参数可选,可选值为：</p>
-
-<ul>
-<li>m 表示单位为米。</li>
-<li>km 表示单位为千米。</li>
-<li>mi 表示单位为英里。</li>
-<li>ft 表示单位为英尺。</li>
-</ul>
-
-<p>默认是米。</p>
-
-<p>简单写一个方法，传入key和要查询的两点，及距离单位。</p>
-
-<pre><code class="language-Go">func dist(key, m1, m2, unit string) float64 {
-	rc := RedisClient.Get()
-	defer rc.Close()
-
-	rs1, _ := redis.Float64(rc.Do(&quot;GEODIST&quot;, key, m1, m2, unit))
-
-	return rs
-}
-</code></pre>
-
-<p>GEODIST返回值是双精度浮点数，这里直接使用redigo包的Float64方法转换返回了。</p>
-
-<h4>使用</h4>
-
-<pre><code class="language-Go">rs1 := dist(&quot;citylist&quot;, &quot;beijing&quot;, &quot;tianjin&quot;, &quot;km&quot;)
-rs2 := dist(&quot;citylist&quot;, &quot;beijing&quot;, &quot;tangshan&quot;, &quot;km&quot;)
-rs3 := dist(&quot;citylist&quot;, &quot;beijing&quot;, &quot;baoding&quot;, &quot;km&quot;)
-
-fmt.Println(&quot;北京-天津&quot;, rs1)
-fmt.Println(&quot;北京-唐山&quot;, rs2)
-fmt.Println(&quot;北京-保定&quot;, rs3)
-</code></pre>
-
-                    </div>
-                    <footer class="article-footer">
-                      <a href="https://qichengzx.github.io/2017/09/23/redis-geo-with-redigo-in-golang-part-2.html#comments" class="article-comment-link">Comments</a>
-                      
-                        <ul class="article-tag-list">
-                        
-                          <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="/tags/go">go</a>
-                          </li>
-                        
-                          <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="/tags/redis">redis</a>
-                          </li>
-                        
-                          <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="/tags/redigo">redigo</a>
-                          </li>
-                        
-                          <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="/tags/geo">geo</a>
-                          </li>
-                        
-                        </ul>
-                      
-                    </footer>
-                  </div>
-                  <nav id="article-nav">
-                    
-
-                    
-                  </nav>
-                </article>
-
-        
 
         
         
@@ -1047,6 +1014,10 @@ fmt.Println(&quot;北京-保定&quot;, rs3)
 
 
 
+  <a class="page-number" href="/page/7/">7</a>
+
+
+
 
   <a class="extend next" rel="next" href="/page/3/">Next »</a>
 
@@ -1069,7 +1040,7 @@ fmt.Println(&quot;北京-保定&quot;, rs3)
                       
                       <li class="category-list-item">
                         <a class="category-list-link" href="/categories/default/">default</a>
-                        <span class="category-list-count">8</span>
+                        <span class="category-list-count">9</span>
                       </li>
                       
                       <li class="category-list-item">
@@ -1286,6 +1257,11 @@ fmt.Println(&quot;北京-保定&quot;, rs3)
                       </li>
                       
                       <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/rust/">rust</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
                         <a class="tag-list-link" href="/tags/ssl/">ssl</a>
                         <span class="tag-list-count">1</span>
                       </li>
@@ -1483,6 +1459,11 @@ fmt.Println(&quot;北京-保定&quot;, rs3)
                     <span class="archive-list-count">1</span>
                   </li>
                   
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2025/01">2025/01</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
                 </ul>
               </div>
             </div>
@@ -1494,6 +1475,10 @@ fmt.Println(&quot;北京-保定&quot;, rs3)
               <h3 class="widget-title">RECENTS</h3>
               <div class="widget">
                 <ul>
+                  
+                  <li>
+                    <a href="https://qichengzx.github.io/2025/01/12/08-rustlings-enums.html">08-rustlings-enums</a>
+                  </li>
                   
                   <li>
                     <a href="https://qichengzx.github.io/2021/07/18/pipeline-pattern-in-go-part-1.html">Go 流水线模式</a>
@@ -1511,10 +1496,6 @@ fmt.Println(&quot;北京-保定&quot;, rs3)
                     <a href="https://qichengzx.github.io/2019/01/01/go-in-the-browser.html">【译】Go和WebAssembly：在浏览器中运行Go程序</a>
                   </li>
                   
-                  <li>
-                    <a href="https://qichengzx.github.io/2018/06/15/qq-007-captcha.html">腾讯防水墙验证码使用</a>
-                  </li>
-                  
                 </ul>
               </div>
             </div>
@@ -1528,7 +1509,7 @@ fmt.Println(&quot;北京-保定&quot;, rs3)
         <footer id="footer">
           <div class="outer">
             <div id="footer-info" class="inner">
-              &copy; 2021 启程<br>
+              &copy; 2025 启程<br>
               Powered by <a href="https://github.com/qichengzx/gopress" target="_blank">gopress</a>
             </div>
             </div>

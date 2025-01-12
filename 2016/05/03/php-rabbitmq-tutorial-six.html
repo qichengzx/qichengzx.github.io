@@ -102,11 +102,11 @@ echo &quot;[.] Got &quot;, $response, &quot;\n&quot;;
 
 <p>记住刚才的内容，考虑下面的建议：</p>
 
-<p>​   确保可以明显的看出哪个方法调用的是本地的哪个是远程的。</p>
+<p>​	确保可以明显的看出哪个方法调用的是本地的哪个是远程的。</p>
 
-<p>​   系统文档化。让组件之间的依赖变得清晰可见。</p>
+<p>​	系统文档化。让组件之间的依赖变得清晰可见。</p>
 
-<p>​   错误处理。当RPC服务长时间关闭客户端该作何反应？</p>
+<p>​	错误处理。当RPC服务长时间关闭客户端该作何反应？</p>
 
 <p>如果有疑问，则尽量避免使用RPC。如果可以话，你应该使用异步管道——而不是RPC——像阻塞，结果被异步推送到下个计算阶段。</p>
 
@@ -129,13 +129,13 @@ $channel-&gt;basic_publish($msg, '', 'rpc_queue');
 
 <p>AMQP协议定义了14个消息属性。大部分不常用，下面的除外：</p>
 
-<p>​   delivery_mode：值为2时表示持久化，1为临时的。也许你还记得这个属性来自第二节。</p>
+<p>​	delivery_mode：值为2时表示持久化，1为临时的。也许你还记得这个属性来自第二节。</p>
 
-<p>​   content_type：编码格式，比如经常用的JSON格式，良好的做法是设置为：application/json。</p>
+<p>​	content_type：编码格式，比如经常用的JSON格式，良好的做法是设置为：application/json。</p>
 
-<p>​   reply_to：通常用来定义回调队列名称。</p>
+<p>​	reply_to：通常用来定义回调队列名称。</p>
 
-<p>​   correlation_id：用来关联RPC的响应和请求。</p>
+<p>​	correlation_id：用来关联RPC的响应和请求。</p>
 
 <h3>Correlation Id</h3>
 
@@ -151,15 +151,15 @@ $channel-&gt;basic_publish($msg, '', 'rpc_queue');
 
 <p>RPC工作流程：</p>
 
-<p>​   当客户端开始运行时会创建一个匿名独有回调队列。</p>
+<p>​	当客户端开始运行时会创建一个匿名独有回调队列。</p>
 
-<p>​   RPC请求中，客户端消息带有两个属性：reply_to用来设置回调队列，correlation_id用来唯一标识每一个请求。</p>
+<p>​	RPC请求中，客户端消息带有两个属性：reply_to用来设置回调队列，correlation_id用来唯一标识每一个请求。</p>
 
-<p>​   请求被发送到rpc_queue队列。</p>
+<p>​	请求被发送到rpc_queue队列。</p>
 
-<p>​   RPC worker（又称worker）在队列中守护，等待新请求。当请求到达，它会进行处理，然后把结果以消息的形式发送回客户端的队列，队列名便是客户端消息带有的reply_to的值。</p>
+<p>​	RPC worker（又称worker）在队列中守护，等待新请求。当请求到达，它会进行处理，然后把结果以消息的形式发送回客户端的队列，队列名便是客户端消息带有的reply_to的值。</p>
 
-<p>​   客户端等待回调队列中的数据。当消息到达，检查它的correlation_id的值。如果符合客户端发送给RPC服务器中请求的值，客户端会返回响应内容到应用中。</p>
+<p>​	客户端等待回调队列中的数据。当消息到达，检查它的correlation_id的值。如果符合客户端发送给RPC服务器中请求的值，客户端会返回响应内容到应用中。</p>
 
 <h3>整合</h3>
 
@@ -228,11 +228,11 @@ $connection-&gt;close();
 
 <p>服务端代码相当简单：</p>
 
-<p>​   和以往一样我们会从创建连接，频道，和声明队列开始</p>
+<p>​	和以往一样我们会从创建连接，频道，和声明队列开始</p>
 
-<p>​   也许我们想要运行更多的进程。为了在多个服务器之间负载均衡，需要在$channel.basic_qos中设置prefech_count；</p>
+<p>​	也许我们想要运行更多的进程。为了在多个服务器之间负载均衡，需要在$channel.basic_qos中设置prefech_count；</p>
 
-<p>​   我们使用basic_consume访问队列。然后进入while循环等待请求消息，处理，然后返回响应消息。</p>
+<p>​	我们使用basic_consume访问队列。然后进入while循环等待请求消息，处理，然后返回响应消息。</p>
 
 <p>RPC客户端 rpc_client.php：</p>
 
@@ -309,19 +309,19 @@ echo &quot; [.] Got &quot;, $response, &quot;\n&quot;;
 
 <p>这里展现的并不是RPC服务的唯一可能实现，但它有一些重要的优势：</p>
 
-<p>​   如果RPC服务太慢，可以按比例增加运行数量。试试在新控制台裕兴第二个rpc_server.php服务。</p>
+<p>​	如果RPC服务太慢，可以按比例增加运行数量。试试在新控制台裕兴第二个rpc_server.php服务。</p>
 
-<p>​   在客户端，RPC要求只发送和接收一条消息。不能有像队列声明一样的异步调用。结果就是，对于单一的RPC请求，客户端仅需要一个网络往返。</p>
+<p>​	在客户端，RPC要求只发送和接收一条消息。不能有像队列声明一样的异步调用。结果就是，对于单一的RPC请求，客户端仅需要一个网络往返。</p>
 
 <p>现在的代码还是过于简单，并没有想解决更复杂（更重要）的问题，比如：</p>
 
-<p>​   要是没有服务端守护运行，客户端作何反应？</p>
+<p>​	要是没有服务端守护运行，客户端作何反应？</p>
 
-<p>​   RPC客户端是否需要设置超时？</p>
+<p>​	RPC客户端是否需要设置超时？</p>
 
-<p>​   如果服务端引发异常，是否该把它发送到客户端？</p>
+<p>​	如果服务端引发异常，是否该把它发送到客户端？</p>
 
-<p>​   处理前阻止无效消息（如检查范围，类型）进入？</p>
+<p>​	处理前阻止无效消息（如检查范围，类型）进入？</p>
 
 <p>如果想尝试，可以在<a href="https://www.rabbitmq.com/plugins.html">rabbitmq-management</a> 里找到一些有用的查看队列的插件。</p>
 
@@ -381,7 +381,7 @@ echo &quot; [.] Got &quot;, $response, &quot;\n&quot;;
                       
                       <li class="category-list-item">
                         <a class="category-list-link" href="/categories/default/">default</a>
-                        <span class="category-list-count">8</span>
+                        <span class="category-list-count">9</span>
                       </li>
                       
                       <li class="category-list-item">
@@ -598,6 +598,11 @@ echo &quot; [.] Got &quot;, $response, &quot;\n&quot;;
                       </li>
                       
                       <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/rust/">rust</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
                         <a class="tag-list-link" href="/tags/ssl/">ssl</a>
                         <span class="tag-list-count">1</span>
                       </li>
@@ -795,6 +800,11 @@ echo &quot; [.] Got &quot;, $response, &quot;\n&quot;;
                     <span class="archive-list-count">1</span>
                   </li>
                   
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2025/01">2025/01</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
                 </ul>
               </div>
             </div>
@@ -806,6 +816,10 @@ echo &quot; [.] Got &quot;, $response, &quot;\n&quot;;
               <h3 class="widget-title">RECENTS</h3>
               <div class="widget">
                 <ul>
+                  
+                  <li>
+                    <a href="https://qichengzx.github.io/2025/01/12/08-rustlings-enums.html">08-rustlings-enums</a>
+                  </li>
                   
                   <li>
                     <a href="https://qichengzx.github.io/2021/07/18/pipeline-pattern-in-go-part-1.html">Go 流水线模式</a>
@@ -823,10 +837,6 @@ echo &quot; [.] Got &quot;, $response, &quot;\n&quot;;
                     <a href="https://qichengzx.github.io/2019/01/01/go-in-the-browser.html">【译】Go和WebAssembly：在浏览器中运行Go程序</a>
                   </li>
                   
-                  <li>
-                    <a href="https://qichengzx.github.io/2018/06/15/qq-007-captcha.html">腾讯防水墙验证码使用</a>
-                  </li>
-                  
                 </ul>
               </div>
             </div>
@@ -840,7 +850,7 @@ echo &quot; [.] Got &quot;, $response, &quot;\n&quot;;
         <footer id="footer">
           <div class="outer">
             <div id="footer-info" class="inner">
-              &copy; 2021 启程<br>
+              &copy; 2025 启程<br>
               Powered by <a href="https://github.com/qichengzx/gopress" target="_blank">gopress</a>
             </div>
             </div>

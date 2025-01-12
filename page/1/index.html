@@ -64,6 +64,160 @@
       
         
         
+                <article id="53a81c5866df79c1059ad054622e0b12" class="article" itemscope itemprop="blogPost">
+                  <div class="article-meta">
+                    <a href="https://qichengzx.github.io/2025/01/12/08-rustlings-enums.html" class="article-date">
+                      <time itemprop="datePublished">2025-01-12 12:00:52</time>
+                    </a>
+                    <div class="article-category">
+                      <a class="article-category-link" href="/categories/default">default</a>
+                    </div>
+                  </div>
+                  <div class="article-inner">
+                    <header class="article-header">
+                      <h1 itemprop="name">
+                        <a class="article-title" href="https://qichengzx.github.io/2025/01/12/08-rustlings-enums.html">08-rustlings-enums</a>
+                      </h1>
+                    </header>
+                    <div class="article-entry" itemprop="articleBody">
+                      <h4>enums1.rs</h4>
+
+<p>原始代码：</p>
+
+<pre><code class="language-rust">#[derive(Debug)]
+enum Message {
+    // TODO: Define a few types of messages as used below.
+}
+
+fn main() {
+    println!(&quot;{:?}&quot;, Message::Resize);
+    println!(&quot;{:?}&quot;, Message::Move);
+    println!(&quot;{:?}&quot;, Message::Echo);
+    println!(&quot;{:?}&quot;, Message::ChangeColor);
+    println!(&quot;{:?}&quot;, Message::Quit);
+}
+
+</code></pre>
+
+<p>编译报错内容：</p>
+
+<pre><code class="language-shell">error[E0599]: no variant or associated item named `Resize` found for enum `Message` in the current scope
+ --&gt; exercises/08_enums/enums1.rs:7:31
+  |
+2 | enum Message {
+  | ------------ variant or associated item `Resize` not found for this enum
+...
+7 |     println!(&quot;{:?}&quot;, Message::Resize);
+  |                               ^^^^^^ variant or associated item not found in `Message`
+
+error[E0599]: no variant or associated item named `Move` found for enum `Message` in the current scope
+ --&gt; exercises/08_enums/enums1.rs:8:31
+  |
+2 | enum Message {
+  | ------------ variant or associated item `Move` not found for this enum
+...
+8 |     println!(&quot;{:?}&quot;, Message::Move);
+  |                               ^^^^ variant or associated item not found in `Message`
+
+error[E0599]: no variant or associated item named `Echo` found for enum `Message` in the current scope
+ --&gt; exercises/08_enums/enums1.rs:9:31
+  |
+2 | enum Message {
+  | ------------ variant or associated item `Echo` not found for this enum
+...
+9 |     println!(&quot;{:?}&quot;, Message::Echo);
+  |                               ^^^^ variant or associated item not found in `Message`
+
+error[E0599]: no variant or associated item named `ChangeColor` found for enum `Message` in the current scope
+  --&gt; exercises/08_enums/enums1.rs:10:31
+   |
+2  | enum Message {
+   | ------------ variant or associated item `ChangeColor` not found for this enum
+...
+10 |     println!(&quot;{:?}&quot;, Message::ChangeColor);
+   |                               ^^^^^^^^^^^ variant or associated item not found in `Message`
+
+error[E0599]: no variant or associated item named `Quit` found for enum `Message` in the current scope
+  --&gt; exercises/08_enums/enums1.rs:11:31
+   |
+2  | enum Message {
+   | ------------ variant or associated item `Quit` not found for this enum
+...
+11 |     println!(&quot;{:?}&quot;, Message::Quit);
+   |                               ^^^^ variant or associated item not found in `Message`
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `exercises` (bin &quot;enums1&quot;) due to 5 previous errors
+
+</code></pre>
+
+<p>这一节的报错已经很明显，每一个错误都有提示，那么根据提示可以看到，<code>Message</code>枚举缺少字段，所以补全字段即可：</p>
+
+<pre><code class="language-shell">error[E0599]: no variant or associated item named `Resize` found for enum `Message` in the current scope
+ --&gt; exercises/08_enums/enums1.rs:7:31
+  |
+2 | enum Message {
+  | ------------ variant or associated item `Resize` not found for this enum
+</code></pre>
+
+<p>根据main 中的逻辑可以得知，需要有<code>Resize</code>,<code>Move</code>,<code>Echo</code>,<code>ChangeColor</code>和<code>Quit</code>。</p>
+
+<p>补全后：</p>
+
+<pre><code class="language-rust">#[derive(Debug)]
+enum Message {
+    // TODO: Define a few types of messages as used below.
+    Resize,
+    Move,
+    Echo,
+    ChangeColor,
+    Quit,
+}
+
+</code></pre>
+
+<p>将会输出：</p>
+
+<pre><code class="language-shell">Output
+Resize
+Move
+Echo
+ChangeColor
+Quit
+
+
+Exercise done ✓
+Solution for comparison: solutions/08_enums/enums1.rs
+When done experimenting, enter `n` to move on to the next exercise 🦀
+
+Progress: [################################################################&gt;-----------------------------------------------------------------------------------------------------------------------]  33/94
+Current exercise: exercises/08_enums/enums1.rs
+
+</code></pre>
+
+                    </div>
+                    <footer class="article-footer">
+                      <a href="https://qichengzx.github.io/2025/01/12/08-rustlings-enums.html#comments" class="article-comment-link">Comments</a>
+                      
+                        <ul class="article-tag-list">
+                        
+                          <li class="article-tag-list-item">
+                            <a class="article-tag-list-link" href="/tags/rust">rust</a>
+                          </li>
+                        
+                        </ul>
+                      
+                    </footer>
+                  </div>
+                  <nav id="article-nav">
+                    
+
+                    
+                  </nav>
+                </article>
+
+        
+        
                 <article id="37e6ad89f012b41081720afaf9458635" class="article" itemscope itemprop="blogPost">
                   <div class="article-meta">
                     <a href="https://qichengzx.github.io/2021/07/18/pipeline-pattern-in-go-part-1.html" class="article-date">
@@ -2082,83 +2236,6 @@ commit 4
                 </article>
 
         
-        
-                <article id="269e871b9f4cf4386dbc37a70393b0bb" class="article" itemscope itemprop="blogPost">
-                  <div class="article-meta">
-                    <a href="https://qichengzx.github.io/2018/05/03/go-recursion.html" class="article-date">
-                      <time itemprop="datePublished">2018-05-03 15:15:41</time>
-                    </a>
-                    <div class="article-category">
-                      <a class="article-category-link" href="/categories/golang">golang</a>
-                    </div>
-                  </div>
-                  <div class="article-inner">
-                    <header class="article-header">
-                      <h1 itemprop="name">
-                        <a class="article-title" href="https://qichengzx.github.io/2018/05/03/go-recursion.html">Go 递归</a>
-                      </h1>
-                    </header>
-                    <div class="article-entry" itemprop="articleBody">
-                      <p>递归，就是在运行的过程中调用自己。</p>
-
-<p>通过以下阶乘函数来看下递归的写法：</p>
-
-<pre><code class="language-golang">func factorial(x uint) uint {
-  if x == 0 {
-    return 1
-  }
-  return x * factorial(x-1)
-}
-</code></pre>
-
-<p>factorial 函数调用自己，形成函数递归，为了更好地理解这个函数是如何工作的，可以通过 factorial(2) 来理解。</p>
-
-<ul>
-<li><p>x == 0 ？ 不等于, x = 2</p></li>
-
-<li><p>计算 x - 1 的阶乘</p>
-
-<ul>
-<li><p>x == 0 ? 不等于, x = 1</p></li>
-
-<li><p>计算 x - 1 的阶乘</p>
-
-<ul>
-<li>x == 0 ? 等于, 返回 1</li>
-</ul></li>
-
-<li><p>返回 1 * 1</p></li>
-</ul></li>
-
-<li><p>返回 2 * 1</p></li>
-</ul>
-
-<p>递归函数通过不断的调用自身完成需求，需要注意的是需要设置退出条件，否则就死循环了。</p>
-
-<p>递归函数可以非常方便的解决数学上的问题，如阶乘，斐波那契数列等。</p>
-
-                    </div>
-                    <footer class="article-footer">
-                      <a href="https://qichengzx.github.io/2018/05/03/go-recursion.html#comments" class="article-comment-link">Comments</a>
-                      
-                        <ul class="article-tag-list">
-                        
-                          <li class="article-tag-list-item">
-                            <a class="article-tag-list-link" href="/tags/go">go</a>
-                          </li>
-                        
-                        </ul>
-                      
-                    </footer>
-                  </div>
-                  <nav id="article-nav">
-                    
-
-                    
-                  </nav>
-                </article>
-
-        
 
         
         
@@ -2197,6 +2274,10 @@ commit 4
 
 
 
+  <a class="page-number" href="/page/7/">7</a>
+
+
+
 
   <a class="extend next" rel="next" href="/page/2/">Next »</a>
 
@@ -2219,7 +2300,7 @@ commit 4
                       
                       <li class="category-list-item">
                         <a class="category-list-link" href="/categories/default/">default</a>
-                        <span class="category-list-count">8</span>
+                        <span class="category-list-count">9</span>
                       </li>
                       
                       <li class="category-list-item">
@@ -2436,6 +2517,11 @@ commit 4
                       </li>
                       
                       <li class="tag-list-item">
+                        <a class="tag-list-link" href="/tags/rust/">rust</a>
+                        <span class="tag-list-count">1</span>
+                      </li>
+                      
+                      <li class="tag-list-item">
                         <a class="tag-list-link" href="/tags/ssl/">ssl</a>
                         <span class="tag-list-count">1</span>
                       </li>
@@ -2633,6 +2719,11 @@ commit 4
                     <span class="archive-list-count">1</span>
                   </li>
                   
+                  <li class="archive-list-item">
+                    <a class="archive-list-link" href="/archives/2025/01">2025/01</a>
+                    <span class="archive-list-count">1</span>
+                  </li>
+                  
                 </ul>
               </div>
             </div>
@@ -2644,6 +2735,10 @@ commit 4
               <h3 class="widget-title">RECENTS</h3>
               <div class="widget">
                 <ul>
+                  
+                  <li>
+                    <a href="https://qichengzx.github.io/2025/01/12/08-rustlings-enums.html">08-rustlings-enums</a>
+                  </li>
                   
                   <li>
                     <a href="https://qichengzx.github.io/2021/07/18/pipeline-pattern-in-go-part-1.html">Go 流水线模式</a>
@@ -2661,10 +2756,6 @@ commit 4
                     <a href="https://qichengzx.github.io/2019/01/01/go-in-the-browser.html">【译】Go和WebAssembly：在浏览器中运行Go程序</a>
                   </li>
                   
-                  <li>
-                    <a href="https://qichengzx.github.io/2018/06/15/qq-007-captcha.html">腾讯防水墙验证码使用</a>
-                  </li>
-                  
                 </ul>
               </div>
             </div>
@@ -2678,7 +2769,7 @@ commit 4
         <footer id="footer">
           <div class="outer">
             <div id="footer-info" class="inner">
-              &copy; 2021 启程<br>
+              &copy; 2025 启程<br>
               Powered by <a href="https://github.com/qichengzx/gopress" target="_blank">gopress</a>
             </div>
             </div>
